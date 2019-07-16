@@ -8,4 +8,3 @@ export class Submission {
   @Column({ length: 500 })
   title: string;
 }
-
