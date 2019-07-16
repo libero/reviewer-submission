@@ -10,7 +10,17 @@ export class SubmissionService {
     private readonly submissionRepository: Repository<Submission>,
   ) {}
 
-  findAll(): Promise<Submission[]> {
-    return this.submissionRepository.find();
+  async findAll(): Promise<Submission[]> {
+    return await this.submissionRepository.find();
+  }
+
+  async insertOne(): Promise<string> {
+
+    const thing: Submission = {
+      id: 100,
+      title: 'test submission',
+    };
+
+    return this.submissionRepository.save(thing).then(() => 'some string');
   }
 }

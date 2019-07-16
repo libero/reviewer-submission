@@ -6,3 +6,7 @@ type Submission {
 type Query {
   getSubmissions: [Submission!]!
 }
+
+type Mutation {
+  writeSubmission: String!
+}
