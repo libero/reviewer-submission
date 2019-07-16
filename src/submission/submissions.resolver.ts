@@ -19,7 +19,7 @@ export class SubmissionsResolver {
 
   @Query('getSubmissions')
   async getSubmissions(@Args() args, @Info() info): Promise<Submission[]> {
-    return [];
+    return await this.submissionService.findAll();
   }
 
   @Mutation('writeSubmission')
