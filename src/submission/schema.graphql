@@ -1,0 +1,8 @@
+type Submission {
+  id: ID!
+  title: String!
+}
+
+type Query {
+  getSubmissions: [Submission!]!
+}
