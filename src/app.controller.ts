@@ -10,4 +10,11 @@ export class AppController {
   async serveRoot(@Res() res): Promise<any> {
     res.sendFile(resolve('../client/dist/index.html'))
   }
+
+  @Get('/cats')
+  getCats(): Object {
+    return {
+      name: 'Snazzle'
+    }
+  }
 }
