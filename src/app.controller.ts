@@ -6,14 +6,7 @@ import { resolve } from 'path';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get('/cats')
-  getCats(): Object {
-    return {
-      name: 'Snazzle'
-    }
-  }
-
-  @Get('*')
+  @Get('/')
   async serveRoot(@Res() res): Promise<any> {
     res.sendFile(resolve('../client/dist/index.html'))
   }

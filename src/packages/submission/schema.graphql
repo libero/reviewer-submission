@@ -8,5 +8,9 @@ type Query {
 }
 
 type Mutation {
-  writeSubmission: String!
+  createSubmission: Submission!
+}
+
+type Mutation {
+  changeTitle: String!
 }
