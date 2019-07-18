@@ -27,8 +27,8 @@ export class SubmissionsResolver {
     return await this.submissionService.create();
   }
 
-  @Mutation('changeTitle')
-  async changeTitle(@Args('title') id: string, @Args('title') title: string): Promise<Submission> {
+  @Mutation('changeSubmissionTitle')
+  async changeSubmissionTitle(@Args('id') id: string, @Args('title') title: string): Promise<Submission> {
     return await this.submissionService.changeTitle(id, title);
   }
 }
