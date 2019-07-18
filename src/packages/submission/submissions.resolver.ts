@@ -22,9 +22,9 @@ export class SubmissionsResolver {
     return await this.submissionService.findAll();
   }
 
-  @Mutation('createSubmission')
-  async createSubmission(): Promise<Submission> {
-    return await this.submissionService.create();
+  @Mutation('startSubmission')
+  async startSubmission(): Promise<Submission> {
+    return await this.submissionService.start();
   }
 
   @Mutation('changeSubmissionTitle')

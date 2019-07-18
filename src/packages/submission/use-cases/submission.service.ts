@@ -15,7 +15,7 @@ export class SubmissionService {
     return await this.submissionRepository.find();
   }
 
-  async create(): Promise<Submission> {
+  async start(): Promise<Submission> {
     const submission: Submission = Submission.make(uuid())
 
     return this.submissionRepository.save(submission);

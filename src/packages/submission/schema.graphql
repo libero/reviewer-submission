@@ -8,7 +8,7 @@ type Query {
 }
 
 type Mutation {
-  createSubmission: Submission!
+  startSubmission: Submission!
 }
 
 type Mutation {
