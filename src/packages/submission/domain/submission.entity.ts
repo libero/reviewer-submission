@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, CreateDateColumn, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Submission {
@@ -8,7 +8,7 @@ export class Submission {
   @Column({ length: 500 })
   title: string;
 
-  @Column({type: 'timestamp', default: "now()"})
+  @CreateDateColumn()
   updated: Date;
 
   // For now, `lastStepVisited` will always be "title"
