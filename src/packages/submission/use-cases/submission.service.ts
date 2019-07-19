@@ -21,6 +21,12 @@ export class SubmissionService {
     return this.submissionRepository.save(submission);
   }
 
+  async findOne(id: string): Promise<Submission> {
+    const submission: Submission = await this.submissionRepository.findOne(id);
+
+    return submission;
+  }
+
   async changeTitle(id: string, title: string): Promise<Submission> {
     const submission: Submission = await this.submissionRepository.findOne(id)
 

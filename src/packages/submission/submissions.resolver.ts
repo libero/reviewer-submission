@@ -22,6 +22,11 @@ export class SubmissionsResolver {
     return await this.submissionService.findAll();
   }
 
+  @Query('getSubmission')
+  async getSubmission(@Args('id') id: string): Promise<Submission> {
+    return await this.submissionService.findOne(id);
+  }
+
   @Mutation('startSubmission')
   async startSubmission(): Promise<Submission> {
     return await this.submissionService.start();

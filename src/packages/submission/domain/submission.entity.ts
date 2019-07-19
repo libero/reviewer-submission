@@ -8,6 +8,10 @@ export class Submission {
   @Column({ length: 500 })
   title: string;
 
+  @Column({type: 'timestamp', default: "now()"})
+  updated: Date;
+
+  // For now, `lastStepVisited` will always be "title"
   static make(id: string) {
     return new Submission(id, '');
   }

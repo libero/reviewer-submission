@@ -1,10 +1,12 @@
 type Submission {
   id: ID!
   title: String!
+  updated: String!
 }
 
 type Query {
   getSubmissions: [Submission!]!
+  getSubmission(id: ID!): Submission
 }
 
 type Mutation {
