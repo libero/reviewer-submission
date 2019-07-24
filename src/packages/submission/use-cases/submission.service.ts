@@ -16,7 +16,7 @@ export class SubmissionService {
   }
 
   async start(): Promise<Submission> {
-    const submission: Submission = Submission.make(uuid())
+    const submission: Submission = Submission.make(uuid());
 
     return this.submissionRepository.save(submission);
   }
@@ -28,10 +28,10 @@ export class SubmissionService {
   }
 
   async changeTitle(id: string, title: string): Promise<Submission> {
-    const submission: Submission = await this.submissionRepository.findOne(id)
+    const submission: Submission = await this.submissionRepository.findOne(id);
 
-    submission.changeTitle(title)
+    submission.changeTitle(title);
 
-    return this.submissionRepository.save(submission)
+    return this.submissionRepository.save(submission);
   }
 }

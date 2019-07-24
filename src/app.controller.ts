@@ -8,6 +8,6 @@ export class AppController {
 
   @Get('/')
   async serveRoot(@Res() res): Promise<any> {
-    res.sendFile(resolve('../client/dist/index.html'))
+    res.sendFile(resolve('../client/dist/index.html'));
   }
 }
