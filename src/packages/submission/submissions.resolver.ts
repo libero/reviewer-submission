@@ -20,7 +20,6 @@ export class SubmissionsResolver {
   }
 
   @Query('getSubmissions')
-  @UseGuards(GqlAuthGuard)
   async getSubmissions(): Promise<Submission[]> {
     return await this.submissionService.findAll();
   }
