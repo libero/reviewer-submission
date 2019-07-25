@@ -7,8 +7,10 @@ import {
   Resolver,
   Subscription,
 } from '@nestjs/graphql';
+import { UseGuards } from '@nestjs/common';
 import { Submission } from './domain/submission.entity';
 import { SubmissionService } from './use-cases/submission.service';
+import { GqlAuthGuard } from '../auth/graphql.guard';
 
 @Resolver()
 export class SubmissionsResolver {
