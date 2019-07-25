@@ -6,11 +6,14 @@ import { AppService } from './app.service';
 import { ConfigModule } from './packages/config/config.module';
 import { ConfigService } from './packages/config/config.service';
 import { SubmissionModule } from './packages/submission/submission.module';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
   controllers: [AppController],
   imports: [
+    PassportModule.register({defaultStrategy: 'jwt'}),
     GraphQLModule.forRoot({
+      context: ({ req }) => ({ req }),
       typePaths: ['./**/*.graphql'],
     }),
     TypeOrmModule.forRootAsync({
