@@ -2,6 +2,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { JwtPayload } from './types';
+import { JwtService } from '@nestjs/jwt';
 
 // TODO: Remove
 export interface User {
@@ -10,6 +11,9 @@ export interface User {
 
 @Injectable()
 export class AuthService {
+  constructor(
+    private readonly jwtService: JwtService,
+  ) {}
   // - To look up the user from here, we need to inject the UserService
   // The input to this function needs to be the jwt token object
   async validateUser(tokenObj: JwtPayload): Promise<User | null> {

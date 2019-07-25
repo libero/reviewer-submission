@@ -2,6 +2,7 @@ import { Strategy, ExtractJwt } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable} from '@nestjs/common';
 import { JwtPayload } from './types';
+import { jwtSecret } from './constants';
 import { AuthService } from './auth.service';
 
 @Injectable()
@@ -10,16 +11,14 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: process.env.JWT_SECRET,
+      secretOrKey: jwtSecret,
     });
   }
 
   async validate(jwtPayload: JwtPayload): Promise<any> {
+    // NOTE: this currently always returns null - we don't have a way to query a user yet!
     const user = this.authService.validateUser(jwtPayload);
 
-    // This is from the example on nestjs
-    // tslint:disable-next-line
-    console.log('validate');
     if (! user ) {
       throw new Error();
     }
