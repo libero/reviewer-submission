@@ -5,6 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from './packages/config/config.module';
 import { ConfigService } from './packages/config/config.service';
+import { AuthModule } from './packages/auth/auth.module';
 import { SubmissionModule } from './packages/submission/submission.module';
 import { PassportModule } from '@nestjs/passport';
 
@@ -31,6 +32,7 @@ import { PassportModule } from '@nestjs/passport';
       } as TypeOrmModuleOptions),
     }),
     ConfigModule,
+    AuthModule,
     SubmissionModule,
   ],
   providers: [AppService],
