@@ -3,10 +3,10 @@ import { Submission } from './submission.entity';
 
 describe('Submission Entity', () => {
   it ('changeTitle works', () => {
-    const submission = Submission.make(uuid())
+    const submission = Submission.make(uuid());
 
-    submission.changeTitle('foo')
+    submission.changeTitle('foo');
 
-    expect(submission.title).toBe('foo')
-  })
-})
+    expect(submission.title).toBe('foo');
+  });
+});
