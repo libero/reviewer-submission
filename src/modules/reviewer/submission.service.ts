@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuid } from 'uuid';
-import { Submission } from '../domain/submission.entity';
+import { Submission } from '../../packages/submission/submission.entity';
 
 @Injectable()
 export class SubmissionService {

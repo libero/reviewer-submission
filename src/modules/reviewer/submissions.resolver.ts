@@ -8,9 +8,8 @@ import {
   Subscription,
 } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
-import { Submission } from './domain/submission.entity';
-import { SubmissionService } from './use-cases/submission.service';
-import { GqlAuthGuard } from '../auth/graphql.guard';
+import { Submission } from '../../packages/submission/submission.entity';
+import { SubmissionService } from './submission.service';
 
 @Resolver()
 export class SubmissionsResolver {

@@ -3,10 +3,10 @@ import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { GraphQLModule } from '@nestjs/graphql';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ConfigModule } from './packages/config/config.module';
-import { ConfigService } from './packages/config/config.service';
-import { AuthModule } from './packages/auth/auth.module';
-import { SubmissionModule } from './packages/submission/submission.module';
+import { ConfigModule } from './packages-old/config/config.module';
+import { ConfigService } from './packages-old/config/config.service';
+import { AuthModule } from './packages-old/auth/auth.module';
+import { SubmissionModule } from './modules/reviewer/submission.module';
 import { PassportModule } from '@nestjs/passport';
 
 @Module({
