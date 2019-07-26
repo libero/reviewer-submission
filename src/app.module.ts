@@ -15,7 +15,7 @@ import { PassportModule } from '@nestjs/passport';
     PassportModule.register({defaultStrategy: 'jwt'}),
     GraphQLModule.forRoot({
       context: ({ req }) => ({ req }),
-      typePaths: ['./**/*.graphql'],
+      typePaths: ['./modules/**/*.graphql'],
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
