@@ -3,10 +3,10 @@ import { Entity, CreateDateColumn, Column, PrimaryGeneratedColumn } from 'typeor
 import { Submission } from './submission.entity';
 
 export class SubmissionController {
-  repository = null
+  repository = null;
 
   constructor(repo) {
-    this.repository = repo
+    this.repository = repo;
   }
 
   async findAll(): Promise<Submission[]> {

@@ -7,13 +7,13 @@ import { Submission } from '../../packages/submission/submission.entity';
 @Injectable()
 export class SubmissionService {
 
-  controller = null
+  controller = null;
 
   constructor(
     @InjectRepository(Submission)
     private readonly submissionRepository: Repository<Submission>,
   ) {
-    this.controller = new SubmissionController(this.submissionRepository)
+    this.controller = new SubmissionController(this.submissionRepository);
   }
 
   async findAll(): Promise<Submission[]> {
