@@ -1,16 +1,16 @@
 import { v4 as uuid } from 'uuid';
-import { Entity, CreateDateColumn, Column, PrimaryGeneratedColumn } from 'typeorm';
 import { Submission } from './submission.entity';
+import { SubmissionRepository} from './submission.repository';
 
 export class SubmissionController {
   repository = null;
 
-  constructor(repo) {
+  constructor(repo : SubmissionRepository) {
     this.repository = repo;
   }
 
   async findAll(): Promise<Submission[]> {
-    return await this.repository.find();
+    return await this.repository.findAll();
   }
 
   async start(): Promise<Submission> {
@@ -20,9 +20,7 @@ export class SubmissionController {
   }
 
   async findOne(id: string): Promise<Submission> {
-    const submission: Submission = await this.repository.findOne(id);
-
-    return submission;
+    return await this.repository.findById(id);
   }
 
   async changeTitle(id: string, title: string): Promise<Submission> {
