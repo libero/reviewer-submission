@@ -12,7 +12,7 @@ import { Submission } from '../../packages/submission/submission.entity';
 import { SubmissionService } from './submission.service';
 
 @Resolver()
-export class SubmissionsResolver {
+export class SubmissionResolver {
   constructor(
     private readonly submissionService: SubmissionService,
   ) {

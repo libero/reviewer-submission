@@ -6,7 +6,7 @@ import { AppService } from './app.service';
 import { ConfigModule } from './modules/config/config.module';
 import { ConfigService } from './modules/config/config.service';
 import { AuthModule } from './packages-old/auth/auth.module';
-import { SubmissionModule } from './modules/reviewer/submission.module';
+import { SubmissionModule } from './modules/submission-adaptor/submission.module';
 import { PassportModule } from '@nestjs/passport';
 
 @Module({
