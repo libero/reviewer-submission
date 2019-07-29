@@ -1,11 +1,12 @@
 import { v4 as uuid } from 'uuid';
 import { Submission } from './submission.entity';
-import { SubmissionRepository} from './submission.repository';
+// Needed for next stage
+// import { SubmissionRepository} from './submission.repository';
 
 export class SubmissionController {
   repository = null;
 
-  constructor(repo : SubmissionRepository) {
+  constructor(repo : any) {
     this.repository = repo;
   }
 

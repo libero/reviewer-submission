@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SubmissionController } from '../../packages/submission/submission.controller';
 import { Submission } from '../../packages/submission/submission.entity';
-import { knex } from 'knex';
 import { ConfigService } from '../config/config.service';
 
 @Injectable()
@@ -11,11 +10,15 @@ export class SubmissionService {
 
   // Improvements (1) funfix (2) use dto not Submission class
   controller = null;
-  submissionRepository = null;
+  // submissionRepository = null;
 
-  constructor(config: ConfigService) {
-    const connection = new knex(config.getSubmissionRepositoryConnection())
-    this.submissionRepository = new KnexSubmissionRepository(connection);
+  constructor(config: ConfigService,
+    @InjectRepository(Submission)
+    private readonly submissionRepository: Repository<Submission>,
+  ) {
+    // TODO: submissionReposi
+    // const connection = new knex(config.getSubmissionRepositoryConnection())
+    // this.submissionRepository = new KnexSubmissionRepository(connection);
     this.controller = new SubmissionController(this.submissionRepository);
   }
 
