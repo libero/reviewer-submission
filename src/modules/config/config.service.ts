@@ -9,15 +9,15 @@ export class ConfigService {
     // if a .env file is present, store it, otherwise ignore
     if (fs.existsSync(filePath)) {
       const { parsed } = dotenv.config({ path: filePath });
-      this.envConfig = parsed;
+      this.envConfig = parsed || {};
     } else {
       this.envConfig = {};
     }
   }
 
   get(key: string): string {
-    // fallback to process environment config if not found
-    return this.envConfig[key] || process.env[key];
+    // fallback to process environment config if not found and then fall back to empty string
+    return this.envConfig[key] || process.env[key] || '';
   }
 
   getSubmissionRepositoryConnection(): any {

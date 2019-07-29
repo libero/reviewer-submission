@@ -14,6 +14,7 @@ export class SubmissionController {
     return await this.repository
       .map(repo => repo.findAll())
       .getOrElseL(() => {
+
         // tslint:disable-next-line
         console.error('No repo');
 
@@ -28,13 +29,13 @@ export class SubmissionController {
   }
 
   async findOne(id: string): Promise<Submission> {
-    return await this.repository.map(repo => repo.findById(id)).get();
+    return await this.repository.map(async repo => (await repo.findById(id)).get()).get();
   }
 
   async changeTitle(id: string, title: string): Promise<Submission> {
     return await this.repository
       .map(async repo => {
-        const submission: Submission = await repo.findById(id);
+        const submission: Submission = (await repo.findById(id)).get();
 
         submission.changeTitle(title);
 
