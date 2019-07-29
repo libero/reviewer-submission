@@ -23,7 +23,7 @@ export class SubmissionService {
 
     // Obviously, this isn't the way we should do things moving forward, but let's make it work before
     // We refactor it properly.
-    
+
     this.controller = Some(new SubmissionController(
       // This object is actually the submission repository, it just follows the definition provided
       // This is all going to be removed when we add knex
@@ -39,7 +39,7 @@ export class SubmissionService {
   }
 
   async start(): Promise<Submission> {
-    return this.controller.map(controller => controller.start()).get(); 
+    return this.controller.map(controller => controller.start()).get();
   }
 
   async findOne(id: string): Promise<Submission> {
