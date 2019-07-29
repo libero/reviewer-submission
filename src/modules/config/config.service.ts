@@ -20,12 +20,12 @@ export class ConfigService {
     return this.envConfig[key] || process.env[key];
   }
 
-  getSubmissionRepositoryConnection() : any {
+  getSubmissionRepositoryConnection(): any {
     return {
       dialect: 'sqlite3',
       connection: {
         filename: './data.db',
-      }
+      },
     };
   }
 }

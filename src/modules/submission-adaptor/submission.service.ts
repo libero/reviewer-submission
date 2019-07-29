@@ -13,7 +13,7 @@ export class SubmissionService {
   // submissionRepository = null;
 
   constructor(config: ConfigService,
-    @InjectRepository(Submission)
+              @InjectRepository(Submission)
     private readonly submissionRepository: Repository<Submission>,
   ) {
     // TODO: submissionReposi

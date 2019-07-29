@@ -6,7 +6,7 @@ import { Submission } from './submission.entity';
 export class SubmissionController {
   repository = null;
 
-  constructor(repo : any) {
+  constructor(repo: any) {
     this.repository = repo;
   }
 
