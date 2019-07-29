@@ -1,7 +1,11 @@
 import { Entity, CreateDateColumn, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { ISubmission } from './submission.repository';
+
+// This is database logic, that should eventually be decoupled from the interface and moved into
+// /src/modules/.
 
 @Entity()
-export class Submission {
+export class Submission implements ISubmission {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
