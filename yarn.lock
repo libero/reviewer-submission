@@ -2391,6 +2391,45 @@ function-bind@^1.1.1:
   resolved "https://registry.yarnpkg.com/function-bind/-/function-bind-1.1.1.tgz#a56899d3ea3c9bab874bb9773b7c5ede92f4895d"
   integrity sha512-yIovAzMX49sF8Yl58fSCWJ5svSLuaibPxXQJFLmBObTuCr0Mf1KiPopGM9NiFjiYBCbfaa2Fh6breQ6ANVTI0A==
 
+funfix-core@^7.0.1:
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/funfix-core/-/funfix-core-7.0.1.tgz#894a9f39ef582c5d6dcc9ef384381d12819e8094"
+  integrity sha1-iUqfOe9YLF1tzJ7zhDgdEoGegJQ=
+  dependencies:
+    funland "^0.1.4"
+
+funfix-effect@^7.0.1:
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/funfix-effect/-/funfix-effect-7.0.1.tgz#715f0c55a59ae520595da7e39f9ab1e239544069"
+  integrity sha1-cV8MVaWa5SBZXafjn5qx4jlUQGk=
+  dependencies:
+    funfix-core "^7.0.1"
+    funfix-exec "^7.0.1"
+    funland "^0.1.4"
+
+funfix-exec@^7.0.1:
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/funfix-exec/-/funfix-exec-7.0.1.tgz#82e476ec4a29817ccb4740b1700c0a1d9c17734e"
+  integrity sha1-guR27EopgXzLR0CxcAwKHZwXc04=
+  dependencies:
+    funfix-core "^7.0.1"
+    funland "^0.1.4"
+
+funfix@^7.0.1:
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/funfix/-/funfix-7.0.1.tgz#aa33b71622b18bc65570795e1f75199f09bdadda"
+  integrity sha1-qjO3FiKxi8ZVcHleH3UZnwm9rdo=
+  dependencies:
+    funfix-core "^7.0.1"
+    funfix-effect "^7.0.1"
+    funfix-exec "^7.0.1"
+    funland "^0.1.4"
+
+funland@^0.1.4:
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/funland/-/funland-0.1.5.tgz#abbe0c6e8477be1aeac07a17005ca4ca18f8c1a8"
+  integrity sha512-rwAiqVgWEj3+OrIlARf0ebHwcuoAqukkiqfq3+FPf1FAa2/tbdvxr/FPjJD3FnljSuktwWM3f8jHNRS6ASJIsw==
+
 gauge@~2.7.3:
   version "2.7.4"
   resolved "https://registry.yarnpkg.com/gauge/-/gauge-2.7.4.tgz#2c03405c7538c39d7eb37b317022e325fb018bf7"

@@ -30,6 +30,7 @@
     "@types/uuid": "^3.4.5",
     "apollo-server-express": "^2.6.9",
     "dotenv": "^8.0.0",
+    "funfix": "^7.0.1",
     "graphql": "^14.4.2",
     "graphql-tools": "^4.0.5",
     "passport": "^0.4.0",
