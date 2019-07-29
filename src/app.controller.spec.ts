@@ -17,7 +17,7 @@ describe('AppController', () => {
   describe('root', () => {
     it('should send a good healthcheck to the user', () => {
       const mockRes = {
-        status: (code: number) => ({json: (data: any) => ({code, data})}),
+        status: (code: number) => ({json: (data: unknown) => ({code, data})}),
       };
 
       expect(appController.sendHealthCheck(mockRes)).resolves.toEqual({code: 200, data: {ok: true}});

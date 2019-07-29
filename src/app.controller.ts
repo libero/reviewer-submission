@@ -8,12 +8,12 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get('/')
-  async serveRoot(@Res() res): Promise<any> {
+  async serveRoot(@Res() res): Promise<void> {
     res.sendFile(resolve('../client/dist/index.html'));
   }
 
   @Get('/health')
-  async sendHealthCheck(@Res() res): Promise<any> {
+  async sendHealthCheck(@Res() res): Promise<{ok: true}> {
     return res.status(200).json({ok: true});
   }
 

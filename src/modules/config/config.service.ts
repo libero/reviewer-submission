@@ -2,6 +2,13 @@
 import * as dotenv from 'dotenv';
 import * as fs from 'fs';
 
+export interface SubmissionRepositoryConnection {
+  dialect: string;
+  connection: {
+    filename?: string;
+  };
+}
+
 export class ConfigService {
   private readonly envConfig: { [key: string]: string };
 
@@ -20,7 +27,7 @@ export class ConfigService {
     return this.envConfig[key] || process.env[key] || '';
   }
 
-  getSubmissionRepositoryConnection(): any {
+  getSubmissionRepositoryConnection(): SubmissionRepositoryConnection {
     return {
       dialect: 'sqlite3',
       connection: {

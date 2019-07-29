@@ -28,7 +28,7 @@ export class SubmissionService {
       // This object is actually the submission repository, it just follows the definition provided
       // This is all going to be removed when we add knex
     {
-      save: async (s: any) => await submissionRepository.save(s),
+      save: async (s: Submission) => await submissionRepository.save(s),
       findById: async (id: string) => Option.of(await submissionRepository.findOne(id)),
       findAll: async () => await submissionRepository.find(),
     }));
