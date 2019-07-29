@@ -19,4 +19,13 @@ export class ConfigService {
     // fallback to process environment config if not found
     return this.envConfig[key] || process.env[key];
   }
+
+  getSubmissionRepositoryConnection(): any {
+    return {
+      dialect: 'sqlite3',
+      connection: {
+        filename: './data.db',
+      },
+    };
+  }
 }

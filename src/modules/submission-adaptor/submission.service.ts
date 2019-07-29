@@ -1,37 +1,40 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { v4 as uuid } from 'uuid';
+import { SubmissionController } from '../../packages/submission/submission.controller';
 import { Submission } from '../../packages/submission/submission.entity';
+import { ConfigService } from '../config/config.service';
 
 @Injectable()
 export class SubmissionService {
-  constructor(
-    @InjectRepository(Submission)
+
+  // Improvements (1) funfix (2) use dto not Submission class
+  controller = null;
+  // submissionRepository = null;
+
+  constructor(config: ConfigService,
+              @InjectRepository(Submission)
     private readonly submissionRepository: Repository<Submission>,
-  ) {}
+  ) {
+    // TODO: submissionReposi
+    // const connection = new knex(config.getSubmissionRepositoryConnection())
+    // this.submissionRepository = new KnexSubmissionRepository(connection);
+    this.controller = new SubmissionController(this.submissionRepository);
+  }
 
   async findAll(): Promise<Submission[]> {
-    return await this.submissionRepository.find();
+    return await this.controller.findAll();
   }
 
   async start(): Promise<Submission> {
-    const submission: Submission = Submission.make(uuid());
-
-    return this.submissionRepository.save(submission);
+    return this.controller.start();
   }
 
   async findOne(id: string): Promise<Submission> {
-    const submission: Submission = await this.submissionRepository.findOne(id);
-
-    return submission;
+    return this.controller.findOne(id);
   }
 
   async changeTitle(id: string, title: string): Promise<Submission> {
-    const submission: Submission = await this.submissionRepository.findOne(id);
-
-    submission.changeTitle(title);
-
-    return this.submissionRepository.save(submission);
+    return this.controller.changeTitle(id, title);
   }
 }
