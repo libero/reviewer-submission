@@ -19,7 +19,14 @@ export class SubmissionService {
     // TODO: submissionReposi
     // const connection = new knex(config.getSubmissionRepositoryConnection())
     // this.submissionRepository = new KnexSubmissionRepository(connection);
-    this.controller = new SubmissionController(this.submissionRepository);
+
+    // Obviously, this isn't the way we should do things moving forward, but let's make it work before
+    // We refactor it properly.
+    this.controller = new SubmissionController({
+      save: async (s: any) => await submissionRepository.save(s),
+      findById: submissionRepository.findOne,
+      findAll: async () => await submissionRepository.find(),
+    });
   }
 
   async findAll(): Promise<Submission[]> {
