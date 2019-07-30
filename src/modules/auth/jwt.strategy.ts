@@ -15,7 +15,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
 
-  async validate(jwtPayload: JwtPayload): Promise<any> {
+  // The user type is as yet unknown
+  async validate(jwtPayload: JwtPayload): Promise<unknown> {
     // NOTE: this currently always returns null - we don't have a way to query a user yet!
     const user = this.authService.validateUser(jwtPayload);
 
