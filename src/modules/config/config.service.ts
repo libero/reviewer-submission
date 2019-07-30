@@ -2,12 +2,7 @@
 import * as dotenv from 'dotenv';
 import * as fs from 'fs';
 
-export interface SubmissionRepositoryConnection {
-  dialect: string;
-  connection: {
-    filename?: string;
-  };
-}
+import { Config as KnexConfig } from 'knex';
 
 export class ConfigService {
   private readonly envConfig: { [key: string]: string };
@@ -27,7 +22,7 @@ export class ConfigService {
     return this.envConfig[key] || process.env[key] || '';
   }
 
-  getSubmissionRepositoryConnection(): SubmissionRepositoryConnection {
+  getSubmissionRepositoryConnection(): KnexConfig {
     return {
       dialect: 'sqlite3',
       connection: {
