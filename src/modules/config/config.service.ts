@@ -1,7 +1,6 @@
 
 import * as dotenv from 'dotenv';
 import * as fs from 'fs';
-
 import { Config as KnexConfig } from 'knex';
 
 export class ConfigService {
@@ -23,6 +22,15 @@ export class ConfigService {
   }
 
   getSubmissionRepositoryConnection(): KnexConfig {
+    return {
+      dialect: 'sqlite3',
+      connection: {
+        filename: './data.db',
+      },
+    };
+  }
+
+  getSurveyResponseRepositoryConnection(): KnexConfig {
     return {
       dialect: 'sqlite3',
       connection: {
