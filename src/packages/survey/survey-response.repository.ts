@@ -9,7 +9,7 @@ export interface ISurveyResponse {
   id: string;
   surveyId: string;
   submissionId: string;
-  questions: Answer[];
+  questions: Question[];
   answers: Answer[];
   answerQuestion(questionId: string, questionText: string, answerText: string);
   toDTO(): object;
