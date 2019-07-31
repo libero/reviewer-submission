@@ -4,7 +4,6 @@ import { SurveyResponse } from './survey-response.entity';
 import { SurveyResponseRepository } from './survey-response.repository';
 import { SurveyAnswer } from './survey-answer';
 
-
 export class SurveyResponseController {
   repository: Option<SurveyResponseRepository> = None;
 
@@ -12,7 +11,7 @@ export class SurveyResponseController {
     this.repository = Some(repository);
   }
 
-  async submitResponse(surveyId: string, submissionId: string, answers: Array<SurveyAnswer>): Promise<SurveyResponse> {
+  async submitResponse(surveyId: string, submissionId: string, answers: SurveyAnswer[]): Promise<SurveyResponse> {
     const surveyResponse = new SurveyResponse(uuid(), surveyId, submissionId);
 
     answers.forEach(({ questionId, text, answer }: SurveyAnswer) => {

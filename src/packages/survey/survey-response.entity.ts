@@ -1,6 +1,6 @@
 import { ISurveyResponse } from './survey-response.repository';
-import { Question } from "./question";
-import { Answer } from "./answer";
+import { Question } from './question';
+import { Answer } from './answer';
 
 export class SurveyResponse implements ISurveyResponse {
   id: string;
@@ -9,16 +9,16 @@ export class SurveyResponse implements ISurveyResponse {
 
   submissionId: string;
 
-  questions: Array<Question>;
+  questions: Question[];
 
-  answers: Array<Answer>;
+  answers: Answer[];
 
-  constructor (
+  constructor(
     id: string,
     surveyId: string,
     submissionId: string,
-    questions: Array<Question> = [],
-    answers: Array<Answer> = []
+    questions: Question[] = [],
+    answers: Answer[] = [],
   ) {
     this.id = id;
     this.surveyId = surveyId;
@@ -29,14 +29,14 @@ export class SurveyResponse implements ISurveyResponse {
 
   // store the answer to a question along with the question text, replacing it if one already exists
   answerQuestion(questionId: string, questionText: string, answerText: string) {
-    const answer = new Answer(questionId, answerText);
-    const question = new Question(questionId, questionText);
+    const newAnswer = new Answer(questionId, answerText);
+    const newQuestion = new Question(questionId, questionText);
 
     const answerIndex = this.answers.findIndex(answer => answer.questionId === questionId);
-    answerIndex !== -1 ? this.answers.splice(answerIndex, 1, answer) : this.answers.push(answer);
+    answerIndex !== -1 ? this.answers.splice(answerIndex, 1, newAnswer) : this.answers.push(newAnswer);
 
     const questionIndex = this.questions.findIndex(question => question.id === questionId);
-    questionIndex !== -1 ? this.questions.splice(questionIndex, 1, question) : this.questions.push(question);
+    questionIndex !== -1 ? this.questions.splice(questionIndex, 1, newQuestion) : this.questions.push(newQuestion);
   }
 
   // should we maybe have a SurveyResponseDTO ?
@@ -49,6 +49,6 @@ export class SurveyResponse implements ISurveyResponse {
         questions: this.questions,
         answers: this.answers,
       },
-    }
+    };
   }
 }

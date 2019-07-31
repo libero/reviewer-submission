@@ -18,8 +18,7 @@ export class SurveyService {
   }
 
   // again, do we use SurveyAnswer or an interface?
-  submitResponse(surveyId: string, submissionId: string, answers: Array<SurveyAnswer>): Promise<SurveyResponse> {
+  submitResponse(surveyId: string, submissionId: string, answers: SurveyAnswer[]): Promise<SurveyResponse> {
     return this.controller.map(controller => controller.submitResponse(surveyId, submissionId, answers)).get();
   }
 }
-
