@@ -1,22 +1,23 @@
-import { ISurveyResponse } from './survey-response.repository';
+import { ISurveyResponse, SurveyResponseDTO } from './survey-response.repository';
 import { Question } from './question';
 import { Answer } from './answer';
+import { Uuid } from '../../core';
 
 export class SurveyResponse implements ISurveyResponse {
-  id: string;
+  id: Uuid;
 
-  surveyId: string;
+  surveyId: Uuid;
 
-  submissionId: string;
+  submissionId: Uuid;
 
   questions: Question[];
 
   answers: Answer[];
 
   constructor(
-    id: string,
-    surveyId: string,
-    submissionId: string,
+    id: Uuid,
+    surveyId: Uuid,
+    submissionId: Uuid,
     questions: Question[] = [],
     answers: Answer[] = [],
   ) {
@@ -40,7 +41,7 @@ export class SurveyResponse implements ISurveyResponse {
   }
 
   // should we maybe have a SurveyResponseDTO ?
-  toDTO(): object {
+  toDTO(): SurveyResponseDTO {
     return {
       id: this.id,
       surveyId: this.surveyId,
