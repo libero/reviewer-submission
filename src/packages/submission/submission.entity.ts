@@ -1,14 +1,14 @@
-import { ISubmission } from './submission.repository';
+import { ISubmission, SubmissionId } from './submission.repository';
 
 export class Submission implements ISubmission {
-  id: string;
+  id: SubmissionId;
 
   title: string;
 
   updated: Date;
 
   // For now, `lastStepVisited` will always be "title"
-  static make(id: string) {
+  static make(id: SubmissionId) {
     return new Submission({id, title: '', updated: new Date()});
   }
 

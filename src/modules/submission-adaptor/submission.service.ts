@@ -1,11 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { SubmissionController } from '../../packages/submission/submission.controller';
 import { KnexSubmissionRepository } from './submission.repo';
 import { Submission } from '../../packages/submission/submission.entity';
 import { ConfigService } from '../config/config.service';
 import { Option, Some, None } from 'funfix';
+import { SubmissionId } from '../../packages/submission/submission.repository'
 
 import * as Knex from 'knex';
 
@@ -34,11 +33,11 @@ export class SubmissionService {
     return this.controller.map(controller => controller.start()).get();
   }
 
-  async findOne(id: string): Promise<Submission> {
+  async findOne(id: SubmissionId): Promise<Submission> {
     return this.controller.map(controller => controller.findOne(id)).get();
   }
 
-  async changeTitle(id: string, title: string): Promise<Submission> {
+  async changeTitle(id: SubmissionId, title: string): Promise<Submission> {
     return this.controller
       .map(controller => controller.changeTitle(id, title))
       .get();

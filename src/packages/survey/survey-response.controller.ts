@@ -1,9 +1,10 @@
 import { v4 as uuid } from 'uuid';
 import { None, Option, Some } from 'funfix';
 import { SurveyResponse } from './survey-response.entity';
-import { SurveyResponseRepository } from './survey-response.repository';
+import { SurveyResponseRepository, SurveyId, SurveyResponseId } from './survey-response.repository';
 import { Uuid } from '../../core';
 import { SurveyAnswer } from './survey-answer';
+import { SubmissionId } from '../submission/submission.repository';
 
 export class SurveyResponseController {
   repository: Option<SurveyResponseRepository> = None;
@@ -12,9 +13,10 @@ export class SurveyResponseController {
     this.repository = Some(repository);
   }
 
-  async submitResponse(surveyId: string, submissionId: string, answers: SurveyAnswer[]): Promise<SurveyResponse> {
-    const surveyResponse = new SurveyResponse(uuid() as Uuid,
-            surveyId as Uuid,
+  async submitResponse(surveyId: SurveyId, submissionId: SubmissionId, answers: SurveyAnswer[]): Promise<SurveyResponse> {
+    const id = SurveyResponseId.fromUuid(uuid());
+    const surveyResponse = new SurveyResponse(id,
+            surveyId,
             submissionId );
 
     answers.forEach(({ questionId, text, answer }: SurveyAnswer) => {

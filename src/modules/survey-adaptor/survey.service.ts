@@ -6,6 +6,8 @@ import { KnexSurveyResponseRepository } from './survey-response.repository';
 import { SurveyResponseController } from 'src/packages/survey/survey-response.controller';
 import { SurveyAnswer } from 'src/packages/survey/survey-answer';
 import { SurveyResponse } from 'src/packages/survey/survey-response.entity';
+import { SurveyId } from 'src/packages/survey/survey-response.repository';
+import { SubmissionId } from 'src/packages/submission/submission.repository';
 
 @Injectable()
 export class SurveyService {
@@ -18,7 +20,7 @@ export class SurveyService {
   }
 
   // again, do we use SurveyAnswer or an interface?
-  submitResponse(surveyId: string, submissionId: string, answers: SurveyAnswer[]): Promise<SurveyResponse> {
+  submitResponse(surveyId: SurveyId, submissionId: SubmissionId, answers: SurveyAnswer[]): Promise<SurveyResponse> {
     return this.controller.map(controller => controller.submitResponse(surveyId, submissionId, answers)).get();
   }
 }

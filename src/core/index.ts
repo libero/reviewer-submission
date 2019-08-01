@@ -5,9 +5,8 @@ const UUIDRefinement = refinement(string, (str: string) => uuidCheck.test(str), 
 
 export type Uuid = TypeOf<typeof UUIDRefinement>;
 
-/*
 
-All this is testing trying to make the UUID types more specific
+// All this is testing trying to make the UUID types more specific
 
 // https://github.com/Microsoft/TypeScript/issues/202#issuecomment-498201335
 
@@ -25,28 +24,27 @@ export function branded<T, Brand>() {
   }
 }
 
-// helper function for creating nominal type in TS
-// by using intersection with { __brand: Type }
-// https://github.com/Microsoft/TypeScript/issues/202
-function brand<T, B extends string> (
-  type: Type<string, T>,
-  _brand: B
-): Type<string, T & { __brand: B }> {
-  return type as any
+// Modified for UUID
+export function uuidType<Brand>() {
+  return class Type {
+      value: Type;
+      '__ kind': Brand;
+      static fromUuid<Cls extends typeof Type>(this: Cls, t: Uuid) {
+        return t as unknown as InstanceType<Cls>;
+      }
+      static toUuid<Cls extends typeof Type>(this:Cls, b: InstanceType<Cls>) {
+        return b as unknown as Uuid
+      }
+      static Type: Type;
+  }
 }
 
-// const BtypeX = brand(string, 'typeX')
-// const BtypeY = brand(UUIDRefinement, 'typeY')
-type typeX = TypeOf<typeof UUIDRefinement>;
-type typeY = TypeOf<typeof UUIDRefinement>;
+/* THIS CODE WILL ERROR:
 
-// class typeA extends branded<string, 'Uuid'>() {}
-// class typeB extends branded<string, 'Uuid'>() {}
+class AnimalId extends uuidType<'AnimalId'>() {}
+class VegtableId extends uuidType<'VegtableId'>() {}
+var x : AnimalId = AnimalId.toUuid('428a6b06-1120-4970-a0dc-3c48102d46ad');
+var y : VegtableId = VegtableId.toUuid('928a6b06-1120-4970-a0dc-3c48102d46ad');
 
-var x : typeX = '428a6b06-1120-4970-a0dc-3c48102d46ad';
-var y : typeY = '928a6b06-1120-4970-a0dc-3c48102d46ad';
-
-console.log(x,y);
 x = y;
-
 */

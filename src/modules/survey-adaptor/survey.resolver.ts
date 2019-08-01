@@ -5,6 +5,8 @@ import {
 } from '@nestjs/graphql';
 import { SurveyService } from './survey.service';
 import { SurveyResponse } from 'src/packages/survey/survey-response.entity';
+import { SurveyId } from 'src/packages/survey/survey-response.repository';
+import { SubmissionId } from 'src/packages/submission/submission.repository';
 import { SurveyAnswer } from 'src/packages/survey/survey-answer';
 
 @Resolver()
@@ -21,6 +23,6 @@ export class SurveyResolver {
     @Args('submissionId') submissionId: string,
     @Args('answers') answers: SurveyAnswer[],
   ): Promise<SurveyResponse> {
-    return this.surveyService.submitResponse(surveyId, submissionId, answers);
+    return this.surveyService.submitResponse(SurveyId.fromUuid(surveyId), SubmissionId.fromUuid(submissionId), answers);
   }
 }

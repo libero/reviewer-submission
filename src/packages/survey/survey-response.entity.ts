@@ -1,23 +1,23 @@
-import { ISurveyResponse, SurveyResponseDTO } from './survey-response.repository';
+import { ISurveyResponse, SurveyResponseDTO, SurveyId, SurveyResponseId } from './survey-response.repository';
+import { SubmissionId } from '../submission/submission.repository';
 import { Question } from './question';
 import { Answer } from './answer';
-import { Uuid } from '../../core';
 
 export class SurveyResponse implements ISurveyResponse {
-  id: Uuid;
+  id: SurveyResponseId;
 
-  surveyId: Uuid;
+  surveyId: SurveyId;
 
-  submissionId: Uuid;
+  submissionId: SubmissionId;
 
   questions: Question[];
 
   answers: Answer[];
 
   constructor(
-    id: Uuid,
-    surveyId: Uuid,
-    submissionId: Uuid,
+    id: SurveyResponseId,
+    surveyId: SurveyId,
+    submissionId: SubmissionId,
     questions: Question[] = [],
     answers: Answer[] = [],
   ) {
