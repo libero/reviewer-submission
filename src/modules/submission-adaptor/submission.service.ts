@@ -4,7 +4,7 @@ import { KnexSubmissionRepository } from './submission.repo';
 import { Submission } from '../../packages/submission/submission.entity';
 import { ConfigService } from '../config/config.service';
 import { Option, Some, None } from 'funfix';
-import { SubmissionId } from '../../packages/submission/submission.repository'
+import { SubmissionId } from '../../packages/submission/submission.repository';
 
 import * as Knex from 'knex';
 

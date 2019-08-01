@@ -5,11 +5,8 @@ const UUIDRefinement = refinement(string, (str: string) => uuidCheck.test(str), 
 
 export type Uuid = TypeOf<typeof UUIDRefinement>;
 
-
 // All this is testing trying to make the UUID types more specific
-
 // https://github.com/Microsoft/TypeScript/issues/202#issuecomment-498201335
-
 export function branded<T, Brand>() {
   return class Type {
       value: Type;
