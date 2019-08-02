@@ -5,6 +5,7 @@ import { SubmissionController } from '../../packages/submission/submission.contr
 import { KnexSubmissionRepository } from './submission.repo';
 import { Submission } from '../../packages/submission/submission.entity';
 import { ConfigService } from '../config/config.service';
+import { Uuid } from '../../core';
 import { Option, Some, None } from 'funfix';
 
 import * as Knex from 'knex';
@@ -34,13 +35,18 @@ export class SubmissionService {
     return this.controller.map(controller => controller.start()).get();
   }
 
-  async findOne(id: string): Promise<Submission> {
+  async findOne(id: Uuid): Promise<Submission> {
     return this.controller.map(controller => controller.findOne(id)).get();
   }
 
-  async changeTitle(id: string, title: string): Promise<Submission> {
+  async changeTitle(id: Uuid, title: string): Promise<Submission> {
     return this.controller
       .map(controller => controller.changeTitle(id, title))
       .get();
+  }
+
+  async deleteSubmission(id: Uuid): Promise<boolean> {
+    return this.controller.map(controller => controller.deleteSubmission(id))
+    .get();
   }
 }

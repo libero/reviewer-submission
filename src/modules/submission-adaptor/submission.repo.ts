@@ -1,6 +1,7 @@
 // This should probably be called something else
 import { SubmissionRepository, ISubmission } from '../../packages/submission/submission.repository';
 import { Option, None } from 'funfix';
+import { Uuid } from '../../core';
 import * as Knex from 'knex';
 
 export class KnexSubmissionRepository implements SubmissionRepository {
@@ -40,6 +41,18 @@ export class KnexSubmissionRepository implements SubmissionRepository {
     await this.knex(this.TABLE_NAME).insert({...subm, updated: new Date().toISOString()});
 
     return subm;
+  }
+
+  public async delete(id: Uuid): Promise<boolean> {
+
+    const res = await this.knex(this.TABLE_NAME).where({id}).delete();
+
+    // NOTE: Maybe this should error if it can't delete anything? e.g. res === 0?
+    if (res > 1) {
+      throw new Error('Error: deleted too much!');
+    }
+
+    return res === 1;
   }
 
 }

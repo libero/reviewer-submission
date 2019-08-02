@@ -2,6 +2,7 @@ import { v4 as uuid } from 'uuid';
 import { Submission } from './submission.entity';
 import { ISubmission, SubmissionRepository } from './submission.repository';
 import { Option, None, Some } from 'funfix';
+import { Uuid } from '../../core';
 
 export class SubmissionController {
   repository: Option<SubmissionRepository> = None;
@@ -26,13 +27,13 @@ export class SubmissionController {
       .get();
   }
 
-  async findOne(id: string): Promise<Submission> {
+  async findOne(id: Uuid): Promise<Submission> {
     return await this.repository
       .map(async repo => new Submission((await repo.findById(id)).get()))
       .get();
   }
 
-  async changeTitle(id: string, title: string): Promise<Submission> {
+  async changeTitle(id: Uuid, title: string): Promise<Submission> {
     return await this.repository
       .map(async repo => {
         const submission: Submission = new Submission(
@@ -44,5 +45,11 @@ export class SubmissionController {
         return new Submission(await repo.save(submission));
       })
       .get();
+  }
+
+  async deleteSubmission(id: Uuid): Promise<boolean> {
+    return await this.repository.map(async repo => {
+      return await repo.delete(id);
+    }).get();
   }
 }

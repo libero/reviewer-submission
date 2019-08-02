@@ -15,4 +15,5 @@ type Mutation {
 
 type Mutation {
   changeSubmissionTitle(id: ID!, title: String!): Submission!
+  deleteSubmission(id: ID!): Boolean
 }
