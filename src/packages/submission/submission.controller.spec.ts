@@ -1,4 +1,3 @@
-// TODO: Tests for the controller class
 import { SubmissionRepository, ISubmission} from './submission.repository';
 import { SubmissionController } from './submission.controller';
 import { Some, None } from 'funfix';
