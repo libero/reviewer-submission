@@ -1,4 +1,4 @@
-import { SubmissionRepository, ISubmission} from './submission.repository';
+import { SubmissionRepository, ISubmission } from './submission.repository';
 import { SubmissionController } from './submission.controller';
 import { Some, None } from 'funfix';
 import { Submission } from './submission.entity';
@@ -18,11 +18,11 @@ describe('submission controller', () => {
     delete: jest.fn(async () => false),
   });
 
-  describe('find all submissions',  () => {
+  describe('find all submissions', () => {
     it('finds all submissions', async () => {
       const mockRepo = newMockSubmissionRepository();
 
-      const controller = new SubmissionController( mockRepo );
+      const controller = new SubmissionController(mockRepo);
 
       const allFound = await controller.findAll();
 
@@ -35,7 +35,7 @@ describe('submission controller', () => {
     it('errors when it doesn\'t have a repo', async () => {
       const mockRepo = newMockSubmissionRepository();
 
-      const controller = new SubmissionController( mockRepo );
+      const controller = new SubmissionController(mockRepo);
       controller.repository = None;
 
       expect(controller.findAll()).rejects.toThrow();
@@ -50,7 +50,7 @@ describe('submission controller', () => {
         findAll,
       };
 
-      const controller = new SubmissionController( mockRepo );
+      const controller = new SubmissionController(mockRepo);
 
       const allFound = await controller.findAll();
 
@@ -63,7 +63,7 @@ describe('submission controller', () => {
     it('starts a new submission', async () => {
       const mockRepo = newMockSubmissionRepository();
 
-      const controller = new SubmissionController( mockRepo );
+      const controller = new SubmissionController(mockRepo);
 
       const newSubmission = await controller.start();
       expect(mockRepo.save.mock.calls.length).toBe(1);
@@ -73,7 +73,7 @@ describe('submission controller', () => {
     it('errors when it doesn\'t have a repo', async () => {
       const mockRepo = newMockSubmissionRepository();
 
-      const controller = new SubmissionController( mockRepo );
+      const controller = new SubmissionController(mockRepo);
       controller.repository = None;
 
       expect(controller.start()).rejects.toThrow();
@@ -85,7 +85,7 @@ describe('submission controller', () => {
     it('errors when it can\'t find one', async () => {
       const mockRepo = newMockSubmissionRepository();
 
-      const controller = new SubmissionController( mockRepo );
+      const controller = new SubmissionController(mockRepo);
 
       expect(controller.findOne(v4())).rejects.toThrow();
       expect(mockRepo.findById.mock.calls.length).toBe(1);
@@ -94,7 +94,7 @@ describe('submission controller', () => {
     it('errors when it doesn\'t have a repo', async () => {
       const mockRepo = newMockSubmissionRepository();
 
-      const controller = new SubmissionController( mockRepo );
+      const controller = new SubmissionController(mockRepo);
       controller.repository = None;
 
       expect(controller.findOne(v4())).rejects.toThrow();
@@ -109,9 +109,9 @@ describe('submission controller', () => {
         findById,
       };
 
-      const controller = new SubmissionController( mockRepo );
+      const controller = new SubmissionController(mockRepo);
 
-      const found =  await controller.findOne(v4());
+      const found = await controller.findOne(v4());
 
       expect(findById.mock.calls.length).toBe(1);
       expect(found).toBeInstanceOf(Submission);
@@ -122,7 +122,7 @@ describe('submission controller', () => {
     it('errors when it doesn\'t have a repo', async () => {
       const mockRepo = newMockSubmissionRepository();
 
-      const controller = new SubmissionController( mockRepo );
+      const controller = new SubmissionController(mockRepo);
       controller.repository = None;
 
       expect(controller.findOne(v4())).rejects.toThrow();
@@ -138,9 +138,14 @@ describe('submission controller', () => {
         findById,
       };
 
-      const controller = new SubmissionController( mockRepo );
+      const controller = new SubmissionController(mockRepo);
 
-      expect(controller.changeTitle(v4(), 'Some new title that will be lost in the sands of time')).rejects.toThrow();
+      expect(
+        controller.changeTitle(
+          v4(),
+          'Some new title that will be lost in the sands of time',
+        ),
+      ).rejects.toThrow();
       expect(findById.mock.calls.length).toBe(1);
       expect(mockRepo.save.mock.calls.length).toBe(0);
     });
@@ -153,7 +158,7 @@ describe('submission controller', () => {
         findById,
       };
 
-      const controller = new SubmissionController( mockRepo );
+      const controller = new SubmissionController(mockRepo);
 
       const newTitle = 'Some new title';
 
