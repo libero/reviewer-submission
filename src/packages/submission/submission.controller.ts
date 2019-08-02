@@ -1,14 +1,14 @@
 import { v4 as uuid } from 'uuid';
 import { Submission } from './submission.entity';
 import { ISubmission, SubmissionRepository } from './submission.repository';
-import { Option, None, Some } from 'funfix';
+import { Option, None } from 'funfix';
 import { Uuid } from '../../core';
 
 export class SubmissionController {
   repository: Option<SubmissionRepository> = None;
 
   constructor(repo: SubmissionRepository) {
-    this.repository = Some(repo);
+    this.repository = Option.of(repo);
   }
 
   async findAll(): Promise<Submission[]> {
