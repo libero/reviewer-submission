@@ -8,7 +8,7 @@ export class Submission implements ISubmission {
   updated: Date;
 
   // For now, `lastStepVisited` will always be "title"
-  static make(id: string): Submission {
+  public static make(id: string): Submission {
     return new Submission({id, title: '', updated: new Date()});
   }
 
@@ -19,7 +19,7 @@ export class Submission implements ISubmission {
     this.updated = updated || new Date();
   }
 
-  changeTitle(title: string) {
+  public changeTitle(title: string) {
     this.title = title;
   }
 

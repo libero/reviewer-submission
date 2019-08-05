@@ -9,13 +9,19 @@ export class SurveyResponseController {
   repository: Option<SurveyResponseRepository> = None;
 
   constructor(repository: SurveyResponseRepository) {
-    this.repository = Some(repository);
+    this.repository = Option.of(repository);
   }
 
-  async submitResponse(surveyId: string, submissionId: string, answers: SurveyAnswer[]): Promise<SurveyResponse> {
-    const surveyResponse = new SurveyResponse(uuid() as Uuid,
-            surveyId as Uuid,
-            submissionId );
+  async submitResponse(
+    surveyId: string,
+    submissionId: string,
+    answers: SurveyAnswer[],
+  ): Promise<SurveyResponse> {
+    const surveyResponse = new SurveyResponse({
+      id: uuid() as Uuid,
+      surveyId,
+      submissionId,
+    });
 
     answers.forEach(({ questionId, text, answer }: SurveyAnswer) => {
       surveyResponse.answerQuestion(questionId, text, answer);
