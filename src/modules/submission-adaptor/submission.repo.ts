@@ -38,9 +38,10 @@ export class KnexSubmissionRepository implements SubmissionRepository {
   }
 
   public async save(subm: ISubmission): Promise<ISubmission> {
-    await this.knex(this.TABLE_NAME).insert({...subm, updated: new Date().toISOString()});
+    const toInsert = {...subm, updated: new Date().toISOString()};
 
-    return subm;
+    await this.knex(this.TABLE_NAME).insert(toInsert);
+    return toInsert;
   }
 
   public async delete(id: Uuid): Promise<boolean> {

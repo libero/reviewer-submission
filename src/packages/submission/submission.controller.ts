@@ -23,7 +23,7 @@ export class SubmissionController {
     const submission: Submission = Submission.make(uuid());
 
     return await this.repository
-      .map(async repo => new Submission(await repo.save(submission)))
+      .map(async repo => await repo.save(submission))
       .get();
   }
 
