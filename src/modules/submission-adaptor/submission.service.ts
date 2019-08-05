@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { SubmissionController } from '../../packages/submission/submission.controller';
 import { KnexSubmissionRepository } from './submission.repo';
 import { Submission } from '../../packages/submission/submission.entity';
+import { ISubmission } from '../../packages/submission/submission.repository';
 import { ConfigService } from '../config/config.service';
 import { Uuid } from '../../core';
 import { Option, Some, None } from 'funfix';
@@ -31,7 +32,7 @@ export class SubmissionService {
     return await this.controller.map(controller => controller.findAll()).get();
   }
 
-  async start(): Promise<Submission> {
+  async start(): Promise<ISubmission> {
     return this.controller.map(controller => controller.start()).get();
   }
 

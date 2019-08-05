@@ -9,6 +9,7 @@ import {
 import { Uuid } from '../../core';
 import { UseGuards } from '@nestjs/common';
 import { Submission } from '../../packages/submission/submission.entity';
+import { ISubmission } from '../../packages/submission/submission.repository';
 import { SubmissionService } from './submission.service';
 
 @Resolver()
@@ -24,12 +25,12 @@ export class SubmissionResolver {
   }
 
   @Query('getSubmission')
-  async getSubmission(@Args('id') id: string): Promise<Submission> {
-    return await this.submissionService.findOne(id);
+  async getSubmission(@Args('id') id: string): Promise<ISubmission> {
+    return (await this.submissionService.findOne(id)).toDTO();
   }
 
   @Mutation('startSubmission')
-  async startSubmission(): Promise<Submission> {
+  async startSubmission(): Promise<ISubmission> {
     return await this.submissionService.start();
   }
 

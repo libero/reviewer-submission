@@ -32,13 +32,14 @@ export class KnexSubmissionRepository implements SubmissionRepository {
   }
 
   public async findById(id: string): Promise<Option<ISubmission>> {
-    const rows = await this.knex(this.TABLE_NAME).where({id}).select('id', 'title', 'updated');
+    const rows = await this.knex(this.TABLE_NAME).where({id}).select<ISubmission[]>('id', 'title', 'updated');
 
     return Option.of(rows[0]);
   }
 
   public async save(subm: ISubmission): Promise<ISubmission> {
-    const toInsert = {...subm, updated: new Date().toISOString()};
+    // Should this use the Submission entity?
+    const toInsert = {...subm, updated: new Date()};
 
     await this.knex(this.TABLE_NAME).insert(toInsert);
     return toInsert;

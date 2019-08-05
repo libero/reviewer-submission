@@ -20,11 +20,13 @@ export class SubmissionController {
   }
 
   async start(): Promise<Submission> {
-    const submission: Submission = Submission.make(uuid());
+    const submission: Submission = await Submission.make(uuid());
 
-    return await this.repository
-      .map(async repo => await repo.save(submission))
+    await this.repository
+      .map(async repo => await repo.save(submission.toDTO()))
       .get();
+
+    return submission;
   }
 
   async findOne(id: Uuid): Promise<Submission> {
