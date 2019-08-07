@@ -17,9 +17,9 @@ export class SurveyResponseController {
     submissionId: SubmissionId,
     answers: SurveyAnswer[],
   ): Promise<SurveyResponse> {
-    const id : SurveyResponseId = SurveyResponseId.fromUuid(uuid());
+    const id: SurveyResponseId = SurveyResponseId.fromUuid(uuid());
     const surveyResponse = new SurveyResponse({
-      id: id,
+      id,
       surveyId,
       submissionId,
     });

@@ -2,7 +2,7 @@ import {
   ISurveyResponse,
   SurveyResponseDTO,
   SurveyId,
-  SurveyResponseId
+  SurveyResponseId,
 } from './survey-response.repository';
 import { Question } from './question';
 import { Answer } from './answer';

@@ -1,8 +1,9 @@
 import { Question } from './question';
 import { Answer } from './answer';
-import { uuidType } from '../../core';
+import { uuidType } from '../core';
 import { SubmissionId } from '../submission/submission.repository';
 
+// tslint:disable:max-classes-per-file
 export class SurveyId extends uuidType<'SurveyId'>() {}
 export class SurveyResponseId extends uuidType<'SurveyResponseId'>() {}
 

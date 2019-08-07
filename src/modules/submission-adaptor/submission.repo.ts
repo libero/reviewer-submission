@@ -1,7 +1,6 @@
 // This should probably be called something else
 import { SubmissionRepository, ISubmission, SubmissionId } from '../../packages/submission/submission.repository';
 import { Option, None } from 'funfix';
-import { Uuid } from '../../core';
 import * as Knex from 'knex';
 
 export class KnexSubmissionRepository implements SubmissionRepository {
