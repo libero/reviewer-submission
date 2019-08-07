@@ -1,7 +1,7 @@
 import {string, refinement, TypeOf } from 'io-ts';
 
-const uuidCheck = /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i;
-const UUIDRefinement = refinement(string, (str: string) => uuidCheck.test(str), 'Uuid');
+export const uuidCheck = /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i;
+export const UUIDRefinement = refinement(string, (str: string) => uuidCheck.test(str), 'Uuid');
 
 // tslint:disable:max-classes-per-file
 export type Uuid = TypeOf<typeof UUIDRefinement>;
@@ -41,7 +41,7 @@ export function uuidType<Brand>() {
 
 class AnimalId extends uuidType<'AnimalId'>() {}
 class VegtableId extends uuidType<'VegtableId'>() {}
-var x : AnimalId = AnimalId.toUuid('428a6b06-1120-4970-a0dc-3c48102d46ad');
+#var x : AnimalId = AnimalId.toUuid('428a6b06-1120-4970-a0dc-3c48102d46ad');
 var y : VegtableId = VegtableId.toUuid('928a6b06-1120-4970-a0dc-3c48102d46ad');
 
 x = y;
