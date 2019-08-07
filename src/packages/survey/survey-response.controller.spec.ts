@@ -1,5 +1,6 @@
 import { SurveyResponseController } from './survey-response.controller';
-import { ISurveyResponse, SurveyResponseDTO} from './survey-response.repository';
+import { SurveyResponseDTO, SurveyResponseId, SurveyId} from './survey-response.repository';
+import { SubmissionId} from '../submission/submission.repository';
 import { SurveyResponse } from './survey-response.entity';
 import { SurveyAnswer } from './survey-answer';
 import { v4 } from 'uuid';
@@ -8,9 +9,9 @@ import { None } from 'funfix';
 describe('Survey Controller', () => {
   describe('submitResponse', () => {
     const exampleSurveyResponse: SurveyResponseDTO = {
-      id: v4(),
-      surveyId: v4(),
-      submissionId: v4(),
+      id: SurveyResponseId.fromUuid(v4()),
+      surveyId: SurveyId.fromUuid(v4()),
+      submissionId: SubmissionId.fromUuid(v4()),
       response: {
         questions: [],
         answers: [],
@@ -26,15 +27,15 @@ describe('Survey Controller', () => {
       const controller = new SurveyResponseController(newSurveyResponseRepo());
       controller.repository = None;
 
-      expect(controller.submitResponse(v4(), v4(), [])).rejects.toThrow();
+      expect(controller.submitResponse(SurveyId.fromUuid(v4()), SubmissionId.fromUuid(v4()), [])).rejects.toThrow();
     });
 
     it('saves the correct data', async () => {
       const repo = newSurveyResponseRepo();
       const controller = new SurveyResponseController(repo);
 
-      const surveyId = v4();
-      const submissionId = v4();
+      const surveyId = SurveyId.fromUuid(v4());
+      const submissionId = SubmissionId.fromUuid(v4());
 
       const [question1Id, question2Id, question3Id, question4Id] = [v4(), v4(), v4(), v4()];
 

@@ -1,4 +1,4 @@
-import { SubmissionRepository, ISubmission } from './submission.repository';
+import { ISubmission, SubmissionId } from './submission.repository';
 import { SubmissionController } from './submission.controller';
 import { Some, None } from 'funfix';
 import { Submission } from './submission.entity';
@@ -6,7 +6,7 @@ import { v4 } from 'uuid';
 
 describe('submission controller', () => {
   const mockISubmission: ISubmission = {
-    id: v4(),
+    id: SubmissionId.fromUuid(v4()),
     title: 'The Importance of Unit Testing One\'s Controller Logic',
     updated: new Date(),
   };
@@ -87,7 +87,7 @@ describe('submission controller', () => {
 
       const controller = new SubmissionController(mockRepo);
 
-      expect(controller.findOne(v4())).rejects.toThrow();
+      expect(controller.findOne(SubmissionId.fromUuid(v4()))).rejects.toThrow();
       expect(mockRepo.findById.mock.calls.length).toBe(1);
     });
 
@@ -97,7 +97,7 @@ describe('submission controller', () => {
       const controller = new SubmissionController(mockRepo);
       controller.repository = None;
 
-      expect(controller.findOne(v4())).rejects.toThrow();
+      expect(controller.findOne(SubmissionId.fromUuid(v4()))).rejects.toThrow();
       expect(mockRepo.findById.mock.calls.length).toBe(0);
     });
 
@@ -111,7 +111,7 @@ describe('submission controller', () => {
 
       const controller = new SubmissionController(mockRepo);
 
-      const found = await controller.findOne(v4());
+      const found = await controller.findOne(SubmissionId.fromUuid(v4()));
 
       expect(findById.mock.calls.length).toBe(1);
       expect(found).toBeInstanceOf(Submission);
@@ -125,7 +125,7 @@ describe('submission controller', () => {
       const controller = new SubmissionController(mockRepo);
       controller.repository = None;
 
-      expect(controller.findOne(v4())).rejects.toThrow();
+      expect(controller.findOne(SubmissionId.fromUuid(v4()))).rejects.toThrow();
       expect(mockRepo.save.mock.calls.length).toBe(0);
       expect(mockRepo.findById.mock.calls.length).toBe(0);
     });
@@ -142,7 +142,7 @@ describe('submission controller', () => {
 
       expect(
         controller.changeTitle(
-          v4(),
+          SubmissionId.fromUuid(v4()),
           'Some new title that will be lost in the sands of time',
         ),
       ).rejects.toThrow();
@@ -162,7 +162,7 @@ describe('submission controller', () => {
 
       const newTitle = 'Some new title';
 
-      const newSubmission = await controller.changeTitle(v4(), newTitle);
+      const newSubmission = await controller.changeTitle(SubmissionId.fromUuid(v4()), newTitle);
 
       expect(newSubmission).toBeInstanceOf(Submission);
       expect(newSubmission.title).toBe(newTitle);
