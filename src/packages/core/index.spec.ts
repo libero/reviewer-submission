@@ -72,7 +72,7 @@ describe('core types and utils', () => {
       expect(result.allDiagnostics).toHaveLength(2);
 
       const message = ts.flattenDiagnosticMessageText(result.allDiagnostics[0].messageText, ' ');
-      const expectedError = 'Type \'VegtableId\' is not assignable to type \'AnimalId\'.'
+      const expectedError = 'Type \'VegtableId\' is not assignable to type \'AnimalId\'.';
       const expectedErrorCode = 2322;
 
       expect(result.allDiagnostics[0].code).toBe(expectedErrorCode);
