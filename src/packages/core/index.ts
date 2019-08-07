@@ -36,13 +36,3 @@ export function uuidType<Brand>() {
       static Type: UuidType;
   };
 }
-
-/* THIS CODE WILL ERROR:
-
-class AnimalId extends uuidType<'AnimalId'>() {}
-class VegtableId extends uuidType<'VegtableId'>() {}
-#var x : AnimalId = AnimalId.toUuid('428a6b06-1120-4970-a0dc-3c48102d46ad');
-var y : VegtableId = VegtableId.toUuid('928a6b06-1120-4970-a0dc-3c48102d46ad');
-
-x = y;
-*/
