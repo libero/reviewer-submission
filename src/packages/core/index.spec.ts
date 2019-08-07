@@ -17,7 +17,7 @@ function compile(fileNames: string[], options: ts.CompilerOptions): { exitCode: 
 }
 
 describe('core types and utils', () => {
-  describe('uuid type', () => {
+  describe('uuid regex', () => {
     it('passes a valid, generated uuid', () => {
       const testString: Uuid = v4();
 
