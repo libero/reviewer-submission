@@ -1,13 +1,13 @@
 import { v4 as uuid } from 'uuid';
 import { Submission } from './submission.entity';
 import { ISubmission, SubmissionRepository, SubmissionId } from './submission.repository';
-import { Option, None, Some } from 'funfix';
+import { Option, None } from 'funfix';
 
 export class SubmissionController {
   repository: Option<SubmissionRepository> = None;
 
   constructor(repo: SubmissionRepository) {
-    this.repository = Some(repo);
+    this.repository = Option.of(repo);
   }
 
   async findAll(): Promise<Submission[]> {
@@ -20,11 +20,13 @@ export class SubmissionController {
 
   async start(): Promise<Submission> {
     const id = SubmissionId.fromUuid(uuid());
-    const submission: Submission = Submission.make(id);
+    const submission: Submission = await Submission.make(id);
 
-    return await this.repository
-      .map(async repo => new Submission(await repo.save(submission.toDTO())))
+    await this.repository
+      .map(async repo => await repo.save(submission.toDTO()))
       .get();
+
+    return submission;
   }
 
   async findOne(id: SubmissionId): Promise<Submission> {
@@ -45,5 +47,11 @@ export class SubmissionController {
         return new Submission(await repo.save(submission.toDTO()));
       })
       .get();
+  }
+
+  async deleteSubmission(id: SubmissionId): Promise<boolean> {
+    return await this.repository.map(async repo => {
+      return await repo.delete(id);
+    }).get();
   }
 }

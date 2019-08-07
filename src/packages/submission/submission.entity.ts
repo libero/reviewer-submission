@@ -8,17 +8,18 @@ export class Submission implements ISubmission {
   updated: Date;
 
   // For now, `lastStepVisited` will always be "title"
-  static make(id: SubmissionId) {
+  public static make(id: SubmissionId): Submission {
     return new Submission({id, title: '', updated: new Date()});
   }
 
   // This is wired up so that you can create an entity from the DTO described by ISubmission
-  constructor({id, title}: ISubmission) {
+  constructor({id, title, updated}: {id: SubmissionId, title: string, updated?: Date}) {
     this.id = id;
     this.title = title;
+    this.updated = updated || new Date();
   }
 
-  changeTitle(title: string) {
+  public changeTitle(title: string) {
     this.title = title;
   }
 

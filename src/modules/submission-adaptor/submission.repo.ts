@@ -1,6 +1,7 @@
 // This should probably be called something else
 import { SubmissionRepository, ISubmission, SubmissionId } from '../../packages/submission/submission.repository';
 import { Option, None } from 'funfix';
+import { Uuid } from '../../core';
 import * as Knex from 'knex';
 
 export class KnexSubmissionRepository implements SubmissionRepository {
@@ -31,15 +32,29 @@ export class KnexSubmissionRepository implements SubmissionRepository {
   }
 
   public async findById(id: SubmissionId): Promise<Option<ISubmission>> {
-    const rows = await this.knex(this.TABLE_NAME).where({id}).select('id', 'title', 'updated');
+    const rows = await this.knex(this.TABLE_NAME).where({id}).select<ISubmission[]>('id', 'title', 'updated');
 
     return Option.of(rows[0]);
   }
 
   public async save(subm: ISubmission): Promise<ISubmission> {
-    await this.knex(this.TABLE_NAME).insert({...subm, updated: new Date().toISOString()});
+    // Should this use the Submission entity?
+    const toInsert = {...subm, updated: new Date()};
 
-    return subm;
+    await this.knex(this.TABLE_NAME).insert(toInsert);
+    return toInsert;
+  }
+
+  public async delete(id: SubmissionId): Promise<boolean> {
+
+    const res = await this.knex(this.TABLE_NAME).where({id}).delete();
+
+    // NOTE: Maybe this should error if it can't delete anything? e.g. res === 0?
+    if (res > 1) {
+      throw new Error('Error: deleted too much!');
+    }
+
+    return res === 1;
   }
 
 }

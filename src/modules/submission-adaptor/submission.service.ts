@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { SubmissionController } from '../../packages/submission/submission.controller';
 import { KnexSubmissionRepository } from './submission.repo';
 import { Submission } from '../../packages/submission/submission.entity';
+import { ISubmission } from '../../packages/submission/submission.repository';
 import { ConfigService } from '../config/config.service';
 import { Option, Some, None } from 'funfix';
 import { SubmissionId } from '../../packages/submission/submission.repository';
@@ -29,7 +30,7 @@ export class SubmissionService {
     return await this.controller.map(controller => controller.findAll()).get();
   }
 
-  async start(): Promise<Submission> {
+  async start(): Promise<ISubmission> {
     return this.controller.map(controller => controller.start()).get();
   }
 
@@ -41,5 +42,10 @@ export class SubmissionService {
     return this.controller
       .map(controller => controller.changeTitle(id, title))
       .get();
+  }
+
+  async deleteSubmission(id: SubmissionId): Promise<boolean> {
+    return this.controller.map(controller => controller.deleteSubmission(id))
+    .get();
   }
 }
