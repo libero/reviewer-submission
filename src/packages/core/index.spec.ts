@@ -30,9 +30,15 @@ describe('core types and utils', () => {
   });
 
   describe('UuidType class', () => {
+    const tempFile = './test.tmp.ts';
+
     class AnimalId extends uuidType<'AnimalId'>() {}
     // tslint:disable-next-line
     class VegtableId extends uuidType<'VegtableId'>() {}
+
+    afterAll(() => {
+      fs.unlinkSync(tempFile);
+    });
 
     it('similar types can be assigned', () => {
       let x: AnimalId;
@@ -58,7 +64,6 @@ describe('core types and utils', () => {
           }
       })`;
 
-      const tempFile = './test.tmp.ts';
       fs.writeFileSync(tempFile, tscode);
 
       const result = compile([ tempFile ], {
