@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import { v4 } from 'uuid';
-import { Uuid,  uuidCheck, uuidType} from '.';
+import { Uuid,  uuidCheck, uuidType} from './uuid';
 import * as ts from 'typescript';
 
 // taken from: https://github.com/Microsoft/TypeScript-wiki/blob/master/Using-the-Compiler-API.md#a-minimal-compiler
