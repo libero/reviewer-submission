@@ -1,10 +1,14 @@
 ARG image_tag=latest
 
-FROM liberoadmin/reviewer_server_typescript:${image_tag}
+FROM liberoadmin/reviewer_server_typescript:${image_tag} as server_typescript
 
+FROM node:10-alpine
 MAINTAINER eLife Reviewer Product Team <reviewer-product@elifesciences.org>
 
 WORKDIR /app
+
+COPY --from=server_typescript /app/node_modules/ ./node_modules/
+COPY --from=server_typescript /app/dist/ ./dist/
 
 EXPOSE 3000
 

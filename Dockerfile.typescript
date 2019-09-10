@@ -1,12 +1,19 @@
 ARG image_tag=latest
 
-FROM liberoadmin/reviewer_server_packages:${image_tag}
+FROM liberoadmin/reviewer_server_packages:${image_tag} AS server_packages
+FROM node:10-alpine
+MAINTAINER eLife Reviewer Product Team <reviewer-product@elifesciences.org>
 
 WORKDIR /app
 
-COPY tsconfig.build.json . 
-COPY tsconfig.json .
-COPY tslint.json .
+COPY --from=server_packages /app/node_modules/ ./node_modules/
+
+COPY  tsconfig.build.json \
+      tsconfig.json \
+      tslint.json \
+      package.json \
+      ./
+
 COPY src/ ./src/
 
 RUN yarn build
