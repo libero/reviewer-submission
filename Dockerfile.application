@@ -10,6 +10,8 @@ WORKDIR /app
 COPY --from=server_typescript /app/node_modules/ ./node_modules/
 COPY --from=server_typescript /app/dist/ ./dist/
 
+COPY src/*/*/*.graphql ./dist/modules/graphql/
+
 EXPOSE 3000
 
 HEALTHCHECK --interval=1m --timeout=1s \
