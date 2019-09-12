@@ -1,6 +1,6 @@
 ARG image_tag=latest
 
-FROM liberoadmin/reviewer_shared_packages:${image_tag} AS library_image
+FROM libero/reviewer_shared_packages:${image_tag} AS library_image
 
 FROM node:10-alpine
 
