@@ -21,7 +21,6 @@
     "update:internal": "yarn upgrade -P @libero"
   },
   "dependencies": {
-    "auth-utils": "../lib/auth-utils",
     "@nestjs/common": "^6.0.0",
     "@nestjs/core": "^6.0.0",
     "@nestjs/graphql": "^6.4.2",
@@ -31,6 +30,7 @@
     "@nestjs/typeorm": "^6.1.3",
     "@types/uuid": "^3.4.5",
     "apollo-server-express": "^2.6.9",
+    "auth-utils": "../lib/auth-utils",
     "dotenv": "^8.0.0",
     "dotenv-cli": "^2.0.1",
     "fp-ts": "^2.0.3",
@@ -50,6 +50,7 @@
     "sqlite3": "^4.0.9",
     "type-graphql": "^0.17.4",
     "typeorm": "^0.2.18",
+    "typesafe-uuid": "^1.0.2",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
@@ -68,7 +69,7 @@
     "ts-node": "8.1.0",
     "tsconfig-paths": "3.8.0",
     "tslint": "5.16.0",
-    "typescript": "3.4.3",
+    "typescript": "3.6.3",
     "wait-on": "^3.2.0"
   },
   "jest": {

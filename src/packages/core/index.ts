@@ -1,1 +1,0 @@
-export { uuidType } from './uuid';

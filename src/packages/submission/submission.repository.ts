@@ -1,5 +1,5 @@
 import { Option } from 'funfix';
-import { uuidType } from '../core';
+import { uuidType } from 'typesafe-uuid';
 
 export class SubmissionId extends uuidType<'SubmissionId'>() {}
 
