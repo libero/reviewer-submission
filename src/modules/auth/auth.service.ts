@@ -2,7 +2,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserIdentity } from 'auth-utils';
+import { UserIdentity } from '@libero/auth-utils';
 
 // TODO: Remove
 export interface User {
