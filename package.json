@@ -21,6 +21,7 @@
     "update:internal": "yarn upgrade -P @libero"
   },
   "dependencies": {
+    "@libero/auth-utils": "^0.1.0",
     "@nestjs/common": "^6.0.0",
     "@nestjs/core": "^6.0.0",
     "@nestjs/graphql": "^6.4.2",
@@ -29,7 +30,6 @@
     "@nestjs/platform-express": "^6.0.0",
     "@types/uuid": "^3.4.5",
     "apollo-server-express": "^2.6.9",
-    "@libero/auth-utils": "../lib/auth-utils",
     "dotenv": "^8.0.0",
     "dotenv-cli": "^2.0.1",
     "fp-ts": "^2.0.3",
