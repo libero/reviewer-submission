@@ -1,0 +1,26 @@
+language: node_js
+stages:
+  - test
+  - build
+  - deploy
+jobs:
+  include:
+    - stage: test
+      name: Test
+      node_js:
+        - 10.16.3
+      script:
+        - make lint
+        - make test
+
+    - stage: build
+      if:
+        tag IS present
+      name: Build
+      script: make build
+
+    - stage: deploy
+      if:
+        branch = master
+      name: Deploy
+      script: make push
