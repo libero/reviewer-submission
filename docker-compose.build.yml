@@ -1,26 +1,9 @@
 version: '3'
 services:
-  # base container
-  submission_typescript:
+  submission:
     build:
       context: "."
-      dockerfile: "Dockerfile.typescript"
+      dockerfile: 'Dockerfile'
       args:
         image_tag: ${IMAGE_TAG}
-    image: libero/reviewer_submission_typescript:${IMAGE_TAG}
-
-  # Server
-  submission_application:
-    build:
-      context: "."
-      dockerfile: 'Dockerfile.application'
-      args:
-        image_tag: ${IMAGE_TAG}
-    image: libero/reviewer_submission_application:${IMAGE_TAG}
-    networks:
-      - 'reviewer_build'
-
-networks:
-  reviewer_build:
-    external:
-      name: reviewer_build
+    image: libero/reviewer_submission:${IMAGE_TAG}
