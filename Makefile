@@ -5,20 +5,17 @@ DOCKER_COMPOSE = IMAGE_TAG=${IMAGE_TAG} docker-compose -f docker-compose.build.y
 
 PUSH_COMMAND = IMAGE_TAG=${IMAGE_TAG} .scripts/travis/push-image.sh
 
-ci:
-	make build_source lint test build_application push_application
+get_deps:
+	yarn
 
-build_source:
-	${DOCKER_COMPOSE} build submission_source
+lint: get_deps
+	yarn lint
 
-lint: build_source
-	${DOCKER_COMPOSE} run submission_source yarn lint
+test: get_deps
+	yarn test
 
-test: build_source
-	${DOCKER_COMPOSE} run submission_source yarn test
+build:
+	${DOCKER_COMPOSE} build submission
 
-build_application: build_source
-	${DOCKER_COMPOSE} build reviewer_submission
-
-push_application: lint test build_application
+push:
 	${PUSH_COMMAND} reviewer_submission
