@@ -1,4 +1,4 @@
-language: node_js
+language: minimal
 stages:
   - test
   - build
@@ -6,6 +6,7 @@ stages:
 jobs:
   include:
     - stage: test
+      language: node_js
       name: Test
       node_js:
         - 10.16.3
