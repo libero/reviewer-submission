@@ -18,4 +18,4 @@ build:
 	${DOCKER_COMPOSE} build submission
 
 push:
-	${PUSH_COMMAND} reviewer_submission
+	${PUSH_COMMAND} reviewer-submission
