@@ -1,0 +1,9 @@
+version: '3'
+services:
+  submission:
+    build:
+      context: "."
+      dockerfile: 'Dockerfile'
+      args:
+        image_tag: ${IMAGE_TAG}
+    image: libero/reviewer_submission:${IMAGE_TAG}

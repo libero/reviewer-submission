@@ -1,0 +1,25 @@
+language: minimal
+stages:
+  - test
+  - build
+  - deploy
+jobs:
+  include:
+    - stage: test
+      language: node_js
+      name: Test
+      node_js:
+        - 10.16.3
+      script:
+        - make lint
+        - make test
+
+    - stage: build
+      name: Build
+      script: make build
+
+    - stage: deploy
+      if:
+        branch = master AND type != pull_request
+      name: Deploy
+      script: make push
