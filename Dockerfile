@@ -9,7 +9,7 @@ COPY  tsconfig.build.json \
       tsconfig.json \
       tslint.json \
       package.json \
-			yarn.lock \
+      yarn.lock \
       ./
 
 COPY src/ ./src/
