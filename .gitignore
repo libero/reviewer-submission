@@ -69,3 +69,6 @@ docker-compose.override.yml
 *.tmp.ts
 data/
 dist/
+
+#sqlite output file
+data.db
