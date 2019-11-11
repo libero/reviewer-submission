@@ -1,0 +1,18 @@
+## This is only a single container right now but in future this should bring up supporting services needed for development ie: postgres, audit service ect.
+version: '3'
+services:
+  application:
+    image: node:10
+    ports:
+      - "${SERVER_PORT}:3000"
+    environment:
+      SERVER_PORT: ${SERVER_PORT}
+    working_dir: "/src"
+    healthcheck:
+      test: "curl localhost:3000/health"
+      interval: 1m
+      timeout: 10s
+      retries: 3
+    command: ["bash", "-c", "yarn && yarn run start:dev"]
+    volumes:
+      - ./:/src/:z
