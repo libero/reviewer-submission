@@ -15,6 +15,7 @@ This should get you started with a [default configuration](../.env.example) that
 ### Server
 
 Start the database service
+
 ```
 docker-compose up -d postgres
 ```
