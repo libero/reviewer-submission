@@ -4,8 +4,7 @@
 
 ```
 cp .env.example .env
-yarn
-yarn start:dev
+docker-compose up
 ```
 
 ## Overview
