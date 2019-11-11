@@ -16,7 +16,6 @@ This should get you started with a [default configuration](../.env.example) that
 
 To start the server, run
 ```
-cd server/
 yarn
 yarn run start:dev
 ```
