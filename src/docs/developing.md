@@ -20,3 +20,11 @@ cd server/
 yarn
 yarn run start:dev
 ```
+
+### Developing in containers
+
+To start the service in a container alongside any supporting services, run
+
+```
+docker-compose up
+```
