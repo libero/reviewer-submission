@@ -1,8 +1,8 @@
 {
-  "name": "test-project",
-  "version": "0.0.1",
+  "name": "reviewer-submission",
+  "version": "0.1.0",
   "description": "",
-  "author": "",
+  "author": "libero-npm@elifesciences.org",
   "license": "MIT",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
@@ -19,6 +19,16 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "update:internal": "yarn upgrade -P @libero"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/libero/reviewer-submission"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn lint",
+      "pre-push": "yarn test"
+    }
   },
   "dependencies": {
     "@libero/auth-utils": "^0.1.0",
@@ -59,7 +69,8 @@
     "@types/node": "^10.12.18",
     "@types/supertest": "^2.0.7",
     "concurrently": "^4.1.0",
-    "jest": "^23.6.0",
+    "husky": "^3.0.9",
+    "jest": "^24.9.0",
     "nodemon": "^1.18.9",
     "prettier": "^1.15.3",
     "supertest": "^3.4.1",
