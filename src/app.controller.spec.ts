@@ -3,24 +3,24 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 describe('AppController', () => {
-  let appController: AppController;
+    let appController: AppController;
 
-  beforeEach(async () => {
-    const app: TestingModule = await Test.createTestingModule({
-      controllers: [AppController],
-      providers: [AppService],
-    }).compile();
+    beforeEach(async () => {
+        const app: TestingModule = await Test.createTestingModule({
+            controllers: [AppController],
+            providers: [AppService],
+        }).compile();
 
-    appController = app.get<AppController>(AppController);
-  });
-
-  describe('root', () => {
-    it('should send a good healthcheck to the user', () => {
-      const mockRes = {
-        status: (code: number) => ({json: (data: unknown) => ({code, data})}),
-      };
-
-      expect(appController.sendHealthCheck(mockRes)).resolves.toEqual({code: 200, data: {ok: true}});
+        appController = app.get<AppController>(AppController);
     });
-  });
+
+    describe('root', () => {
+        it('should send a good healthcheck to the user', () => {
+            const mockRes = {
+                status: (code: number): object => ({ json: (data: unknown): object => ({ code, data }) }),
+            };
+
+            expect(appController.sendHealthCheck(mockRes)).resolves.toEqual({ code: 200, data: { ok: true } });
+        });
+    });
 });

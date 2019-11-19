@@ -1,13 +1,13 @@
 export class SurveyAnswer {
-  readonly questionId;
+    readonly questionId;
 
-  readonly text;
+    readonly text;
 
-  readonly answer;
+    readonly answer;
 
-  public constructor(questionId: string, text: string, answer: string) {
-    this.questionId = questionId;
-    this.text = text;
-    this.answer = answer;
-  }
+    public constructor(questionId: string, text: string, answer: string) {
+        this.questionId = questionId;
+        this.text = text;
+        this.answer = answer;
+    }
 }
