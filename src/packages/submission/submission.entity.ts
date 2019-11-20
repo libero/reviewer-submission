@@ -1,4 +1,4 @@
-import { Submission as ISubmission, SubmissionId } from './submission.repository';
+import { ISubmission, SubmissionId } from './submission.repository';
 
 export class Submission implements ISubmission {
     id: SubmissionId;

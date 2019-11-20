@@ -7,10 +7,10 @@ export class SurveyId extends uuidType<'SurveyId'>() {}
 export class SurveyResponseId extends uuidType<'SurveyResponseId'>() {}
 
 export interface SurveyResponseRepository {
-    save(surveyResponse: SurveyResponse): Promise<SurveyResponse>;
+    save(surveyResponse: ISurveyResponse): Promise<ISurveyResponse>;
 }
 
-export interface SurveyResponse {
+export interface ISurveyResponse {
     id: SurveyResponseId;
     surveyId: SurveyId;
     submissionId: SubmissionId;

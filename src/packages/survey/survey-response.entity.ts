@@ -1,9 +1,4 @@
-import {
-    SurveyResponse as ISurveyResponse,
-    SurveyResponseDTO,
-    SurveyId,
-    SurveyResponseId,
-} from './survey-response.repository';
+import { ISurveyResponse, SurveyResponseDTO, SurveyId, SurveyResponseId } from './survey-response.repository';
 import { Question } from './question';
 import { Answer } from './answer';
 import { SubmissionId } from '../submission/submission.repository';

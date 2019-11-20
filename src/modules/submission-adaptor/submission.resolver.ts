@@ -1,7 +1,7 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { Submission } from '../../packages/submission/submission.entity';
 import { SubmissionId } from '../../packages/submission/submission.repository';
-import { Submission as ISubmission } from '../../packages/submission/submission.repository';
+import { Submission } from '../../packages/submission/submission.repository';
 import { SubmissionService } from './submission.service';
 
 @Resolver()

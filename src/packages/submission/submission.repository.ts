@@ -4,15 +4,14 @@ import { uuidType } from 'typesafe-uuid';
 export class SubmissionId extends uuidType<'SubmissionId'>() {}
 
 export interface SubmissionRepository {
-    findAll(): Promise<Submission[]>;
-    findById(id: SubmissionId): Promise<Option<Submission>>;
-    save(subm: Submission): Promise<Submission>;
+    findAll(): Promise<ISubmission[]>;
+    findById(id: SubmissionId): Promise<Option<ISubmission>>;
+    save(subm: ISubmission): Promise<ISubmission>;
     delete(id: SubmissionId): Promise<boolean>;
 }
 
-// I'm treating Submission as a DTO for Submission (./submission.entity)
-
-export interface Submission {
+// I'm treating ISubmission as a DTO for Submission
+export interface ISubmission {
     id: SubmissionId;
     title: string;
     updated: Date;

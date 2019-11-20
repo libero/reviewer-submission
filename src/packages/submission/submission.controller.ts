@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { Submission } from './submission.entity';
-import { Submission as ISubmission, SubmissionRepository, SubmissionId } from './submission.repository';
+import { Submission, SubmissionRepository, SubmissionId } from './submission.repository';
 import { Option, None } from 'funfix';
 
 export class SubmissionController {

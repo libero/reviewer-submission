@@ -1,9 +1,5 @@
 // This should probably be called something else
-import {
-    SubmissionRepository,
-    Submission as ISubmission,
-    SubmissionId,
-} from '../../packages/submission/submission.repository';
+import { SubmissionRepository, ISubmission, SubmissionId } from '../../packages/submission/submission.repository';
 import { Option } from 'funfix';
 import * as Knex from 'knex';
 

@@ -1,4 +1,4 @@
-import { Submission as ISubmission, SubmissionId } from './submission.repository';
+import { Submission, SubmissionId } from './submission.repository';
 import { SubmissionController } from './submission.controller';
 import { Some, None } from 'funfix';
 import { Submission } from './submission.entity';
