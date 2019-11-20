@@ -75,15 +75,14 @@
   dependencies:
     "@hapi/hoek" "8.x.x"
 
-"@libero/auth-utils@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@libero/auth-utils/-/auth-utils-0.1.0.tgz#e8f0c40f39333ab3e1b2f9d90ca2d7db38d7e2c4"
-  integrity sha512-31RnGzTLdB5SwBDP8darx7wOkblYVtc2+GoX8NhGlHxdvdDkebb/iEp3CNkxtkGdghMoEtEsfQYXFDk/788Q6g==
+"@libero/auth-token@^0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@libero/auth-token/-/auth-token-0.1.1.tgz#c3dfe09c032a168820e45d14566295fdee990516"
+  integrity sha512-nxe9LhHcc8yshz+nlR29F5NW8qars6D9j3Wg5cyBm9b7NDwbWFBJ/ylJfs0Ehi2RkJVOsuQzy04heMNGMM7yGQ==
   dependencies:
     "@types/jsonwebtoken" "^8.3.3"
     "@types/pino" "^5.8.10"
     "@types/uuid" "^3.4.5"
-    dotenv-cli "^2.0.1"
     funfix "^7.0.1"
     jsonwebtoken "^8.5.1"
     pino "^5.13.2"

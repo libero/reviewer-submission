@@ -21,7 +21,7 @@
     "update:internal": "yarn upgrade -P @libero"
   },
   "dependencies": {
-    "@libero/auth-utils": "^0.1.0",
+    "@libero/auth-token": "^0.1.1",
     "@nestjs/common": "^6.0.0",
     "@nestjs/core": "^6.0.0",
     "@nestjs/graphql": "^6.4.2",
