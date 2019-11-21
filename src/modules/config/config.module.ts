@@ -1,17 +1,25 @@
 
-import { Module } from '@nestjs/common';
+import { Module, DynamicModule, Global } from '@nestjs/common';
 import { ConfigService } from './config.service';
 
-const envFilename = '../.env' + (process.env.NODE_ENV ? '.' + process.env.NODE_ENV : '');
+// @Module({
+//   providers: [
+//     {
+//       provide: ConfigService,
+//       useValue: new ConfigService(envFilename),
+//     },
+//   ],
+//   exports: [ConfigService],
+// })
 
-@Module({
-  providers: [
-    {
-      provide: ConfigService,
-      useValue: new ConfigService(envFilename),
-    },
-  ],
-  exports: [ConfigService],
-})
-
-export class ConfigModule {}
+@Global()
+@Module({})
+export class ConfigModule {
+  static load(configPath: string): DynamicModule {
+    return {
+      module: ConfigModule,
+      providers: [{ provide: ConfigService, useValue: new ConfigService(configPath)}],
+      exports: [ConfigService],
+    };
+  }
+}

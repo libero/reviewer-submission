@@ -1,41 +1,68 @@
 
-import * as dotenv from 'dotenv';
 import * as fs from 'fs';
 import { Config as KnexConfig } from 'knex';
+import { get } from 'lodash';
+
+interface DatabaseConnectionConfig {
+  type: string;
+  host: string;
+  port: number;
+  database: string;
+  username?: string;
+  password?: string;
+}
+
+interface Config {
+  port: number;
+  connections: [];
+}
 
 export class ConfigService {
-  private readonly envConfig: { [key: string]: string };
+  private readonly config: Config;
 
   constructor(filePath: string) {
-    // if a .env file is present, store it, otherwise ignore
     if (fs.existsSync(filePath)) {
-      const { parsed } = dotenv.config({ path: filePath });
-      this.envConfig = parsed || {};
+      this.config = JSON.parse(fs.readFileSync(filePath, 'utf8'));
     } else {
-      this.envConfig = {};
+      throw new Error(`Config file not found at ${filePath}`);
+      // this.config = { port: 3000, connections: [] };
     }
   }
 
-  get(key: string): string {
-    // fallback to process environment config if not found and then fall back to empty string
-    return this.envConfig[key] || process.env[key] || '';
+  getPort(): number {
+    return this.config.port;
   }
 
   getSubmissionRepositoryConnection(): KnexConfig {
-    return {
-      dialect: 'sqlite3',
-      connection: {
-        filename: './data.db',
-      },
-    };
+    const config: DatabaseConnectionConfig = get(this.config, 'database.connections.submission');
+
+    return this.getKnexDatabaseConfig(config);
   }
 
   getSurveyResponseRepositoryConnection(): KnexConfig {
-    return {
-      dialect: 'sqlite3',
-      connection: {
-        filename: './data.db',
-      },
-    };
+    const config: DatabaseConnectionConfig = get(this.config, 'database.connections.survey');
+
+    return this.getKnexDatabaseConfig(config);
+  }
+
+  private getKnexDatabaseConfig(config: DatabaseConnectionConfig): KnexConfig {
+    if (config.type === 'sqlite3') {
+      return {
+        dialect: 'sqlite3',
+        connection: {
+          filename: config.database,
+        },
+      };
+    } else {
+      return {
+        dialect: config.type,
+        connection: {
+          database: config.database,
+          user: config.username,
+          password: config.password,
+          port: config.port,
+        },
+      };
+    }
   }
 }

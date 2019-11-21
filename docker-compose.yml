@@ -4,9 +4,7 @@ services:
   application:
     image: node:10
     ports:
-      - "${SERVER_PORT}:3000"
-    environment:
-      SERVER_PORT: ${SERVER_PORT}
+      - "${SERVER_PORT:-3000}:3000"
     working_dir: "/src"
     healthcheck:
       test: "curl localhost:3000/health"
@@ -16,3 +14,11 @@ services:
     command: ["bash", "-c", "yarn && yarn run start:dev"]
     volumes:
       - ./:/src/:z
+      - ./config/:/config/:z
+    networks:
+      - "infra_api"
+
+networks:
+  infra_api:
+    external:
+      name: "infra_api"

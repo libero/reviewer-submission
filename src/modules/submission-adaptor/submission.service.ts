@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import * as Knex from 'knex';
 import { SubmissionController } from '../../packages/submission/submission.controller';
 import { KnexSubmissionRepository } from './submission.repo';
 import { Submission } from '../../packages/submission/submission.entity';
@@ -6,8 +7,6 @@ import { ISubmission } from '../../packages/submission/submission.repository';
 import { ConfigService } from '../config/config.service';
 import { Option, Some, None } from 'funfix';
 import { SubmissionId } from '../../packages/submission/submission.repository';
-
-import * as Knex from 'knex';
 
 @Injectable()
 export class SubmissionService {
