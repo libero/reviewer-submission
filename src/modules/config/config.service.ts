@@ -46,14 +46,14 @@ export class ConfigService {
     private getKnexDatabaseConfig(config: DatabaseConnectionConfig): KnexConfig {
         if (config.type === 'sqlite3') {
             return {
-                dialect: 'sqlite3',
+                client: 'sqlite3',
                 connection: {
                     filename: config.database,
                 },
             };
         } else {
             return {
-                dialect: config.type,
+                client: config.type,
                 connection: {
                     database: config.database,
                     user: config.username,
