@@ -50,6 +50,7 @@ export class ConfigService {
                 connection: {
                     filename: config.database,
                 },
+                useNullAsDefault: true,
             };
         } else {
             return {
