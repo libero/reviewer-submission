@@ -11,16 +11,18 @@ import { SubmissionId } from 'src/packages/submission/submission.repository';
 
 @Injectable()
 export class SurveyService {
-  controller: Option<SurveyResponseController> = None;
+    controller: Option<SurveyResponseController> = None;
 
-  constructor(config: ConfigService) {
-    const surveyResponseRepository = new KnexSurveyResponseRepository(Knex(config.getSurveyResponseRepositoryConnection()));
+    constructor(config: ConfigService) {
+        const surveyResponseRepository = new KnexSurveyResponseRepository(
+            Knex(config.getSurveyResponseRepositoryConnection()),
+        );
 
-    this.controller = Some(new SurveyResponseController(surveyResponseRepository));
-  }
+        this.controller = Some(new SurveyResponseController(surveyResponseRepository));
+    }
 
-  // again, do we use SurveyAnswer or an interface?
-  submitResponse(surveyId: SurveyId, submissionId: SubmissionId, answers: SurveyAnswer[]): Promise<SurveyResponse> {
-    return this.controller.map(controller => controller.submitResponse(surveyId, submissionId, answers)).get();
-  }
+    // again, do we use SurveyAnswer or an interface?
+    submitResponse(surveyId: SurveyId, submissionId: SubmissionId, answers: SurveyAnswer[]): Promise<SurveyResponse> {
+        return this.controller.map(controller => controller.submitResponse(surveyId, submissionId, answers)).get();
+    }
 }

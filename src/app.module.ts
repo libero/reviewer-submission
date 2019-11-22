@@ -9,17 +9,17 @@ import { PassportModule } from '@nestjs/passport';
 import { resolve } from 'path';
 
 @Module({
-  controllers: [AppController],
-  imports: [
-    PassportModule.register({defaultStrategy: 'jwt'}),
-    GraphQLModule.forRoot({
-      context: ({ req }) => ({ req }),
-      typePaths: ['**/modules/**/*.graphql'],
-    }),
-    ConfigModule.load(resolve(__dirname, '..', 'config', 'config.json')),
-    AuthModule,
-    SubmissionModule,
-  ],
-  providers: [AppService],
+    controllers: [AppController],
+    imports: [
+        PassportModule.register({ defaultStrategy: 'jwt' }),
+        GraphQLModule.forRoot({
+            context: ({ req }) => ({ req }),
+            typePaths: ['**/modules/**/*.graphql'],
+        }),
+        ConfigModule.load(resolve(__dirname, '..', 'config', 'config.json')),
+        AuthModule,
+        SubmissionModule,
+    ],
+    providers: [AppService],
 })
 export class AppModule {}

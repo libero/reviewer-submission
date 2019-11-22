@@ -1,33 +1,33 @@
 import { ISubmission, SubmissionId } from './submission.repository';
 
 export class Submission implements ISubmission {
-  id: SubmissionId;
+    id: SubmissionId;
 
-  title: string;
+    title: string;
 
-  updated: Date;
+    updated: Date;
 
-  // For now, `lastStepVisited` will always be "title"
-  public static make(id: SubmissionId): Submission {
-    return new Submission({id, title: '', updated: new Date()});
-  }
+    // For now, `lastStepVisited` will always be "title"
+    public static make(id: SubmissionId): Submission {
+        return new Submission({ id, title: '', updated: new Date() });
+    }
 
-  // This is wired up so that you can create an entity from the DTO described by ISubmission
-  constructor({id, title, updated}: {id: SubmissionId, title: string, updated?: Date}) {
-    this.id = id;
-    this.title = title;
-    this.updated = updated || new Date();
-  }
+    // This is wired up so that you can create an entity from the DTO described by ISubmission
+    constructor({ id, title, updated }: { id: SubmissionId; title: string; updated?: Date }) {
+        this.id = id;
+        this.title = title;
+        this.updated = updated || new Date();
+    }
 
-  public changeTitle(title: string) {
-    this.title = title;
-  }
+    public changeTitle(title: string): void {
+        this.title = title;
+    }
 
-  public toDTO(): ISubmission {
-    return {
-      id: this.id,
-      title: this.title,
-      updated: this.updated,
-    };
-  }
+    public toDTO(): ISubmission {
+        return {
+            id: this.id,
+            title: this.title,
+            updated: this.updated,
+        };
+    }
 }
