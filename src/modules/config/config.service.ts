@@ -24,7 +24,6 @@ export class ConfigService {
             this.config = JSON.parse(fs.readFileSync(filePath, 'utf8'));
         } else {
             throw new Error(`Config file not found at ${filePath}`);
-            // this.config = { port: 3000, connections: [] };
         }
     }
 
