@@ -32,13 +32,13 @@ export class ConfigService {
     }
 
     getSubmissionRepositoryConnection(): KnexConfig {
-        const config: DatabaseConnectionConfig = get(this.config, 'database.connections.submission');
+        const config: DatabaseConnectionConfig = get(this.config, 'databases.submission');
 
         return this.getKnexDatabaseConfig(config);
     }
 
     getSurveyResponseRepositoryConnection(): KnexConfig {
-        const config: DatabaseConnectionConfig = get(this.config, 'database.connections.survey');
+        const config: DatabaseConnectionConfig = get(this.config, 'databases.survey');
 
         return this.getKnexDatabaseConfig(config);
     }

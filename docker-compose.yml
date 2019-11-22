@@ -12,6 +12,8 @@ services:
       timeout: 10s
       retries: 3
     command: ["bash", "-c", "yarn && yarn run start:dev"]
+    environment:
+      NEW_RELIC_HOME: ${NEW_RELIC_HOME:-/config}
     volumes:
       - ./:/src/:z
       - ./config/:/config/:z
