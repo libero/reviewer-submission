@@ -6,7 +6,8 @@ import { ConfigModule } from './modules/config/config.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { SubmissionModule } from './modules/submission-adaptor/submission.module';
 import { PassportModule } from '@nestjs/passport';
-import { resolve } from 'path';
+
+const configPath = process.env.CONFIG_PATH ? process.env.CONFIG_PATH : '/config/config.json';
 
 @Module({
     controllers: [AppController],
@@ -16,7 +17,7 @@ import { resolve } from 'path';
             context: ({ req }) => ({ req }),
             typePaths: ['**/modules/**/*.graphql'],
         }),
-        ConfigModule.load(resolve(__dirname, '..', 'config', 'config.json')),
+        ConfigModule.load(configPath),
         AuthModule,
         SubmissionModule,
     ],
