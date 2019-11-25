@@ -4,9 +4,7 @@ services:
   application:
     image: node:10
     ports:
-      - "${SERVER_PORT}:3000"
-    environment:
-      SERVER_PORT: ${SERVER_PORT}
+      - "${SERVER_PORT:-3000}:3000"
     working_dir: "/src"
     healthcheck:
       test: "curl localhost:3000/health"
@@ -14,5 +12,15 @@ services:
       timeout: 10s
       retries: 3
     command: ["bash", "-c", "yarn && yarn run start:dev"]
+    environment:
+      NEW_RELIC_HOME: ${NEW_RELIC_HOME:-/config}
     volumes:
       - ./:/src/:z
+      - ./config/:/config/:z
+    networks:
+      - "infra_api"
+
+networks:
+  infra_api:
+    external:
+      name: "infra_api"

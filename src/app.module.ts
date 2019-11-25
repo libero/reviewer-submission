@@ -6,6 +6,7 @@ import { ConfigModule } from './modules/config/config.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { SubmissionModule } from './modules/submission-adaptor/submission.module';
 import { PassportModule } from '@nestjs/passport';
+import { resolve } from 'path';
 
 @Module({
     controllers: [AppController],
@@ -15,7 +16,7 @@ import { PassportModule } from '@nestjs/passport';
             context: ({ req }) => ({ req }),
             typePaths: ['**/modules/**/*.graphql'],
         }),
-        ConfigModule,
+        ConfigModule.load(resolve(__dirname, '..', 'config', 'config.json')),
         AuthModule,
         SubmissionModule,
     ],
