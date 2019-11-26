@@ -7,7 +7,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { SubmissionModule } from './modules/submission-adaptor/submission.module';
 import { PassportModule } from '@nestjs/passport';
 
-const configPath = process.env.CONFIG_PATH ? process.env.CONFIG_PATH : '/config/config.json';
+const configPath = process.env.CONFIG_PATH ? process.env.CONFIG_PATH : '/etc/reviewer/config.json';
 
 @Module({
     controllers: [AppController],
