@@ -56,6 +56,7 @@ export class ConfigService {
             return {
                 client: config.type,
                 connection: {
+                    host: config.host,
                     database: config.database,
                     user: config.username,
                     password: config.password,
