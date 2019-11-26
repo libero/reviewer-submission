@@ -13,10 +13,10 @@ services:
       retries: 3
     command: ["bash", "-c", "yarn && yarn run start:dev"]
     environment:
-      NEW_RELIC_HOME: ${NEW_RELIC_HOME:-/config}
+      NEW_RELIC_HOME: ${NEW_RELIC_HOME:-/etc/reviewer/}
     volumes:
       - ./:/src/:z
-      - ./config/:/config/:z
+      - ./config/:/etc/reviewer/:z
     networks:
       - "infra_api"
 
