@@ -1,103 +1,103 @@
 {
-  "name": "reviewer-submission",
-  "version": "0.1.0",
-  "description": "",
-  "author": "libero-npm@elifesciences.org",
-  "license": "MIT",
-  "scripts": {
-    "build": "tsc -p tsconfig.build.json",
-    "format": "prettier --write \"src/**/*.ts\"",
-    "start": "ts-node -r tsconfig-paths/register src/main.ts",
-    "start:dev": "NEW_RELIC_HOME=config/ CONFIG_PATH=config/config.json concurrently --handle-input \"wait-on dist/main.js && nodemon\" \"tsc -w -p tsconfig.build.json\" ",
-    "start:debug": "nodemon --config nodemon-debug.json",
-    "prestart:prod": "rimraf dist && npm run build",
-    "start:prod": "node dist/main.js",
-    "lint": "eslint --ext .js,.ts src/",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
-    "update:internal": "yarn upgrade -P @libero"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/libero/reviewer-submission"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "yarn lint",
-      "pre-push": "yarn test"
-    }
-  },
-  "dependencies": {
-    "@libero/auth-token": "^0.1.1",
-    "@nestjs/common": "^6.0.0",
-    "@nestjs/core": "^6.0.0",
-    "@nestjs/graphql": "^6.4.2",
-    "@nestjs/jwt": "^6.1.1",
-    "@nestjs/passport": "^6.1.0",
-    "@nestjs/platform-express": "^6.0.0",
-    "@types/uuid": "^3.4.5",
-    "apollo-server-express": "^2.6.9",
-    "dotenv-cli": "^2.0.1",
-    "fp-ts": "^2.0.3",
-    "funfix": "^7.0.1",
-    "graphql": "^14.4.2",
-    "graphql-tools": "^4.0.5",
-    "io-ts": "^2.0.0",
-    "knex": "^0.19.1",
-    "lodash": "^4.17.15",
-    "newrelic": "^5.10.0",
-    "passport": "^0.4.0",
-    "passport-jwt": "^4.0.0",
-    "passport-local": "^1.0.0",
-    "pg": "^7.11.0",
-    "reflect-metadata": "^0.1.12",
-    "rimraf": "^2.6.2",
-    "rxjs": "^6.3.3",
-    "sqlite3": "^4.0.9",
-    "type-graphql": "^0.17.4",
-    "typesafe-uuid": "^1.0.2",
-    "uuid": "^3.3.2"
-  },
-  "devDependencies": {
-    "@nestjs/testing": "^6.0.0",
-    "@types/dotenv": "^6.1.1",
-    "@types/express": "^4.16.0",
-    "@types/jest": "^23.3.13",
-    "@types/lodash": "^4.14.149",
-    "@types/node": "^10.12.18",
-    "@types/supertest": "^2.0.7",
-    "@typescript-eslint/eslint-plugin": "^2.8.0",
-    "@typescript-eslint/parser": "^2.8.0",
-    "concurrently": "^4.1.0",
-    "eslint": "^6.6.0",
-    "eslint-config-prettier": "^6.7.0",
-    "eslint-plugin-prettier": "^3.1.1",
-    "husky": "^3.0.9",
-    "jest": "^24.9.0",
-    "nodemon": "^1.18.9",
-    "prettier": "^1.19.1",
-    "supertest": "^3.4.1",
-    "ts-jest": "24.0.2",
-    "ts-node": "8.1.0",
-    "tsconfig-paths": "3.8.0",
-    "typescript": "3.6.3",
-    "wait-on": "^3.2.0"
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "json",
-      "ts"
-    ],
-    "rootDir": "src",
-    "testRegex": ".(test|spec).ts$",
-    "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
+    "name": "reviewer-submission",
+    "version": "0.1.0",
+    "description": "",
+    "author": "libero-npm@elifesciences.org",
+    "license": "MIT",
+    "scripts": {
+        "build": "tsc -p tsconfig.build.json",
+        "format": "prettier --write \"src/**/*.ts\"",
+        "start": "ts-node -r tsconfig-paths/register src/main.ts",
+        "start:dev": "NEW_RELIC_HOME=config/ CONFIG_PATH=config/config.json concurrently --handle-input \"wait-on dist/main.js && nodemon\" \"tsc -w -p tsconfig.build.json\" ",
+        "start:debug": "nodemon --config nodemon-debug.json",
+        "prestart:prod": "rimraf dist && npm run build",
+        "start:prod": "node dist/main.js",
+        "lint": "eslint --ext .js,.ts src/",
+        "test": "jest",
+        "test:watch": "jest --watch",
+        "test:cov": "jest --coverage",
+        "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+        "test:e2e": "jest --config ./test/jest-e2e.json",
+        "update:internal": "yarn upgrade -P @libero"
     },
-    "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
-  }
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/libero/reviewer-submission"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "yarn lint",
+            "pre-push": "yarn test"
+        }
+    },
+    "dependencies": {
+        "@libero/auth-token": "^0.1.1",
+        "@nestjs/common": "^6.0.0",
+        "@nestjs/core": "^6.0.0",
+        "@nestjs/graphql": "^6.4.2",
+        "@nestjs/jwt": "^6.1.1",
+        "@nestjs/passport": "^6.1.0",
+        "@nestjs/platform-express": "^6.0.0",
+        "@types/uuid": "^3.4.5",
+        "apollo-server-express": "^2.6.9",
+        "dotenv-cli": "^2.0.1",
+        "fp-ts": "^2.0.3",
+        "funfix": "^7.0.1",
+        "graphql": "^14.4.2",
+        "graphql-tools": "^4.0.5",
+        "io-ts": "^2.0.0",
+        "knex": "^0.19.1",
+        "lodash": "^4.17.15",
+        "newrelic": "^5.10.0",
+        "passport": "^0.4.0",
+        "passport-jwt": "^4.0.0",
+        "passport-local": "^1.0.0",
+        "pg": "^7.11.0",
+        "reflect-metadata": "^0.1.12",
+        "rimraf": "^2.6.2",
+        "rxjs": "^6.3.3",
+        "sqlite3": "^4.0.9",
+        "type-graphql": "^0.17.4",
+        "typesafe-uuid": "^1.0.2",
+        "uuid": "^3.3.2"
+    },
+    "devDependencies": {
+        "@nestjs/testing": "^6.0.0",
+        "@types/dotenv": "^6.1.1",
+        "@types/express": "^4.16.0",
+        "@types/jest": "^23.3.13",
+        "@types/lodash": "^4.14.149",
+        "@types/node": "^10.12.18",
+        "@types/supertest": "^2.0.7",
+        "@typescript-eslint/eslint-plugin": "^2.8.0",
+        "@typescript-eslint/parser": "^2.8.0",
+        "concurrently": "^4.1.0",
+        "eslint": "^6.6.0",
+        "eslint-config-prettier": "^6.7.0",
+        "eslint-plugin-prettier": "^3.1.1",
+        "husky": "^3.0.9",
+        "jest": "^24.9.0",
+        "nodemon": "^1.18.9",
+        "prettier": "^1.19.1",
+        "supertest": "^3.4.1",
+        "ts-jest": "24.0.2",
+        "ts-node": "8.1.0",
+        "tsconfig-paths": "3.8.0",
+        "typescript": "3.6.3",
+        "wait-on": "^3.2.0"
+    },
+    "jest": {
+        "moduleFileExtensions": [
+            "js",
+            "json",
+            "ts"
+        ],
+        "rootDir": "src",
+        "testRegex": ".test.ts$",
+        "transform": {
+            "^.+\\.(t|j)s$": "ts-jest"
+        },
+        "coverageDirectory": "../coverage",
+        "testEnvironment": "node"
+    }
 }
