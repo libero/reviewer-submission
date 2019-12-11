@@ -1,27 +1,25 @@
 import * as fs from 'fs';
 import { Config as KnexConfig } from 'knex';
 import { get } from 'lodash';
-
-interface DatabaseConnectionConfig {
-    type: string;
-    host: string;
-    port: number;
-    database: string;
-    username?: string;
-    password?: string;
-}
-
-interface Config {
-    port: number;
-    connections: [];
-}
+import { Config, DatabaseConnectionConfig } from './config.types';
 
 export class ConfigService {
+    private static supportedClients: string[] = [
+        'pg', 'sqlite3'
+    ];
     private readonly config: Config;
 
-    constructor(filePath: string) {
+    constructor(initializer: string | Config) {
+        if (typeof initializer == 'string') {
+            this.config = this.load(initializer);
+        } else {
+            this.config = initializer;
+        }
+    }
+
+    private load(filePath: string) : Config {
         if (fs.existsSync(filePath)) {
-            this.config = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+            return JSON.parse(fs.readFileSync(filePath, 'utf8'));
         } else {
             throw new Error(`Config file not found at ${filePath}`);
         }
@@ -44,16 +42,17 @@ export class ConfigService {
     }
 
     private getKnexDatabaseConfig(config: DatabaseConnectionConfig): KnexConfig {
+        let result: KnexConfig;
         if (config.type === 'sqlite3') {
-            return {
+            result = {
                 client: 'sqlite3',
                 connection: {
                     filename: config.database,
                 },
                 useNullAsDefault: true,
             };
-        } else {
-            return {
+        } else if (ConfigService.supportedClients.includes(config.type)) {
+            result = {
                 client: config.type,
                 connection: {
                     host: config.host,
@@ -63,6 +62,9 @@ export class ConfigService {
                     port: config.port,
                 },
             };
+        } else {
+            throw new Error(`Configuration contains unsupported database client: ${config.type}`);
         }
+        return result;
     }
 }

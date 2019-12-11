@@ -1,0 +1,13 @@
+{
+    "port": 33333,
+    "databases": {
+        "submission": {
+            "type": "sqlite3",
+            "database": "data1.db"
+        },
+        "survey": {
+            "type": "sqlite3",
+            "database": "data2.db"
+        }
+    }
+}
