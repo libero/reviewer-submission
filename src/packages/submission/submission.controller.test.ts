@@ -1,4 +1,4 @@
-import { ISubmission, SubmissionId } from './submission.repository';
+import { ISubmission, SubmissionId, SubmissionRepository } from './submission.repository';
 import { SubmissionController } from './submission.controller';
 import { Some, None } from 'funfix';
 import { Submission } from './submission.entity';
@@ -11,12 +11,12 @@ describe('submission controller', () => {
         updated: new Date(),
     };
 
-    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-    const newMockSubmissionRepository = () => ({
+    const newMockSubmissionRepository = (): SubmissionRepository => ({
         findAll: jest.fn(async () => [mockISubmission, mockISubmission]),
         findById: jest.fn(async () => None),
         save: jest.fn(async (arg: ISubmission) => arg),
         delete: jest.fn(async () => false),
+        close: jest.fn(),
     });
 
     describe('find all submissions', () => {
@@ -27,7 +27,7 @@ describe('submission controller', () => {
 
             const allFound = await controller.findAll();
 
-            expect(mockRepo.findAll.mock.calls.length).toBe(1);
+            expect(mockRepo.findAll).toBeCalledTimes(1);
             expect(allFound.length).toBe(2);
             expect(allFound[0]).toBeInstanceOf(Submission);
             expect(allFound[1]).toBeInstanceOf(Submission);
@@ -40,7 +40,7 @@ describe('submission controller', () => {
             controller.repository = None;
 
             expect(controller.findAll()).rejects.toThrow();
-            expect(mockRepo.findAll.mock.calls.length).toBe(0);
+            expect(mockRepo.findAll).toBeCalledTimes(0);
         });
 
         it("returns an empty array when there aren't any submissions", async () => {
@@ -55,7 +55,7 @@ describe('submission controller', () => {
 
             const allFound = await controller.findAll();
 
-            expect(mockRepo.findAll.mock.calls.length).toBe(1);
+            expect(mockRepo.findAll).toBeCalledTimes(1);
             expect(allFound.length).toBe(0);
         });
     });
@@ -67,7 +67,7 @@ describe('submission controller', () => {
             const controller = new SubmissionController(mockRepo);
 
             const newSubmission = await controller.start();
-            expect(mockRepo.save.mock.calls.length).toBe(1);
+            expect(mockRepo.save).toBeCalledTimes(1);
             expect(newSubmission).toBeInstanceOf(Submission);
         });
 
@@ -78,7 +78,7 @@ describe('submission controller', () => {
             controller.repository = None;
 
             expect(controller.start()).rejects.toThrow();
-            expect(mockRepo.save.mock.calls.length).toBe(0);
+            expect(mockRepo.save).toBeCalledTimes(0);
         });
     });
 
@@ -89,7 +89,7 @@ describe('submission controller', () => {
             const controller = new SubmissionController(mockRepo);
 
             expect(controller.findOne(SubmissionId.fromUuid(v4()))).rejects.toThrow();
-            expect(mockRepo.findById.mock.calls.length).toBe(1);
+            expect(mockRepo.findById).toBeCalledTimes(1);
         });
 
         it("errors when it doesn't have a repo", async () => {
@@ -99,7 +99,7 @@ describe('submission controller', () => {
             controller.repository = None;
 
             expect(controller.findOne(SubmissionId.fromUuid(v4()))).rejects.toThrow();
-            expect(mockRepo.findById.mock.calls.length).toBe(0);
+            expect(mockRepo.findById).toBeCalledTimes(0);
         });
 
         it("returns it if it's there", async () => {
@@ -114,7 +114,7 @@ describe('submission controller', () => {
 
             const found = await controller.findOne(SubmissionId.fromUuid(v4()));
 
-            expect(findById.mock.calls.length).toBe(1);
+            expect(findById).toBeCalledTimes(1);
             expect(found).toBeInstanceOf(Submission);
         });
     });
@@ -127,8 +127,8 @@ describe('submission controller', () => {
             controller.repository = None;
 
             expect(controller.findOne(SubmissionId.fromUuid(v4()))).rejects.toThrow();
-            expect(mockRepo.save.mock.calls.length).toBe(0);
-            expect(mockRepo.findById.mock.calls.length).toBe(0);
+            expect(mockRepo.save).toBeCalledTimes(0);
+            expect(mockRepo.findById).toBeCalledTimes(0);
         });
 
         it("errors when the submission doesn't exist", async () => {
@@ -147,8 +147,8 @@ describe('submission controller', () => {
                     'Some new title that will be lost in the sands of time',
                 ),
             ).rejects.toThrow();
-            expect(findById.mock.calls.length).toBe(1);
-            expect(mockRepo.save.mock.calls.length).toBe(0);
+            expect(findById).toBeCalledTimes(1);
+            expect(mockRepo.save).toBeCalledTimes(0);
         });
 
         it('changes the title', async () => {
@@ -167,8 +167,8 @@ describe('submission controller', () => {
 
             expect(newSubmission).toBeInstanceOf(Submission);
             expect(newSubmission.title).toBe(newTitle);
-            expect(findById.mock.calls.length).toBe(1);
-            expect(mockRepo.save.mock.calls.length).toBe(1);
+            expect(findById).toBeCalledTimes(1);
+            expect(mockRepo.save).toBeCalledTimes(1);
         });
     });
 });

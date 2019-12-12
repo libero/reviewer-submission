@@ -4,12 +4,20 @@ import { SurveyResponse } from './survey-response.entity';
 import { SurveyResponseRepository, SurveyId, SurveyResponseId } from './survey-response.repository';
 import { SurveyAnswer } from './survey-answer';
 import { SubmissionId } from '../submission/submission.repository';
+import { Logger } from '@nestjs/common';
 
 export class SurveyResponseController {
     repository: Option<SurveyResponseRepository> = None;
+    private readonly logger = new Logger(SurveyResponseController.name);
 
     constructor(repository: SurveyResponseRepository) {
         this.repository = Option.of(repository);
+    }
+
+    close(): void {
+        this.logger.log('Closing repository');
+        this.repository.get().close();
+        this.repository = None;
     }
 
     async submitResponse(

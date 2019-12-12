@@ -8,6 +8,7 @@ export class SurveyResponseId extends uuidType<'SurveyResponseId'>() {}
 
 export interface SurveyResponseRepository {
     save(surveyResponse: ISurveyResponse): Promise<ISurveyResponse>;
+    close(): void;
 }
 
 export interface ISurveyResponse {

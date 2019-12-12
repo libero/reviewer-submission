@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { Option, Some, None } from 'funfix';
 import * as Knex from 'knex';
 import { ConfigService } from '../config/config.service';
@@ -10,15 +10,21 @@ import { SurveyId } from 'src/packages/survey/survey-response.repository';
 import { SubmissionId } from 'src/packages/submission/submission.repository';
 
 @Injectable()
-export class SurveyService {
+export class SurveyService implements OnModuleDestroy {
     controller: Option<SurveyResponseController> = None;
+    surveyResponseRepository: KnexSurveyResponseRepository;
 
     constructor(config: ConfigService) {
-        const surveyResponseRepository = new KnexSurveyResponseRepository(
+        this.surveyResponseRepository = new KnexSurveyResponseRepository(
             Knex(config.getSurveyResponseRepositoryConnection()),
         );
 
-        this.controller = Some(new SurveyResponseController(surveyResponseRepository));
+        this.controller = Some(new SurveyResponseController(this.surveyResponseRepository));
+    }
+
+    onModuleDestroy(): void {
+        this.controller.get().close();
+        this.controller = None;
     }
 
     // again, do we use SurveyAnswer or an interface?
