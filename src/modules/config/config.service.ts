@@ -4,9 +4,7 @@ import { get } from 'lodash';
 import { Config, DatabaseConnectionConfig } from './config.types';
 
 export class ConfigService {
-    private static supportedClients: string[] = [
-        'pg', 'sqlite3'
-    ];
+    private static supportedClients: string[] = ['pg', 'sqlite3'];
     private readonly config: Config;
 
     constructor(initializer: string | Config) {
@@ -17,7 +15,7 @@ export class ConfigService {
         }
     }
 
-    private load(filePath: string) : Config {
+    private load(filePath: string): Config {
         if (fs.existsSync(filePath)) {
             return JSON.parse(fs.readFileSync(filePath, 'utf8'));
         } else {

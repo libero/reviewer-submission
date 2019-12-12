@@ -11,4 +11,8 @@ export class KnexSurveyResponseRepository implements SurveyResponseRepository {
 
         return surveyResponse;
     }
+
+    close(): void {
+        this.knex.destroy();
+    }
 }

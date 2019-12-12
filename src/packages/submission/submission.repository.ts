@@ -8,6 +8,7 @@ export interface SubmissionRepository {
     findById(id: SubmissionId): Promise<Option<ISubmission>>;
     save(subm: ISubmission): Promise<ISubmission>;
     delete(id: SubmissionId): Promise<boolean>;
+    close(): void;
 }
 
 // I'm treating ISubmission as a DTO for Submission

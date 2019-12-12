@@ -5,20 +5,19 @@ const config: Config = {
     port: 12345,
     databases: {
         survey: { type: 'sqlite3', host: 'Terry Wogan', port: 123, database: 'survey' },
-        submission: { type: 'pg', host: 'Clive James', port: 456, database: 'submission' }
-    }
-}
+        submission: { type: 'pg', host: 'Clive James', port: 456, database: 'submission' },
+    },
+};
 
 const badConfig: Config = {
     port: 12345,
     databases: {
         survey: { type: 'blue', host: 'Terry Wogan', port: 123, database: 'survey' },
-        submission: { type: 'yellow', host: 'Clive James', port: 456, database: 'submission' }
-    }
-}
+        submission: { type: 'yellow', host: 'Clive James', port: 456, database: 'submission' },
+    },
+};
 
 describe('ConfigService', () => {
-
     it('can be initialised with a file', () => {
         const cs = new ConfigService('src/modules/config/test-config.json');
         expect(cs.getPort()).toEqual(33333);
@@ -45,7 +44,7 @@ describe('ConfigService', () => {
         expect(cs.getSurveyResponseRepositoryConnection()).toEqual({
             client: 'sqlite3',
             connection: {
-                filename: 'survey'
+                filename: 'survey',
             },
             useNullAsDefault: true,
         });
@@ -56,8 +55,8 @@ describe('ConfigService', () => {
                 port: 456,
                 database: 'submission',
                 password: undefined,
-                user: undefined
-            }
+                user: undefined,
+            },
         });
     });
 
@@ -65,7 +64,7 @@ describe('ConfigService', () => {
         const cs = new ConfigService(badConfig);
         expect(cs.getPort()).toBe(12345);
         expect(() => {
-            cs.getSurveyResponseRepositoryConnection()
+            cs.getSurveyResponseRepositoryConnection();
         }).toThrow('Configuration contains unsupported database client');
     });
 });

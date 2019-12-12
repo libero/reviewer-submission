@@ -2,12 +2,20 @@ import { v4 as uuid } from 'uuid';
 import { Submission } from './submission.entity';
 import { ISubmission, SubmissionRepository, SubmissionId } from './submission.repository';
 import { Option, None } from 'funfix';
+import { Logger } from '@nestjs/common';
 
 export class SubmissionController {
     repository: Option<SubmissionRepository> = None;
+    private readonly logger = new Logger(SubmissionController.name);
 
     constructor(repo: SubmissionRepository) {
         this.repository = Option.of(repo);
+    }
+
+    close(): void {
+        this.logger.log('Closing repository');
+        this.repository.get().close();
+        this.repository = None;
     }
 
     async findAll(): Promise<Submission[]> {

@@ -25,6 +25,10 @@ export class KnexSubmissionRepository implements SubmissionRepository {
         });
     }
 
+    close(): void {
+        this.knex.destroy();
+    }
+
     public async findAll(): Promise<ISubmission[]> {
         const stuff = await this.knex(this.TABLE_NAME).select<ISubmission[]>('id', 'title', 'updated');
 

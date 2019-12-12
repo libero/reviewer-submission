@@ -1,4 +1,3 @@
-
 export interface DatabaseConnectionConfig {
     type: string;
     host: string;
@@ -11,7 +10,7 @@ export interface DatabaseConnectionConfig {
 export interface Config {
     port: number;
     databases: {
-        survey: DatabaseConnectionConfig,
-        submission: DatabaseConnectionConfig
+        survey: DatabaseConnectionConfig;
+        submission: DatabaseConnectionConfig;
     };
 }
