@@ -21,6 +21,7 @@ describe('Survey Controller', () => {
         // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
         const newSurveyResponseRepo = () => ({
             save: jest.fn(async thing => thing || new SurveyResponse(exampleSurveyResponse)),
+            close: jest.fn(),
         });
 
         it("errors when there isn't a repo", async () => {
