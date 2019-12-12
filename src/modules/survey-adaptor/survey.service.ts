@@ -19,7 +19,7 @@ export class SurveyService implements OnModuleDestroy {
             Knex(config.getSurveyResponseRepositoryConnection()),
         );
 
-        this.controller = Some(new SurveyResponseController(surveyResponseRepository));
+        this.controller = Some(new SurveyResponseController(this.surveyResponseRepository));
     }
 
     onModuleDestroy(): void {
