@@ -1,5 +1,5 @@
 import { SurveyResponseController } from './survey-response.controller';
-import { SurveyResponseDTO, SurveyResponseId, SurveyId } from './survey-response.repository';
+import { SurveyResponseDTO, SurveyResponseId, SurveyId, SurveyResponseRepository } from './survey-response.repository';
 import { SubmissionId } from '../submission/submission.repository';
 import { SurveyResponse } from './survey-response.entity';
 import { SurveyAnswer } from './survey-answer';
@@ -18,8 +18,7 @@ describe('Survey Controller', () => {
             },
         };
 
-        // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-        const newSurveyResponseRepo = () => ({
+        const newSurveyResponseRepo = (): SurveyResponseRepository => ({
             save: jest.fn(async thing => thing || new SurveyResponse(exampleSurveyResponse)),
             close: jest.fn(),
         });
@@ -94,8 +93,8 @@ describe('Survey Controller', () => {
             };
 
             // JSON.stringify because JEST asserts on object instances and I ain't got time fo dat
-            expect(JSON.stringify(repo.save.mock.calls)).toEqual(JSON.stringify([[expectedResult]]));
-            expect(repo.save.mock.calls.length).toBe(1);
+            expect(repo.save).toBeCalledWith(expectedResult);
+            expect(repo.save).toBeCalledTimes(1);
         });
     });
 });
