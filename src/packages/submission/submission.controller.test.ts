@@ -17,6 +17,7 @@ describe('submission controller', () => {
         findById: jest.fn(async () => None),
         save: jest.fn(async (arg: ISubmission) => arg),
         delete: jest.fn(async () => false),
+        close: jest.fn(),
     });
 
     describe('find all submissions', () => {
