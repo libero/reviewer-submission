@@ -8,21 +8,25 @@ describe('submission controller', () => {
     const mockSubmissionEntity: Submission = {
         id: SubmissionId.fromUuid(v4()),
         title: "The Importance of Unit Testing One's Controller Logic",
-        updated: new Date()
+        updated: new Date(),
     };
 
     const newMockSubmissionRepository = (): SubmissionRepository => ({
         findAll: jest.fn(async () => Option.of([mockSubmissionEntity, mockSubmissionEntity])),
         findById: jest.fn(async () => None),
         save: jest.fn(async (arg: Submission) => Option.of(arg)),
-        create: jest.fn(async () => Option.of(new SubmissionEntity({
-            id: SubmissionId.fromUuid(v4()),
-            title: '',
-            updated: new Date()
-        }))),
+        create: jest.fn(async () =>
+            Option.of(
+                new SubmissionEntity({
+                    id: SubmissionId.fromUuid(v4()),
+                    title: '',
+                    updated: new Date(),
+                }),
+            ),
+        ),
         delete: jest.fn(async () => 1),
         close: jest.fn(),
-        changeTitle: jest.fn( async () => Option.of(mockSubmissionEntity) )
+        changeTitle: jest.fn(async () => Option.of(mockSubmissionEntity)),
     });
 
     describe('find all submissions', () => {
@@ -95,11 +99,9 @@ describe('submission controller', () => {
         });
     });
 
-
     describe('changeTitle for a submission', () => {
-
         it('changes the title', async () => {
-            const mr = newMockSubmissionRepository()
+            const mr = newMockSubmissionRepository();
             const controller = new SubmissionController(mr);
 
             const newTitle = 'Some new title';

@@ -87,7 +87,7 @@ export class KnexSubmissionRepository implements SubmissionRepository {
     public async changeTitle(id: SubmissionId, title: string): Promise<Option<Submission>> {
         const result = await this.findById(id);
         if (result.isEmpty()) {
-            return None
+            return None;
         } else {
             result.get().title = title;
             return this.save(result.get());
