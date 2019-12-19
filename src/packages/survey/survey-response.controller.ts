@@ -3,7 +3,7 @@ import { None, Option } from 'funfix';
 import { SurveyResponse } from './survey-response.entity';
 import { SurveyResponseRepository, SurveyId, SurveyResponseId } from './survey-response.repository';
 import { SurveyAnswer } from './survey-answer';
-import { SubmissionId } from '../submission/submission.repository';
+import { SubmissionId } from '../submission/submission.types';
 import { Logger } from '@nestjs/common';
 
 export class SurveyResponseController {

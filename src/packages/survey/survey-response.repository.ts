@@ -1,7 +1,7 @@
 import { Question } from './question';
 import { Answer } from './answer';
 import { uuidType } from 'typesafe-uuid';
-import { SubmissionId } from '../submission/submission.repository';
+import { SubmissionId } from '../submission/submission.types';
 
 export class SurveyId extends uuidType<'SurveyId'>() {}
 export class SurveyResponseId extends uuidType<'SurveyResponseId'>() {}

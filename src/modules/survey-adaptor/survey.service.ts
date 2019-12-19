@@ -7,7 +7,7 @@ import { SurveyResponseController } from 'src/packages/survey/survey-response.co
 import { SurveyAnswer } from 'src/packages/survey/survey-answer';
 import { SurveyResponse } from 'src/packages/survey/survey-response.entity';
 import { SurveyId } from 'src/packages/survey/survey-response.repository';
-import { SubmissionId } from 'src/packages/submission/submission.repository';
+import { SubmissionId } from 'src/packages/submission/submission.types';
 
 @Injectable()
 export class SurveyService implements OnModuleDestroy {

@@ -1,6 +1,6 @@
 import { SurveyResponseController } from './survey-response.controller';
 import { SurveyResponseDTO, SurveyResponseId, SurveyId, SurveyResponseRepository } from './survey-response.repository';
-import { SubmissionId } from '../submission/submission.repository';
+import { SubmissionId } from '../submission/submission.types';
 import { SurveyResponse } from './survey-response.entity';
 import { SurveyAnswer } from './survey-answer';
 import { v4 } from 'uuid';

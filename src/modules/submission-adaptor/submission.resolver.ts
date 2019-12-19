@@ -1,35 +1,47 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { Submission } from '../../packages/submission/submission.entity';
-import { SubmissionId } from '../../packages/submission/submission.repository';
-import { ISubmission } from '../../packages/submission/submission.repository';
+import { SubmissionId, DtoViewSubmission } from '../../packages/submission/submission.types';
 import { SubmissionService } from './submission.service';
 
+/*
+ * Principle - convert to/from dtoView
+ */
 @Resolver()
 export class SubmissionResolver {
     constructor(private readonly submissionService: SubmissionService) {}
 
     @Query('getSubmissions')
-    async getSubmissions(): Promise<Submission[]> {
-        return await this.submissionService.findAll();
+    async getSubmissions(): Promise<DtoViewSubmission[] | null> {
+        const result = await this.submissionService.findAll();
+        return result.getOrElse(null);
     }
 
     @Query('getSubmission')
-    async getSubmission(@Args('id') id: string): Promise<ISubmission> {
-        return (await this.submissionService.findOne(SubmissionId.fromUuid(id))).toDTO();
+    async getSubmission(@Args('id') id: string): Promise<DtoViewSubmission | null> {
+        const result = await this.submissionService.findOne(SubmissionId.fromUuid(id));
+        if (result.isEmpty()) {
+            return null;
+        } else {
+            return result.get();
+        }
     }
 
-    @Mutation('startSubmission')
-    async startSubmission(): Promise<ISubmission> {
-        return await this.submissionService.start();
+    @Mutation('createSubmission')
+    async startSubmission(): Promise<DtoViewSubmission | null> {
+        const result = await this.submissionService.create();
+        return result.getOrElse(null);
     }
 
     @Mutation('changeSubmissionTitle')
-    async changeSubmissionTitle(@Args('id') id: string, @Args('title') title: string): Promise<Submission> {
-        return await this.submissionService.changeTitle(SubmissionId.fromUuid(id), title);
+    async changeSubmissionTitle(
+        @Args('id') id: string,
+        @Args('title') title: string,
+    ): Promise<DtoViewSubmission | null> {
+        const result = await this.submissionService.changeTitle(SubmissionId.fromUuid(id), title);
+        return result.getOrElse(null);
     }
 
     @Mutation('deleteSubmission')
-    async deleteSubmission(@Args('id') id: SubmissionId): Promise<boolean> {
-        return await this.submissionService.deleteSubmission(id);
+    async deleteSubmission(@Args('id') id: SubmissionId): Promise<number> {
+        return await this.submissionService.delete(id);
     }
 }

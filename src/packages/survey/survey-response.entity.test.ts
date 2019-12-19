@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { SurveyResponse } from './survey-response.entity';
 import { SurveyId, SurveyResponseId } from './survey-response.repository';
-import { SubmissionId } from '../submission/submission.repository';
+import { SubmissionId } from '../submission/submission.types';
 import { Question } from './question';
 import { Answer } from './answer';
 
