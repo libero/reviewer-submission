@@ -1,23 +1,19 @@
 import { v4 as uuid } from 'uuid';
-import { Submission } from './submission.entity';
-import { SubmissionId } from './submission.repository';
+import { SubmissionEntity } from './submission.entity';
+import { SubmissionId } from './submission.types';
 
 describe('Submission Entity', () => {
     it('creates a new entity properly', () => {
         const id = SubmissionId.fromUuid(uuid());
-        const submission = Submission.make(id);
+        const submission = new SubmissionEntity({
+            id: id,
+            title: '',
+            updated: new Date(),
+        });
 
-        expect(submission).toBeInstanceOf(Submission);
+        expect(submission).toBeInstanceOf(SubmissionEntity);
         expect(submission.title).toBeDefined();
         expect(submission.id).toBe(id);
         expect(submission.updated).toBeDefined();
-    });
-    it('changeTitle works', () => {
-        const id = SubmissionId.fromUuid(uuid());
-        const submission = Submission.make(id);
-
-        submission.changeTitle('foo');
-
-        expect(submission.title).toBe('foo');
     });
 });

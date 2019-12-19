@@ -1,61 +1,41 @@
-import { v4 as uuid } from 'uuid';
-import { Submission } from './submission.entity';
-import { ISubmission, SubmissionRepository, SubmissionId } from './submission.repository';
-import { Option, None } from 'funfix';
 import { Logger } from '@nestjs/common';
+import { Option, None } from 'funfix';
+import { SubmissionRepository, SubmissionId, Submission } from './submission.types';
 
 export class SubmissionController {
-    repository: Option<SubmissionRepository> = None;
     private readonly logger = new Logger(SubmissionController.name);
 
-    constructor(repo: SubmissionRepository) {
-        this.repository = Option.of(repo);
-    }
+    constructor(readonly repository: SubmissionRepository) {}
 
     close(): void {
         this.logger.log('Closing repository');
-        this.repository.get().close();
-        this.repository = None;
+        this.repository.close();
     }
 
-    async findAll(): Promise<Submission[]> {
-        return await this.repository
-            .map(async repo => (await repo.findAll()).map((isub: ISubmission) => new Submission(isub)))
-            .get();
+    async findAll(): Promise<Option<Submission[]>> {
+        return new Promise(async resolve => {
+            const result: Option<Submission[]> = await this.repository.findAll();
+            if (result.isEmpty()) {
+                resolve(None);
+            } else {
+                resolve(Option.of(result.get()));
+            }
+        });
     }
 
-    async start(): Promise<Submission> {
-        const id = SubmissionId.fromUuid(uuid());
-        const submission: Submission = await Submission.make(id);
-
-        await this.repository.map(async repo => await repo.save(submission.toDTO())).get();
-
-        return submission;
+    async create(): Promise<Option<Submission>> {
+        return this.repository.create();
     }
 
-    async findOne(id: SubmissionId): Promise<Submission> {
-        return await this.repository.map(async repo => new Submission((await repo.findById(id)).get())).get();
+    async findOne(id: SubmissionId): Promise<Option<Submission>> {
+        return this.repository.findById(id);
     }
 
-    async changeTitle(id: SubmissionId, title: string): Promise<Submission> {
-        return await this.repository
-            .map(async repo => {
-                const submission: Submission = new Submission(
-                    (await repo.findById(id)).get(), // XXX: Will error if submission can't be found
-                );
-
-                submission.changeTitle(title);
-
-                return new Submission(await repo.save(submission.toDTO()));
-            })
-            .get();
+    async changeTitle(id: SubmissionId, title: string): Promise<Option<Submission>> {
+        return this.repository.changeTitle(id, title);
     }
 
-    async deleteSubmission(id: SubmissionId): Promise<boolean> {
-        return await this.repository
-            .map(async repo => {
-                return await repo.delete(id);
-            })
-            .get();
+    async delete(id: SubmissionId): Promise<number> {
+        return this.repository.delete(id);
     }
 }

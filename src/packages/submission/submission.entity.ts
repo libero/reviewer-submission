@@ -1,16 +1,11 @@
-import { ISubmission, SubmissionId } from './submission.repository';
+import { SubmissionId, DtoSubmission, DtoViewSubmission, Submission } from './submission.types';
 
-export class Submission implements ISubmission {
+export class SubmissionEntity implements Submission {
     id: SubmissionId;
 
     title: string;
 
     updated: Date;
-
-    // For now, `lastStepVisited` will always be "title"
-    public static make(id: SubmissionId): Submission {
-        return new Submission({ id, title: '', updated: new Date() });
-    }
 
     // This is wired up so that you can create an entity from the DTO described by ISubmission
     constructor({ id, title, updated }: { id: SubmissionId; title: string; updated?: Date }) {
@@ -18,16 +13,24 @@ export class Submission implements ISubmission {
         this.title = title;
         this.updated = updated || new Date();
     }
+}
 
-    public changeTitle(title: string): void {
-        this.title = title;
-    }
-
-    public toDTO(): ISubmission {
+export class SubmissionMapper {
+    public static toDto(sub: Submission): DtoSubmission {
         return {
-            id: this.id,
-            title: this.title,
-            updated: this.updated,
+            id: sub.id,
+            title: sub.title,
+            updated: sub.updated,
         };
+    }
+    public static toViewDto(sub: Submission): DtoViewSubmission {
+        return {
+            id: sub.id,
+            title: sub.title,
+            updated: sub.updated,
+        };
+    }
+    public static fromDto(sub: DtoSubmission): SubmissionEntity {
+        return new SubmissionEntity(sub);
     }
 }

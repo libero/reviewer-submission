@@ -1,19 +1,17 @@
 import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import * as Knex from 'knex';
+import { Option } from 'funfix';
 import { SubmissionController } from '../../packages/submission/submission.controller';
-import { KnexSubmissionRepository } from './submission.repo';
-import { Submission } from '../../packages/submission/submission.entity';
-import { ISubmission } from '../../packages/submission/submission.repository';
 import { ConfigService } from '../config/config.service';
-import { Option, Some, None } from 'funfix';
-import { SubmissionId } from '../../packages/submission/submission.repository';
+import { SubmissionId, DtoViewSubmission } from '../../packages/submission/submission.types';
+import { KnexSubmissionRepository } from './submission.repository';
 
 export type SubmissionServiceConfig = {
     getSubmissionRepositoryConnection(): string;
 };
 @Injectable()
 export class SubmissionService implements OnModuleDestroy {
-    controller: Option<SubmissionController> = None;
+    controller: SubmissionController;
 
     constructor(config: ConfigService) {
         const knexConnection = Knex(config.getSubmissionRepositoryConnection());
@@ -21,31 +19,30 @@ export class SubmissionService implements OnModuleDestroy {
         const submissionRepo = new KnexSubmissionRepository(knexConnection);
         submissionRepo.initSchema();
 
-        this.controller = Some(new SubmissionController(submissionRepo));
+        this.controller = new SubmissionController(submissionRepo);
     }
 
     onModuleDestroy(): void {
-        this.controller.get().close();
-        this.controller = None;
+        this.controller.close();
     }
 
-    async findAll(): Promise<Submission[]> {
-        return await this.controller.map(controller => controller.findAll()).get();
+    async findAll(): Promise<Option<DtoViewSubmission[]>> {
+        return this.controller.findAll();
     }
 
-    async start(): Promise<ISubmission> {
-        return this.controller.map(controller => controller.start()).get();
+    async create(): Promise<Option<DtoViewSubmission>> {
+        return this.controller.create();
     }
 
-    async findOne(id: SubmissionId): Promise<Submission> {
-        return this.controller.map(controller => controller.findOne(id)).get();
+    async findOne(id: SubmissionId): Promise<Option<DtoViewSubmission>> {
+        return this.controller.findOne(id);
     }
 
-    async changeTitle(id: SubmissionId, title: string): Promise<Submission> {
-        return this.controller.map(controller => controller.changeTitle(id, title)).get();
+    async changeTitle(id: SubmissionId, title: string): Promise<Option<DtoViewSubmission>> {
+        return this.controller.changeTitle(id, title);
     }
 
-    async deleteSubmission(id: SubmissionId): Promise<boolean> {
-        return this.controller.map(controller => controller.deleteSubmission(id)).get();
+    async delete(id: SubmissionId): Promise<number> {
+        return this.controller.delete(id);
     }
 }

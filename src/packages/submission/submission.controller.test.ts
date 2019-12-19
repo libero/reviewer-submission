@@ -1,22 +1,32 @@
-import { ISubmission, SubmissionId, SubmissionRepository } from './submission.repository';
+import { Submission, SubmissionId, SubmissionRepository } from './submission.types';
 import { SubmissionController } from './submission.controller';
-import { Some, None } from 'funfix';
-import { Submission } from './submission.entity';
+import { Some, None, Option } from 'funfix';
 import { v4 } from 'uuid';
+import { SubmissionEntity } from './submission.entity';
 
 describe('submission controller', () => {
-    const mockISubmission: ISubmission = {
+    const mockSubmissionEntity: Submission = {
         id: SubmissionId.fromUuid(v4()),
         title: "The Importance of Unit Testing One's Controller Logic",
         updated: new Date(),
     };
 
     const newMockSubmissionRepository = (): SubmissionRepository => ({
-        findAll: jest.fn(async () => [mockISubmission, mockISubmission]),
+        findAll: jest.fn(async () => Option.of([mockSubmissionEntity, mockSubmissionEntity])),
         findById: jest.fn(async () => None),
-        save: jest.fn(async (arg: ISubmission) => arg),
-        delete: jest.fn(async () => false),
+        save: jest.fn(async (arg: Submission) => Option.of(arg)),
+        create: jest.fn(async () =>
+            Option.of(
+                new SubmissionEntity({
+                    id: SubmissionId.fromUuid(v4()),
+                    title: '',
+                    updated: new Date(),
+                }),
+            ),
+        ),
+        delete: jest.fn(async () => 1),
         close: jest.fn(),
+        changeTitle: jest.fn(async () => Option.of(mockSubmissionEntity)),
     });
 
     describe('find all submissions', () => {
@@ -28,23 +38,12 @@ describe('submission controller', () => {
             const allFound = await controller.findAll();
 
             expect(mockRepo.findAll).toBeCalledTimes(1);
-            expect(allFound.length).toBe(2);
-            expect(allFound[0]).toBeInstanceOf(Submission);
-            expect(allFound[1]).toBeInstanceOf(Submission);
-        });
-
-        it("errors when it doesn't have a repo", async () => {
-            const mockRepo = newMockSubmissionRepository();
-
-            const controller = new SubmissionController(mockRepo);
-            controller.repository = None;
-
-            expect(controller.findAll()).rejects.toThrow();
-            expect(mockRepo.findAll).toBeCalledTimes(0);
+            expect(allFound.isEmpty()).toBeFalsy();
+            expect(allFound.get().length).toBe(2);
         });
 
         it("returns an empty array when there aren't any submissions", async () => {
-            const findAll = jest.fn(async () => []);
+            const findAll = jest.fn(async () => Option.of([]));
 
             const mockRepo = {
                 ...newMockSubmissionRepository(),
@@ -56,54 +55,37 @@ describe('submission controller', () => {
             const allFound = await controller.findAll();
 
             expect(mockRepo.findAll).toBeCalledTimes(1);
-            expect(allFound.length).toBe(0);
+            expect(allFound.isEmpty()).toBeFalsy();
+            expect(allFound.get()).toHaveLength(0);
         });
     });
 
-    describe('start new submission', () => {
-        it('starts a new submission', async () => {
+    describe('create new submission', () => {
+        it('creates a new submission', async () => {
             const mockRepo = newMockSubmissionRepository();
 
             const controller = new SubmissionController(mockRepo);
 
-            const newSubmission = await controller.start();
-            expect(mockRepo.save).toBeCalledTimes(1);
-            expect(newSubmission).toBeInstanceOf(Submission);
-        });
-
-        it("errors when it doesn't have a repo", async () => {
-            const mockRepo = newMockSubmissionRepository();
-
-            const controller = new SubmissionController(mockRepo);
-            controller.repository = None;
-
-            expect(controller.start()).rejects.toThrow();
-            expect(mockRepo.save).toBeCalledTimes(0);
+            const newSubmission = await controller.create();
+            expect(mockRepo.create).toBeCalledTimes(1);
+            expect(newSubmission.isEmpty()).toBeFalsy();
         });
     });
 
     describe('findOne submission', () => {
-        it("errors when it can't find one", async () => {
+        it("None when it can't find one", async () => {
             const mockRepo = newMockSubmissionRepository();
 
             const controller = new SubmissionController(mockRepo);
 
-            expect(controller.findOne(SubmissionId.fromUuid(v4()))).rejects.toThrow();
+            const found = await controller.findOne(SubmissionId.fromUuid(v4()));
+
             expect(mockRepo.findById).toBeCalledTimes(1);
-        });
-
-        it("errors when it doesn't have a repo", async () => {
-            const mockRepo = newMockSubmissionRepository();
-
-            const controller = new SubmissionController(mockRepo);
-            controller.repository = None;
-
-            expect(controller.findOne(SubmissionId.fromUuid(v4()))).rejects.toThrow();
-            expect(mockRepo.findById).toBeCalledTimes(0);
+            expect(found.isEmpty()).toBeTruthy();
         });
 
         it("returns it if it's there", async () => {
-            const findById = jest.fn(async () => Some(mockISubmission));
+            const findById = jest.fn(async () => Some(mockSubmissionEntity));
 
             const mockRepo = {
                 ...newMockSubmissionRepository(),
@@ -115,60 +97,23 @@ describe('submission controller', () => {
             const found = await controller.findOne(SubmissionId.fromUuid(v4()));
 
             expect(findById).toBeCalledTimes(1);
-            expect(found).toBeInstanceOf(Submission);
+            expect(found.isEmpty()).toBeFalsy();
         });
     });
 
     describe('changeTitle for a submission', () => {
-        it("errors when it doesn't have a repo", async () => {
-            const mockRepo = newMockSubmissionRepository();
-
-            const controller = new SubmissionController(mockRepo);
-            controller.repository = None;
-
-            expect(controller.findOne(SubmissionId.fromUuid(v4()))).rejects.toThrow();
-            expect(mockRepo.save).toBeCalledTimes(0);
-            expect(mockRepo.findById).toBeCalledTimes(0);
-        });
-
-        it("errors when the submission doesn't exist", async () => {
-            const findById = jest.fn(async () => None);
-
-            const mockRepo = {
-                ...newMockSubmissionRepository(),
-                findById,
-            };
-
-            const controller = new SubmissionController(mockRepo);
-
-            expect(
-                controller.changeTitle(
-                    SubmissionId.fromUuid(v4()),
-                    'Some new title that will be lost in the sands of time',
-                ),
-            ).rejects.toThrow();
-            expect(findById).toBeCalledTimes(1);
-            expect(mockRepo.save).toBeCalledTimes(0);
-        });
-
         it('changes the title', async () => {
-            const findById = jest.fn(async () => Some(mockISubmission));
-
-            const mockRepo = {
-                ...newMockSubmissionRepository(),
-                findById,
-            };
-
-            const controller = new SubmissionController(mockRepo);
+            const mr = newMockSubmissionRepository();
+            const controller = new SubmissionController(mr);
 
             const newTitle = 'Some new title';
 
-            const newSubmission = await controller.changeTitle(SubmissionId.fromUuid(v4()), newTitle);
+            const id = SubmissionId.fromUuid(v4());
+            const newSubmission = await controller.changeTitle(id, newTitle);
 
-            expect(newSubmission).toBeInstanceOf(Submission);
-            expect(newSubmission.title).toBe(newTitle);
-            expect(findById).toBeCalledTimes(1);
-            expect(mockRepo.save).toBeCalledTimes(1);
+            expect(newSubmission.isEmpty()).toBeFalsy();
+            expect(mr.changeTitle).toBeCalledTimes(1);
+            expect(mr.changeTitle).toBeCalledWith(id, newTitle);
         });
     });
 });

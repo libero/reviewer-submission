@@ -2,7 +2,7 @@ import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { SurveyService } from './survey.service';
 import { SurveyResponse } from 'src/packages/survey/survey-response.entity';
 import { SurveyId } from 'src/packages/survey/survey-response.repository';
-import { SubmissionId } from 'src/packages/submission/submission.repository';
+import { SubmissionId } from 'src/packages/submission/submission.types';
 import { SurveyAnswer } from 'src/packages/survey/survey-answer';
 
 @Resolver()
