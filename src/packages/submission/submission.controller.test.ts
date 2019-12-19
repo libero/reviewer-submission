@@ -73,13 +73,15 @@ describe('submission controller', () => {
     });
 
     describe('findOne submission', () => {
-        it("errors when it can't find one", async () => {
+        it("None when it can't find one", async () => {
             const mockRepo = newMockSubmissionRepository();
 
             const controller = new SubmissionController(mockRepo);
 
-            expect(controller.findOne(SubmissionId.fromUuid(v4()))).rejects.toThrow();
+            const found = await controller.findOne(SubmissionId.fromUuid(v4()));
+
             expect(mockRepo.findById).toBeCalledTimes(1);
+            expect(found.isEmpty()).toBeTruthy();
         });
 
         it("returns it if it's there", async () => {
