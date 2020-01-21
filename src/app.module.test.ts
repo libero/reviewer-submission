@@ -16,7 +16,7 @@ describe('AppModule - construction', () => {
 
     it('all imports are as expected', () => {
         const imports = Reflect.getMetadata(METADATA.IMPORTS, AppModule);
-        expect(imports).toHaveLength(4);
+        expect(imports).toHaveLength(5);
     });
 
     it('all controllers are as expected', () => {

@@ -2,6 +2,7 @@ import { ConfigService } from './config.service';
 import { Config } from './config.types';
 
 const config: Config = {
+    userAdapterUrl: 'http://localhost:3000/current-user',
     port: 12345,
     databases: {
         survey: { type: 'sqlite3', host: 'Terry Wogan', port: 123, database: 'survey' },
@@ -15,6 +16,7 @@ const badConfig: Config = {
         survey: { type: 'blue', host: 'Terry Wogan', port: 123, database: 'survey' },
         submission: { type: 'yellow', host: 'Clive James', port: 456, database: 'submission' },
     },
+    userAdapterUrl: 'http://localhost:3000/current-user',
 };
 
 describe('ConfigService', () => {

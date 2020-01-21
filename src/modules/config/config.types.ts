@@ -13,4 +13,5 @@ export interface Config {
         survey: DatabaseConnectionConfig;
         submission: DatabaseConnectionConfig;
     };
+    userAdapterUrl: string;
 }

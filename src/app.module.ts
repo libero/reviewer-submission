@@ -11,6 +11,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './modules/auth/auth.module';
 import { SubmissionModule } from './modules/submission-adaptor/submission.module';
+import { UserModule } from './modules/user-adapter/user.module';
 import { PassportModule } from '@nestjs/passport';
 
 @Module({
@@ -23,6 +24,7 @@ import { PassportModule } from '@nestjs/passport';
         }),
         AuthModule,
         SubmissionModule,
+        UserModule,
     ],
     providers: [AppService],
 })

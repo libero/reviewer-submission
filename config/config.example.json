@@ -9,5 +9,6 @@
             "type": "sqlite3",
             "database": "data.db"
         }
-    }
+    },
+    "userAdapterUrl": "http://localhost:3003/current-user"
 }
