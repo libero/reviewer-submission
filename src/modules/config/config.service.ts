@@ -27,6 +27,10 @@ export class ConfigService {
         return this.config.port;
     }
 
+    getUserAdapterUrl(): string {
+        return this.config.userAdapterUrl;
+    }
+
     getSubmissionRepositoryConnection(): KnexConfig {
         const config: DatabaseConnectionConfig = get(this.config, 'databases.submission');
 
