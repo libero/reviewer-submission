@@ -5,6 +5,5 @@ export interface User {
 }
 
 export interface UserRepository {
-    userAdapterUrl: string;
     getCurrentUser(header: string): Promise<User>;
 }

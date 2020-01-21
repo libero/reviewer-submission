@@ -17,6 +17,7 @@ export class RestUserRepository implements UserRepository {
             return await response.json();
         } catch (error) {
             this.logger.error(error);
+            throw error;
         }
     }
 }

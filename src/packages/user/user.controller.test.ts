@@ -19,7 +19,6 @@ describe('submission controller', () => {
         getCurrentUser(header: string): Promise<User> {
             return header === 'null' ? Promise.resolve(mockUserNoRole) : Promise.resolve(mockUser);
         },
-        userAdapterUrl: '',
     });
 
     describe('find the user information', () => {
