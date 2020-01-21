@@ -7,7 +7,7 @@ const config: Config = {
     databases: {
         survey: { type: 'sqlite3', host: 'Terry Wogan', port: 123, database: 'survey' },
         submission: { type: 'pg', host: 'Clive James', port: 456, database: 'submission' },
-    }
+    },
 };
 
 const badConfig: Config = {
