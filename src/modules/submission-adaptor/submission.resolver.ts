@@ -1,6 +1,8 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { SubmissionId, DtoViewSubmission } from '../../packages/submission/submission.types';
 import { SubmissionService } from './submission.service';
+import { UseGuards } from '@nestjs/common';
+import { GqlAuthGuard } from '../auth/graphql.guard';
 
 /*
  * Principle - convert to/from dtoView
@@ -26,6 +28,7 @@ export class SubmissionResolver {
     }
 
     @Mutation('startSubmission')
+    @UseGuards(GqlAuthGuard)
     async startSubmission(@Args('articleType') articleType: string): Promise<DtoViewSubmission | null> {
         const result = await this.submissionService.create(articleType);
         return result.getOrElse(null);

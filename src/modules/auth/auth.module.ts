@@ -4,7 +4,7 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtSecret } from './constants';
-
+// REMOVE - whole folder just json-token
 @Module({
     imports: [
         PassportModule,

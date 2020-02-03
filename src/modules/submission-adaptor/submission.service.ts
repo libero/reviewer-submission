@@ -5,7 +5,7 @@ import { SubmissionController } from '../../packages/submission/submission.contr
 import { ConfigService } from '../config/config.service';
 import { SubmissionId, DtoViewSubmission } from '../../packages/submission/submission.types';
 import { KnexSubmissionRepository } from './submission.repository';
-
+// REMOVE MAYBE? Probably
 export type SubmissionServiceConfig = {
     getSubmissionRepositoryConnection(): string;
 };

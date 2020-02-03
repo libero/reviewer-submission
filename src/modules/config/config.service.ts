@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import { Config as KnexConfig } from 'knex';
 import { get } from 'lodash';
 import { Config, DatabaseConnectionConfig } from './config.types';
-
+// REMOVE - use own config - whole folder
 export class ConfigService {
     private static supportedClients: string[] = ['pg', 'sqlite3'];
     private readonly config: Config;
