@@ -1,0 +1,19 @@
+## This is only a single container right now but in future this should bring up supporting services needed for development ie: postgres, audit service ect.
+version: '3'
+services:
+  application:
+    image: libero/reviewer-submission:local
+    container_name: test_reviewer-submission
+    ports:
+      - "${SERVER_PORT:-3000}:3000"
+    environment:
+      # NEW_RELIC_LOG_ENABLED: "false"
+      NEW_RELIC_NO_CONFIG_FILE: "true"
+      CONFIG_PATH: /etc/reviewer/config.json
+    volumes:
+      - ./tests/config/reviewer-submission.json:/etc/reviewer/config.json
+    healthcheck:
+      test: 'echo -e "GET /health\n\n" | nc localhost ${SERVER_PORT:-3000}'
+      interval: 3s
+      timeout: 10s
+      retries: 3
