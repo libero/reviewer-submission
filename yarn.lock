@@ -690,6 +690,11 @@
   resolved "https://registry.yarnpkg.com/@types/http-assert/-/http-assert-1.5.1.tgz#d775e93630c2469c2f980fc27e3143240335db3b"
   integrity sha512-PGAK759pxyfXE78NbKxyfRcWYA/KwW17X290cNev/qAsn9eQIxkH4shoNBafH37wewhDG/0p1cHPbK6+SzZjWQ==
 
+"@types/http-errors@^1.6.3":
+  version "1.6.3"
+  resolved "https://registry.yarnpkg.com/@types/http-errors/-/http-errors-1.6.3.tgz#619a55768eab98299e8f76747339f3373f134e69"
+  integrity sha512-4KCE/agIcoQ9bIfa4sBxbZdnORzRjIw8JNQPLfqoNv7wQl/8f8mRbW68Q8wBsQFoJkPUHGlQYZ9sqi5WpfGSEQ==
+
 "@types/istanbul-lib-coverage@*", "@types/istanbul-lib-coverage@^2.0.0":
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/@types/istanbul-lib-coverage/-/istanbul-lib-coverage-2.0.1.tgz#42995b446db9a48a11a07ec083499a860e9138ff"
@@ -816,6 +821,15 @@
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/@types/pino-std-serializers/-/pino-std-serializers-2.4.0.tgz#8cad99175cb79c2448f7455a2d32fb3fde29579c"
   integrity sha512-eAdu+NW1IkCdmp85SnhyKha+OOREQMT9lXaoICQxa7bhSauRiLzu3WSNt9Mf2piuJvWeXF/G0hGWHr63xNpIRA==
+
+"@types/pino@^5.15.4":
+  version "5.15.4"
+  resolved "https://registry.yarnpkg.com/@types/pino/-/pino-5.15.4.tgz#64559cb993726a27de5f1f8c991d2ae53e484d30"
+  integrity sha512-7DaTWeUPerXShJICqXwe/igZknWSGLHf+S3L6lBvMRLeLoi27kvP+nnZKS1x2wzLGInfUJuCgo1OW07JbCQKPQ==
+  dependencies:
+    "@types/node" "*"
+    "@types/pino-std-serializers" "*"
+    "@types/sonic-boom" "*"
 
 "@types/pino@^5.8.10":
   version "5.8.13"
@@ -5721,6 +5735,18 @@ pino@^5.13.2:
   version "5.13.6"
   resolved "https://registry.yarnpkg.com/pino/-/pino-5.13.6.tgz#c7669cb02add833b3afa75e2dd8c6e4cb411295e"
   integrity sha512-cYhvK4lopLnW/OtU3uRqBNsPiBt0Cdv97LGJg4yPGbGajlOjWWaODwD66q3Ynqnj6bSNw8HSofYcEOKZqh4Gcg==
+  dependencies:
+    fast-redact "^2.0.0"
+    fast-safe-stringify "^2.0.7"
+    flatstr "^1.0.12"
+    pino-std-serializers "^2.4.2"
+    quick-format-unescaped "^3.0.3"
+    sonic-boom "^0.7.5"
+
+pino@^5.16.0:
+  version "5.16.0"
+  resolved "https://registry.yarnpkg.com/pino/-/pino-5.16.0.tgz#94d01cb38b5f4a16dd4d7c47aa489fbfe40c3c06"
+  integrity sha512-k9cDzHd9S/oYSQ9B9g9+7RXkfsZX78sQXERC8x4p2XArECZXULx9nqNwZvJHsLj779wPCt+ybN+dG8jFR70p6Q==
   dependencies:
     fast-redact "^2.0.0"
     fast-safe-stringify "^2.0.7"
