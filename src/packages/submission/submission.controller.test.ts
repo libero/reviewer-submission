@@ -70,6 +70,12 @@ describe('submission controller', () => {
             expect(mockRepo.create).toBeCalledTimes(1);
             expect(newSubmission.isEmpty()).toBeFalsy();
         });
+        it('it should throw if type is invalid', async () => {
+            const mockRepo = newMockSubmissionRepository();
+
+            const controller = new SubmissionController(mockRepo);
+            await expect(controller.create('invalid')).rejects.toThrow();
+        });
     });
 
     describe('findOne submission', () => {
