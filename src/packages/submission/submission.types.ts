@@ -26,7 +26,7 @@ export interface SubmissionRepository {
     findById(id: SubmissionId): Promise<Option<Submission>>;
     changeTitle(id: SubmissionId, title: string): Promise<Option<Submission>>;
 
-    create(): Promise<Option<Submission>>;
+    create(articleType: string): Promise<Option<Submission>>;
     save(sub: Submission): Promise<Option<Submission>>;
     delete(id: SubmissionId): Promise<number>;
     close(): void;

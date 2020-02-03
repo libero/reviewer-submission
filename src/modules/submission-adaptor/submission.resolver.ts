@@ -26,8 +26,8 @@ export class SubmissionResolver {
     }
 
     @Mutation('createSubmission')
-    async startSubmission(): Promise<DtoViewSubmission | null> {
-        const result = await this.submissionService.create();
+    async startSubmission(@Args('articleType') articleType: string): Promise<DtoViewSubmission | null> {
+        const result = await this.submissionService.create(articleType);
         return result.getOrElse(null);
     }
 

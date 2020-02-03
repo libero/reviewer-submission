@@ -23,8 +23,8 @@ export class SubmissionController {
         });
     }
 
-    async create(): Promise<Option<Submission>> {
-        return this.repository.create();
+    async create(articleType: string): Promise<Option<Submission>> {
+        return this.repository.create(articleType);
     }
 
     async findOne(id: SubmissionId): Promise<Option<Submission>> {
