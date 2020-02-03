@@ -30,8 +30,8 @@ export class SubmissionService implements OnModuleDestroy {
         return this.controller.findAll();
     }
 
-    async create(): Promise<Option<DtoViewSubmission>> {
-        return this.controller.create();
+    async create(articleType: string): Promise<Option<DtoViewSubmission>> {
+        return this.controller.create(articleType);
     }
 
     async findOne(id: SubmissionId): Promise<Option<DtoViewSubmission>> {

@@ -66,9 +66,15 @@ describe('submission controller', () => {
 
             const controller = new SubmissionController(mockRepo);
 
-            const newSubmission = await controller.create();
+            const newSubmission = await controller.create('researchArticle');
             expect(mockRepo.create).toBeCalledTimes(1);
             expect(newSubmission.isEmpty()).toBeFalsy();
+        });
+        it('it should throw if type is invalid', async () => {
+            const mockRepo = newMockSubmissionRepository();
+
+            const controller = new SubmissionController(mockRepo);
+            await expect(controller.create('invalid')).rejects.toThrow();
         });
     });
 

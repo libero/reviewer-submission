@@ -1,6 +1,9 @@
-import { Logger } from '@nestjs/common';
+import { Logger, HttpException, HttpStatus } from '@nestjs/common';
 import { Option, None } from 'funfix';
 import { SubmissionRepository, SubmissionId, Submission } from './submission.types';
+
+// TODO: this is temporary until the picture on validation and article types is clearer.
+const articlesTypes = ['researchArticle', 'featureArticle', 'researchAdvance'];
 
 export class SubmissionController {
     private readonly logger = new Logger(SubmissionController.name);
@@ -23,8 +26,11 @@ export class SubmissionController {
         });
     }
 
-    async create(): Promise<Option<Submission>> {
-        return this.repository.create();
+    async create(articleType: string): Promise<Option<Submission>> {
+        if (!articlesTypes.includes(articleType)) {
+            throw new HttpException('Unprocessable entity', HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+        return this.repository.create(articleType);
     }
 
     async findOne(id: SubmissionId): Promise<Option<Submission>> {
