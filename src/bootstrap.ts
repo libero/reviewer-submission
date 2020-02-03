@@ -6,6 +6,7 @@ import { METADATA } from '@nestjs/common/constants';
 import { ConfigModule } from './modules/config/config.module';
 import { Config } from './modules/config/config.types';
 import { Logger } from '@nestjs/common';
+import { HttpExceptionFilter } from './filters/http-exception.filter';
 
 if (process.env.NEW_RELIC_NO_CONFIG_FILE) {
     Logger.warn('!!! New Relic has been disabled !!!');
@@ -34,6 +35,7 @@ export const createApp = async (config: null | Config): Promise<NestExpressAppli
 
 export async function bootstrap(config: null | Config): Promise<NestExpressApplication> {
     const app = await createApp(config);
+    app.useGlobalFilters(new HttpExceptionFilter());
     const configService = app.get(ConfigService);
     // The app is designed to be run in a container so binding it to all NICs
     // should be fine!

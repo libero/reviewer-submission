@@ -1,10 +1,12 @@
-import { Logger, HttpException, HttpStatus } from '@nestjs/common';
+import { Logger, HttpException, HttpStatus, UseGuards } from '@nestjs/common';
 import { Option, None } from 'funfix';
 import { SubmissionRepository, SubmissionId, Submission } from './submission.types';
+import { AuthGuard } from '@nestjs/passport';
 
 // TODO: this is temporary until the picture on validation and article types is clearer.
 const articlesTypes = ['researchArticle', 'featureArticle', 'researchAdvance'];
 
+@UseGuards(AuthGuard)
 export class SubmissionController {
     private readonly logger = new Logger(SubmissionController.name);
 

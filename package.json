@@ -17,7 +17,7 @@
         "test:watch": "NEW_RELIC_NO_CONFIG_FILE=true jest --watch",
         "test:cov": "NEW_RELIC_NO_CONFIG_FILE=true jest --coverage",
         "test:debug": "NEW_RELIC_NO_CONFIG_FILE=true node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-        "test:e2e": "jest --config ./test/jest-e2e.json",
+        "test:integration": "jest ./tests/",
         "update:internal": "yarn upgrade -P @libero"
     },
     "repository": {
