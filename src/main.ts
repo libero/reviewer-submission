@@ -1,6 +1,6 @@
 import * as express from 'express';
 import { Express, Request, Response } from 'express';
-import { ApolloServer, gql } from 'apollo-server-express';
+import { ApolloServer } from 'apollo-server-express';
 import config from './config';
 import errorHandler from './middleware/error-handler';
 import { InfraLogger as logger } from './logger';
