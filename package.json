@@ -13,6 +13,7 @@
         "prestart:prod": "rimraf dist && npm run build",
         "start:prod": "node dist/main.js",
         "lint": "eslint --ext .js,.ts src/",
+        "migrate": "ts-node src/migrate.ts",
         "test": "NEW_RELIC_NO_CONFIG_FILE=true jest ./src",
         "test:watch": "NEW_RELIC_NO_CONFIG_FILE=true jest ./src --watch",
         "test:cov": "NEW_RELIC_NO_CONFIG_FILE=true jest ./src --coverage",
@@ -32,6 +33,7 @@
     },
     "dependencies": {
         "@libero/auth-token": "^0.1.1",
+        "@libero/migrator": "^0.1.0",
         "@nestjs/common": "^6.0.0",
         "@nestjs/core": "^6.0.0",
         "@nestjs/graphql": "^6.4.2",
