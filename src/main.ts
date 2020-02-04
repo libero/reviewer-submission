@@ -21,7 +21,7 @@ const init = async (): Promise<void> => {
     // best to mount helmet so soon as possible to ensure headers are set: defaults - https://www.npmjs.com/package/helmet#how-it-works
     app.use(helmet());
     try {
-        const typeDefs = await importSchema(join(__dirname + '/modules/submission-adaptor/submission.graphql'));
+        const typeDefs = await importSchema(join(__dirname + '/schemas/submission.graphql'));
         const apolloServer = new ApolloServer({ typeDefs, resolvers });
         apolloServer.applyMiddleware({ app });
     } catch (e) {

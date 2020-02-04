@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '../config/config.service';
-import { UserController } from '../../packages/user/user.controller';
-import { User } from '../../packages/user/user.types';
-import { RestUserRepository } from './user.repository';
+import { ConfigService } from '../modules/config/config.service';
+import { UserController } from '../controllers/user.controller';
+import { User } from '../types/user.types';
+import { RestUserRepository } from '../repositories/user.repository';
 
 @Injectable()
 export class UserService {

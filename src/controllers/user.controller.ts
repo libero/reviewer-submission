@@ -1,4 +1,4 @@
-import { User, UserRepository } from './user.types';
+import { User, UserRepository } from '../types/user.types';
 import { Controller } from '@nestjs/common';
 
 @Controller('User')

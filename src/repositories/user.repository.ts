@@ -1,5 +1,5 @@
 import { Logger } from '@nestjs/common';
-import { User, UserRepository } from '../../packages/user/user.types';
+import { User, UserRepository } from '../types/user.types';
 import fetch from 'node-fetch';
 
 export class RestUserRepository implements UserRepository {

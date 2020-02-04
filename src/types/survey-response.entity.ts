@@ -1,7 +1,7 @@
-import { ISurveyResponse, SurveyResponseDTO, SurveyId, SurveyResponseId } from './survey-response.repository';
+import { ISurveyResponse, SurveyResponseDTO, SurveyId, SurveyResponseId } from '../types/survey.types';
 import { Question } from './question';
 import { Answer } from './answer';
-import { SubmissionId } from '../submission/submission.types';
+import { SubmissionId } from '../types/submission.types';
 
 export class SurveyResponse implements ISurveyResponse {
     id: SurveyResponseId;
