@@ -3,7 +3,7 @@ import { Option, Some, None } from 'funfix';
 import * as Knex from 'knex';
 import { ConfigService } from '../modules/config/config.service';
 import { KnexSurveyResponseRepository } from '../repositories/survey-response';
-import { SurveyResponseController } from 'src/controllers/survey-response.controller';
+import { SurveyResponseController } from 'src/controllers/survey-response';
 import { SurveyAnswer } from 'src/entities/survey-answer';
 import { SurveyResponse } from 'src/entities/survey-response';
 import { SurveyId } from '../types/survey';

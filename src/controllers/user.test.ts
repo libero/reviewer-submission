@@ -1,5 +1,5 @@
 import { User, UserRepository } from '../types/user';
-import { UserController } from './user.controller';
+import { UserController } from './user';
 // REMOVE WHOLE FOLDER
 describe('submission controller', () => {
     const mockUser: User = {

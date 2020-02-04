@@ -1,4 +1,4 @@
-import { SurveyResponseController } from './survey-response.controller';
+import { SurveyResponseController } from './survey-response';
 import { SurveyResponseDTO, SurveyResponseId, SurveyId, SurveyResponseRepository } from '../types/survey';
 import { SubmissionId } from '../types/submission';
 import { SurveyResponse } from '../entities/survey-response';
