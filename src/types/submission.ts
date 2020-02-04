@@ -1,6 +1,7 @@
 import { Option } from 'funfix';
 import { uuidType } from 'typesafe-uuid';
 
+// TODO: This shouldn't be here. Come back post refactor
 export class SubmissionId extends uuidType<'SubmissionId'>() {}
 
 export interface Submission {
