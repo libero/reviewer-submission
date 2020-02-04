@@ -1,6 +1,6 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { SubmissionId, DtoViewSubmission } from '../../packages/submission/submission.types';
-import { SubmissionService } from './submission.service';
+import { SubmissionId, DtoViewSubmission } from '../../types/submission.types';
+import { SubmissionService } from '../../services/submission';
 import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from '../auth/graphql.guard';
 

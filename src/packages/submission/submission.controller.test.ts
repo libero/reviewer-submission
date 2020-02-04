@@ -1,8 +1,8 @@
-import { Submission, SubmissionId, SubmissionRepository } from './submission.types';
-import { SubmissionController } from './submission.controller';
+import { Submission, SubmissionId, SubmissionRepository } from '../../types/submission.types';
+import { SubmissionController } from '../../controllers/submission';
 import { Some, None, Option } from 'funfix';
 import { v4 } from 'uuid';
-import { SubmissionEntity } from './submission.entity';
+import { SubmissionEntity } from '../../types/submission.entity';
 
 describe('submission controller', () => {
     const mockSubmissionEntity: Submission = {

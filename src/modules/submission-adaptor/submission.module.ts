@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { SubmissionResolver } from './submission.resolver';
-import { SubmissionService } from './submission.service';
+import { SubmissionService } from '../../services/submission';
 import { ConfigModule } from '../config/config.module';
 // REMOVE
 @Module({

@@ -1,15 +1,10 @@
 // This should probably be called something else
 import { v4 as uuid } from 'uuid';
-import {
-    SubmissionRepository,
-    DtoSubmission,
-    SubmissionId,
-    Submission,
-} from '../../packages/submission/submission.types';
+import { SubmissionRepository, DtoSubmission, SubmissionId, Submission } from '../types/submission.types';
 import { Option, None } from 'funfix';
 import * as Knex from 'knex';
 import { Logger } from '@nestjs/common';
-import { SubmissionMapper, SubmissionEntity } from '../../packages/submission/submission.entity';
+import { SubmissionMapper, SubmissionEntity } from '../types/submission.entity';
 
 export class KnexSubmissionRepository implements SubmissionRepository {
     private readonly TABLE_NAME = 'submission';

@@ -1,13 +1,13 @@
 import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { Option, Some, None } from 'funfix';
 import * as Knex from 'knex';
-import { ConfigService } from '../config/config.service';
-import { KnexSurveyResponseRepository } from './survey-response.repository';
+import { ConfigService } from '../modules/config/config.service';
+import { KnexSurveyResponseRepository } from '../modules/survey-adaptor/survey-response.repository';
 import { SurveyResponseController } from 'src/packages/survey/survey-response.controller';
 import { SurveyAnswer } from 'src/packages/survey/survey-answer';
 import { SurveyResponse } from 'src/packages/survey/survey-response.entity';
 import { SurveyId } from 'src/packages/survey/survey-response.repository';
-import { SubmissionId } from 'src/packages/submission/submission.types';
+import { SubmissionId } from '../types/submission.types';
 // REMOVE - MAYBE? PROBABLY!
 @Injectable()
 export class SurveyService implements OnModuleDestroy {

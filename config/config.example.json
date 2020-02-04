@@ -10,5 +10,15 @@
             "database": "data.db"
         }
     },
+    "knex": {
+        "client": "pg",
+        "connection": {
+            "host": "postgres",
+            "database": "reviewer_submission",
+            "user": "postgres",
+            "password": "postgres",
+            "port": 5432
+        }
+    },
     "userAdapterUrl": "http://localhost:3003/current-user"
 }
