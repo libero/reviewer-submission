@@ -1,8 +1,8 @@
 import { SurveyService } from '../services/survey';
 import { SurveyResponse } from 'src/entities/survey-response';
 import { SurveyId } from '../types/survey';
-import { SubmissionId } from '../types/submission.types';
-import { SurveyAnswer } from 'src/types/survey-answer';
+import { SubmissionId } from '../types/submission';
+import { SurveyAnswer } from 'src/entities/survey-answer';
 
 // TODO: type this
 const resolvers = (surveyService: SurveyService): any => ({

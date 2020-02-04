@@ -4,10 +4,10 @@ import * as Knex from 'knex';
 import { ConfigService } from '../modules/config/config.service';
 import { KnexSurveyResponseRepository } from '../repositories/survey-response';
 import { SurveyResponseController } from 'src/controllers/survey-response.controller';
-import { SurveyAnswer } from 'src/types/survey-answer';
+import { SurveyAnswer } from 'src/entities/survey-answer';
 import { SurveyResponse } from 'src/entities/survey-response';
 import { SurveyId } from '../types/survey';
-import { SubmissionId } from '../types/submission.types';
+import { SubmissionId } from '../types/submission';
 // REMOVE - MAYBE? PROBABLY!
 @Injectable()
 export class SurveyService implements OnModuleDestroy {

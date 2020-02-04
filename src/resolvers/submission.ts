@@ -1,5 +1,5 @@
 import { SubmissionService } from '../services/submission';
-import { SubmissionId, DtoViewSubmission } from '../types/submission.types';
+import { SubmissionId, DtoViewSubmission } from '../types/submission';
 
 // TODO: type this
 const resolvers = (submissionService: SubmissionService): any => ({

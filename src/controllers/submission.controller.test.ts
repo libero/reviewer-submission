@@ -1,4 +1,4 @@
-import { Submission, SubmissionId, SubmissionRepository } from '../types/submission.types';
+import { Submission, SubmissionId, SubmissionRepository } from '../types/submission';
 import { SubmissionController } from './submission';
 import { Some, None, Option } from 'funfix';
 import { v4 } from 'uuid';

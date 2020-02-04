@@ -1,6 +1,6 @@
 // This should probably be called something else
 import { v4 as uuid } from 'uuid';
-import { SubmissionRepository, DtoSubmission, SubmissionId, Submission } from '../types/submission.types';
+import { SubmissionRepository, DtoSubmission, SubmissionId, Submission } from '../types/submission';
 import { Option, None } from 'funfix';
 import * as Knex from 'knex';
 import { Logger } from '@nestjs/common';

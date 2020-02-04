@@ -1,7 +1,7 @@
-import { Question } from './question';
-import { Answer } from './answer';
+import { Question } from '../entities/question';
+import { Answer } from '../entities/answer';
 import { uuidType } from 'typesafe-uuid';
-import { SubmissionId } from './submission.types';
+import { SubmissionId } from './submission';
 
 export class SurveyId extends uuidType<'SurveyId'>() {}
 export class SurveyResponseId extends uuidType<'SurveyResponseId'>() {}

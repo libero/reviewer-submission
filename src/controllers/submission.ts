@@ -1,6 +1,6 @@
 import { Logger, HttpException, HttpStatus } from '@nestjs/common';
 import { Option, None } from 'funfix';
-import { SubmissionRepository, SubmissionId, Submission } from '../types/submission.types';
+import { SubmissionRepository, SubmissionId, Submission } from '../types/submission';
 
 // TODO: this is temporary until the picture on validation and article types is clearer.
 const articlesTypes = ['researchArticle', 'featureArticle', 'researchAdvance'];

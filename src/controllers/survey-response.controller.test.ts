@@ -1,8 +1,8 @@
 import { SurveyResponseController } from './survey-response.controller';
 import { SurveyResponseDTO, SurveyResponseId, SurveyId, SurveyResponseRepository } from '../types/survey';
-import { SubmissionId } from '../types/submission.types';
+import { SubmissionId } from '../types/submission';
 import { SurveyResponse } from '../entities/survey-response';
-import { SurveyAnswer } from '../types/survey-answer';
+import { SurveyAnswer } from '../entities/survey-answer';
 import { v4 } from 'uuid';
 import { None } from 'funfix';
 

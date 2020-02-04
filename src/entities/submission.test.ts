@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { SubmissionEntity } from './submission';
-import { SubmissionId } from '../types/submission.types';
+import { SubmissionId } from '../types/submission';
 
 describe('Submission Entity', () => {
     it('creates a new entity properly', () => {

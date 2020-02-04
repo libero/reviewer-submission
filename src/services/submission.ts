@@ -1,7 +1,7 @@
 import * as Knex from 'knex';
 import { Option } from 'funfix';
 import { SubmissionController } from '../controllers/submission';
-import { SubmissionId, DtoViewSubmission } from '../types/submission.types';
+import { SubmissionId, DtoViewSubmission } from '../types/submission';
 import { KnexSubmissionRepository } from '../repositories/submission';
 // REMOVE MAYBE? Probably
 export type SubmissionServiceConfig = {
