@@ -8,7 +8,6 @@ export class KnexSurveyResponseRepository implements SurveyResponseRepository {
 
     public async save(surveyResponse: ISurveyResponse): Promise<ISurveyResponse> {
         await this.knex(this.TABLE_NAME).insert({ ...surveyResponse.toDTO(), updated: new Date().toISOString() });
-
         return surveyResponse;
     }
 
