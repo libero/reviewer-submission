@@ -1,8 +1,9 @@
 import { SubmissionService } from '../services/submission';
 import { SubmissionId, DtoViewSubmission } from '../types/submission';
+import { IResolvers } from 'apollo-server-express';
 
 // TODO: type this
-const resolvers = (submissionService: SubmissionService): any => ({
+const resolvers = (submissionService: SubmissionService): IResolvers => ({
     Query: {
         async getSubmissions(): Promise<DtoViewSubmission[] | null> {
             const result = await submissionService.findAll();
