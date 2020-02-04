@@ -18,8 +18,9 @@ const resolvers = (submissionService: SubmissionService): any => ({
         },
     },
     Mutation: {
-        async startSubmission(articleType: string): Promise<DtoViewSubmission | null> {
-            const result = await submissionService.create(articleType);
+        async startSubmission(_, args): Promise<DtoViewSubmission | null> {
+            console.log('article type', args.articleType);
+            const result = await submissionService.create(args.articleType);
             return result.getOrElse(null);
         },
 
