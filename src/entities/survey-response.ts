@@ -1,6 +1,6 @@
-import { ISurveyResponse, SurveyResponseDTO, SurveyId, SurveyResponseId } from '../types/survey.types';
-import { Question } from './question';
-import { Answer } from './answer';
+import { ISurveyResponse, SurveyResponseDTO, SurveyId, SurveyResponseId } from '../types/survey';
+import { Question } from '../types/question';
+import { Answer } from '../types/answer';
 import { SubmissionId } from '../types/submission.types';
 
 export class SurveyResponse implements ISurveyResponse {

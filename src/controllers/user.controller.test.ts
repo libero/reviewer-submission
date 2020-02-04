@@ -1,4 +1,4 @@
-import { User, UserRepository } from '../types/user.types';
+import { User, UserRepository } from '../types/user';
 import { UserController } from './user.controller';
 // REMOVE WHOLE FOLDER
 describe('submission controller', () => {

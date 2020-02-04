@@ -1,5 +1,5 @@
-import { User } from '../types/user.types';
-import { UserService } from '../services/user.service';
+import { User } from '../types/user';
+import { UserService } from '../services/user';
 
 // TODO: type this
 const resolvers = (userService: UserService): any => ({

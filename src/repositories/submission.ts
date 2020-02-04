@@ -4,7 +4,7 @@ import { SubmissionRepository, DtoSubmission, SubmissionId, Submission } from '.
 import { Option, None } from 'funfix';
 import * as Knex from 'knex';
 import { Logger } from '@nestjs/common';
-import { SubmissionMapper, SubmissionEntity } from '../types/submission.entity';
+import { SubmissionMapper, SubmissionEntity } from '../entities/submission';
 
 export class KnexSubmissionRepository implements SubmissionRepository {
     private readonly TABLE_NAME = 'submission';

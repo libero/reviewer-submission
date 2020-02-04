@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { None, Option } from 'funfix';
-import { SurveyResponse } from '../types/survey-response.entity';
-import { SurveyResponseRepository, SurveyId, SurveyResponseId } from '../types/survey.types';
+import { SurveyResponse } from '../entities/survey-response';
+import { SurveyResponseRepository, SurveyId, SurveyResponseId } from '../types/survey';
 import { SurveyAnswer } from '../types/survey-answer';
 import { SubmissionId } from '../types/submission.types';
 import { Logger } from '@nestjs/common';

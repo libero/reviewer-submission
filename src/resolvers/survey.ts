@@ -1,6 +1,6 @@
-import { SurveyService } from '../services/survey.service';
-import { SurveyResponse } from 'src/types/survey-response.entity';
-import { SurveyId } from '../types/survey.types';
+import { SurveyService } from '../services/survey';
+import { SurveyResponse } from 'src/entities/survey-response';
+import { SurveyId } from '../types/survey';
 import { SubmissionId } from '../types/submission.types';
 import { SurveyAnswer } from 'src/types/survey-answer';
 

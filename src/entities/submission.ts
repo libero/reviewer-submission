@@ -1,4 +1,4 @@
-import { SubmissionId, DtoSubmission, DtoViewSubmission, Submission } from './submission.types';
+import { SubmissionId, DtoSubmission, DtoViewSubmission, Submission } from '../types/submission.types';
 
 export class SubmissionEntity implements Submission {
     id: SubmissionId;

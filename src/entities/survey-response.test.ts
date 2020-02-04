@@ -1,9 +1,9 @@
 import { v4 as uuid } from 'uuid';
-import { SurveyResponse } from './survey-response.entity';
-import { SurveyId, SurveyResponseId } from '../types/survey.types';
+import { SurveyResponse } from './survey-response';
+import { SurveyId, SurveyResponseId } from '../types/survey';
 import { SubmissionId } from '../types/submission.types';
-import { Question } from './question';
-import { Answer } from './answer';
+import { Question } from '../types/question';
+import { Answer } from '../types/answer';
 
 const createSurveyResponse = (): SurveyResponse => {
     const id = SurveyResponseId.fromUuid(uuid());
