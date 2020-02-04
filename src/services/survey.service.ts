@@ -6,7 +6,7 @@ import { KnexSurveyResponseRepository } from '../repositories/survey-response.re
 import { SurveyResponseController } from 'src/controllers/survey-response.controller';
 import { SurveyAnswer } from 'src/types/survey-answer';
 import { SurveyResponse } from 'src/types/survey-response.entity';
-import { SurveyId } from 'src/repositories/survey-response.repository';
+import { SurveyId } from '../types/survey.types';
 import { SubmissionId } from '../types/submission.types';
 // REMOVE - MAYBE? PROBABLY!
 @Injectable()

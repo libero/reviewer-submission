@@ -1,5 +1,5 @@
 import * as Knex from 'knex';
-import { SurveyResponseRepository, ISurveyResponse } from '../../packages/survey/survey-response.repository';
+import { SurveyResponseRepository, ISurveyResponse } from '../types/survey.types';
 
 export class KnexSurveyResponseRepository implements SurveyResponseRepository {
     private readonly TABLE_NAME = 'survey_response';
