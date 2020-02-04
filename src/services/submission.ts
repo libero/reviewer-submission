@@ -9,32 +9,29 @@ export type SubmissionServiceConfig = {
 };
 
 export class SubmissionService {
-    controller: SubmissionController;
+    submissionRepository: KnexSubmissionRepository;
 
     constructor(knexConnection: Knex<{}, unknown[]>) {
-        const submissionRepo = new KnexSubmissionRepository(knexConnection);
-        submissionRepo.initSchema();
-
-        this.controller = new SubmissionController(submissionRepo);
+        this.submissionRepository = new KnexSubmissionRepository(knexConnection);
     }
 
     async findAll(): Promise<Option<DtoViewSubmission[]>> {
-        return this.controller.findAll();
+        return this.submissionRepository.findAll();
     }
 
     async create(articleType: string): Promise<Option<DtoViewSubmission>> {
-        return this.controller.create(articleType);
+        return this.submissionRepository.create(articleType);
     }
 
     async findOne(id: SubmissionId): Promise<Option<DtoViewSubmission>> {
-        return this.controller.findOne(id);
+        return this.submissionRepository.findById(id);
     }
 
     async changeTitle(id: SubmissionId, title: string): Promise<Option<DtoViewSubmission>> {
-        return this.controller.changeTitle(id, title);
+        return this.submissionRepository.changeTitle(id, title);
     }
 
     async delete(id: SubmissionId): Promise<number> {
-        return this.controller.delete(id);
+        return this.submissionRepository.delete(id);
     }
 }

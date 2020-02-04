@@ -8,18 +8,21 @@ export interface Submission {
     id: SubmissionId;
     title: string;
     updated: Date;
+    articleType: string;
 }
 
 export interface DtoSubmission {
     id: SubmissionId;
     title: string;
     updated: Date;
+    articleType: string;
 }
 
 export interface DtoViewSubmission {
     id: SubmissionId;
     title: string;
     updated: Date;
+    articleType: string;
 }
 
 export interface SubmissionRepository {

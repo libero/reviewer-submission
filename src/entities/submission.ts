@@ -7,11 +7,24 @@ export class SubmissionEntity implements Submission {
 
     updated: Date;
 
+    articleType: string;
+
     // This is wired up so that you can create an entity from the DTO described by ISubmission
-    constructor({ id, title, updated }: { id: SubmissionId; title: string; updated?: Date }) {
+    constructor({
+        id,
+        title,
+        updated,
+        articleType,
+    }: {
+        id: SubmissionId;
+        title: string;
+        updated?: Date;
+        articleType: string;
+    }) {
         this.id = id;
         this.title = title;
         this.updated = updated || new Date();
+        this.articleType = articleType;
     }
 }
 
@@ -21,6 +34,7 @@ export class SubmissionMapper {
             id: sub.id,
             title: sub.title,
             updated: sub.updated,
+            articleType: sub.articleType,
         };
     }
     public static toViewDto(sub: Submission): DtoViewSubmission {
@@ -28,6 +42,7 @@ export class SubmissionMapper {
             id: sub.id,
             title: sub.title,
             updated: sub.updated,
+            articleType: sub.articleType,
         };
     }
     public static fromDto(sub: DtoSubmission): SubmissionEntity {

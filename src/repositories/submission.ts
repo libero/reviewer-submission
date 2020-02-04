@@ -35,9 +35,9 @@ export class KnexSubmissionRepository implements SubmissionRepository {
         this.knex.destroy();
     }
 
-    public async create(): Promise<Option<Submission>> {
+    public async create(articleType: string): Promise<Option<Submission>> {
         const id = SubmissionId.fromUuid(uuid());
-        const se = new SubmissionEntity({ id, title: '', updated: new Date() });
+        const se = new SubmissionEntity({ id, title: '', updated: new Date(), articleType });
         return this.save(se);
     }
 
