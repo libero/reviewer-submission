@@ -11,6 +11,7 @@ export interface SurveyResponseRepository {
     close(): void;
 }
 
+// eslint-disable-next-line @typescript-eslint/interface-name-prefix
 export interface ISurveyResponse {
     id: SurveyResponseId;
     surveyId: SurveyId;
