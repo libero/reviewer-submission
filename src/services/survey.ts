@@ -1,4 +1,3 @@
-import { Option, Some, None } from 'funfix';
 import * as Knex from 'knex';
 import { KnexSurveyResponseRepository } from '../repositories/survey-response';
 import { SurveyAnswer } from 'src/entities/survey-answer';

@@ -1,7 +1,6 @@
 // This should probably be called something else
 import { v4 as uuid } from 'uuid';
 import { SubmissionRepository, DtoSubmission, SubmissionId, Submission } from '../types/submission';
-import { Option, None } from 'funfix';
 import * as Knex from 'knex';
 import { Logger } from '@nestjs/common';
 import { SubmissionMapper, SubmissionEntity } from '../entities/submission';
@@ -35,74 +34,49 @@ export class KnexSubmissionRepository implements SubmissionRepository {
         this.knex.destroy();
     }
 
-    public async create(articleType: string): Promise<Option<Submission>> {
+    // TODO: this shouldn't be here
+    public async create(articleType: string): Promise<Submission | null> {
         const id = SubmissionId.fromUuid(uuid());
         const se = new SubmissionEntity({ id, title: '', updated: new Date(), articleType });
         return this.save(se);
     }
 
-    public async findAll(): Promise<Option<Submission[]>> {
-        return new Promise(resolve => {
-            this.knex(this.TABLE_NAME)
-                .select<DtoSubmission[]>('id', 'title', 'updated')
-                .then(items => {
-                    resolve(Option.of(items.map(SubmissionMapper.fromDto)));
-                })
-                .catch(() => {
-                    resolve(None);
-                });
-        });
+    public async findAll(): Promise<Submission[]> {
+        const result = await this.knex(this.TABLE_NAME).select<DtoSubmission[]>('id', 'title', 'updated');
+        return result.map(SubmissionMapper.fromDto);
     }
 
-    public async findById(id: SubmissionId): Promise<Option<Submission>> {
+    public async findById(id: SubmissionId): Promise<Submission | null> {
         const rows = await this.knex(this.TABLE_NAME)
             .where({ id })
             .select<DtoSubmission[]>('id', 'title', 'updated');
 
-        return rows.length > 0 ? Option.of(SubmissionMapper.fromDto(rows[0])) : None;
+        return rows.length > 0 ? SubmissionMapper.fromDto(rows[0]) : null;
     }
 
-    public async save(sub: Submission): Promise<Option<Submission>> {
+    public async save(sub: Submission): Promise<Submission | null> {
         const dtoSubmission: DtoSubmission = SubmissionMapper.toDto(sub);
         dtoSubmission.updated = new Date();
-
-        return new Promise(resolve => {
-            this.knex(this.TABLE_NAME)
-                .insert(dtoSubmission)
-                .returning('id')
-                .then(() => {
-                    resolve(Option.of(SubmissionMapper.fromDto(dtoSubmission)));
-                })
-                .catch(() => {
-                    resolve(None);
-                });
-        });
+        await this.knex(this.TABLE_NAME)
+            .insert(dtoSubmission)
+            .returning('id');
+        return SubmissionMapper.fromDto(dtoSubmission);
     }
 
-    public async changeTitle(id: SubmissionId, title: string): Promise<Option<Submission>> {
+    // TODO: move to service
+    public async changeTitle(id: SubmissionId, title: string): Promise<Submission | null> {
         const result = await this.findById(id);
-        if (result.isEmpty()) {
-            return None;
-        } else {
-            result.get().title = title;
-            return this.save(result.get());
+        if (result === null) {
+            return result;
         }
+        const resultToSave: Submission = { ...result, title };
+        return this.save(resultToSave);
     }
 
-    public async delete(id: SubmissionId): Promise<number> {
-        return new Promise(resolve => {
-            this.knex(this.TABLE_NAME)
-                .where({ id })
-                .delete()
-                .then(res => {
-                    if (res > 1) {
-                        this.logger.error(`Unexpected deleting ${res} items using ${id} from ${this.TABLE_NAME}`);
-                    }
-                    resolve(res);
-                })
-                .catch(() => {
-                    resolve(0);
-                });
-        });
+    public async delete(id: SubmissionId): Promise<boolean> {
+        const res = await this.knex(this.TABLE_NAME)
+            .where({ id })
+            .delete();
+        return res >= 1 ? true : false;
     }
 }

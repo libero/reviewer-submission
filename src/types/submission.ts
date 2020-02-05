@@ -1,4 +1,3 @@
-import { Option } from 'funfix';
 import { uuidType } from 'typesafe-uuid';
 
 // TODO: This shouldn't be here. Come back post refactor
@@ -26,12 +25,12 @@ export interface DtoViewSubmission {
 }
 
 export interface SubmissionRepository {
-    findAll(): Promise<Option<Submission[]>>;
-    findById(id: SubmissionId): Promise<Option<Submission>>;
-    changeTitle(id: SubmissionId, title: string): Promise<Option<Submission>>;
+    findAll(): Promise<Submission[]>;
+    findById(id: SubmissionId): Promise<Submission | null>;
+    changeTitle(id: SubmissionId, title: string): Promise<Submission | null>;
 
-    create(articleType: string): Promise<Option<Submission>>;
-    save(sub: Submission): Promise<Option<Submission>>;
-    delete(id: SubmissionId): Promise<number>;
+    create(articleType: string): Promise<Submission | null>;
+    save(sub: Submission): Promise<Submission | null>;
+    delete(id: SubmissionId): Promise<boolean>;
     close(): void;
 }

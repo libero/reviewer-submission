@@ -1,6 +1,4 @@
 import * as Knex from 'knex';
-import { Option } from 'funfix';
-import { SubmissionController } from '../controllers/submission';
 import { SubmissionId, DtoViewSubmission } from '../types/submission';
 import { KnexSubmissionRepository } from '../repositories/submission';
 // REMOVE MAYBE? Probably
@@ -15,23 +13,23 @@ export class SubmissionService {
         this.submissionRepository = new KnexSubmissionRepository(knexConnection);
     }
 
-    async findAll(): Promise<Option<DtoViewSubmission[]>> {
+    async findAll(): Promise<DtoViewSubmission[]> {
         return this.submissionRepository.findAll();
     }
 
-    async create(articleType: string): Promise<Option<DtoViewSubmission>> {
+    async create(articleType: string): Promise<DtoViewSubmission | null> {
         return this.submissionRepository.create(articleType);
     }
 
-    async findOne(id: SubmissionId): Promise<Option<DtoViewSubmission>> {
+    async findOne(id: SubmissionId): Promise<DtoViewSubmission | null> {
         return this.submissionRepository.findById(id);
     }
 
-    async changeTitle(id: SubmissionId, title: string): Promise<Option<DtoViewSubmission>> {
+    async changeTitle(id: SubmissionId, title: string): Promise<DtoViewSubmission | null> {
         return this.submissionRepository.changeTitle(id, title);
     }
 
-    async delete(id: SubmissionId): Promise<number> {
+    async delete(id: SubmissionId): Promise<boolean> {
         return this.submissionRepository.delete(id);
     }
 }
