@@ -2,7 +2,7 @@ import * as Knex from 'knex';
 import { SubmissionId, DtoViewSubmission, Submission } from '../types/submission';
 import { KnexSubmissionRepository } from '../repositories/submission';
 import uuid = require('uuid');
-import { SubmissionEntity } from 'dist/packages/submission/submission.entity';
+import { SubmissionEntity } from '../entities/submission';
 
 export class SubmissionService {
     submissionRepository: KnexSubmissionRepository;
