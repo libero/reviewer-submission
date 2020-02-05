@@ -25,15 +25,16 @@ const init = async (): Promise<void> => {
     const app: Express = express();
     const knexConnection = knex(config.knex);
     // TODO: this needs thinking
-    const resolvers = {
-        ...SubmissionResolvers(new SubmissionService(knexConnection)),
-        ...SurveyResolvers(new SurveyService(knexConnection)),
-        ...UserResolvers(new UserService(config.userAdapterUrl)),
-    };
+    const resolvers = [
+        SubmissionResolvers(new SubmissionService(knexConnection)),
+        SurveyResolvers(new SurveyService(knexConnection)),
+        UserResolvers(new UserService(config.userAdapterUrl)),
+    ];
     // best to mount helmet so soon as possible to ensure headers are set: defaults - https://www.npmjs.com/package/helmet#how-it-works
     app.use(helmet());
     try {
         const typeDefs = await importSchema(join(__dirname + '/schemas/*.graphql'));
+        console.log(typeDefs);
         const apolloServer = new ApolloServer({
             typeDefs,
             resolvers,
