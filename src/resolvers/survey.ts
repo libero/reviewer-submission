@@ -23,4 +23,4 @@ const resolvers = (surveyService: SurveyService): IResolvers => ({
     },
 });
 
-export default resolvers;
+export const SurveyResolvers = resolvers;

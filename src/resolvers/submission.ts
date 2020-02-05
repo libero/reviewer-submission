@@ -26,4 +26,4 @@ const resolvers = (submissionService: SubmissionService): IResolvers => ({
     },
 });
 
-export default resolvers;
+export const SubmissionResolvers = resolvers;

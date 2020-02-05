@@ -10,4 +10,4 @@ const resolvers = (userService: UserService): IResolvers => ({
     },
 });
 
-export default resolvers;
+export const UserResolvers = resolvers;
