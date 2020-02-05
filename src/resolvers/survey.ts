@@ -14,7 +14,7 @@ const resolvers = (surveyService: SurveyService): IResolvers => ({
             args: { surveyId: string; submissionId: string; answers: SurveyAnswer[] },
         ): Promise<SurveyResponse> {
             const { surveyId, submissionId, answers } = args;
-            return surveyService.submitResponse(
+            return await surveyService.submitResponse(
                 SurveyId.fromUuid(surveyId),
                 SubmissionId.fromUuid(submissionId),
                 answers,
