@@ -4,6 +4,7 @@ import { Config as KnexConfig } from 'knex';
 export interface Config {
     port: number;
     knex: KnexConfig;
+    userAdapterUrl: string;
 }
 
 const configPath = process.env.CONFIG_PATH ? process.env.CONFIG_PATH : '/etc/reviewer/config.json';
