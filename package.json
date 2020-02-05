@@ -32,12 +32,6 @@
     },
     "dependencies": {
         "@libero/auth-token": "^0.1.1",
-        "@nestjs/common": "^6.0.0",
-        "@nestjs/core": "^6.0.0",
-        "@nestjs/graphql": "^6.4.2",
-        "@nestjs/jwt": "^6.1.1",
-        "@nestjs/passport": "^6.1.0",
-        "@nestjs/platform-express": "^6.0.0",
         "@types/http-errors": "^1.6.3",
         "@types/pino": "^5.15.4",
         "@types/uuid": "^3.4.5",
@@ -71,7 +65,6 @@
         "uuid": "^3.3.2"
     },
     "devDependencies": {
-        "@nestjs/testing": "^6.0.0",
         "@types/dotenv": "^6.1.1",
         "@types/express": "^4.17.2",
         "@types/helmet": "^0.0.45",

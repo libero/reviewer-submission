@@ -1,11 +1,11 @@
 import { SubmissionRepository, DtoSubmission, SubmissionId, Submission } from '../types/submission';
 import * as Knex from 'knex';
-import { Logger } from '@nestjs/common';
+import { InfraLogger as logger } from '../logger';
 import { SubmissionMapper } from '../entities/submission';
 
 export class KnexSubmissionRepository implements SubmissionRepository {
     private readonly TABLE_NAME = 'submission';
-    private readonly logger = new Logger(KnexSubmissionRepository.name);
+    // private readonly logger = new Logger(KnexSubmissionRepository.name);
 
     public constructor(private readonly knex: Knex<{}, unknown[]>) {}
 
@@ -23,12 +23,12 @@ export class KnexSubmissionRepository implements SubmissionRepository {
             table.uuid('id');
             table.string('title');
             table.timestamp('updated').defaultTo(this.knex.fn.now());
-            this.logger.log(`created table ${this.TABLE_NAME}`);
+            logger.log(`created table ${this.TABLE_NAME}`);
         });
     }
 
     close(): void {
-        this.logger.log(`Closing repository.`);
+        logger.log(`Closing repository.`);
         this.knex.destroy();
     }
 
