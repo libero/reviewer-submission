@@ -23,3 +23,13 @@ type SurveyAnswer {
   questionId: ID!
   answer: String!
 }
+
+input InputSurveyAnswer {
+  questionId: ID!
+  text: String!
+  answer: String!
+}
+
+type Mutation {
+  submitSurveyResponse(surveyId: String, submissionId: String, answers: [InputSurveyAnswer]!): SurveyResponse!
+}
