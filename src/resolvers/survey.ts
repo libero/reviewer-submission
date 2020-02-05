@@ -10,10 +10,10 @@ const resolvers = (surveyService: SurveyService): IResolvers => ({
     Mutation: {
         // Using the SurveyAnswer data container class. Should it be an interface instead?
         async submitSurveyResponse(
-            surveyId: string,
-            submissionId: string,
-            answers: SurveyAnswer[],
+            _,
+            args: { surveyId: string; submissionId: string; answers: SurveyAnswer[] },
         ): Promise<SurveyResponse> {
+            const { surveyId, submissionId, answers } = args;
             return surveyService.submitResponse(
                 SurveyId.fromUuid(surveyId),
                 SubmissionId.fromUuid(submissionId),

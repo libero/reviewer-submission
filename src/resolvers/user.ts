@@ -4,8 +4,8 @@ import { IResolvers } from 'apollo-server-express';
 
 const resolvers = (userService: UserService): IResolvers => ({
     Query: {
-        async getCurrentUser(header: string): Promise<User> {
-            return await userService.getCurrentUser(header);
+        async getCurrentUser(_, args, context: { authScope: string }): Promise<User> {
+            return await userService.getCurrentUser(context.authScope);
         },
     },
 });

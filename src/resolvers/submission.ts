@@ -12,16 +12,16 @@ const resolvers = (submissionService: SubmissionService): IResolvers => ({
         },
     },
     Mutation: {
-        async startSubmission(_, args): Promise<DtoViewSubmission | null> {
+        async startSubmission(_, args: { articleType: string }): Promise<DtoViewSubmission | null> {
             return await submissionService.create(args.articleType);
         },
 
-        async changeSubmissionTitle(id: string, title: string): Promise<DtoViewSubmission | null> {
-            return await submissionService.changeTitle(SubmissionId.fromUuid(id), title);
+        async changeSubmissionTitle(_, args: { id: string; title: string }): Promise<DtoViewSubmission | null> {
+            return await submissionService.changeTitle(SubmissionId.fromUuid(args.id), args.title);
         },
 
-        async deleteSubmission(id: SubmissionId): Promise<boolean> {
-            return await submissionService.delete(id);
+        async deleteSubmission(_, args: { id: SubmissionId }): Promise<boolean> {
+            return await submissionService.delete(args.id);
         },
     },
 });
