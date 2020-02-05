@@ -1,7 +1,7 @@
 import * as Knex from 'knex';
 import { KnexSurveyResponseRepository } from '../repositories/survey-response';
-import { SurveyAnswer } from 'src/entities/survey-answer';
-import { SurveyResponse } from 'src/entities/survey-response';
+import { SurveyAnswer } from '../entities/survey-answer';
+import { SurveyResponse } from '../entities/survey-response';
 import { SurveyId, SurveyResponseId } from '../types/survey';
 import { SubmissionId } from '../types/submission';
 import uuid = require('uuid');

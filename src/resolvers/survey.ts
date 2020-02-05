@@ -1,6 +1,6 @@
 import { IResolvers } from 'apollo-server-express';
 import { SurveyService } from '../services/survey';
-import { SurveyResponse } from 'src/entities/survey-response';
+import { SurveyResponse } from '../entities/survey-response';
 import { SurveyId } from '../types/survey';
 import { SubmissionId } from '../types/submission';
 import { SurveyAnswer } from '../entities/survey-answer';
