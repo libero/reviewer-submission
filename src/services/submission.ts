@@ -1,10 +1,8 @@
 import * as Knex from 'knex';
-import { SubmissionId, DtoViewSubmission } from '../types/submission';
+import { SubmissionId, DtoViewSubmission, Submission } from '../types/submission';
 import { KnexSubmissionRepository } from '../repositories/submission';
-// REMOVE MAYBE? Probably
-export type SubmissionServiceConfig = {
-    getSubmissionRepositoryConnection(): string;
-};
+import uuid = require('uuid');
+import { SubmissionEntity } from 'dist/packages/submission/submission.entity';
 
 export class SubmissionService {
     submissionRepository: KnexSubmissionRepository;
@@ -18,7 +16,9 @@ export class SubmissionService {
     }
 
     async create(articleType: string): Promise<DtoViewSubmission | null> {
-        return this.submissionRepository.create(articleType);
+        const id = SubmissionId.fromUuid(uuid());
+        const submission = new SubmissionEntity({ id, title: '', updated: new Date(), articleType });
+        return this.submissionRepository.save(submission);
     }
 
     async findOne(id: SubmissionId): Promise<DtoViewSubmission | null> {
@@ -26,7 +26,12 @@ export class SubmissionService {
     }
 
     async changeTitle(id: SubmissionId, title: string): Promise<DtoViewSubmission | null> {
-        return this.submissionRepository.changeTitle(id, title);
+        const result = await this.submissionRepository.findById(id);
+        if (result === null) {
+            return result;
+        }
+        const resultToSave: Submission = { ...result, title };
+        return this.submissionRepository.save(resultToSave);
     }
 
     async delete(id: SubmissionId): Promise<boolean> {

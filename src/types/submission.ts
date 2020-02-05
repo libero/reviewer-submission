@@ -27,9 +27,6 @@ export interface DtoViewSubmission {
 export interface SubmissionRepository {
     findAll(): Promise<Submission[]>;
     findById(id: SubmissionId): Promise<Submission | null>;
-    changeTitle(id: SubmissionId, title: string): Promise<Submission | null>;
-
-    create(articleType: string): Promise<Submission | null>;
     save(sub: Submission): Promise<Submission | null>;
     delete(id: SubmissionId): Promise<boolean>;
     close(): void;

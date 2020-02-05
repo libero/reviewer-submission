@@ -11,6 +11,12 @@ import { importSchema } from 'graphql-import';
 import { SubmissionService } from './services/submission';
 import SubmssionResolver from './resolvers/submission';
 
+// Apollo server express does not export this, but its experss
+export interface ExpressContext {
+    req: Request;
+    res: Response;
+}
+
 const init = async (): Promise<void> => {
     logger.info('Starting service');
     // Start the application
@@ -22,7 +28,13 @@ const init = async (): Promise<void> => {
     app.use(helmet());
     try {
         const typeDefs = await importSchema(join(__dirname + '/schemas/submission.graphql'));
-        const apolloServer = new ApolloServer({ typeDefs, resolvers });
+        const apolloServer = new ApolloServer({
+            typeDefs,
+            resolvers,
+            context: ({ req }: ExpressContext): { authorization: string | undefined } => ({
+                authorization: req.headers.authorization,
+            }),
+        });
         apolloServer.applyMiddleware({ app });
     } catch (e) {
         logger.trace(e);
