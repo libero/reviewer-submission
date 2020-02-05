@@ -12,17 +12,17 @@ export class SubmissionService {
     }
 
     async findAll(): Promise<DtoViewSubmission[]> {
-        return this.submissionRepository.findAll();
+        return await this.submissionRepository.findAll();
     }
 
     async create(articleType: string): Promise<DtoViewSubmission | null> {
         const id = SubmissionId.fromUuid(uuid());
         const submission = new SubmissionEntity({ id, title: '', updated: new Date(), articleType });
-        return this.submissionRepository.save(submission);
+        return await this.submissionRepository.save(submission);
     }
 
     async findOne(id: SubmissionId): Promise<DtoViewSubmission | null> {
-        return this.submissionRepository.findById(id);
+        return await this.submissionRepository.findById(id);
     }
 
     async changeTitle(id: SubmissionId, title: string): Promise<DtoViewSubmission | null> {
@@ -31,10 +31,10 @@ export class SubmissionService {
             return result;
         }
         const resultToSave: Submission = { ...result, title };
-        return this.submissionRepository.save(resultToSave);
+        return await this.submissionRepository.save(resultToSave);
     }
 
     async delete(id: SubmissionId): Promise<boolean> {
-        return this.submissionRepository.delete(id);
+        return await this.submissionRepository.delete(id);
     }
 }
