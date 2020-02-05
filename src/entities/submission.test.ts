@@ -9,6 +9,7 @@ describe('Submission Entity', () => {
             id: id,
             title: '',
             updated: new Date(),
+            articleType: '',
         });
 
         expect(submission).toBeInstanceOf(SubmissionEntity);
