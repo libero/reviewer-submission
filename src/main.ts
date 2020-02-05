@@ -5,6 +5,7 @@ import { Express, Request, Response } from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import config from './config';
 import errorHandler from './middleware/error-handler';
+import authenticate from './middleware/authenticate';
 import { InfraLogger as logger } from './logger';
 import { join } from 'path';
 import { importSchema } from 'graphql-import';
@@ -36,6 +37,7 @@ const init = async (): Promise<void> => {
             forceGraphQLImport: false,
             skipGraphQLImport: true,
         });
+        app.use(authenticate(config.jwtSecret));
         const apolloServer = new ApolloServer({
             typeDefs,
             resolvers,

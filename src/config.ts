@@ -1,10 +1,11 @@
 import { readFileSync } from 'fs';
 import { Config as KnexConfig } from 'knex';
-// TODO: jwt env value
+
 export interface Config {
     port: number;
     knex: KnexConfig;
     userAdapterUrl: string;
+    jwtSecret: string;
 }
 
 const configPath = process.env.CONFIG_PATH ? process.env.CONFIG_PATH : '/etc/reviewer/config.json';
