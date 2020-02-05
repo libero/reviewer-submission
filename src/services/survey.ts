@@ -1,8 +1,6 @@
-import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { Option, Some, None } from 'funfix';
 import * as Knex from 'knex';
 import { KnexSurveyResponseRepository } from '../repositories/survey-response';
-import { SurveyResponseController } from 'src/controllers/survey-response';
 import { SurveyAnswer } from 'src/entities/survey-answer';
 import { SurveyResponse } from 'src/entities/survey-response';
 import { SurveyId, SurveyResponseId } from '../types/survey';
