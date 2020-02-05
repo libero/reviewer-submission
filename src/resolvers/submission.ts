@@ -20,8 +20,9 @@ const resolvers = (submissionService: SubmissionService): IResolvers => ({
             return await submissionService.changeTitle(SubmissionId.fromUuid(args.id), args.title);
         },
 
-        async deleteSubmission(_, args: { id: SubmissionId }): Promise<boolean> {
-            return await submissionService.delete(args.id);
+        async deleteSubmission(_, { id }: { id: SubmissionId }): Promise<SubmissionId> {
+            await submissionService.delete(id);
+            return id;
         },
     },
 });
