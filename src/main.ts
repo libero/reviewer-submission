@@ -32,12 +32,13 @@ const init = async (): Promise<void> => {
     ];
     // best to mount helmet so soon as possible to ensure headers are set: defaults - https://www.npmjs.com/package/helmet#how-it-works
     app.use(helmet());
+    app.get('/health', (_: Request, res: Response) => res.sendStatus(200));
+    app.use(authenticate(config.jwtSecret));
     try {
         const typeDefs = await importSchema(join(__dirname, './schemas/**/*.graphql'), {
             forceGraphQLImport: false,
             skipGraphQLImport: true,
         });
-        app.use(authenticate(config.jwtSecret));
         const apolloServer = new ApolloServer({
             typeDefs,
             resolvers,
@@ -49,9 +50,6 @@ const init = async (): Promise<void> => {
     } catch (e) {
         logger.trace(e);
     }
-
-    // This is how we do dependency injection at the moment
-    app.get('/health', (_: Request, res: Response) => res.sendStatus(200));
     app.use(errorHandler);
 
     app.listen(config.port, () => logger.info(`Service listening on port ${config.port}`));
