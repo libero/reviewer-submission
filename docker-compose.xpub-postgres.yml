@@ -1,0 +1,9 @@
+version: '3'
+services:
+  xpub-postgres:
+    build:
+      context: "."
+      dockerfile: 'xpub-postgres.Dockerfile'
+      args:
+        image_tag: ${IMAGE_TAG}
+    image: libero/reviewer-xpub-postgres:${IMAGE_TAG}
