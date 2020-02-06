@@ -16,6 +16,8 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+CREATE SCHEMA xpublegacy;
+
 --
 -- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
 --
@@ -42,8 +44,6 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA xpublegacy;
 --
 
 COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
-
-CREATE SCHEMA xpublegacy;
 
 --
 -- Name: auditaction; Type: TYPE; Schema: xpublegacy; Owner: -
