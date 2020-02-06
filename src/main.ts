@@ -4,7 +4,6 @@ import * as knex from 'knex';
 import { Express, Request, Response } from 'express';
 import { ApolloServer, AuthenticationError } from 'apollo-server-express';
 import config from './config';
-import errorHandler from './middleware/error-handler';
 import { InfraLogger as logger } from './logger';
 import { join } from 'path';
 import { importSchema } from 'graphql-import';
@@ -13,6 +12,7 @@ import { SubmissionResolvers, SurveyResolvers, UserResolvers } from './resolvers
 import { SurveyService } from './services/survey';
 import { UserService } from './services/user';
 import { verify } from 'jsonwebtoken';
+import { GraphQLError, GraphQLFormattedError } from 'graphql';
 
 // Apollo server express does not export this, but its experss
 export interface ExpressContext {
@@ -51,12 +51,15 @@ const init = async (): Promise<void> => {
                     throw new AuthenticationError('You must be logged in');
                 }
             },
+            formatError: (error: GraphQLError): GraphQLFormattedError => {
+                // @todo: revisit how we handle errors
+                return error;
+            },
         });
         apolloServer.applyMiddleware({ app });
     } catch (e) {
         logger.trace(e);
     }
-    app.use(errorHandler);
 
     app.listen(config.port, () => logger.info(`Service listening on port ${config.port}`));
 };

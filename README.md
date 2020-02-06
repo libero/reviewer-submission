@@ -11,7 +11,6 @@ The structre is as follows:
 * Repositories is the data access layer
 * Services is the business logic layer
 * Resolvers is the GraphQL resolver layer
-* Middleware for express.js e.g. error handler etc
 * Schemas holds all the GraphQL schemas
 
 ## Setup
