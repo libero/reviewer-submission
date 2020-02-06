@@ -28,12 +28,12 @@ const init = async (): Promise<void> => {
     const resolvers = [
         SubmissionResolvers(new SubmissionService(knexConnection)),
         SurveyResolvers(new SurveyService(knexConnection)),
-        UserResolvers(new UserService(config.userAdapterUrl)),
+        UserResolvers(new UserService(config.user_adapter_url)),
     ];
     // best to mount helmet so soon as possible to ensure headers are set: defaults - https://www.npmjs.com/package/helmet#how-it-works
     app.use(helmet());
     app.get('/health', (_: Request, res: Response) => res.sendStatus(200));
-    app.use(authenticate(config.jwtSecret));
+    app.use(authenticate(config.authentication_jwt_secret));
     try {
         const typeDefs = await importSchema(join(__dirname, './schemas/**/*.graphql'), {
             forceGraphQLImport: false,

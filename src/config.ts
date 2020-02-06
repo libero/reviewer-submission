@@ -4,8 +4,8 @@ import { Config as KnexConfig } from 'knex';
 export interface Config {
     port: number;
     knex: KnexConfig;
-    userAdapterUrl: string;
-    jwtSecret: string;
+    user_adapter_url: string;
+    authentication_jwt_secret: string;
 }
 
 const configPath = process.env.CONFIG_PATH ? process.env.CONFIG_PATH : '/etc/reviewer/config.json';
