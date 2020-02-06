@@ -1,12 +1,27 @@
 # Reviewer Submission
 
+## Design and folder structure
+
+The application uses the following:
+  * TypeScript
+  * Express.js
+  * GraphQL (Apollo Server)
+
+The structre is as follows:
+* Repositories is the data access layer
+* Services is the business logic layer
+* Resolvers is the GraphQL resolver layer
+* Schemas holds all the GraphQL schemas
+
 ## Setup
 
-```
-cp .env.example .env
-docker-compose up
+To run the setup and install all dependencies
+```sh
+make setup
 ```
 
-## Overview
+## Start locally
 
-A service built on [NestJS](https://docs.nestjs.com/) for handling, validating and storing manuscript submissions via an exposed graphql interface. 
+```sh
+yarn run start:dev
+```

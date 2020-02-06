@@ -1,18 +1,15 @@
 
 IMAGE_TAG ?= "local"
-
 DOCKER_COMPOSE = IMAGE_TAG=${IMAGE_TAG} docker-compose -f docker-compose.build.yml
-
 DOCKER_COMPOSE_TEST = docker-compose -f docker-compose.test.yml
-
 PUSH_COMMAND = IMAGE_TAG=${IMAGE_TAG} .scripts/travis/push-image.sh
-
 GET_SCHEMA_TABLES = psql -q -t -U postgres -c "select count(*) from information_schema.tables where table_schema='xpublegacy';" | xargs
 LOAD_SCHEMA = psql -U postgres -f xpub-schema.sql
 
-
-setup_gitmodules:
+setup:
+	if [ ! -e ./config/config.json ] ; then cp config/config.example.json config/config.json ; fi
 	git submodule update --init --recursive
+	$(MAKE) get_deps
 
 get_deps:
 	yarn

@@ -1,14 +1,15 @@
 {
     "port": 3000,
-    "databases": {
-        "submission": {
-            "type": "sqlite3",
-            "database": "data.db"
-        },
-        "survey": {
-            "type": "sqlite3",
-            "database": "data.db"
+    "knex": {
+        "client": "pg",
+        "connection": {
+            "host": "postgres",
+            "database": "reviewer_submission",
+            "user": "postgres",
+            "password": "postgres",
+            "port": 5432
         }
     },
-    "userAdapterUrl": "http://localhost:3003/current-user"
+    "authentication_jwt_secret": "super_secret_jam",
+    "user_adapter_url": "http://localhost:3003/current-user"
 }

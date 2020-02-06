@@ -26,7 +26,7 @@ WORKDIR /app
 COPY --from=source /app/node_modules/ ./node_modules/
 COPY --from=source /app/dist/ ./dist/
 
-COPY src/*/*/*.graphql ./dist/modules/graphql/
+COPY src/schemas/*.graphql ./dist/schemas/
 
 EXPOSE 3000
 

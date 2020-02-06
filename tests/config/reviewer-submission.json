@@ -10,5 +10,6 @@
             "database": "data.db"
         }
     },
-    "userAdapterUrl": "http://localhost:3003/current-user"
+    "authentication_jwt_secret": "super_secret_jam",
+    "user_adapter_url": "http://localhost:3003/current-user"
 }
