@@ -2,10 +2,9 @@ import * as express from 'express';
 import * as helmet from 'helmet';
 import * as knex from 'knex';
 import { Express, Request, Response } from 'express';
-import { ApolloServer } from 'apollo-server-express';
+import { ApolloServer, AuthenticationError } from 'apollo-server-express';
 import config from './config';
 import errorHandler from './middleware/error-handler';
-import authenticate from './middleware/authenticate';
 import { InfraLogger as logger } from './logger';
 import { join } from 'path';
 import { importSchema } from 'graphql-import';
@@ -13,6 +12,7 @@ import { SubmissionService } from './services/submission';
 import { SubmissionResolvers, SurveyResolvers, UserResolvers } from './resolvers';
 import { SurveyService } from './services/survey';
 import { UserService } from './services/user';
+import { verify } from 'jsonwebtoken';
 
 // Apollo server express does not export this, but its experss
 export interface ExpressContext {
@@ -33,7 +33,6 @@ const init = async (): Promise<void> => {
     // best to mount helmet so soon as possible to ensure headers are set: defaults - https://www.npmjs.com/package/helmet#how-it-works
     app.use(helmet());
     app.get('/health', (_: Request, res: Response) => res.sendStatus(200));
-    app.use(authenticate(config.authentication_jwt_secret));
     try {
         const typeDefs = await importSchema(join(__dirname, './schemas/**/*.graphql'), {
             forceGraphQLImport: false,
@@ -42,9 +41,16 @@ const init = async (): Promise<void> => {
         const apolloServer = new ApolloServer({
             typeDefs,
             resolvers,
-            context: ({ req }: ExpressContext): { authorization: string | undefined } => ({
-                authorization: req.headers.authorization,
-            }),
+            context: ({ req }: ExpressContext): { userId: string } => {
+                try {
+                    // @todo: we need to use the correct libero auth token
+                    const token = (req.headers.authorization || '').split(' ')[1];
+                    const decodedToken = verify(token, config.authentication_jwt_secret) as { sub: string };
+                    return { userId: decodedToken.sub };
+                } catch (e) {
+                    throw new AuthenticationError('You must be logged in');
+                }
+            },
         });
         apolloServer.applyMiddleware({ app });
     } catch (e) {
