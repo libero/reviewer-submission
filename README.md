@@ -16,11 +16,13 @@ The structre is as follows:
 
 ## Setup
 
-```
-cp config/config.example.json config/config.json
-docker-compose up
+To run the setup and install all dependencies
+```sh
+make setup
 ```
 
-## Overview
+## Start locally
 
-A service built on [NestJS](https://docs.nestjs.com/) for handling, validating and storing manuscript submissions via an exposed graphql interface. 
+```sh
+yarn run start:dev
+```

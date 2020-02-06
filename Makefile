@@ -7,8 +7,10 @@ DOCKER_COMPOSE_TEST = docker-compose -f docker-compose.test.yml
 
 PUSH_COMMAND = IMAGE_TAG=${IMAGE_TAG} .scripts/travis/push-image.sh
 
-setup_gitmodules:
+setup:
+	if [ ! -e ./config/config.json ] ; then cp config/config.example.json config/config.json ; fi
 	git submodule update --init --recursive
+	$(MAKE) get_deps
 
 get_deps:
 	yarn
