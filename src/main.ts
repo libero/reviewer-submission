@@ -13,6 +13,7 @@ import { SurveyService } from './services/survey';
 import { UserService } from './services/user';
 import { verify } from 'jsonwebtoken';
 import { GraphQLError, GraphQLFormattedError } from 'graphql';
+import * as hpp from 'hpp';
 
 // Apollo server express does not export this, but its experss
 export interface ExpressContext {
@@ -32,6 +33,7 @@ const init = async (): Promise<void> => {
     ];
     // best to mount helmet so soon as possible to ensure headers are set: defaults - https://www.npmjs.com/package/helmet#how-it-works
     app.use(helmet());
+    app.use(hpp());
     app.get('/health', (_: Request, res: Response) => res.sendStatus(200));
     try {
         const typeDefs = await importSchema(join(__dirname, './schemas/**/*.graphql'), {
