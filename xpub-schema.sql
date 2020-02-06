@@ -53,7 +53,8 @@ CREATE TYPE xpublegacy.auditaction AS ENUM (
     'CREATED',
     'UPDATED',
     'DELETED',
-    'MECA_RESULT'
+    'MECA_RESULT',
+    'LOGGED_IN'
 );
 
 
