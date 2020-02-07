@@ -79,7 +79,7 @@ SET default_with_oids = false;
 CREATE TABLE public.audit_log (
     id uuid NOT NULL,
     created timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    user_id uuid,
+    user_id text,
     object_id uuid,
     object_type text,
     updated timestamp with time zone,
@@ -395,15 +395,6 @@ ALTER TABLE ONLY public."user"
 --
 
 CREATE INDEX ejp_name_concat ON public.ejp_name USING btree (lower(((first || ' '::text) || last)));
-
-
---
--- Name: audit_log audit_log_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.audit_log
-    ADD CONSTRAINT audit_log_user_id_fkey FOREIGN KEY (user_id) REFERENCES public."user"(id);
-
 
 --
 -- Name: file file_manuscript_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
