@@ -16,8 +16,6 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
-CREATE SCHEMA xpublegacy;
-
 --
 -- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
 --
@@ -36,7 +34,7 @@ COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 -- Name: pgcrypto; Type: EXTENSION; Schema: -; Owner: -
 --
 
-CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA xpublegacy;
+CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
 
 
 --
@@ -46,10 +44,10 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA xpublegacy;
 COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
 
 --
--- Name: auditaction; Type: TYPE; Schema: xpublegacy; Owner: -
+-- Name: auditaction; Type: TYPE; Schema: public; Owner: -
 --
 
-CREATE TYPE xpublegacy.auditaction AS ENUM (
+CREATE TYPE public.auditaction AS ENUM (
     'CREATED',
     'UPDATED',
     'DELETED',
@@ -59,10 +57,10 @@ CREATE TYPE xpublegacy.auditaction AS ENUM (
 
 
 --
--- Name: filestatus; Type: TYPE; Schema: xpublegacy; Owner: -
+-- Name: filestatus; Type: TYPE; Schema: public; Owner: -
 --
 
-CREATE TYPE xpublegacy.filestatus AS ENUM (
+CREATE TYPE public.filestatus AS ENUM (
     'CREATED',
     'UPLOADED',
     'STORED',
@@ -75,10 +73,10 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: audit_log; Type: TABLE; Schema: xpublegacy; Owner: -
+-- Name: audit_log; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE xpublegacy.audit_log (
+CREATE TABLE public.audit_log (
     id uuid NOT NULL,
     created timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     user_id uuid,
@@ -86,15 +84,15 @@ CREATE TABLE xpublegacy.audit_log (
     object_type text,
     updated timestamp with time zone,
     value text,
-    action xpublegacy.auditaction
+    action public.auditaction
 );
 
 
 --
--- Name: ejp_name; Type: TABLE; Schema: xpublegacy; Owner: -
+-- Name: ejp_name; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE xpublegacy.ejp_name (
+CREATE TABLE public.ejp_name (
     id integer NOT NULL,
     first text,
     last text
@@ -102,20 +100,20 @@ CREATE TABLE xpublegacy.ejp_name (
 
 
 --
--- Name: entities; Type: TABLE; Schema: xpublegacy; Owner: -
+-- Name: entities; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE xpublegacy.entities (
+CREATE TABLE public.entities (
     id uuid NOT NULL,
     data jsonb
 );
 
 
 --
--- Name: file; Type: TABLE; Schema: xpublegacy; Owner: -
+-- Name: file; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE xpublegacy.file (
+CREATE TABLE public.file (
     id uuid NOT NULL,
     manuscript_id uuid NOT NULL,
     created timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -126,15 +124,15 @@ CREATE TABLE xpublegacy.file (
     url text NOT NULL,
     mime_type text,
     size integer,
-    status xpublegacy.filestatus DEFAULT 'CREATED'::xpublegacy.filestatus
+    status public.filestatus DEFAULT 'CREATED'::public.filestatus
 );
 
 
 --
--- Name: identity; Type: TABLE; Schema: xpublegacy; Owner: -
+-- Name: identity; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE xpublegacy.identity (
+CREATE TABLE public.identity (
     id uuid NOT NULL,
     user_id uuid NOT NULL,
     created timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -148,10 +146,10 @@ CREATE TABLE xpublegacy.identity (
 
 
 --
--- Name: journal; Type: TABLE; Schema: xpublegacy; Owner: -
+-- Name: journal; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE xpublegacy.journal (
+CREATE TABLE public.journal (
     id uuid NOT NULL,
     organization_id uuid NOT NULL,
     created timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -162,10 +160,10 @@ CREATE TABLE xpublegacy.journal (
 
 
 --
--- Name: manuscript; Type: TABLE; Schema: xpublegacy; Owner: -
+-- Name: manuscript; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE xpublegacy.manuscript (
+CREATE TABLE public.manuscript (
     id uuid NOT NULL,
     journal_id uuid,
     created timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -191,20 +189,20 @@ CREATE TABLE xpublegacy.manuscript (
 
 
 --
--- Name: migrations; Type: TABLE; Schema: xpublegacy; Owner: -
+-- Name: migrations; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE xpublegacy.migrations (
+CREATE TABLE public.migrations (
     id text NOT NULL,
     run_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP
 );
 
 
 --
--- Name: organization; Type: TABLE; Schema: xpublegacy; Owner: -
+-- Name: organization; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE xpublegacy.organization (
+CREATE TABLE public.organization (
     id uuid NOT NULL,
     created timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated timestamp with time zone,
@@ -213,10 +211,10 @@ CREATE TABLE xpublegacy.organization (
 
 
 --
--- Name: review; Type: TABLE; Schema: xpublegacy; Owner: -
+-- Name: review; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE xpublegacy.review (
+CREATE TABLE public.review (
     id uuid NOT NULL,
     created timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated timestamp with time zone,
@@ -228,10 +226,10 @@ CREATE TABLE xpublegacy.review (
 
 
 --
--- Name: semantic_extraction; Type: TABLE; Schema: xpublegacy; Owner: -
+-- Name: semantic_extraction; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE xpublegacy.semantic_extraction (
+CREATE TABLE public.semantic_extraction (
     id uuid NOT NULL,
     created timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated timestamp with time zone,
@@ -242,10 +240,10 @@ CREATE TABLE xpublegacy.semantic_extraction (
 
 
 --
--- Name: survey_response; Type: TABLE; Schema: xpublegacy; Owner: -
+-- Name: survey_response; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE xpublegacy.survey_response (
+CREATE TABLE public.survey_response (
     id uuid NOT NULL,
     survey_id character varying(255) NOT NULL,
     manuscript_id uuid NOT NULL,
@@ -256,10 +254,10 @@ CREATE TABLE xpublegacy.survey_response (
 
 
 --
--- Name: team; Type: TABLE; Schema: xpublegacy; Owner: -
+-- Name: team; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE xpublegacy.team (
+CREATE TABLE public.team (
     id uuid NOT NULL,
     created timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated timestamp with time zone,
@@ -271,10 +269,10 @@ CREATE TABLE xpublegacy.team (
 
 
 --
--- Name: user; Type: TABLE; Schema: xpublegacy; Owner: -
+-- Name: user; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE xpublegacy."user" (
+CREATE TABLE public."user" (
     id uuid NOT NULL,
     created timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated timestamp with time zone,
@@ -282,174 +280,174 @@ CREATE TABLE xpublegacy."user" (
 );
 
 --
--- Name: audit_log audit_log_pkey; Type: CONSTRAINT; Schema: xpublegacy; Owner: -
+-- Name: audit_log audit_log_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY xpublegacy.audit_log
+ALTER TABLE ONLY public.audit_log
     ADD CONSTRAINT audit_log_pkey PRIMARY KEY (id);
 
 
 --
--- Name: ejp_name ejp_name_pkey; Type: CONSTRAINT; Schema: xpublegacy; Owner: -
+-- Name: ejp_name ejp_name_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY xpublegacy.ejp_name
+ALTER TABLE ONLY public.ejp_name
     ADD CONSTRAINT ejp_name_pkey PRIMARY KEY (id);
 
 
 --
--- Name: entities entities_pkey; Type: CONSTRAINT; Schema: xpublegacy; Owner: -
+-- Name: entities entities_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY xpublegacy.entities
+ALTER TABLE ONLY public.entities
     ADD CONSTRAINT entities_pkey PRIMARY KEY (id);
 
 
 --
--- Name: file file_pkey; Type: CONSTRAINT; Schema: xpublegacy; Owner: -
+-- Name: file file_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY xpublegacy.file
+ALTER TABLE ONLY public.file
     ADD CONSTRAINT file_pkey PRIMARY KEY (id);
 
 
 --
--- Name: identity identity_pkey; Type: CONSTRAINT; Schema: xpublegacy; Owner: -
+-- Name: identity identity_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY xpublegacy.identity
+ALTER TABLE ONLY public.identity
     ADD CONSTRAINT identity_pkey PRIMARY KEY (id);
 
 
 --
--- Name: journal journal_pkey; Type: CONSTRAINT; Schema: xpublegacy; Owner: -
+-- Name: journal journal_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY xpublegacy.journal
+ALTER TABLE ONLY public.journal
     ADD CONSTRAINT journal_pkey PRIMARY KEY (id);
 
 
 --
--- Name: manuscript manuscript_pkey; Type: CONSTRAINT; Schema: xpublegacy; Owner: -
+-- Name: manuscript manuscript_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY xpublegacy.manuscript
+ALTER TABLE ONLY public.manuscript
     ADD CONSTRAINT manuscript_pkey PRIMARY KEY (id);
 
 
 --
--- Name: migrations migrations_pkey; Type: CONSTRAINT; Schema: xpublegacy; Owner: -
+-- Name: migrations migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY xpublegacy.migrations
+ALTER TABLE ONLY public.migrations
     ADD CONSTRAINT migrations_pkey PRIMARY KEY (id);
 
 
 --
--- Name: organization organization_pkey; Type: CONSTRAINT; Schema: xpublegacy; Owner: -
+-- Name: organization organization_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY xpublegacy.organization
+ALTER TABLE ONLY public.organization
     ADD CONSTRAINT organization_pkey PRIMARY KEY (id);
 
 
 --
--- Name: review review_pkey; Type: CONSTRAINT; Schema: xpublegacy; Owner: -
+-- Name: review review_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY xpublegacy.review
+ALTER TABLE ONLY public.review
     ADD CONSTRAINT review_pkey PRIMARY KEY (id);
 
 
 --
--- Name: semantic_extraction semantic_extraction_pkey; Type: CONSTRAINT; Schema: xpublegacy; Owner: -
+-- Name: semantic_extraction semantic_extraction_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY xpublegacy.semantic_extraction
+ALTER TABLE ONLY public.semantic_extraction
     ADD CONSTRAINT semantic_extraction_pkey PRIMARY KEY (id);
 
 
 --
--- Name: survey_response survey_response_pkey; Type: CONSTRAINT; Schema: xpublegacy; Owner: -
+-- Name: survey_response survey_response_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY xpublegacy.survey_response
+ALTER TABLE ONLY public.survey_response
     ADD CONSTRAINT survey_response_pkey PRIMARY KEY (id);
 
 
 --
--- Name: team team_pkey; Type: CONSTRAINT; Schema: xpublegacy; Owner: -
+-- Name: team team_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY xpublegacy.team
+ALTER TABLE ONLY public.team
     ADD CONSTRAINT team_pkey PRIMARY KEY (id);
 
 
 --
--- Name: user user_pkey; Type: CONSTRAINT; Schema: xpublegacy; Owner: -
+-- Name: user user_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY xpublegacy."user"
+ALTER TABLE ONLY public."user"
     ADD CONSTRAINT user_pkey PRIMARY KEY (id);
 
 --
--- Name: ejp_name_concat; Type: INDEX; Schema: xpublegacy; Owner: -
+-- Name: ejp_name_concat; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX ejp_name_concat ON xpublegacy.ejp_name USING btree (lower(((first || ' '::text) || last)));
-
-
---
--- Name: audit_log audit_log_user_id_fkey; Type: FK CONSTRAINT; Schema: xpublegacy; Owner: -
---
-
-ALTER TABLE ONLY xpublegacy.audit_log
-    ADD CONSTRAINT audit_log_user_id_fkey FOREIGN KEY (user_id) REFERENCES xpublegacy."user"(id);
+CREATE INDEX ejp_name_concat ON public.ejp_name USING btree (lower(((first || ' '::text) || last)));
 
 
 --
--- Name: file file_manuscript_id_fkey; Type: FK CONSTRAINT; Schema: xpublegacy; Owner: -
+-- Name: audit_log audit_log_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY xpublegacy.file
-    ADD CONSTRAINT file_manuscript_id_fkey FOREIGN KEY (manuscript_id) REFERENCES xpublegacy.manuscript(id);
-
-
---
--- Name: identity identity_user_id_fkey; Type: FK CONSTRAINT; Schema: xpublegacy; Owner: -
---
-
-ALTER TABLE ONLY xpublegacy.identity
-    ADD CONSTRAINT identity_user_id_fkey FOREIGN KEY (user_id) REFERENCES xpublegacy."user"(id);
+ALTER TABLE ONLY public.audit_log
+    ADD CONSTRAINT audit_log_user_id_fkey FOREIGN KEY (user_id) REFERENCES public."user"(id);
 
 
 --
--- Name: journal journal_organization_id_fkey; Type: FK CONSTRAINT; Schema: xpublegacy; Owner: -
+-- Name: file file_manuscript_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY xpublegacy.journal
-    ADD CONSTRAINT journal_organization_id_fkey FOREIGN KEY (organization_id) REFERENCES xpublegacy.organization(id);
-
-
---
--- Name: manuscript manuscript_journal_id_fkey; Type: FK CONSTRAINT; Schema: xpublegacy; Owner: -
---
-
-ALTER TABLE ONLY xpublegacy.manuscript
-    ADD CONSTRAINT manuscript_journal_id_fkey FOREIGN KEY (journal_id) REFERENCES xpublegacy.journal(id);
+ALTER TABLE ONLY public.file
+    ADD CONSTRAINT file_manuscript_id_fkey FOREIGN KEY (manuscript_id) REFERENCES public.manuscript(id);
 
 
 --
--- Name: manuscript manuscript_previous_version_fkey; Type: FK CONSTRAINT; Schema: xpublegacy; Owner: -
+-- Name: identity identity_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY xpublegacy.manuscript
-    ADD CONSTRAINT manuscript_previous_version_fkey FOREIGN KEY (previous_version) REFERENCES xpublegacy.manuscript(id);
+ALTER TABLE ONLY public.identity
+    ADD CONSTRAINT identity_user_id_fkey FOREIGN KEY (user_id) REFERENCES public."user"(id);
 
 
 --
--- Name: review review_user_id_fkey; Type: FK CONSTRAINT; Schema: xpublegacy; Owner: -
+-- Name: journal journal_organization_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY xpublegacy.review
-    ADD CONSTRAINT review_user_id_fkey FOREIGN KEY (user_id) REFERENCES xpublegacy."user"(id);
+ALTER TABLE ONLY public.journal
+    ADD CONSTRAINT journal_organization_id_fkey FOREIGN KEY (organization_id) REFERENCES public.organization(id);
+
+
+--
+-- Name: manuscript manuscript_journal_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.manuscript
+    ADD CONSTRAINT manuscript_journal_id_fkey FOREIGN KEY (journal_id) REFERENCES public.journal(id);
+
+
+--
+-- Name: manuscript manuscript_previous_version_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.manuscript
+    ADD CONSTRAINT manuscript_previous_version_fkey FOREIGN KEY (previous_version) REFERENCES public.manuscript(id);
+
+
+--
+-- Name: review review_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.review
+    ADD CONSTRAINT review_user_id_fkey FOREIGN KEY (user_id) REFERENCES public."user"(id);
