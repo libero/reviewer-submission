@@ -20,7 +20,7 @@
         "test:integration": "jest ./tests/",
         "update:internal": "yarn upgrade -P @libero",
         "merge:schemas": "ts-node tasks/merge-schemas.ts",
-        "lint:schemas": "yarn merge:schemas && graphql-schema-linter lint-schemas/all.graphql"
+        "lint:schemas": "yarn merge:schemas && graphql-schema-linter lint-schemas/all.graphql -r types-are-capitalized,input-object-values-are-camel-cased,defined-types-are-used,enum-values-all-caps,fields-are-camel-cased"
     },
     "repository": {
         "type": "git",
@@ -28,7 +28,7 @@
     },
     "husky": {
         "hooks": {
-            "precommit": "yarn lint && yarn lint:schemas",
+            "pre-commit": "yarn lint && yarn lint:schemas",
             "pre-push": "yarn test"
         }
     },
