@@ -46,5 +46,6 @@ describe('App', () => {
         );
         expect(response.status).toBe(200);
         expect(response.data.errors.length).toBeGreaterThan(0);
+        expect(response.data.errors[0].message).toBe('Invalid article type');
     });
 });

@@ -17,6 +17,10 @@ export class SubmissionService {
     }
 
     async create(articleType: string): Promise<DtoViewSubmission | null> {
+        if (!SubmissionService.validateArticleType(articleType)) {
+            throw new Error('Invalid article type');
+        }
+
         const id = SubmissionId.fromUuid(uuid());
         const submission = new SubmissionEntity({ id, title: '', updated: new Date(), articleType });
         return await this.submissionRepository.save(submission);
@@ -37,5 +41,10 @@ export class SubmissionService {
 
     async delete(id: SubmissionId): Promise<boolean> {
         return await this.submissionRepository.delete(id);
+    }
+
+    static validateArticleType(articleType: string): boolean {
+        const articlesTypes = ['researchArticle', 'featureArticle', 'researchAdvance'];
+        return articlesTypes.includes(articleType);
     }
 }
