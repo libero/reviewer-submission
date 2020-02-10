@@ -9,6 +9,7 @@ export class SubmissionService {
 
     constructor(knexConnection: Knex<{}, unknown[]>) {
         this.submissionRepository = new KnexSubmissionRepository(knexConnection);
+        this.submissionRepository.initSchema();
     }
 
     async findAll(): Promise<DtoViewSubmission[]> {
