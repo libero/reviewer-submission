@@ -4,7 +4,7 @@ import { InfraLogger as logger } from '../logger';
 import { SubmissionMapper } from '../entities/submission';
 
 export class KnexSubmissionRepository implements SubmissionRepository {
-    private readonly TABLE_NAME = 'submission';
+    private readonly TABLE_NAME = 'manuscript';
     // private readonly logger = new Logger(KnexSubmissionRepository.name);
 
     public constructor(private readonly knex: Knex<{}, unknown[]>) {}
