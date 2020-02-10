@@ -77,3 +77,5 @@ data.db
 config/*
 !config/config.example.json
 !config/newrelic.example.js
+
+lint-schemas/

@@ -19,7 +19,9 @@
         "test:cov": "NEW_RELIC_NO_CONFIG_FILE=true jest ./src --coverage",
         "test:debug": "NEW_RELIC_NO_CONFIG_FILE=true node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest .src/ --runInBand",
         "test:integration": "CONFIG_PATH=tests/config/reviewer-submission.json jest ./tests/",
-        "update:internal": "yarn upgrade -P @libero"
+        "update:internal": "yarn upgrade -P @libero",
+        "merge:schemas": "ts-node tasks/merge-schemas.ts",
+        "lint:schemas": "yarn merge:schemas && graphql-schema-linter lint-schemas/all.graphql -r types-are-capitalized,input-object-values-are-camel-cased,defined-types-are-used,enum-values-all-caps,fields-are-camel-cased"
     },
     "repository": {
         "type": "git",
@@ -27,7 +29,7 @@
     },
     "husky": {
         "hooks": {
-            "pre-commit": "yarn lint",
+            "pre-commit": "yarn lint && yarn lint:schemas",
             "pre-push": "yarn test"
         }
     },
@@ -68,6 +70,7 @@
         "@typescript-eslint/eslint-plugin": "^2.8.0",
         "@typescript-eslint/parser": "^2.8.0",
         "axios": "^0.19.2",
+        "graphql-schema-linter": "^0.2.4",
         "husky": "^3.0.9",
         "jest": "^24.9.0",
         "nodemon": "^1.18.9",
@@ -92,5 +95,8 @@
         },
         "coverageDirectory": "../coverage",
         "testEnvironment": "node"
+    },
+    "engines": {
+      "node": ">=12.15.0"
     }
 }

@@ -15,7 +15,7 @@ jobs:
       language: node_js
       name: Test
       node_js:
-        - 10.16.3
+        - 12.15.0
       script:
         - make lint
         - make test
