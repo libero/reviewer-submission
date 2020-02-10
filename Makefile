@@ -24,6 +24,7 @@ test: get_deps
 test_integration:
 	${DOCKER_COMPOSE_TEST} down
 	${DOCKER_COMPOSE_TEST} up -d
+	./.scripts/docker/wait-healthy.sh test_postgres 20
 	./.scripts/docker/wait-healthy.sh test_reviewer-submission 20
 	yarn run test:integration
 	${DOCKER_COMPOSE_TEST} down
