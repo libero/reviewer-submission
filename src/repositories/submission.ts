@@ -26,7 +26,7 @@ export class KnexSubmissionRepository implements SubmissionRepository {
                 table.string('title');
                 table.timestamp('updated').defaultTo(this.knex.fn.now());
                 table.jsonb('meta');
-                logger.log(`created table ${this.TABLE_NAME}`);
+                logger.info(`created table ${this.TABLE_NAME}`);
             });
     }
 

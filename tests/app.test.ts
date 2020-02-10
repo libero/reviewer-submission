@@ -45,6 +45,7 @@ describe('App', () => {
             { headers: { Authorization: `Bearer ${jwtToken}` } },
         );
         expect(response.status).toBe(200);
+        console.log('response.data', response.data);
         expect(response.data.errors.length).toBeGreaterThan(0);
     });
 });
