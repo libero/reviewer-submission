@@ -12,13 +12,15 @@
         "start:debug": "nodemon --config nodemon-debug.json",
         "prestart:prod": "rimraf dist && npm run build",
         "start:prod": "node dist/main.js",
-        "lint": "eslint --ext .js,.ts src/",
+        "lint": "eslint --ext .js,.ts,.graphql src/",
         "test": "NEW_RELIC_NO_CONFIG_FILE=true jest ./src",
         "test:watch": "NEW_RELIC_NO_CONFIG_FILE=true jest ./src --watch",
         "test:cov": "NEW_RELIC_NO_CONFIG_FILE=true jest ./src --coverage",
         "test:debug": "NEW_RELIC_NO_CONFIG_FILE=true node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest .src/ --runInBand",
         "test:integration": "jest ./tests/",
-        "update:internal": "yarn upgrade -P @libero"
+        "update:internal": "yarn upgrade -P @libero",
+        "merge:schemas": "ts-node tasks/merge-schemas.ts",
+        "lint:schemas": "yarn merge:schemas && graphql-schema-linter lint-schemas/all.graphql"
     },
     "repository": {
         "type": "git",
@@ -26,9 +28,14 @@
     },
     "husky": {
         "hooks": {
-            "pre-commit": "yarn lint",
+            "precommit": "yarn lint && yarn lint:schemas",
             "pre-push": "yarn test"
         }
+    },
+    "lint-staged": {
+        "*.graphql": [
+            "graphql-schema-linter src/**/*.graphql"
+        ]
     },
     "dependencies": {
         "@libero/auth-token": "^0.1.1",
@@ -67,8 +74,11 @@
         "@typescript-eslint/eslint-plugin": "^2.8.0",
         "@typescript-eslint/parser": "^2.8.0",
         "axios": "^0.19.2",
+        "graphql-schema-linter": "^0.2.4",
         "husky": "^3.0.9",
         "jest": "^24.9.0",
+        "lint-staged": "^10.0.7",
+        "merge-graphql-schemas": "^1.7.6",
         "nodemon": "^1.18.9",
         "pino-pretty": "^3.5.0",
         "prettier": "^1.19.1",
