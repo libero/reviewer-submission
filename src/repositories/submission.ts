@@ -4,7 +4,7 @@ import { InfraLogger as logger } from '../logger';
 import { SubmissionMapper } from '../entities/submission';
 
 export class KnexSubmissionRepository implements SubmissionRepository {
-    private readonly TABLE_NAME = 'submission';
+    private readonly TABLE_NAME = 'manuscript';
     // private readonly logger = new Logger(KnexSubmissionRepository.name);
 
     public constructor(private readonly knex: Knex<{}, unknown[]>) {}
@@ -23,8 +23,9 @@ export class KnexSubmissionRepository implements SubmissionRepository {
             .withSchema('public')
             .createTable(this.TABLE_NAME, (table: Knex.CreateTableBuilder) => {
                 table.uuid('id');
-                table.string('title');
                 table.timestamp('updated').defaultTo(this.knex.fn.now());
+                table.string('status');
+                table.string('created_by');
                 table.jsonb('meta');
                 logger.info(`created table ${this.TABLE_NAME}`);
             });
@@ -38,7 +39,7 @@ export class KnexSubmissionRepository implements SubmissionRepository {
     public async findAll(): Promise<Submission[]> {
         const result = await this.knex
             .withSchema('public')
-            .select<DtoSubmission[]>('id', 'title', 'updated', 'meta')
+            .select<DtoSubmission[]>('id', 'updated', 'created_by', 'status', 'meta')
             .from(this.TABLE_NAME);
         return result.map(SubmissionMapper.fromDto);
     }
@@ -46,7 +47,7 @@ export class KnexSubmissionRepository implements SubmissionRepository {
     public async findById(id: SubmissionId): Promise<Submission | null> {
         const rows = await this.knex
             .withSchema('public')
-            .select<DtoSubmission[]>('id', 'title', 'updated', 'meta')
+            .select<DtoSubmission[]>('id', 'updated', 'created_by', 'status', 'meta')
             .from(this.TABLE_NAME)
             .where({ id });
 

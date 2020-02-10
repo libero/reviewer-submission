@@ -16,13 +16,20 @@ export class SubmissionService {
         return await this.submissionRepository.findAll();
     }
 
-    async create(articleType: string): Promise<DtoViewSubmission | null> {
+    async create(articleType: string, userId: string): Promise<DtoViewSubmission | null> {
         if (!SubmissionService.validateArticleType(articleType)) {
             throw new Error('Invalid article type');
         }
 
         const id = SubmissionId.fromUuid(uuid());
-        const submission = new SubmissionEntity({ id, title: '', updated: new Date(), articleType });
+        const submission = new SubmissionEntity({
+            id,
+            title: '',
+            updated: new Date(),
+            articleType,
+            status: 'INITIAL',
+            createdBy: userId,
+        });
         return await this.submissionRepository.save(submission);
     }
 

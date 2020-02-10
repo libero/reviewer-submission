@@ -23,6 +23,7 @@ describe('App', () => {
             { headers: { Authorization: `Bearer ${jwtToken}` } },
         );
         expect(response.status).toBe(200);
+        console.log(response.data.errors);
         expect(response.data.data.startSubmission.id).toHaveLength(36);
     });
 

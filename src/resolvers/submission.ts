@@ -12,8 +12,8 @@ const resolvers = (submissionService: SubmissionService): IResolvers => ({
         },
     },
     Mutation: {
-        async startSubmission(_, args: { articleType: string }): Promise<DtoViewSubmission | null> {
-            return await submissionService.create(args.articleType);
+        async startSubmission(_, args: { articleType: string }, context): Promise<DtoViewSubmission | null> {
+            return await submissionService.create(args.articleType, context.userId);
         },
 
         async changeSubmissionTitle(_, args: { id: string; title: string }): Promise<DtoViewSubmission | null> {
