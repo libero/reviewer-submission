@@ -10,7 +10,7 @@ export interface Submission {
 }
 
 type xpubMeta = {
-    articleType: string
+    articleType: string;
 };
 export interface DtoSubmission {
     id: SubmissionId;

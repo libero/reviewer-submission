@@ -13,6 +13,7 @@
         "prestart:prod": "rimraf dist && npm run build",
         "start:prod": "node dist/main.js",
         "lint": "eslint --ext .js,.ts src/",
+        "prettier": "prettier --write './src/**/*.ts'",
         "test": "NEW_RELIC_NO_CONFIG_FILE=true jest ./src",
         "test:watch": "NEW_RELIC_NO_CONFIG_FILE=true jest ./src --watch",
         "test:cov": "NEW_RELIC_NO_CONFIG_FILE=true jest ./src --coverage",

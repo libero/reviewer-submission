@@ -36,7 +36,7 @@ export class SubmissionMapper {
             updated: sub.updated,
             meta: {
                 articleType: sub.articleType,
-            }
+            },
         };
     }
     public static toViewDto(sub: Submission): DtoViewSubmission {
@@ -48,9 +48,9 @@ export class SubmissionMapper {
         };
     }
     public static fromDto(sub: DtoSubmission): SubmissionEntity {
-        const mappedSubmissionDto: Submission = { 
+        const mappedSubmissionDto: Submission = {
             ...sub,
-            articleType: SubmissionMapper.getMetaValue(sub, 'articleType')
+            articleType: SubmissionMapper.getMetaValue(sub, 'articleType'),
         };
         return new SubmissionEntity(mappedSubmissionDto);
     }
@@ -58,7 +58,7 @@ export class SubmissionMapper {
     static getMetaValue(sub: DtoSubmission, metaProperty: string): string {
         try {
             return (sub.meta as { [key: string]: string })[metaProperty];
-        }catch(_) {
+        } catch (_) {
             throw new Error(`Unable to find property ${metaProperty} on DtoSubmission`);
         }
     }

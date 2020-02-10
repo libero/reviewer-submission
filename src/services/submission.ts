@@ -17,7 +17,7 @@ export class SubmissionService {
 
     async create(articleType: string): Promise<DtoViewSubmission | null> {
         const id = SubmissionId.fromUuid(uuid());
-        const submission = new SubmissionEntity({ id, title: '', updated: new Date(), articleType});
+        const submission = new SubmissionEntity({ id, title: '', updated: new Date(), articleType });
         return await this.submissionRepository.save(submission);
     }
 
