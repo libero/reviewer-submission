@@ -12,7 +12,7 @@
         "start:debug": "nodemon --config nodemon-debug.json",
         "prestart:prod": "rimraf dist && npm run build",
         "start:prod": "node dist/main.js",
-        "lint": "eslint --ext .js,.ts,.graphql src/",
+        "lint": "eslint --ext .js,.ts src/",
         "test": "NEW_RELIC_NO_CONFIG_FILE=true jest ./src",
         "test:watch": "NEW_RELIC_NO_CONFIG_FILE=true jest ./src --watch",
         "test:cov": "NEW_RELIC_NO_CONFIG_FILE=true jest ./src --coverage",
@@ -31,11 +31,6 @@
             "precommit": "yarn lint && yarn lint:schemas",
             "pre-push": "yarn test"
         }
-    },
-    "lint-staged": {
-        "*.graphql": [
-            "graphql-schema-linter src/**/*.graphql"
-        ]
     },
     "dependencies": {
         "@libero/auth-token": "^0.1.1",
