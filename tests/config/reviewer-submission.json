@@ -3,7 +3,7 @@
     "knex": {
         "client": "pg",
         "connection": {
-            "host": "postgres",
+            "host": "localhost",
             "database": "postgres",
             "user": "postgres",
             "password": "postgres",

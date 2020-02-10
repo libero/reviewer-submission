@@ -2,6 +2,8 @@ import { SubmissionService } from '../services/submission';
 import { SubmissionId, DtoViewSubmission } from '../types/submission';
 import { IResolvers } from 'apollo-server-express';
 
+const articlesTypes = ['researchArticle', 'featureArticle', 'researchAdvance'];
+
 const resolvers = (submissionService: SubmissionService): IResolvers => ({
     Query: {
         async getSubmissions(): Promise<DtoViewSubmission[] | null> {
@@ -13,6 +15,9 @@ const resolvers = (submissionService: SubmissionService): IResolvers => ({
     },
     Mutation: {
         async startSubmission(_, args: { articleType: string }): Promise<DtoViewSubmission | null> {
+            if (!articlesTypes.includes(args.articleType)) {
+                throw new Error('Invalid article type');
+            }
             return await submissionService.create(args.articleType);
         },
 
