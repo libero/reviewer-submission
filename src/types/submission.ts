@@ -9,11 +9,14 @@ export interface Submission {
     articleType: string;
 }
 
+type xpubMeta = {
+    articleType: string
+};
 export interface DtoSubmission {
     id: SubmissionId;
     title: string;
     updated: Date;
-    articleType: string;
+    meta: xpubMeta;
 }
 
 export interface DtoViewSubmission {

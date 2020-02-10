@@ -23,6 +23,7 @@ export class KnexSubmissionRepository implements SubmissionRepository {
             table.uuid('id');
             table.string('title');
             table.timestamp('updated').defaultTo(this.knex.fn.now());
+            table.jsonb('meta');
             logger.log(`created table ${this.TABLE_NAME}`);
         });
     }
@@ -33,14 +34,14 @@ export class KnexSubmissionRepository implements SubmissionRepository {
     }
 
     public async findAll(): Promise<Submission[]> {
-        const result = await this.knex(this.TABLE_NAME).select<DtoSubmission[]>('id', 'title', 'updated');
+        const result = await this.knex(this.TABLE_NAME).select<DtoSubmission[]>('id', 'title', 'updated', 'meta');
         return result.map(SubmissionMapper.fromDto);
     }
 
     public async findById(id: SubmissionId): Promise<Submission | null> {
         const rows = await this.knex(this.TABLE_NAME)
             .where({ id })
-            .select<DtoSubmission[]>('id', 'title', 'updated');
+            .select<DtoSubmission[]>('id', 'title', 'updated', 'meta');
 
         return rows.length > 0 ? SubmissionMapper.fromDto(rows[0]) : null;
     }
