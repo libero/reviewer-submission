@@ -23,7 +23,6 @@ describe('App', () => {
             { headers: { Authorization: `Bearer ${jwtToken}` } },
         );
         expect(response.status).toBe(200);
-        console.log(response.data);
         expect(response.data.data.startSubmission.id).toHaveLength(36);
     });
 
@@ -47,5 +46,27 @@ describe('App', () => {
         expect(response.status).toBe(200);
         expect(response.data.errors.length).toBeGreaterThan(0);
         expect(response.data.errors[0].message).toBe('Invalid article type');
+    });
+
+    it('returns error bad query - no articleType param', async () => {
+        expect.assertions(2);
+        await axios
+            .post(
+                'http://localhost:3000/graphql',
+                {
+                    query: `mutation StartSubmission($articleType: String) {
+                    startSubmission(articleType: $articleType) {
+                        id
+                    }
+                }
+            `,
+                    variables: {},
+                },
+                { headers: { Authorization: `Bearer ${jwtToken}` } },
+            )
+            .catch(e => {
+                expect(e.response.status).toBe(400);
+                expect(e.response.statusText).toBe('Bad Request');
+            });
     });
 });
