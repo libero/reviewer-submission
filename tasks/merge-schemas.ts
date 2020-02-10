@@ -11,5 +11,4 @@ const importOptions = {
 util.promisify(fs.mkdir)('lint-schemas', { recursive: true })
     .then(_ => importSchema(path.join(__dirname, '..', 'src', './schemas/**/*.graphql'), importOptions))
     .then(merged => util.promisify(fs.writeFile)('lint-schemas/all.graphql', merged, { encoding: 'utf8' }))
-    .then(_ => console.log('done'))
-    .catch((e: Error) => console.log('Error', e));
+    .then(_ => console.log('done'));
