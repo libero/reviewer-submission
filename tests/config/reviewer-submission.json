@@ -1,5 +1,7 @@
 {
     "port": 3000,
+    "max_ql_complexity": 100,
+    "max_ql_depth": 5,
     "knex": {
         "client": "pg",
         "connection": {

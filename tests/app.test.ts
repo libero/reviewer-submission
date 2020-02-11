@@ -70,4 +70,37 @@ describe('App', () => {
                 expect(e.response.statusText).toBe('Bad Request');
             });
     });
+
+    it('returns error bad query - when depth is more than 5', async () => {
+        await axios
+            .post(
+                'http://localhost:3000/graphql',
+                {
+                    query: `query QueryIsTooDeep {
+                        getCurrentUser {
+                            getCurrentUser {
+                                getCurrentUser {
+                                    getCurrentUser {
+                                        getCurrentUser {
+                                            getCurrentUser {
+                                                id
+                                                name
+                                                role
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                      }
+            `,
+                    variables: {},
+                },
+                { headers: { Authorization: `Bearer ${jwtToken}` } },
+            )
+            .catch(e => {
+                expect(e.response.data.errors[0].message).toBe("'QueryIsTooDeep' exceeds maximum operation depth of 5");
+                expect(e.response.status).toBe(400);
+            });
+    });
 });
