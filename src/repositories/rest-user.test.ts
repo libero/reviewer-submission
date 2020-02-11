@@ -7,9 +7,9 @@ const mockedFetch = mocked(fetch, true);
 
 describe('REST User Repository', () => {
     it('get current user', async () => {
-        const mockFetchPromise = Promise.resolve({
+        const mockFetchPromise = {
             json: () => Promise.resolve({ value: 3 }),
-        }) as unknown;
+        } as unknown;
 
         mockedFetch.mockResolvedValue(Promise.resolve(mockFetchPromise as Response));
 
