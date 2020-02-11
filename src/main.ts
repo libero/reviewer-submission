@@ -46,7 +46,7 @@ const init = async (): Promise<void> => {
         const apolloServer = new ApolloServer({
             schema,
             validationRules: [
-                depthLimit(10),
+                depthLimit(5),
                 // may need to have resolver level complexity, but this is okay for now.
                 queryComplexity({
                     maximumComplexity: 1000,
