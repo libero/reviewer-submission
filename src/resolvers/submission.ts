@@ -1,5 +1,5 @@
 import { SubmissionService } from '../services/submission';
-import { SubmissionId, DtoViewSubmission } from '../types/knex-submission';
+import { SubmissionId, DtoViewSubmission } from '../types/submission';
 import { IResolvers } from 'apollo-server-express';
 
 const resolvers = (submissionService: SubmissionService): IResolvers => ({
