@@ -56,13 +56,11 @@ const init = async (): Promise<void> => {
             // The point to consider - is this expected behaviour or should it allow Introspection regardless of auth status.
             context: ({ req }: ExpressContext): { userId: string } => {
                 try {
-                    // console.log('req', req);
                     // @todo: we need to use the correct libero auth token
                     const token = (req.headers.authorization || '').split(' ')[1];
                     const decodedToken = verify(token, config.authentication_jwt_secret) as { sub: string };
                     return { userId: decodedToken.sub };
                 } catch (e) {
-                    console.log('what?', e);
                     throw new AuthenticationError('You must be logged in');
                 }
             },
