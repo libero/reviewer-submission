@@ -18,7 +18,7 @@ describe('REST User Repository', () => {
         expect(user).toMatchObject({ value: 3 });
         expect(mockedFetch).toHaveBeenCalled();
         expect(mockedFetch).toHaveBeenCalledWith('user-url', {
-            headers: [['authorization', 'header']]
+            headers: [['authorization', 'header']],
         });
     });
 });
