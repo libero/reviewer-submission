@@ -1,6 +1,6 @@
 ARG image_tag=latest
 
-FROM node:12.15-alpine as source
+FROM node:12.15 as source
 MAINTAINER eLife Reviewer Product Team <reviewer-product@elifesciences.org>
 
 WORKDIR /app
