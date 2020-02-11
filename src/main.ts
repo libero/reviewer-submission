@@ -15,7 +15,7 @@ import { verify } from 'jsonwebtoken';
 import { GraphQLError, GraphQLFormattedError } from 'graphql';
 import * as hpp from 'hpp';
 import * as depthLimit from 'graphql-depth-limit';
-import queryComplexity from 'graphql-query-complexity';
+import queryComplexity, { simpleEstimator } from 'graphql-query-complexity';
 
 // Apollo server express does not export this, but its experss
 export interface ExpressContext {
@@ -50,6 +50,12 @@ const init = async (): Promise<void> => {
                 // may need to have resolver level complexity, but this is okay for now.
                 queryComplexity({
                     maximumComplexity: 1000,
+                    estimators: [
+                        // default fallback estimator.
+                        simpleEstimator({
+                            defaultComplexity: 1,
+                        }),
+                    ],
                 }),
             ],
             // @todo: Introspection queries will be blocked unless you are authenticated.
