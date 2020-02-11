@@ -71,19 +71,21 @@ describe('App', () => {
             });
     });
 
-    it.only('returns error bad query - when depth is more than 5', async () => {
+    it('returns error bad query - when depth is more than 5', async () => {
         await axios
             .post(
                 'http://localhost:3000/graphql',
                 {
-                    query: `query naughtyQuery {
-                        getSubmission(id: "42") {
-                            getSubmission(id: "42") {
-                                getSubmission(id: "42") {
-                                    getSubmission(id: "42") {
-                                        getSubmission(id: "42") {
-                                            getSubmission(id: "42") {
+                    query: `query QueryIsTooDeep {
+                        getCurrentUser {
+                            getCurrentUser {
+                                getCurrentUser {
+                                    getCurrentUser {
+                                        getCurrentUser {
+                                            getCurrentUser {
                                                 id
+                                                name
+                                                role
                                             }
                                         }
                                     }
@@ -97,8 +99,7 @@ describe('App', () => {
                 { headers: { Authorization: `Bearer ${jwtToken}` } },
             )
             .catch(e => {
-                console.log('e.response', e.response.data.errors);
-                expect(e.response.data.errors[0].message).toBe("'naughtyQuery' exceeds maximum operation depth of 5")
+                expect(e.response.data.errors[0].message).toBe("'QueryIsTooDeep' exceeds maximum operation depth of 5");
                 expect(e.response.status).toBe(400);
             });
     });
