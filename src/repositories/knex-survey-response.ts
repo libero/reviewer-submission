@@ -7,7 +7,11 @@ export class KnexSurveyResponseRepository implements SurveyResponseRepository {
     public constructor(private readonly knex: Knex<{}, unknown[]>) {}
 
     public async save(surveyResponse: ISurveyResponse): Promise<ISurveyResponse> {
-        await this.knex(this.TABLE_NAME).insert({ ...surveyResponse.toDTO(), updated: new Date().toISOString() });
+        await this.knex
+            .withSchema('public')
+            .insert({ ...surveyResponse.toDTO(), updated: new Date().toISOString() })
+            .into(this.TABLE_NAME);
+
         return surveyResponse;
     }
 

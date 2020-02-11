@@ -1,5 +1,5 @@
 import * as Knex from 'knex';
-import { KnexSurveyResponseRepository } from '../repositories/survey-response';
+import { KnexSurveyResponseRepository } from '../repositories/knex-survey-response';
 import { SurveyAnswer } from '../entities/survey-answer';
 import { SurveyResponse } from '../entities/survey-response';
 import { SurveyId, SurveyResponseId } from '../types/survey';
