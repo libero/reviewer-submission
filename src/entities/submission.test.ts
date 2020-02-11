@@ -8,6 +8,8 @@ describe('Submission Entity', () => {
         const submission = new SubmissionEntity({
             id: id,
             title: '',
+            status: 'INITIAL',
+            createdBy: '123',
             updated: new Date(),
             articleType: '',
         });

@@ -9,15 +9,27 @@ export class SubmissionService {
 
     constructor(knexConnection: Knex<{}, unknown[]>) {
         this.submissionRepository = new KnexSubmissionRepository(knexConnection);
+        this.submissionRepository.initSchema();
     }
 
     async findAll(): Promise<DtoViewSubmission[]> {
         return await this.submissionRepository.findAll();
     }
 
-    async create(articleType: string): Promise<DtoViewSubmission | null> {
+    async create(articleType: string, userId: string): Promise<DtoViewSubmission | null> {
+        if (!SubmissionService.validateArticleType(articleType)) {
+            throw new Error('Invalid article type');
+        }
+
         const id = SubmissionId.fromUuid(uuid());
-        const submission = new SubmissionEntity({ id, title: '', updated: new Date(), articleType });
+        const submission = new SubmissionEntity({
+            id,
+            title: '',
+            updated: new Date(),
+            articleType,
+            status: 'INITIAL',
+            createdBy: userId,
+        });
         return await this.submissionRepository.save(submission);
     }
 
@@ -36,5 +48,10 @@ export class SubmissionService {
 
     async delete(id: SubmissionId): Promise<boolean> {
         return await this.submissionRepository.delete(id);
+    }
+
+    static validateArticleType(articleType: string): boolean {
+        const articlesTypes = ['researchArticle', 'featureArticle', 'researchAdvance'];
+        return articlesTypes.includes(articleType);
     }
 }
