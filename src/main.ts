@@ -2,7 +2,7 @@ import * as express from 'express';
 import * as helmet from 'helmet';
 import * as knex from 'knex';
 import { Express, Request, Response } from 'express';
-import { ApolloServer, AuthenticationError } from 'apollo-server-express';
+import { ApolloServer, AuthenticationError, makeExecutableSchema } from 'apollo-server-express';
 import config from './config';
 import { InfraLogger as logger } from './logger';
 import { join } from 'path';
@@ -14,6 +14,8 @@ import { UserService } from './services/user';
 import { verify } from 'jsonwebtoken';
 import { GraphQLError, GraphQLFormattedError } from 'graphql';
 import * as hpp from 'hpp';
+import * as depthLimit from 'graphql-depth-limit';
+import queryComplexity from 'graphql-query-complexity';
 
 // Apollo server express does not export this, but its experss
 export interface ExpressContext {
@@ -40,16 +42,27 @@ const init = async (): Promise<void> => {
             forceGraphQLImport: false,
             skipGraphQLImport: true,
         });
+        const schema = makeExecutableSchema({ typeDefs, resolvers });
         const apolloServer = new ApolloServer({
-            typeDefs,
-            resolvers,
+            schema,
+            validationRules: [
+                depthLimit(10),
+                // may need to have resolver level complexity, but this is okay for now.
+                queryComplexity({
+                    maximumComplexity: 1000,
+                }),
+            ],
+            // @todo: Introspection queries will be blocked unless you are authenticated.
+            // The point to consider - is this expected behaviour or should it allow Introspection regardless of auth status.
             context: ({ req }: ExpressContext): { userId: string } => {
                 try {
+                    // console.log('req', req);
                     // @todo: we need to use the correct libero auth token
                     const token = (req.headers.authorization || '').split(' ')[1];
                     const decodedToken = verify(token, config.authentication_jwt_secret) as { sub: string };
                     return { userId: decodedToken.sub };
                 } catch (e) {
+                    console.log('what?', e);
                     throw new AuthenticationError('You must be logged in');
                 }
             },
