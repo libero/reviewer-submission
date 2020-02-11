@@ -1,5 +1,5 @@
 import { User } from '../types/user';
-import { RestUserRepository } from '../repositories/user';
+import { RestUserRepository } from '../repositories/rest-user';
 
 export class UserService {
     restUserRepository: RestUserRepository;

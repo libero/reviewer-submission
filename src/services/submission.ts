@@ -1,6 +1,6 @@
 import * as Knex from 'knex';
 import { SubmissionId, DtoViewSubmission, Submission } from '../types/submission';
-import { KnexSubmissionRepository } from '../repositories/submission';
+import { KnexSubmissionRepository } from '../repositories/knex-submission';
 import uuid = require('uuid');
 import { SubmissionEntity } from '../entities/submission';
 
@@ -9,7 +9,6 @@ export class SubmissionService {
 
     constructor(knexConnection: Knex<{}, unknown[]>) {
         this.submissionRepository = new KnexSubmissionRepository(knexConnection);
-        this.submissionRepository.initSchema();
     }
 
     async findAll(): Promise<DtoViewSubmission[]> {
