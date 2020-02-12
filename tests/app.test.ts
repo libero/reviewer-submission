@@ -10,12 +10,12 @@ describe('Application Integration Tests', () => {
             'http://localhost:3000/graphql',
             {
                 query: `
-                mutation StartSubmission($articleType: String!) {
-                    startSubmission(articleType: $articleType) {
-                        id
+                    mutation StartSubmission($articleType: String!) {
+                        startSubmission(articleType: $articleType) {
+                            id
+                        }
                     }
-                }
-            `,
+                `,
                 variables: {
                     articleType: 'researchArticle',
                 },
