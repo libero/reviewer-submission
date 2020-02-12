@@ -7,17 +7,19 @@ import config from './config';
 import { InfraLogger as logger } from './logger';
 import { join } from 'path';
 import { importSchema } from 'graphql-import';
-import { SubmissionService } from './services/submission';
-import { SubmissionResolvers, SurveyResolvers, UserResolvers } from './resolvers';
-import { SurveyService } from './services/survey';
-import { UserService } from './services/user';
 import { verify } from 'jsonwebtoken';
 import { GraphQLError, GraphQLFormattedError } from 'graphql';
 import * as hpp from 'hpp';
 import * as depthLimit from 'graphql-depth-limit';
 import queryComplexity, { simpleEstimator } from 'graphql-query-complexity';
+import { SubmissionService } from './submission/models/submission-service';
+import { SubmissionResolvers } from './submission/resolvers/submission';
+import { SurveyResolvers } from './survey/resolvers/survey';
+import { SurveyService } from './survey/models/survey-service';
+import { UserResolvers } from './user/resolvers/user';
+import { UserService } from './user/models/user-service';
 
-// Apollo server express does not export this, but its experss
+// Apollo server express does not export this, but its express
 export interface ExpressContext {
     req: Request;
     res: Response;

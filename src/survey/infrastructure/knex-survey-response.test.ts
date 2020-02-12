@@ -1,10 +1,10 @@
 import { v4 as uuid } from 'uuid';
 import * as Knex from 'knex';
 import { KnexSurveyResponseRepository } from './knex-survey-response';
-import { SurveyId, SurveyResponseId } from '../types/survey';
-import { SubmissionId } from '../types/submission';
-import { MockKnex } from './knex-mock';
-import { SurveyResponse } from '../entities/survey-response';
+import { SurveyId, SurveyResponseId } from '../survey';
+import { SubmissionId } from '../../submission/submission';
+import { MockKnex } from '../../test-mocks/knex-mock';
+import { SurveyResponse } from '../models/survey-response';
 
 const testSurveyResponse = new SurveyResponse({
     id: SurveyResponseId.fromUuid(uuid()),

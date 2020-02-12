@@ -4,7 +4,7 @@ import config from '../src/config';
 
 const jwtToken = sign({ sub: '123' }, config.authentication_jwt_secret);
 
-describe('App', () => {
+describe('Application Integration Tests', () => {
     it('returns no errors on valid research article', async () => {
         const response = await axios.post(
             'http://localhost:3000/graphql',

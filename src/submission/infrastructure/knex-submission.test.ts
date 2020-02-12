@@ -1,9 +1,9 @@
 import { v4 as uuid } from 'uuid';
 import * as Knex from 'knex';
 import { KnexSubmissionRepository } from './knex-submission';
-import { SubmissionId } from '../types/submission';
-import { MockKnex } from './knex-mock';
-import { SubmissionMapper } from '../entities/submission';
+import { SubmissionId } from '../submission';
+import { MockKnex } from '../../test-mocks/knex-mock';
+import { SubmissionMapper } from '../models/submission';
 
 const testSubmission = {
     id: SubmissionId.fromUuid(uuid()),

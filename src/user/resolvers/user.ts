@@ -1,5 +1,5 @@
-import { User } from '../types/user';
-import { UserService } from '../services/user';
+import { User } from '../user';
+import { UserService } from '../models/user-service';
 import { IResolvers } from 'apollo-server-express';
 
 const resolvers = (userService: UserService): IResolvers => ({
