@@ -2,7 +2,7 @@ import { SubmissionService } from './submission-service';
 import { MockKnex } from '../../test-mocks/knex-mock';
 import Knex = require('knex');
 import uuid = require('uuid');
-import { SubmissionId, xpubMeta } from '../submission';
+import { SubmissionId, xpubMeta, Submission } from '../submission';
 
 describe('Submission Service', () => {
     let mockKnex: MockKnex;
@@ -73,5 +73,17 @@ describe('Submission Service', () => {
         const submissionId = submission == null ? null : submission.id;
         expect(submissionId).toBeTruthy();
         expect(submissionId).toHaveLength(36);
+    });
+
+    it('should change title', async () => {
+        const title = 'i am updated';
+        mockKnex.where = jest.fn().mockImplementation(() => [dtoSubmission]);
+        const service = new SubmissionService((mockKnex as unknown) as Knex);
+        const submission = await service.changeTitle(dtoSubmission.id, title);
+        const submissionId = submission == null ? null : submission.id;
+        const returnedTitle = submission == null ? null : submission.title;
+        expect(submissionId).toBeTruthy();
+        expect(submissionId).toHaveLength(36);
+        expect(returnedTitle).toBe(title);
     });
 });
