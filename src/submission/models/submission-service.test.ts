@@ -32,28 +32,28 @@ describe('Submission Service', () => {
         mockKnex.returning = jest.fn().mockReturnValue(mockKnex);
     });
 
-    it('should call repo findAll and return results', async () => {
+    it('should return results as array - findAll', async () => {
         mockKnex.from = jest.fn().mockImplementation(() => [dtoSubmission, dtoSubmission]);
         const service = new SubmissionService((mockKnex as unknown) as Knex);
         const results = await service.findAll();
         expect(results).toHaveLength(2);
     });
 
-    it('should call repo findAll and not throw if results are empty', async () => {
+    it('should return empty array and not throw if results are empty - findAll', async () => {
         mockKnex.from = jest.fn().mockImplementation(() => []);
         const service = new SubmissionService((mockKnex as unknown) as Knex);
         const results = await service.findAll();
         expect(results).toHaveLength(0);
     });
 
-    it('should call repo findById and return null if empty', async () => {
+    it('should call repo findById and return null if empty - findOne', async () => {
         mockKnex.where = jest.fn().mockImplementation(() => []);
         const service = new SubmissionService((mockKnex as unknown) as Knex);
         const results = await service.findOne(SubmissionId.fromUuid(uuid()));
         expect(results).toBe(null);
     });
 
-    it('should call repo findById and return matching object if not empty', async () => {
+    it('should return matching object if found - findOne', async () => {
         mockKnex.where = jest.fn().mockImplementation(() => [dtoSubmission]);
         const service = new SubmissionService((mockKnex as unknown) as Knex);
         const submission = await service.findOne(dtoSubmission.id);
@@ -62,12 +62,12 @@ describe('Submission Service', () => {
         expect(expectedId).toBe(dtoSubmission.id);
     });
 
-    it('should throw if invalid article type', async () => {
+    it('should throw if invalid article type - create', async () => {
         const service = new SubmissionService((mockKnex as unknown) as Knex);
         expect(service.create('articleType', 'userId')).rejects.toThrowError();
     });
 
-    it('should return new submission', async () => {
+    it('should return new submission if valid - create', async () => {
         const service = new SubmissionService((mockKnex as unknown) as Knex);
         const submission = await service.create('researchArticle', 'userId');
         const submissionId = submission == null ? null : submission.id;
@@ -75,7 +75,7 @@ describe('Submission Service', () => {
         expect(submissionId).toHaveLength(36);
     });
 
-    it('should change title', async () => {
+    it('should change title - changeTitle', async () => {
         const title = 'i am updated';
         mockKnex.where = jest.fn().mockImplementation(() => [dtoSubmission]);
         const service = new SubmissionService((mockKnex as unknown) as Knex);
@@ -87,7 +87,7 @@ describe('Submission Service', () => {
         expect(returnedTitle).toBe(title);
     });
 
-    it('should should return null if submission is return by repo', async () => {
+    it('should should return null if submission is not found - changeTitle', async () => {
         const title = 'i am updated';
         mockKnex.where = jest.fn().mockImplementation(() => []);
         const service = new SubmissionService((mockKnex as unknown) as Knex);
@@ -95,34 +95,26 @@ describe('Submission Service', () => {
         expect(submission).toBe(null);
     });
 
-    it('should should return null if submission is return by repo', async () => {
-        const title = 'i am updated';
-        mockKnex.where = jest.fn().mockImplementation(() => []);
-        const service = new SubmissionService((mockKnex as unknown) as Knex);
-        const submission = await service.changeTitle(dtoSubmission.id, title);
-        expect(submission).toBe(null);
-    });
-
-    it('should return true is delete is successful', async () => {
+    it('should return true is delete is successful - delete', async () => {
         mockKnex.delete = jest.fn().mockImplementation(() => 1);
         const service = new SubmissionService((mockKnex as unknown) as Knex);
         const deleteOutcome = await service.delete(dtoSubmission.id);
         expect(deleteOutcome).toBe(true);
     });
 
-    it('should return false is delete is unsuccessful', async () => {
+    it('should return false is delete is unsuccessful - dlete', async () => {
         mockKnex.delete = jest.fn().mockImplementation(() => 0);
         const service = new SubmissionService((mockKnex as unknown) as Knex);
         const deleteOutcome = await service.delete(dtoSubmission.id);
         expect(deleteOutcome).toBe(false);
     });
 
-    it('should return false if article type is not supported', async () => {
+    it('should return false if article type is not supported - validateArticleType', async () => {
         const isSupported = SubmissionService.validateArticleType('not real');
         expect(isSupported).toBe(false);
     });
 
-    it('should return true if article type is  supported', async () => {
+    it('should return true if article type is  supported - validateArticleType', async () => {
         const isSupported = SubmissionService.validateArticleType('researchArticle');
         expect(isSupported).toBe(true);
     });
