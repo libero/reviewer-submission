@@ -64,7 +64,6 @@ const init = async (): Promise<void> => {
                 requestDidStart: () => ({
                     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
                     didResolveOperation({ request, document }) {
-                        console.log('document', document);
                         // @todo: may need to have resolver level complexity.
                         // This needs to be revisited when the queries and their complexities are known
                         const complexity = getComplexity({
