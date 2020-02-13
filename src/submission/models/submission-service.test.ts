@@ -86,4 +86,12 @@ describe('Submission Service', () => {
         expect(submissionId).toHaveLength(36);
         expect(returnedTitle).toBe(title);
     });
+
+    it('should should return null if submission is return by repo', async () => {
+        const title = 'i am updated';
+        mockKnex.where = jest.fn().mockImplementation(() => []);
+        const service = new SubmissionService((mockKnex as unknown) as Knex);
+        const submission = await service.changeTitle(dtoSubmission.id, title);
+        expect(submission).toBe(null);
+    });
 });
