@@ -2,7 +2,7 @@ import { SubmissionService } from './submission-service';
 import { MockKnex } from '../../test-mocks/knex-mock';
 import Knex = require('knex');
 import uuid = require('uuid');
-import { SubmissionId, xpubMeta, Submission } from '../submission';
+import { SubmissionId, xpubMeta } from '../submission';
 
 describe('Submission Service', () => {
     let mockKnex: MockKnex;
