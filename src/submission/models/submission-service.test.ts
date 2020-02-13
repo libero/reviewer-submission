@@ -94,4 +94,36 @@ describe('Submission Service', () => {
         const submission = await service.changeTitle(dtoSubmission.id, title);
         expect(submission).toBe(null);
     });
+
+    it('should should return null if submission is return by repo', async () => {
+        const title = 'i am updated';
+        mockKnex.where = jest.fn().mockImplementation(() => []);
+        const service = new SubmissionService((mockKnex as unknown) as Knex);
+        const submission = await service.changeTitle(dtoSubmission.id, title);
+        expect(submission).toBe(null);
+    });
+
+    it('should return true is delete is successful', async () => {
+        mockKnex.delete = jest.fn().mockImplementation(() => 1);
+        const service = new SubmissionService((mockKnex as unknown) as Knex);
+        const deleteOutcome = await service.delete(dtoSubmission.id);
+        expect(deleteOutcome).toBe(true);
+    });
+
+    it('should return false is delete is unsuccessful', async () => {
+        mockKnex.delete = jest.fn().mockImplementation(() => 0);
+        const service = new SubmissionService((mockKnex as unknown) as Knex);
+        const deleteOutcome = await service.delete(dtoSubmission.id);
+        expect(deleteOutcome).toBe(false);
+    });
+
+    it('should return false if article type is not supported', async () => {
+        const isSupported = SubmissionService.validateArticleType('not real');
+        expect(isSupported).toBe(false);
+    });
+
+    it('should return true if article type is  supported', async () => {
+        const isSupported = SubmissionService.validateArticleType('researchArticle');
+        expect(isSupported).toBe(true);
+    });
 });
