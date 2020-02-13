@@ -34,7 +34,7 @@ export class KnexSubmissionRepository implements SubmissionRepository {
 
     public async save(sub: Submission): Promise<Submission | null> {
         // @todo: do we merge against remote state?
-        const submission = this.findById(sub.id);
+        const submission = await this.findById(sub.id);
         const dtoSubmission: DtoSubmission = SubmissionMapper.toDto(sub);
         const dtoToSave = { ...dtoSubmission, updated: new Date() };
         if (submission === null) {
