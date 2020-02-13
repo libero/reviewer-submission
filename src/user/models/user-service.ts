@@ -1,5 +1,5 @@
-import { User } from '../types/user';
-import { RestUserRepository } from '../repositories/rest-user';
+import { User } from '../user';
+import { RestUserRepository } from '../infrastructure/rest-user';
 
 export class UserService {
     restUserRepository: RestUserRepository;

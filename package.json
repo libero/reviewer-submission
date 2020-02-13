@@ -18,7 +18,7 @@
         "test:watch": "NEW_RELIC_NO_CONFIG_FILE=true jest ./src --watch",
         "test:cov": "NEW_RELIC_NO_CONFIG_FILE=true jest ./src --coverage",
         "test:debug": "NEW_RELIC_NO_CONFIG_FILE=true node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest .src/ --runInBand",
-        "test:integration": "CONFIG_PATH=tests/config/reviewer-submission.json jest ./tests/",
+        "test:integration": "jest ./tests/",
         "update:internal": "yarn upgrade -P @libero",
         "merge:schemas": "ts-node tasks/merge-schemas.ts",
         "lint:schemas": "yarn merge:schemas && graphql-schema-linter lint-schemas/all.graphql -r types-are-capitalized,input-object-values-are-camel-cased,defined-types-are-used,enum-values-all-caps,fields-are-camel-cased"

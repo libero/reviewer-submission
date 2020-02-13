@@ -1,7 +1,7 @@
-import { SubmissionRepository, DtoSubmission, SubmissionId, Submission } from '../types/submission';
+import { SubmissionRepository, DtoSubmission, SubmissionId, Submission } from '../submission';
 import * as Knex from 'knex';
-import { InfraLogger as logger } from '../logger';
-import { SubmissionMapper } from '../entities/submission';
+import { InfraLogger as logger } from '../../logger';
+import { SubmissionMapper } from '../models/submission';
 
 export class KnexSubmissionRepository implements SubmissionRepository {
     private readonly TABLE_NAME = 'manuscript';
