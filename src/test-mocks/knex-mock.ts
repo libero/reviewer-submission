@@ -23,4 +23,7 @@ export class MockKnex {
     delete(): boolean {
         return true;
     }
+    update(): MockKnex {
+        return this;
+    }
 }

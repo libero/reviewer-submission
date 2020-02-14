@@ -34,6 +34,7 @@ describe('Knex Submission Repository', () => {
         mockKnex.insert = jest.fn().mockReturnValue(mockKnex);
         mockKnex.withSchema = jest.fn().mockReturnValue(mockKnex);
         mockKnex.into = jest.fn().mockReturnValue(mockKnex);
+        mockKnex.update = jest.fn().mockReturnValue(mockKnex);
         mockKnex.select = jest.fn().mockReturnValue(mockKnex);
         mockKnex.from = jest.fn().mockReturnValue(mockKnex);
         mockKnex.where = jest.fn().mockReturnValue(mockKnex);
@@ -82,6 +83,7 @@ describe('Knex Submission Repository', () => {
 
     it('Can save', async () => {
         const repo = new KnexSubmissionRepository((mockKnex as unknown) as Knex);
+        repo.findById = jest.fn().mockReturnValue({ id: testSubmission.id });
         await expect(repo.save(testSubmission)).resolves.toMatchObject({
             id: testSubmission.id,
             title: 'The title',
@@ -91,6 +93,5 @@ describe('Knex Submission Repository', () => {
         });
         expect(mockKnex.withSchema).toBeCalledWith('public');
         expect(mockKnex.into).toBeCalledWith('manuscript');
-        expect(mockKnex.returning).toBeCalledWith('id');
     });
 });

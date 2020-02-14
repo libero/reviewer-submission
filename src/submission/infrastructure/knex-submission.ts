@@ -18,6 +18,7 @@ export class KnexSubmissionRepository implements SubmissionRepository {
             .withSchema('public')
             .select<DtoSubmission[]>('id', 'updated', 'created_by', 'status', 'meta')
             .from(this.TABLE_NAME);
+
         return result.map(SubmissionMapper.fromDto);
     }
 
@@ -32,15 +33,22 @@ export class KnexSubmissionRepository implements SubmissionRepository {
     }
 
     public async save(sub: Submission): Promise<Submission | null> {
+        // @todo: do we merge against remote state?
+        const submission = await this.findById(sub.id);
         const dtoSubmission: DtoSubmission = SubmissionMapper.toDto(sub);
-        dtoSubmission.updated = new Date();
-        await this.knex
-            .withSchema('public')
-            .insert(dtoSubmission)
-            .into(this.TABLE_NAME)
-            .returning('id');
-
-        return SubmissionMapper.fromDto(dtoSubmission);
+        const dtoToSave = { ...dtoSubmission, updated: new Date() };
+        if (submission === null) {
+            await this.knex
+                .withSchema('public')
+                .insert(dtoToSave)
+                .into(this.TABLE_NAME);
+        } else {
+            await this.knex
+                .withSchema('public')
+                .update(dtoToSave)
+                .into(this.TABLE_NAME);
+        }
+        return SubmissionMapper.fromDto(dtoToSave);
     }
 
     public async delete(id: SubmissionId): Promise<boolean> {
