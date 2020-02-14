@@ -1,4 +1,4 @@
-import { SubmissionId, DtoSubmission, DtoViewSubmission, Submission, xpubMeta } from '../submission';
+import { SubmissionId, DtoSubmission, DtoViewSubmission, Submission, xpubMeta, Author } from '../submission';
 
 export class SubmissionEntity implements Submission {
     id: SubmissionId;
@@ -13,6 +13,8 @@ export class SubmissionEntity implements Submission {
 
     createdBy: string;
 
+    details?: Author;
+
     // This is wired up so that you can create an entity from the DTO described by ISubmission
     constructor({
         id,
@@ -21,6 +23,7 @@ export class SubmissionEntity implements Submission {
         articleType,
         status,
         createdBy,
+        details,
     }: {
         id: SubmissionId;
         title: string;
@@ -28,6 +31,7 @@ export class SubmissionEntity implements Submission {
         articleType: string;
         status: string;
         createdBy: string;
+        details?: Author;
     }) {
         this.id = id;
         this.title = title;
@@ -35,6 +39,7 @@ export class SubmissionEntity implements Submission {
         this.articleType = articleType;
         this.status = status;
         this.createdBy = createdBy;
+        this.details = details;
     }
 }
 
@@ -43,6 +48,7 @@ export class SubmissionMapper {
         return {
             id: sub.id,
             updated: sub.updated,
+            details: sub.details,
             // eslint-disable-next-line @typescript-eslint/camelcase
             created_by: sub.createdBy,
             status: sub.status,

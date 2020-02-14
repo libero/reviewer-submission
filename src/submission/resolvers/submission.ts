@@ -1,5 +1,5 @@
 import { SubmissionService } from '../models/submission-service';
-import { SubmissionId, DtoViewSubmission, Submission } from '../submission';
+import { SubmissionId, DtoViewSubmission, Submission, Author } from '../submission';
 import { IResolvers } from 'apollo-server-express';
 
 const resolvers = (submissionService: SubmissionService): IResolvers => ({
@@ -25,8 +25,11 @@ const resolvers = (submissionService: SubmissionService): IResolvers => ({
             return id;
         },
 
-        async autoSave(_, { submission }: { submission: Submission }): Promise<Submission> {
-            return await submissionService.autoSave(submission);
+        // TODO: this used to be just autosave, passing in the whole object or a subset.
+        // It's likely that such a specific resolver is less ideal than a generic auto save route.
+        // It was refactored to match reviwer mocks as much as possible
+        async saveDetailsPage(_, { id, details }: { id: SubmissionId; details: Author }): Promise<Submission> {
+            return await submissionService.saveDetailsPage(id, details);
         },
     },
 });

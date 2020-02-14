@@ -1,5 +1,5 @@
 import * as Knex from 'knex';
-import { SubmissionId, DtoViewSubmission, Submission } from '../submission';
+import { SubmissionId, DtoViewSubmission, Submission, Author } from '../submission';
 import { KnexSubmissionRepository } from '../infrastructure/knex-submission';
 import uuid = require('uuid');
 import { SubmissionEntity, SubmissionMapper } from './submission';
@@ -15,12 +15,16 @@ export class SubmissionService {
         return await this.submissionRepository.findAll();
     }
 
-    async autoSave(sub: Submission): Promise<Submission> {
-        const submission = await this.submissionRepository.save(sub);
+    async saveDetailsPage(id: SubmissionId, details: Author): Promise<Submission> {
+        const submission = await this.submissionRepository.findById(id);
         if (submission === null) {
             throw new Error('Submission not found');
         }
-        return submission;
+        const savedSubmission = await this.submissionRepository.save({ ...submission, details });
+        if (savedSubmission === null) {
+            throw new Error('Submission not found');
+        }
+        return savedSubmission;
     }
 
     async create(articleType: string, userId: string): Promise<DtoViewSubmission | null> {

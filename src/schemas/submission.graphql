@@ -1,16 +1,33 @@
 type Submission {
-  id: ID!
-  title: String!
-  updated: String!
+    id: ID!
+    title: String!
+    updated: String!
+    articleType: String!
+    author: AuthorDetails!
+}
+
+type AuthorDetails {
+    firstName: String!
+    lastName: String!
+    email: String!
+    institution: String!
+}
+
+input AuthorDetailsInput {
+    firstName: String!
+    lastName: String!
+    email: String!
+    institution: String!
 }
 
 type Query {
-  getSubmissions: [Submission!]!
-  getSubmission(id: ID!): Submission
+    getSubmissions: [Submission!]!
+    getSubmission(id: ID!): Submission
 }
 
 type Mutation {
-  startSubmission(articleType: String!): Submission!
-  changeSubmissionTitle(id: ID!, title: String!): Submission!
-  deleteSubmission(id: ID!): Boolean
+    startSubmission(articleType: String!): Submission!
+    changeSubmissionTitle(id: ID!, title: String!): Submission!
+    deleteSubmission(id: ID!): Boolean
+    saveDetailsPage(id: ID!, details: AuthorDetailsInput!): Submission!
 }

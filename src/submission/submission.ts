@@ -2,6 +2,13 @@ import { uuidType } from 'typesafe-uuid';
 
 export class SubmissionId extends uuidType<'SubmissionId'>() {}
 
+// TODO: shouldn't be here really.
+export interface Author {
+    firstName: string;
+    lastName: string;
+    email: string;
+    institution: string;
+}
 export interface Submission {
     id: SubmissionId;
     title: string;
@@ -9,6 +16,7 @@ export interface Submission {
     createdBy: string;
     status: string;
     articleType: string;
+    details?: Author;
 }
 
 export type xpubMeta = {
@@ -20,6 +28,7 @@ export interface DtoSubmission {
     updated: Date;
     created_by: string;
     status: string;
+    details?: Author;
     meta: xpubMeta;
 }
 
@@ -28,6 +37,7 @@ export interface DtoViewSubmission {
     title: string;
     updated: Date;
     articleType: string;
+    details?: Author;
 }
 
 export interface SubmissionRepository {

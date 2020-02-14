@@ -48,7 +48,7 @@ export class KnexSubmissionRepository implements SubmissionRepository {
             return null;
         }
         const dtoSubmission: DtoSubmission = SubmissionMapper.toDto(sub);
-        const dtoToSave = { ...dtoSubmission, updated: new Date() };
+        const dtoToSave = { ...SubmissionMapper.toDto(submission), ...dtoSubmission, updated: new Date() };
         await this.knex
             .withSchema('public')
             .insert(dtoToSave)
