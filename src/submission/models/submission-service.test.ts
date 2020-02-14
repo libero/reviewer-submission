@@ -2,7 +2,7 @@ import { SubmissionService } from './submission-service';
 import { MockKnex } from '../../test-mocks/knex-mock';
 import Knex = require('knex');
 import uuid = require('uuid');
-import { SubmissionId, xpubMeta } from '../submission';
+import { SubmissionId, xpubMeta, Submission } from '../submission';
 
 describe('Submission Service', () => {
     let mockKnex: MockKnex;
@@ -87,12 +87,11 @@ describe('Submission Service', () => {
         expect(returnedTitle).toBe(title);
     });
 
-    it('should should return null if submission is not found - changeTitle', async () => {
+    it('should should throw if submission is not found - changeTitle', async () => {
         const title = 'i am updated';
         mockKnex.where = jest.fn().mockImplementation(() => []);
         const service = new SubmissionService((mockKnex as unknown) as Knex);
-        const submission = await service.changeTitle(dtoSubmission.id, title);
-        expect(submission).toBe(null);
+        expect(service.changeTitle(dtoSubmission.id, title)).rejects.toThrowError();
     });
 
     it('should return true is delete is successful - delete', async () => {
@@ -114,8 +113,39 @@ describe('Submission Service', () => {
         expect(isSupported).toBe(false);
     });
 
-    it('should return true if article type is  supported - validateArticleType', async () => {
+    it('should return true if article type is supported - validateArticleType', async () => {
         const isSupported = SubmissionService.validateArticleType('researchArticle');
         expect(isSupported).toBe(true);
+    });
+
+    it('it should update and return autosaved submssion - autoSave', async () => {
+        const dbSubmission = {
+            id: SubmissionId.fromUuid(uuid()),
+            title: 'The title',
+            status: 'INITIAL',
+            createdBy: '123',
+            updated: new Date(),
+            articleType: 'newspaper',
+            meta,
+        };
+        const newTitle = 'I am new';
+        mockKnex.where = jest.fn().mockImplementation(() => [dbSubmission]);
+        const service = new SubmissionService((mockKnex as unknown) as Knex);
+        const submission = await service.autoSave({ ...dbSubmission, title: newTitle });
+        expect(submission.title).toBe(newTitle);
+    });
+
+    it('it should throw is submission is not found', async () => {
+        const dbSubmission: Submission = {
+            id: SubmissionId.fromUuid(uuid()),
+            title: 'The title',
+            status: 'INITIAL',
+            createdBy: '123',
+            updated: new Date(),
+            articleType: 'newspaper',
+        };
+        mockKnex.where = jest.fn().mockImplementation(() => []);
+        const service = new SubmissionService((mockKnex as unknown) as Knex);
+        expect(service.autoSave(dbSubmission)).rejects.toThrowError();
     });
 });

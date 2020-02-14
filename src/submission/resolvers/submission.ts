@@ -1,5 +1,5 @@
 import { SubmissionService } from '../models/submission-service';
-import { SubmissionId, DtoViewSubmission } from '../submission';
+import { SubmissionId, DtoViewSubmission, Submission } from '../submission';
 import { IResolvers } from 'apollo-server-express';
 
 const resolvers = (submissionService: SubmissionService): IResolvers => ({
@@ -23,6 +23,10 @@ const resolvers = (submissionService: SubmissionService): IResolvers => ({
         async deleteSubmission(_, { id }: { id: SubmissionId }): Promise<SubmissionId> {
             await submissionService.delete(id);
             return id;
+        },
+
+        async autoSave(_, { submission }: { submission: Submission }): Promise<Submission> {
+            return await submissionService.autoSave(submission);
         },
     },
 });

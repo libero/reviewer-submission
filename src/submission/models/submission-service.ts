@@ -2,7 +2,7 @@ import * as Knex from 'knex';
 import { SubmissionId, DtoViewSubmission, Submission } from '../submission';
 import { KnexSubmissionRepository } from '../infrastructure/knex-submission';
 import uuid = require('uuid');
-import { SubmissionEntity } from './submission';
+import { SubmissionEntity, SubmissionMapper } from './submission';
 
 export class SubmissionService {
     submissionRepository: KnexSubmissionRepository;
@@ -15,11 +15,18 @@ export class SubmissionService {
         return await this.submissionRepository.findAll();
     }
 
+    async autoSave(sub: Submission): Promise<Submission> {
+        const submission = await this.submissionRepository.save(sub);
+        if (submission === null) {
+            throw new Error('Submission not found');
+        }
+        return submission;
+    }
+
     async create(articleType: string, userId: string): Promise<DtoViewSubmission | null> {
         if (!SubmissionService.validateArticleType(articleType)) {
             throw new Error('Invalid article type');
         }
-
         const id = SubmissionId.fromUuid(uuid());
         const submission = new SubmissionEntity({
             id,
@@ -29,20 +36,26 @@ export class SubmissionService {
             status: 'INITIAL',
             createdBy: userId,
         });
-        return await this.submissionRepository.save(submission);
+        return await this.submissionRepository.insert(submission);
     }
 
     async findOne(id: SubmissionId): Promise<DtoViewSubmission | null> {
         return await this.submissionRepository.findById(id);
     }
 
-    async changeTitle(id: SubmissionId, title: string): Promise<DtoViewSubmission | null> {
+    async changeTitle(id: SubmissionId, title: string): Promise<DtoViewSubmission> {
         const result = await this.submissionRepository.findById(id);
+        // A bit duplicated, but let's wait for a pattern to emerge
         if (result === null) {
-            return result;
+            throw new Error('Submission not found');
         }
         const resultToSave: Submission = { ...result, title };
-        return await this.submissionRepository.save(resultToSave);
+        const savedSubmission = await this.submissionRepository.save(resultToSave);
+        // A bit duplicated, but let's wait for a pattern to emerge
+        if (savedSubmission === null) {
+            throw new Error('Submission not found');
+        }
+        return SubmissionMapper.toViewDto(savedSubmission);
     }
 
     async delete(id: SubmissionId): Promise<boolean> {
