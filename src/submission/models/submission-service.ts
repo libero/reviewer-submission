@@ -20,6 +20,7 @@ export class SubmissionService {
         if (submission === null) {
             throw new Error('Submission not found');
         }
+        // @TODO: check against xpub, does this live in meta or somewhere else (including deeper nesting within meta)?
         const savedSubmission = await this.submissionRepository.save({ ...submission, details });
         if (savedSubmission === null) {
             throw new Error('Submission not found');

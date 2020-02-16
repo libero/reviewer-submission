@@ -16,6 +16,7 @@ export interface Submission {
     createdBy: string;
     status: string;
     articleType: string;
+    // @TODO: check against xpub, does this live in meta or somewhere else (including deeper nesting within meta)?
     details?: Author;
 }
 
@@ -28,6 +29,7 @@ export interface DtoSubmission {
     updated: Date;
     created_by: string;
     status: string;
+    // @TODO: check against xpub, does this live in meta or somewhere else (including deeper nesting within meta)?
     details?: Author;
     meta: xpubMeta;
 }
@@ -37,6 +39,7 @@ export interface DtoViewSubmission {
     title: string;
     updated: Date;
     articleType: string;
+    // @TODO: check against xpub, does this live in meta or somewhere else (including deeper nesting within meta)?
     details?: Author;
 }
 
