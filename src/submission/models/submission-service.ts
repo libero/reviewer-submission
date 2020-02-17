@@ -1,15 +1,19 @@
 import * as Knex from 'knex';
 import { SubmissionId, DtoViewSubmission, Submission } from '../submission';
 import { KnexSubmissionRepository } from '../infrastructure/knex-submission';
+import { KnexTeamRepository } from '../infrastructure/knex-team';
 import uuid = require('uuid');
 import { SubmissionEntity, SubmissionMapper } from './submission';
-import { Author } from '../people';
+import { Author } from '../team';
 
 export class SubmissionService {
     submissionRepository: KnexSubmissionRepository;
+    teamRepository: KnexTeamRepository;
 
     constructor(knexConnection: Knex<{}, unknown[]>) {
+        // TODO: Use a different connection in future
         this.submissionRepository = new KnexSubmissionRepository(knexConnection);
+        this.teamRepository = new KnexTeamRepository(knexConnection);
     }
 
     async findAll(): Promise<DtoViewSubmission[]> {
@@ -21,13 +25,18 @@ export class SubmissionService {
         if (submission === null) {
             throw new Error('Submission not found');
         }
-        const savedSubmission = await this.submissionRepository.update({ ...submission, details });
+        const savedSubmission = await this.submissionRepository.update({ ...submission });
         if (savedSubmission === null) {
             throw new Error('Submission not found');
         }
+
+        // Also now need to up date the Team repository
+        // const savedAuthor = await this.teamRepository.update(submission.id, 'manuscript', details, 'author');
+
         return savedSubmission;
     }
 
+    // returning of this function is wrong!
     async create(articleType: string, userId: string): Promise<DtoViewSubmission | null> {
         if (!SubmissionService.validateArticleType(articleType)) {
             throw new Error('Invalid article type');

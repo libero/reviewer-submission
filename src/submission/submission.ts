@@ -1,5 +1,4 @@
 import { uuidType } from 'typesafe-uuid';
-import { Author } from './people';
 
 export class SubmissionId extends uuidType<'SubmissionId'>() {}
 
@@ -10,34 +9,39 @@ export interface Submission {
     createdBy: string;
     status: string;
     articleType: string;
-    // @TODO: check against xpub, does this live in meta or somewhere else (including deeper nesting within meta)?
-    details?: Author;
 }
 
 export type xpubMeta = {
     articleType: string;
     title: string;
 };
+/*
+PDH - This interface should be in the infrastructure folder as its purely private
+to the repo.
+*/
 export interface DtoSubmission {
     id: SubmissionId;
     updated: Date;
     created_by: string;
     status: string;
-    // @TODO: check against xpub, does this live in meta or somewhere else (including deeper nesting within meta)?
-    details?: Author;
     meta: xpubMeta;
 }
-
+/*
+PDH - This should be in resolvers... mapper is then used to build model entities
+and communicate with the model layer.
+*/
 export interface DtoViewSubmission {
     id: SubmissionId;
     title: string;
     updated: Date;
     articleType: string;
-    // @TODO: check against xpub, does this live in meta or somewhere else (including deeper nesting within meta)?
-    details?: Author;
 }
 
+/*
+Thought - part of the refactor - we should be using DTOs here not entities
+*/
 export interface SubmissionRepository {
+    create(sub: Submission): Promise<Submission | null>;
     findAll(): Promise<Submission[]>;
     findById(id: SubmissionId): Promise<Submission | null>;
     update(sub: Submission): Promise<Submission | null>;
