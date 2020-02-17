@@ -1,8 +1,9 @@
 import * as Knex from 'knex';
-import { SubmissionId, DtoViewSubmission, Submission, Author } from '../submission';
+import { SubmissionId, DtoViewSubmission, Submission } from '../submission';
 import { KnexSubmissionRepository } from '../infrastructure/knex-submission';
 import uuid = require('uuid');
 import { SubmissionEntity, SubmissionMapper } from './submission';
+import { Author } from '../people';
 
 export class SubmissionService {
     submissionRepository: KnexSubmissionRepository;
@@ -20,8 +21,7 @@ export class SubmissionService {
         if (submission === null) {
             throw new Error('Submission not found');
         }
-        // @TODO: check against xpub, does this live in meta or somewhere else (including deeper nesting within meta)?
-        const savedSubmission = await this.submissionRepository.save({ ...submission, details });
+        const savedSubmission = await this.submissionRepository.update({ ...submission, details });
         if (savedSubmission === null) {
             throw new Error('Submission not found');
         }
@@ -41,7 +41,7 @@ export class SubmissionService {
             status: 'INITIAL',
             createdBy: userId,
         });
-        return await this.submissionRepository.insert(submission);
+        return await this.submissionRepository.create(submission);
     }
 
     async findOne(id: SubmissionId): Promise<DtoViewSubmission | null> {
@@ -55,7 +55,7 @@ export class SubmissionService {
             throw new Error('Submission not found');
         }
         const resultToSave: Submission = { ...result, title };
-        const savedSubmission = await this.submissionRepository.save(resultToSave);
+        const savedSubmission = await this.submissionRepository.update(resultToSave);
         // A bit duplicated, but let's wait for a pattern to emerge
         if (savedSubmission === null) {
             throw new Error('Submission not found');

@@ -84,7 +84,7 @@ describe('Knex Submission Repository', () => {
     it('Can save', async () => {
         const repo = new KnexSubmissionRepository((mockKnex as unknown) as Knex);
         repo.findById = jest.fn().mockReturnValue({ id: testSubmission.id });
-        await expect(repo.save(testSubmission)).resolves.toMatchObject({
+        await expect(repo.update(testSubmission)).resolves.toMatchObject({
             id: testSubmission.id,
             title: 'The title',
             status: 'INITIAL',

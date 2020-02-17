@@ -1,14 +1,8 @@
 import { uuidType } from 'typesafe-uuid';
+import { Author } from './people';
 
 export class SubmissionId extends uuidType<'SubmissionId'>() {}
 
-// TODO: shouldn't be here really.
-export interface Author {
-    firstName: string;
-    lastName: string;
-    email: string;
-    institution: string;
-}
 export interface Submission {
     id: SubmissionId;
     title: string;
@@ -46,7 +40,7 @@ export interface DtoViewSubmission {
 export interface SubmissionRepository {
     findAll(): Promise<Submission[]>;
     findById(id: SubmissionId): Promise<Submission | null>;
-    save(sub: Submission): Promise<Submission | null>;
+    update(sub: Submission): Promise<Submission | null>;
     delete(id: SubmissionId): Promise<boolean>;
     close(): void;
 }

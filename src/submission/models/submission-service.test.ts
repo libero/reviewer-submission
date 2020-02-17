@@ -2,7 +2,8 @@ import { SubmissionService } from './submission-service';
 import { MockKnex } from '../../test-mocks/knex-mock';
 import Knex = require('knex');
 import uuid = require('uuid');
-import { SubmissionId, xpubMeta, Author } from '../submission';
+import { SubmissionId, xpubMeta } from '../submission';
+import { Author } from '../people';
 
 describe('Submission Service', () => {
     let mockKnex: MockKnex;
@@ -87,7 +88,7 @@ describe('Submission Service', () => {
         expect(returnedTitle).toBe(title);
     });
 
-    it('should should throw if submission is not found - changeTitle', async () => {
+    it('should throw if submission is not found - changeTitle', async () => {
         const title = 'i am updated';
         mockKnex.where = jest.fn().mockImplementation(() => []);
         const service = new SubmissionService((mockKnex as unknown) as Knex);
@@ -101,7 +102,7 @@ describe('Submission Service', () => {
         expect(deleteOutcome).toBe(true);
     });
 
-    it('should return false is delete is unsuccessful - dlete', async () => {
+    it('should return false is delete is unsuccessful - delete', async () => {
         mockKnex.delete = jest.fn().mockImplementation(() => 0);
         const service = new SubmissionService((mockKnex as unknown) as Knex);
         const deleteOutcome = await service.delete(dtoSubmission.id);
@@ -118,7 +119,7 @@ describe('Submission Service', () => {
         expect(isSupported).toBe(true);
     });
 
-    it('it should update and return autosaved submssion - autoSave', async () => {
+    it('it should update and return autosaved submission - autoSave', async () => {
         const id = SubmissionId.fromUuid(uuid());
         const dbSubmission = {
             id,

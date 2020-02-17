@@ -32,7 +32,7 @@ export class KnexSubmissionRepository implements SubmissionRepository {
         return rows.length > 0 ? SubmissionMapper.fromDto(rows[0]) : null;
     }
 
-    public async insert(sub: Submission): Promise<Submission | null> {
+    public async create(sub: Submission): Promise<Submission | null> {
         const dtoSubmission: DtoSubmission = SubmissionMapper.toDto(sub);
         await this.knex
             .withSchema('public')
@@ -41,8 +41,8 @@ export class KnexSubmissionRepository implements SubmissionRepository {
         return SubmissionMapper.fromDto(dtoSubmission);
     }
 
-    public async save(sub: Submission): Promise<Submission | null> {
-        // @todo: do we merge against remote state?
+    public async update(sub: Submission): Promise<Submission | null> {
+        // @todo: merge against remote state
         const submission = await this.findById(sub.id);
         if (submission === null) {
             return null;
