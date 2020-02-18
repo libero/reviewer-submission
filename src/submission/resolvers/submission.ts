@@ -1,5 +1,6 @@
 import { SubmissionService } from '../models/submission-service';
-import { SubmissionId, DtoViewSubmission, Submission, Author } from '../submission';
+import { SubmissionId, DtoViewSubmission, Submission } from '../submission';
+import { Author } from '../team';
 import { IResolvers } from 'apollo-server-express';
 
 const resolvers = (submissionService: SubmissionService): IResolvers => ({
