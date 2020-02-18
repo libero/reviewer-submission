@@ -32,7 +32,7 @@ export class KnexSubmissionRepository implements SubmissionRepository {
         return rows.length > 0 ? SubmissionMapper.fromDto(rows[0]) : null;
     }
 
-    public async create(sub: Submission): Promise<Submission | null> {
+    public async create(sub: Submission): Promise<Submission> {
         const dtoSubmission: DtoSubmission = SubmissionMapper.toDto(sub);
         await this.knex
             .withSchema('public')
