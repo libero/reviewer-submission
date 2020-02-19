@@ -36,32 +36,38 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
         return result.map(this.entryToDTO);
     }
 
-    public async findById(id: SubmissionId): Promise<SubmissionDTO> {
+    public async findById(id: SubmissionId): Promise<SubmissionDTO | null> {
         const rows = await this.knex
             .withSchema('public')
             .select<DatabaseEntry[]>('id', 'updated', 'created_by', 'status', 'meta')
             .from(this.TABLE_NAME)
             .where({ id });
 
-        return this.entryToDTO(rows[0]);
+        return rows.length ? this.entryToDTO(rows[0]) : null;
     }
 
-    public async save(dtoSubmission: Partial<SubmissionDTO> & { id: SubmissionId }): Promise<SubmissionDTO> {
+    public async update(dtoSubmission: Partial<SubmissionDTO> & { id: SubmissionId }): Promise<SubmissionDTO> {
         // @todo: do we merge against remote state?
         const submission = await this.findById(dtoSubmission.id);
-        const dtoToSave = this.dtoToEntry({ ...submission, ...dtoSubmission, updated: new Date() });
         if (submission === null) {
-            await this.knex
-                .withSchema('public')
-                .insert(dtoToSave)
-                .into(this.TABLE_NAME);
+            throw new Error(`Unable to find entry with id: ${dtoSubmission.id}`);
         } else {
+            const entryToSave = this.dtoToEntry({ ...submission, ...dtoSubmission, updated: new Date() });
             await this.knex
                 .withSchema('public')
-                .update(dtoToSave)
+                .update(entryToSave)
                 .into(this.TABLE_NAME);
+            return this.entryToDTO(entryToSave);
         }
-        return this.entryToDTO(dtoToSave);
+    }
+
+    public async create(dtoSubmission: Omit<SubmissionDTO, 'updated'>): Promise<SubmissionDTO> {
+        const entryToSave = this.dtoToEntry({ ...dtoSubmission, updated: new Date() });
+        await this.knex
+            .withSchema('public')
+            .insert(entryToSave)
+            .into(this.TABLE_NAME);
+        return this.entryToDTO(entryToSave);
     }
 
     public async delete(id: SubmissionId): Promise<boolean> {
@@ -77,7 +83,7 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
     private dtoToEntry(dto: SubmissionDTO): DatabaseEntry {
         return {
             id: dto.id,
-            updated: dto.updated,
+            updated: dto.updated as Date,
             created_by: dto.createdBy,
             status: dto.status,
             meta: {

@@ -116,12 +116,12 @@ describe('Knex Submission Repository', () => {
         });
     });
 
-    describe('save', () => {
+    describe('update', () => {
         it('calls update on knex if the entry exists', async (): Promise<void> => {
             const repo = new XpubSubmissionRootRepository((mockKnex as unknown) as Knex);
             repo.findById = jest.fn().mockReturnValue({ id: '1' });
             expect(mockKnex.update).toBeCalledTimes(0);
-            await repo.save({
+            await repo.update({
                 id: entryId,
                 title: 'The title',
                 status: 'INITIAL',
@@ -130,21 +130,6 @@ describe('Knex Submission Repository', () => {
             });
             expect(mockKnex.update).toBeCalledTimes(1);
             expect(mockKnex.insert).toBeCalledTimes(0);
-        });
-
-        it('calls insert on knex if the entry does not exists', async (): Promise<void> => {
-            const repo = new XpubSubmissionRootRepository((mockKnex as unknown) as Knex);
-            repo.findById = jest.fn().mockReturnValue(null);
-            expect(mockKnex.insert).toBeCalledTimes(0);
-            await repo.save({
-                id: entryId,
-                title: 'The title',
-                status: 'INITIAL',
-                createdBy: '123',
-                articleType: 'newspaper',
-            });
-            expect(mockKnex.insert).toBeCalledTimes(1);
-            expect(mockKnex.update).toBeCalledTimes(0);
         });
         it('updates the updated time of the entry', async (): Promise<void> => {
             const lastUpdated = databaseEntries[0].updated;
@@ -157,7 +142,7 @@ describe('Knex Submission Repository', () => {
                 articleType: 'newspaper',
                 updated: lastUpdated,
             });
-            const { updated } = await repo.save({
+            const { updated } = await repo.update({
                 id: entryId,
                 title: 'The title',
                 status: 'INITIAL',
@@ -177,9 +162,42 @@ describe('Knex Submission Repository', () => {
                 articleType: 'newspaper',
                 updated: lastUpdated,
             });
-            const result = await repo.save({
+            const result = await repo.update({
                 id: entryId,
                 title: 'A Different Title',
+            });
+            expect(result).toMatchObject({
+                id: entryId,
+                title: 'A Different Title',
+                status: 'INITIAL',
+                createdBy: '123',
+                articleType: 'newspaper',
+            });
+        });
+    });
+    describe('create', () => {
+        it('calls insert on knex', async (): Promise<void> => {
+            const repo = new XpubSubmissionRootRepository((mockKnex as unknown) as Knex);
+            repo.findById = jest.fn().mockReturnValue(null);
+            expect(mockKnex.insert).toBeCalledTimes(0);
+            await repo.create({
+                id: entryId,
+                title: 'The title',
+                status: 'INITIAL',
+                createdBy: '123',
+                articleType: 'newspaper',
+            });
+            expect(mockKnex.insert).toBeCalledTimes(1);
+            expect(mockKnex.update).toBeCalledTimes(0);
+        });
+        it('returns a complete DTO when passed a complete DTO to create', async (): Promise<void> => {
+            const repo = new XpubSubmissionRootRepository((mockKnex as unknown) as Knex);
+            const result = await repo.create({
+                id: entryId,
+                title: 'A Different Title',
+                status: 'INITIAL',
+                createdBy: '123',
+                articleType: 'newspaper',
             });
             expect(result).toMatchObject({
                 id: entryId,

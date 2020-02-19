@@ -28,7 +28,7 @@ export class SubmissionService {
             createdBy: userId,
         });
         // this works because Submission interface == SubmissionDTO interface. In future we will probably ned a toDto on the submission or some mapper class
-        const savedSubmissionDTO = await this.submissionRepository.save(submission);
+        const savedSubmissionDTO = await this.submissionRepository.create(submission);
 
         return new Submission(savedSubmissionDTO);
     }
@@ -48,7 +48,7 @@ export class SubmissionService {
         }
         const submission = new Submission(result);
         submission.title = title;
-        const submissionDTO = await this.submissionRepository.save(submission);
+        const submissionDTO = await this.submissionRepository.update(submission);
         return new Submission(submissionDTO);
     }
 

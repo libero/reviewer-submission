@@ -67,18 +67,18 @@ describe('Submission Service', () => {
 
     describe('create', () => {
         it('throws if an invalid articleType is passed', async (): Promise<void> => {
-            XpubSubmissionRootRepository.prototype.save = jest.fn(async (dto: SubmissionDTO) => dto);
+            XpubSubmissionRootRepository.prototype.create = jest.fn(async (dto: SubmissionDTO) => dto);
             const service = new SubmissionService((null as unknown) as Knex);
             await expect(service.create('articleType', 'userId')).rejects.toThrow();
         });
         it('returns a created Submission when correct values are sent', async (): Promise<void> => {
-            XpubSubmissionRootRepository.prototype.save = jest.fn(async (dto: SubmissionDTO) => dto);
+            XpubSubmissionRootRepository.prototype.create = jest.fn(async (dto: SubmissionDTO) => dto);
             const service = new SubmissionService((null as unknown) as Knex);
             const submission = await service.create('researchArticle', 'userId');
             expect(submission).toBeInstanceOf(Submission);
         });
         it('returns a created Submission with correctly set initial properties', async (): Promise<void> => {
-            XpubSubmissionRootRepository.prototype.save = jest.fn(async (dto: SubmissionDTO) => dto);
+            XpubSubmissionRootRepository.prototype.create = jest.fn(async (dto: SubmissionDTO) => dto);
             const service = new SubmissionService((null as unknown) as Knex);
             const submission = await service.create('researchArticle', 'userId');
             expect(submission.status).toBe('INITIAL');
@@ -92,12 +92,12 @@ describe('Submission Service', () => {
     describe('changeTitle', () => {
         it('should change the title on the submission and send that to the repository', async () => {
             XpubSubmissionRootRepository.prototype.findById = jest.fn().mockReturnValue(submissionRootDTOs[0]);
-            XpubSubmissionRootRepository.prototype.save = jest.fn(async (dto: SubmissionDTO) => dto);
+            XpubSubmissionRootRepository.prototype.update = jest.fn(async (dto: SubmissionDTO) => dto);
             const service = new SubmissionService((null as unknown) as Knex);
             const title = 'There and back again, a Hobbits tale';
             const newSub = await service.changeTitle(submissionRootDTOs[0].id, title);
-            expect(XpubSubmissionRootRepository.prototype.save).toHaveBeenCalledTimes(1);
-            expect(XpubSubmissionRootRepository.prototype.save).toHaveBeenCalledWith({
+            expect(XpubSubmissionRootRepository.prototype.update).toHaveBeenCalledTimes(1);
+            expect(XpubSubmissionRootRepository.prototype.update).toHaveBeenCalledWith({
                 ...submissionRootDTOs[0],
                 title,
             });
@@ -106,7 +106,7 @@ describe('Submission Service', () => {
 
         it('should throw an error if there is no submission found by the passed in id', async () => {
             XpubSubmissionRootRepository.prototype.findById = jest.fn().mockReturnValue(null);
-            XpubSubmissionRootRepository.prototype.save = jest.fn(async (dto: SubmissionDTO) => dto);
+            XpubSubmissionRootRepository.prototype.update = jest.fn(async (dto: SubmissionDTO) => dto);
             const service = new SubmissionService((null as unknown) as Knex);
             const title = 'There and back again, a Hobbits tale';
             await expect(service.changeTitle(submissionRootDTOs[0].id, title)).rejects.toThrow(
