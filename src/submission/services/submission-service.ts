@@ -1,9 +1,9 @@
 import * as Knex from 'knex';
-import { SubmissionId } from '../submission';
-import XpubSubmissionRootRepository from '../infrastructure/xpub-submission-root';
+import { SubmissionId } from '../types';
+import XpubSubmissionRootRepository from '../repositories/xpub-submission-root';
 import uuid = require('uuid');
-import SubmissionMapper from './SubmissionMapper';
-import Submission from './submission';
+import Submission from './models/submission';
+import { SubmissionDTO } from '../repositories/types';
 
 export class SubmissionService {
     submissionRepository: XpubSubmissionRootRepository;
@@ -14,7 +14,7 @@ export class SubmissionService {
 
     async findAll(): Promise<Submission[]> {
         const submissions = await this.submissionRepository.findAll();
-        return submissions.map(SubmissionMapper.dtoToSubmission);
+        return submissions.map((dto: SubmissionDTO) => new Submission(dto));
     }
 
     async create(articleType: string, userId: string): Promise<Submission> {
@@ -27,10 +27,10 @@ export class SubmissionService {
             status: 'INITIAL',
             createdBy: userId,
         });
-        // this works because Submission interface == SubmissionDTO interface. In future we will probably ned a SubmissionToDTO mapper
+        // this works because Submission interface == SubmissionDTO interface. In future we will probably ned a toDto on the submission or some mapper class
         const savedSubmissionDTO = await this.submissionRepository.save(submission);
 
-        return SubmissionMapper.dtoToSubmission(savedSubmissionDTO);
+        return new Submission(savedSubmissionDTO);
     }
 
     async getSubmission(id: SubmissionId): Promise<Submission> {
@@ -38,7 +38,7 @@ export class SubmissionService {
         if (!submissionDTO) {
             throw new Error('Unable to find submission with id: ' + id);
         }
-        return SubmissionMapper.dtoToSubmission(submissionDTO);
+        return new Submission(submissionDTO);
     }
 
     async changeTitle(id: SubmissionId, title: string): Promise<Submission> {
@@ -46,10 +46,10 @@ export class SubmissionService {
         if (result === null) {
             throw new Error('Unable to find submission with id: ' + id);
         }
-        const submission = SubmissionMapper.dtoToSubmission(result);
+        const submission = new Submission(result);
         submission.title = title;
         const submissionDTO = await this.submissionRepository.save(submission);
-        return SubmissionMapper.dtoToSubmission(submissionDTO);
+        return new Submission(submissionDTO);
     }
 
     async deleteSubmission(id: SubmissionId): Promise<boolean> {

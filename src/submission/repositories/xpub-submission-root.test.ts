@@ -2,7 +2,8 @@
 import { v4 as uuid } from 'uuid';
 import * as Knex from 'knex';
 import XpubSubmissionRootRepository from './xpub-submission-root';
-import { SubmissionId, SubmissionDTO } from './types';
+import { SubmissionId } from '../types';
+import { SubmissionDTO } from './types';
 import { MockKnex } from '../../test-mocks/knex-mock';
 
 const entryId = SubmissionId.fromUuid(uuid());

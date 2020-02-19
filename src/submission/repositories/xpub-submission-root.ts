@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import * as Knex from 'knex';
 import { InfraLogger as logger } from '../../logger';
-import { SubmissionRepository, SubmissionDTO, SubmissionId } from './types';
+import { SubmissionId } from '../types';
+import { SubmissionRepository, SubmissionDTO } from './types';
 
 type entryMeta = {
     articleType: string;

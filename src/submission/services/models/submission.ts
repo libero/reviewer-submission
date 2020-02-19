@@ -1,4 +1,4 @@
-import { SubmissionId } from '../submission';
+import { SubmissionId } from '../../types';
 
 export enum ArticleType {
     RESEARCH_ARTICLE = 'researchArticle',
@@ -8,15 +8,10 @@ export enum ArticleType {
 
 export default class Submission {
     id: SubmissionId;
-
     title: string;
-
     updated: Date;
-
     articleType: ArticleType;
-
     status: string;
-
     createdBy: string;
 
     // This is wired up so that you can create an entity from the DTO described by ISubmission

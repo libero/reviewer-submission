@@ -3,7 +3,7 @@ import { KnexSurveyResponseRepository } from '../infrastructure/knex-survey-resp
 import { SurveyAnswer } from './survey-answer';
 import { SurveyResponse } from './survey-response';
 import { SurveyId, SurveyResponseId } from '../survey';
-import { SubmissionId } from '../../submission/submission';
+import { SubmissionId } from '../../submission/types';
 import uuid = require('uuid');
 
 export class SurveyService {

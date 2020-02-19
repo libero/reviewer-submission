@@ -1,10 +1,10 @@
 import { SubmissionService } from './submission-service';
-import XpubSubmissionRootRepository from '../infrastructure/xpub-submission-root';
+import XpubSubmissionRootRepository from '../repositories/xpub-submission-root';
 import { v4 } from 'uuid';
 import Knex = require('knex');
-import { SubmissionId } from '../submission';
-import { SubmissionDTO } from '../infrastructure/types';
-import Submission from './submission';
+import { SubmissionId } from '../types';
+import { SubmissionDTO } from '../repositories/types';
+import Submission from './models/submission';
 
 const submissionRootDTOs: SubmissionDTO[] = [
     {
@@ -25,7 +25,7 @@ const submissionRootDTOs: SubmissionDTO[] = [
     },
 ];
 
-jest.mock('../infrastructure/xpub-submission-root');
+jest.mock('../repositories/xpub-submission-root');
 
 describe('Submission Service', () => {
     beforeEach(() => {

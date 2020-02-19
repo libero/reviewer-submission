@@ -2,7 +2,7 @@ import { v4 as uuid } from 'uuid';
 import * as Knex from 'knex';
 import { KnexSurveyResponseRepository } from './knex-survey-response';
 import { SurveyId, SurveyResponseId } from '../survey';
-import { SubmissionId } from '../../submission/submission';
+import { SubmissionId } from '../../submission/types';
 import { MockKnex } from '../../test-mocks/knex-mock';
 import { SurveyResponse } from '../models/survey-response';
 

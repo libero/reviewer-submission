@@ -1,6 +1,4 @@
-import { uuidType } from 'typesafe-uuid';
-
-export class SubmissionId extends uuidType<'SubmissionId'>() {}
+import { SubmissionId } from '../types';
 
 export interface SubmissionRepository {
     findAll(): Promise<SubmissionDTO[]>;
