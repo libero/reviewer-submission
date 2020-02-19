@@ -105,6 +105,12 @@ describe('Knex Submission Repository', () => {
             const result = await repo.findById(entryId);
             expect((result as SubmissionDTO).id).toEqual(databaseEntries[0].id);
         });
+        it('returns null on no submission found', async (): Promise<void> => {
+            mockKnex.where = jest.fn().mockReturnValue([]);
+            const repo = new XpubSubmissionRootRepository((mockKnex as unknown) as Knex);
+            const result = await repo.findById(entryId);
+            expect(result).toBeNull();
+        });
         it('calls the knex instance methods with the correct parameters', async (): Promise<void> => {
             mockKnex.where = jest.fn().mockReturnValue(databaseEntries);
             const repo = new XpubSubmissionRootRepository((mockKnex as unknown) as Knex);
