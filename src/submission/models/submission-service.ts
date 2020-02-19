@@ -1,27 +1,25 @@
 import * as Knex from 'knex';
-import { SubmissionId, DtoViewSubmission, Submission } from '../submission';
-import { KnexSubmissionRepository } from '../infrastructure/knex-submission';
+import { SubmissionId } from '../submission';
+import XpubSubmissionRootRepository from '../infrastructure/xpub-submission-root';
 import uuid = require('uuid');
-import { SubmissionEntity } from './submission';
+import SubmissionMapper from './SubmissionMapper';
+import Submission from './submission';
 
 export class SubmissionService {
-    submissionRepository: KnexSubmissionRepository;
+    submissionRepository: XpubSubmissionRootRepository;
 
     constructor(knexConnection: Knex<{}, unknown[]>) {
-        this.submissionRepository = new KnexSubmissionRepository(knexConnection);
+        this.submissionRepository = new XpubSubmissionRootRepository(knexConnection);
     }
 
-    async findAll(): Promise<DtoViewSubmission[]> {
-        return await this.submissionRepository.findAll();
+    async findAll(): Promise<Submission[]> {
+        const submissions = await this.submissionRepository.findAll();
+        return submissions.map(SubmissionMapper.dtoToSubmission);
     }
 
-    async create(articleType: string, userId: string): Promise<DtoViewSubmission | null> {
-        if (!SubmissionService.validateArticleType(articleType)) {
-            throw new Error('Invalid article type');
-        }
-
+    async create(articleType: string, userId: string): Promise<Submission> {
         const id = SubmissionId.fromUuid(uuid());
-        const submission = new SubmissionEntity({
+        const submission = new Submission({
             id,
             title: '',
             updated: new Date(),
@@ -29,28 +27,32 @@ export class SubmissionService {
             status: 'INITIAL',
             createdBy: userId,
         });
-        return await this.submissionRepository.save(submission);
+        // this works because Submission interface == SubmissionDTO interface. In future we will probably ned a SubmissionToDTO mapper
+        const savedSubmissionDTO = await this.submissionRepository.save(submission);
+
+        return SubmissionMapper.dtoToSubmission(savedSubmissionDTO);
     }
 
-    async findOne(id: SubmissionId): Promise<DtoViewSubmission | null> {
-        return await this.submissionRepository.findById(id);
+    async getSubmission(id: SubmissionId): Promise<Submission> {
+        const submissionDTO = await this.submissionRepository.findById(id);
+        if (!submissionDTO) {
+            throw new Error('Unable to find submission with id: ' + id);
+        }
+        return SubmissionMapper.dtoToSubmission(submissionDTO);
     }
 
-    async changeTitle(id: SubmissionId, title: string): Promise<DtoViewSubmission | null> {
+    async changeTitle(id: SubmissionId, title: string): Promise<Submission> {
         const result = await this.submissionRepository.findById(id);
         if (result === null) {
-            return result;
+            throw new Error('Unable to find submission with id: ' + id);
         }
-        const resultToSave: Submission = { ...result, title };
-        return await this.submissionRepository.save(resultToSave);
+        const submission = SubmissionMapper.dtoToSubmission(result);
+        submission.title = title;
+        const submissionDTO = await this.submissionRepository.save(submission);
+        return SubmissionMapper.dtoToSubmission(submissionDTO);
     }
 
     async delete(id: SubmissionId): Promise<boolean> {
         return await this.submissionRepository.delete(id);
-    }
-
-    static validateArticleType(articleType: string): boolean {
-        const articlesTypes = ['researchArticle', 'featureArticle', 'researchAdvance'];
-        return articlesTypes.includes(articleType);
     }
 }

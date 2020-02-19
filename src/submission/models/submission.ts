@@ -1,13 +1,19 @@
-import { SubmissionId, DtoSubmission, DtoViewSubmission, Submission, xpubMeta } from '../submission';
+import { SubmissionId } from '../submission';
 
-export class SubmissionEntity implements Submission {
+export enum ArticleType {
+    RESEARCH_ARTICLE = 'researchArticle',
+    FEATURE_ARTICLE = 'featureArticle',
+    RESEARCH_ADVANCE = 'researchAdvance',
+}
+
+export default class Submission {
     id: SubmissionId;
 
     title: string;
 
     updated: Date;
 
-    articleType: string;
+    articleType: ArticleType;
 
     status: string;
 
@@ -32,53 +38,21 @@ export class SubmissionEntity implements Submission {
         this.id = id;
         this.title = title;
         this.updated = updated || new Date();
-        this.articleType = articleType;
+        this.articleType = this.articletTypeFromString(articleType);
         this.status = status;
         this.createdBy = createdBy;
     }
-}
 
-export class SubmissionMapper {
-    public static toDto(sub: Submission): DtoSubmission {
-        return {
-            id: sub.id,
-            updated: sub.updated,
-            // eslint-disable-next-line @typescript-eslint/camelcase
-            created_by: sub.createdBy,
-            status: sub.status,
-            meta: {
-                articleType: sub.articleType,
-                title: sub.title,
-            },
-        };
-    }
-    public static toViewDto(sub: Submission): DtoViewSubmission {
-        return {
-            id: sub.id,
-            title: sub.title,
-            updated: sub.updated,
-            articleType: sub.articleType,
-        };
-    }
-    public static fromDto(sub: DtoSubmission): SubmissionEntity {
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        const { created_by, meta, ...rest } = sub;
-        const mappedSubmissionDto: Submission = {
-            ...rest,
-            // eslint-disable-next-line @typescript-eslint/camelcase
-            createdBy: created_by,
-            title: SubmissionMapper.getMetaValue(meta, 'title'),
-            articleType: SubmissionMapper.getMetaValue(meta, 'articleType'),
-        };
-
-        return new SubmissionEntity(mappedSubmissionDto);
-    }
-
-    static getMetaValue(meta: xpubMeta, metaProperty: string): string {
-        try {
-            return (meta as { [key: string]: string })[metaProperty];
-        } catch (_) {
-            throw new Error(`Unable to find property ${metaProperty} on DtoSubmission`);
+    private articletTypeFromString(type: string): ArticleType {
+        switch (type) {
+            case 'researchArticle':
+                return ArticleType.RESEARCH_ARTICLE;
+            case 'featureArticle':
+                return ArticleType.FEATURE_ARTICLE;
+            case 'researchAdvance':
+                return ArticleType.RESEARCH_ADVANCE;
+            default:
+                throw new Error('Invalid article type');
         }
     }
 }

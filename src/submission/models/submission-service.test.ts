@@ -1,121 +1,130 @@
 import { SubmissionService } from './submission-service';
-import { MockKnex } from '../../test-mocks/knex-mock';
+import XpubSubmissionRootRepository from '../infrastructure/xpub-submission-root';
+import { v4 } from 'uuid';
 import Knex = require('knex');
-import uuid = require('uuid');
-import { SubmissionId, xpubMeta } from '../submission';
+import { SubmissionId } from '../submission';
+import { SubmissionDTO } from '../infrastructure/types';
+import Submission from './submission';
 
-describe('Submission Service', () => {
-    let mockKnex: MockKnex;
-
-    const meta: xpubMeta = {
-        articleType: 'type',
-        title: 'title',
-    };
-
-    const dtoSubmission = {
-        id: SubmissionId.fromUuid(uuid()),
+const submissionRootDTOs: SubmissionDTO[] = [
+    {
+        id: SubmissionId.fromUuid(v4()),
         title: 'The title',
         status: 'INITIAL',
-        updated: new Date(),
-        meta,
-    };
+        createdBy: '123',
+        articleType: 'researchArticle',
+        updated: new Date('2020-02-18T15:14:53.155Z'),
+    },
+    {
+        id: SubmissionId.fromUuid(v4()),
+        title: 'Another title',
+        status: 'INITIAL',
+        createdBy: '124',
+        articleType: 'researchAdvance',
+        updated: new Date('2020-02-18T15:14:53.155Z'),
+    },
+];
 
+jest.mock('../infrastructure/xpub-submission-root');
+
+describe('Submission Service', () => {
     beforeEach(() => {
         jest.resetAllMocks();
-        mockKnex = new MockKnex();
-        mockKnex.insert = jest.fn().mockReturnValue(mockKnex);
-        mockKnex.withSchema = jest.fn().mockReturnValue(mockKnex);
-        mockKnex.into = jest.fn().mockReturnValue(mockKnex);
-        mockKnex.select = jest.fn().mockReturnValue(mockKnex);
-        mockKnex.from = jest.fn().mockReturnValue(mockKnex);
-        mockKnex.where = jest.fn().mockReturnValue(mockKnex);
-        mockKnex.returning = jest.fn().mockReturnValue(mockKnex);
     });
 
-    it('should return results as array - findAll', async () => {
-        mockKnex.from = jest.fn().mockImplementation(() => [dtoSubmission, dtoSubmission]);
-        const service = new SubmissionService((mockKnex as unknown) as Knex);
-        const results = await service.findAll();
-        expect(results).toHaveLength(2);
+    describe('findAll', () => {
+        it('should return results as array of Submissions - findAll', async () => {
+            XpubSubmissionRootRepository.prototype.findAll = jest.fn().mockReturnValue(submissionRootDTOs);
+            const service = new SubmissionService((null as unknown) as Knex);
+            const results = await service.findAll();
+            expect(results).toHaveLength(2);
+            expect(results[0]).toBeInstanceOf(Submission);
+        });
+
+        it('should return empty array and not throw if results are empty', async () => {
+            XpubSubmissionRootRepository.prototype.findAll = jest.fn().mockReturnValue([]);
+            const service = new SubmissionService((null as unknown) as Knex);
+            const results = await service.findAll();
+            expect(results).toHaveLength(0);
+        });
     });
 
-    it('should return empty array and not throw if results are empty - findAll', async () => {
-        mockKnex.from = jest.fn().mockImplementation(() => []);
-        const service = new SubmissionService((mockKnex as unknown) as Knex);
-        const results = await service.findAll();
-        expect(results).toHaveLength(0);
+    describe('findSubmission', () => {
+        it('should return a Submission if one exists', async (): Promise<void> => {
+            XpubSubmissionRootRepository.prototype.findById = jest.fn().mockReturnValue(submissionRootDTOs[0]);
+            const service = new SubmissionService((null as unknown) as Knex);
+            const submission = await service.getSubmission(submissionRootDTOs[0].id);
+            expect(submission).toBeInstanceOf(Submission);
+        });
+        it('throws an error when no submission foubnd', async (): Promise<void> => {
+            XpubSubmissionRootRepository.prototype.findById = jest.fn().mockReturnValue(null);
+            const service = new SubmissionService((null as unknown) as Knex);
+            await expect(service.getSubmission(submissionRootDTOs[0].id)).rejects.toThrow(
+                'Unable to find submission with id: ' + submissionRootDTOs[0].id,
+            );
+        });
     });
 
-    it('should call repo findById and return null if empty - findOne', async () => {
-        mockKnex.where = jest.fn().mockImplementation(() => []);
-        const service = new SubmissionService((mockKnex as unknown) as Knex);
-        const results = await service.findOne(SubmissionId.fromUuid(uuid()));
-        expect(results).toBe(null);
+    describe('create', () => {
+        it('throws if an invalid articleType is passed', async (): Promise<void> => {
+            XpubSubmissionRootRepository.prototype.save = jest.fn(async (dto: SubmissionDTO) => dto);
+            const service = new SubmissionService((null as unknown) as Knex);
+            await expect(service.create('articleType', 'userId')).rejects.toThrow();
+        });
+        it('returns a created Submission when correct values are sent', async (): Promise<void> => {
+            XpubSubmissionRootRepository.prototype.save = jest.fn(async (dto: SubmissionDTO) => dto);
+            const service = new SubmissionService((null as unknown) as Knex);
+            const submission = await service.create('researchArticle', 'userId');
+            expect(submission).toBeInstanceOf(Submission);
+        });
+        it('returns a created Submission with correctly set initial properties', async (): Promise<void> => {
+            XpubSubmissionRootRepository.prototype.save = jest.fn(async (dto: SubmissionDTO) => dto);
+            const service = new SubmissionService((null as unknown) as Knex);
+            const submission = await service.create('researchArticle', 'userId');
+            expect(submission.status).toBe('INITIAL');
+            expect(submission.articleType).toBe('researchArticle');
+            expect(submission.createdBy).toBe('userId');
+            expect(submission.id).toBeDefined();
+            expect(submission.updated).toBeDefined();
+        });
     });
 
-    it('should return matching object if found - findOne', async () => {
-        mockKnex.where = jest.fn().mockImplementation(() => [dtoSubmission]);
-        const service = new SubmissionService((mockKnex as unknown) as Knex);
-        const submission = await service.findOne(dtoSubmission.id);
-        const expectedId = submission ? submission.id : null;
-        expect(expectedId).toBeTruthy();
-        expect(expectedId).toBe(dtoSubmission.id);
+    describe('changeTitle', () => {
+        it('should change the title on the submission and send that to the repository', async () => {
+            XpubSubmissionRootRepository.prototype.findById = jest.fn().mockReturnValue(submissionRootDTOs[0]);
+            XpubSubmissionRootRepository.prototype.save = jest.fn(async (dto: SubmissionDTO) => dto);
+            const service = new SubmissionService((null as unknown) as Knex);
+            const title = 'There and back again, a Hobbits tale';
+            const newSub = await service.changeTitle(submissionRootDTOs[0].id, title);
+            expect(XpubSubmissionRootRepository.prototype.save).toHaveBeenCalledTimes(1);
+            expect(XpubSubmissionRootRepository.prototype.save).toHaveBeenCalledWith({
+                ...submissionRootDTOs[0],
+                title,
+            });
+            expect(newSub.title).toEqual(title);
+        });
+
+        it('should throw an error if there is no submission found by the passed in id', async () => {
+            XpubSubmissionRootRepository.prototype.findById = jest.fn().mockReturnValue(null);
+            XpubSubmissionRootRepository.prototype.save = jest.fn(async (dto: SubmissionDTO) => dto);
+            const service = new SubmissionService((null as unknown) as Knex);
+            const title = 'There and back again, a Hobbits tale';
+            await expect(service.changeTitle(submissionRootDTOs[0].id, title)).rejects.toThrow(
+                'Unable to find submission with id: ' + submissionRootDTOs[0].id,
+            );
+        });
     });
 
-    it('should throw if invalid article type - create', async () => {
-        const service = new SubmissionService((mockKnex as unknown) as Knex);
-        expect(service.create('articleType', 'userId')).rejects.toThrowError();
-    });
-
-    it('should return new submission if valid - create', async () => {
-        const service = new SubmissionService((mockKnex as unknown) as Knex);
-        const submission = await service.create('researchArticle', 'userId');
-        const submissionId = submission == null ? null : submission.id;
-        expect(submissionId).toBeTruthy();
-        expect(submissionId).toHaveLength(36);
-    });
-
-    it('should change title - changeTitle', async () => {
-        const title = 'i am updated';
-        mockKnex.where = jest.fn().mockImplementation(() => [dtoSubmission]);
-        const service = new SubmissionService((mockKnex as unknown) as Knex);
-        const submission = await service.changeTitle(dtoSubmission.id, title);
-        const submissionId = submission == null ? null : submission.id;
-        const returnedTitle = submission == null ? null : submission.title;
-        expect(submissionId).toBeTruthy();
-        expect(submissionId).toHaveLength(36);
-        expect(returnedTitle).toBe(title);
-    });
-
-    it('should should return null if submission is not found - changeTitle', async () => {
-        const title = 'i am updated';
-        mockKnex.where = jest.fn().mockImplementation(() => []);
-        const service = new SubmissionService((mockKnex as unknown) as Knex);
-        const submission = await service.changeTitle(dtoSubmission.id, title);
-        expect(submission).toBe(null);
-    });
-
-    it('should return true is delete is successful - delete', async () => {
-        mockKnex.delete = jest.fn().mockImplementation(() => 1);
-        const service = new SubmissionService((mockKnex as unknown) as Knex);
-        const deleteOutcome = await service.delete(dtoSubmission.id);
-        expect(deleteOutcome).toBe(true);
-    });
-
-    it('should return false is delete is unsuccessful - dlete', async () => {
-        mockKnex.delete = jest.fn().mockImplementation(() => 0);
-        const service = new SubmissionService((mockKnex as unknown) as Knex);
-        const deleteOutcome = await service.delete(dtoSubmission.id);
-        expect(deleteOutcome).toBe(false);
-    });
-
-    it('should return false if article type is not supported - validateArticleType', async () => {
-        const isSupported = SubmissionService.validateArticleType('not real');
-        expect(isSupported).toBe(false);
-    });
-
-    it('should return true if article type is  supported - validateArticleType', async () => {
-        const isSupported = SubmissionService.validateArticleType('researchArticle');
-        expect(isSupported).toBe(true);
+    describe('delete', () => {
+        it('should return true if is deletes the submission', async (): Promise<void> => {
+            XpubSubmissionRootRepository.prototype.delete = jest.fn().mockReturnValue(true);
+            const service = new SubmissionService((null as unknown) as Knex);
+            await expect(service.delete(submissionRootDTOs[0].id)).resolves.toBe(true);
+        });
+        it('should return false if deletion fails', async (): Promise<void> => {
+            XpubSubmissionRootRepository.prototype.delete = jest.fn().mockReturnValue(false);
+            const service = new SubmissionService((null as unknown) as Knex);
+            await expect(service.delete(submissionRootDTOs[0].id)).resolves.toBe(false);
+        });
     });
 });

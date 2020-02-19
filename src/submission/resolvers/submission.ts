@@ -8,7 +8,7 @@ const resolvers = (submissionService: SubmissionService): IResolvers => ({
             return await submissionService.findAll();
         },
         async getSubmission(id: string): Promise<DtoViewSubmission | null> {
-            return await submissionService.findOne(SubmissionId.fromUuid(id));
+            return await submissionService.getSubmission(SubmissionId.fromUuid(id));
         },
     },
     Mutation: {
