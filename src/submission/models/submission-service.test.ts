@@ -115,16 +115,16 @@ describe('Submission Service', () => {
         });
     });
 
-    describe('delete', () => {
+    describe('deleteSubmission', () => {
         it('should return true if is deletes the submission', async (): Promise<void> => {
             XpubSubmissionRootRepository.prototype.delete = jest.fn().mockReturnValue(true);
             const service = new SubmissionService((null as unknown) as Knex);
-            await expect(service.delete(submissionRootDTOs[0].id)).resolves.toBe(true);
+            await expect(service.deleteSubmission(submissionRootDTOs[0].id)).resolves.toBe(true);
         });
         it('should return false if deletion fails', async (): Promise<void> => {
             XpubSubmissionRootRepository.prototype.delete = jest.fn().mockReturnValue(false);
             const service = new SubmissionService((null as unknown) as Knex);
-            await expect(service.delete(submissionRootDTOs[0].id)).resolves.toBe(false);
+            await expect(service.deleteSubmission(submissionRootDTOs[0].id)).resolves.toBe(false);
         });
     });
 });

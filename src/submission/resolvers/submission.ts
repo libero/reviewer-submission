@@ -21,7 +21,7 @@ const resolvers = (submissionService: SubmissionService): IResolvers => ({
         },
 
         async deleteSubmission(_, { id }: { id: SubmissionId }): Promise<SubmissionId> {
-            await submissionService.delete(id);
+            await submissionService.deleteSubmission(id);
             return id;
         },
     },

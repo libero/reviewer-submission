@@ -52,7 +52,7 @@ export class SubmissionService {
         return SubmissionMapper.dtoToSubmission(submissionDTO);
     }
 
-    async delete(id: SubmissionId): Promise<boolean> {
+    async deleteSubmission(id: SubmissionId): Promise<boolean> {
         return await this.submissionRepository.delete(id);
     }
 }
