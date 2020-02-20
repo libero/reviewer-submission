@@ -26,4 +26,26 @@ export default class XpubTeamRepository implements TeamRepository {
             .from(this.TABLE_NAME)
             .where({ object_id });
     }
+
+    public async update(dtoTeam: Partial<TeamDTO> & { id: TeamId }): Promise<TeamDTO> {
+        // @todo: do we merge against remote state?
+        const team = await this.findByObjectId(dtoTeam.id.value);
+        if (team === null) {
+            throw new Error(`Unable to find entry with id: ${dtoTeam.id}`);
+        } else {
+            const entryToSave = { ...team, ...dtoTeam, updated: new Date() };
+            return this.knex
+                .withSchema('public')
+                .update(entryToSave)
+                .into(this.TABLE_NAME);
+        }
+    }
+
+    public async create(dtoSubmission: Omit<TeamDTO, 'updated'>): Promise<TeamDTO> {
+        const entryToSave = { ...dtoSubmission, updated: new Date() };
+        return this.knex
+            .withSchema('public')
+            .insert(entryToSave)
+            .into(this.TABLE_NAME);
+    }
 }

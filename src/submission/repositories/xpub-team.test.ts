@@ -72,4 +72,16 @@ describe('Knex Submission Repository', () => {
             expect(result).toHaveLength(0);
         });
     });
+
+    describe('create', () => {
+        it('should create a new Team using the passed in variables and pass that to knex', async () => {
+            const repo = new XpubTeamRepository((mockKnex as unknown) as Knex);
+            await repo.create(databaseEntries[0]);
+            expect(mockKnex.insert).toBeCalledWith(
+                expect.objectContaining({
+                    id: databaseEntries[0].id,
+                }),
+            );
+        });
+    });
 });
