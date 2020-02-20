@@ -18,29 +18,37 @@ type DatabaseEntry = {
 };
 
 export default class XpubSubmissionRootRepository implements SubmissionRepository {
-    private readonly TABLE_NAME = 'manuscript';
+    _qb: Knex.QueryBuilder<
+        DatabaseEntry,
+        {
+            _base: DatabaseEntry;
+            _hasSelection: false;
+            _keys: never;
+            _aliases: {};
+            _single: false;
+            _intersectProps: {};
+            _unionProps: never;
+        }[]
+    >;
 
-    public constructor(private readonly knex: Knex<{}, unknown[]>) {}
+    public constructor(knex: Knex<{}, unknown[]>) {
+        this._qb = knex<DatabaseEntry>('manuscript');
+    }
 
     close(): void {
         logger.log(`Closing KnexSubmissionRepository.`);
-        this.knex.destroy();
+        //this.knex.destroy();
     }
 
     public async findAll(): Promise<SubmissionDTO[]> {
-        const result = await this.knex
-            .withSchema('public')
-            .select<DatabaseEntry[]>('id', 'updated', 'created_by', 'status', 'meta')
-            .from(this.TABLE_NAME);
+        const result = await this._qb.select<DatabaseEntry[]>('id', 'updated', 'created_by', 'status', 'meta');
 
         return result.map(this.entryToDTO);
     }
 
     public async findById(id: SubmissionId): Promise<SubmissionDTO | null> {
-        const rows = await this.knex
-            .withSchema('public')
+        const rows = await this._qb
             .select<DatabaseEntry[]>('id', 'updated', 'created_by', 'status', 'meta')
-            .from(this.TABLE_NAME)
             .where({ id });
 
         return rows.length ? this.entryToDTO(rows[0]) : null;
@@ -53,27 +61,20 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
             throw new Error(`Unable to find entry with id: ${dtoSubmission.id}`);
         } else {
             const entryToSave = this.dtoToEntry({ ...submission, ...dtoSubmission, updated: new Date() });
-            await this.knex
-                .withSchema('public')
-                .update(entryToSave)
-                .into(this.TABLE_NAME);
+            await this._qb.withSchema('public').update(entryToSave);
             return this.entryToDTO(entryToSave);
         }
     }
 
     public async create(dtoSubmission: Omit<SubmissionDTO, 'updated'>): Promise<SubmissionDTO> {
         const entryToSave = this.dtoToEntry({ ...dtoSubmission, updated: new Date() });
-        await this.knex
-            .withSchema('public')
-            .insert(entryToSave)
-            .into(this.TABLE_NAME);
+        await this._qb.withSchema('public').insert(entryToSave);
         return this.entryToDTO(entryToSave);
     }
 
     public async delete(id: SubmissionId): Promise<boolean> {
-        const res = await this.knex
+        const res = await this._qb
             .withSchema('public')
-            .from(this.TABLE_NAME)
             .where({ id })
             .delete();
         return res >= 1 ? true : false;

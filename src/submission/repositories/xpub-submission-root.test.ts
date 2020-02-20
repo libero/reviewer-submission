@@ -52,7 +52,8 @@ describe('Knex Submission Repository', () => {
     describe('findAll', () => {
         it('returns the correct number of entries', async (): Promise<void> => {
             mockKnex.from = jest.fn().mockReturnValue(databaseEntries);
-            const repo = new XpubSubmissionRootRepository((mockKnex as unknown) as Knex);
+            const f = (name: string) => { return mockKnex}
+            const repo = new XpubSubmissionRootRepository((f as unknown) as Knex);
             const result = await repo.findAll();
             expect(result).toHaveLength(2);
         });
