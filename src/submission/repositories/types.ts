@@ -8,7 +8,6 @@ export interface SubmissionRepository {
     update(sub: Partial<SubmissionDTO> & { id: SubmissionId }): Promise<SubmissionDTO>;
     close(): void;
 }
-
 export interface SubmissionDTO {
     id: SubmissionId;
     updated: Date;
