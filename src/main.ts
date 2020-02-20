@@ -13,7 +13,7 @@ import * as hpp from 'hpp';
 import * as depthLimit from 'graphql-depth-limit';
 import { simpleEstimator, fieldExtensionsEstimator, directiveEstimator, getComplexity } from 'graphql-query-complexity';
 import { separateOperations } from 'graphql';
-import { SubmissionService } from './submission/models/submission-service';
+import { SubmissionService } from './submission/services/submission-service';
 import { SubmissionResolvers } from './submission/resolvers/submission';
 import { SurveyResolvers } from './survey/resolvers/survey';
 import { SurveyService } from './survey/models/survey-service';

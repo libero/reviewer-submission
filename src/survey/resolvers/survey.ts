@@ -1,7 +1,7 @@
 import { IResolvers } from 'apollo-server-express';
 import { SurveyService } from '../models/survey-service';
 import { SurveyId, SurveyResponseDTO } from '../survey';
-import { SubmissionId } from '../../submission/submission';
+import { SubmissionId } from '../../submission/types';
 import { SurveyAnswer } from '../models/survey-answer';
 
 const resolvers = (surveyService: SurveyService): IResolvers => ({
