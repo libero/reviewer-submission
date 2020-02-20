@@ -21,8 +21,25 @@ const queryExecutor = async (query: Knex.QueryBuilder): Promise<DatabaseEntry[]>
     return await query;
 };
 
+type SomeFactory = {
+    queryExecutor(query: Knex.QueryBuilder): Promise<DatabaseEntry[]>;
+    schemaBuiler(): Knex.QueryBuilder;
+};
+
+const someFactory = (knex: Knex<{}, unknown[]>, schemaName: string): SomeFactory => {
+    return {
+        queryExecutor,
+        schemaBuiler(): Knex.QueryBuilder {
+            return knex.withSchema(schemaName);
+        },
+    };
+};
+
 export default class XpubSubmissionRootRepository implements SubmissionRepository {
-    public constructor(private readonly knex: Knex<{}, unknown[]>) {}
+    private _dbDetails: SomeFactory;
+    public constructor(private readonly knex: Knex<{}, unknown[]>) {
+        this._dbDetails = someFactory(knex, 'public');
+    }
 
     close(): void {
         logger.log(`Closing KnexSubmissionRepository.`);
@@ -30,11 +47,10 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
     }
 
     public async findAll(): Promise<SubmissionDTO[]> {
-        const query = this.knex
-            .withSchema('public')
+        const query = this._dbDetails
+            .schemaBuiler()
             .select<DatabaseEntry[]>('id', 'updated', 'created_by', 'status', 'meta');
-        const result = await queryExecutor(query);
-
+        const result = await this._dbDetails.queryExecutor(query);
         console.log(result);
         return result.map(this.entryToDTO);
     }
