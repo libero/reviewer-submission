@@ -1,4 +1,4 @@
-import { SubmissionId } from '../types';
+import { SubmissionId, TeamId } from '../types';
 
 export interface SubmissionRepository {
     create(sub: Omit<SubmissionDTO, 'updated'>): Promise<SubmissionDTO>;
@@ -8,6 +8,18 @@ export interface SubmissionRepository {
     update(sub: Partial<SubmissionDTO> & { id: SubmissionId }): Promise<SubmissionDTO>;
     close(): void;
 }
+
+export interface TeamRepository {
+    findByObjectId(id: string): Promise<TeamDTO[]>;
+    create(dtoSubmission: Omit<TeamDTO, 'updated'>): Promise<TeamDTO>;
+    update(dtoTeam: Partial<TeamDTO> & { id: TeamId }): Promise<TeamDTO>;
+}
+
+export interface TeamDTO {
+    id: TeamId;
+    updated: Date;
+}
+
 export interface SubmissionDTO {
     id: SubmissionId;
     updated: Date;
