@@ -8,7 +8,7 @@ type entryMeta = {
     articleType: string;
     title: string;
 };
-// this is the xpub shema type
+// this is the xpub schema type
 type DatabaseEntry = {
     id: SubmissionId;
     updated: Date;
