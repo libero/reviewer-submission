@@ -37,10 +37,7 @@ const resolvers = (submissionService: SubmissionService): IResolvers => ({
         },
 
         // stub pending
-        async saveDetailsPage(
-            _,
-            { id, details }: { id: SubmissionId; details: Author },
-        ): Promise<DtoViewSubmission | null> {
+        async saveDetailsPage(_, { id, details }: { id: SubmissionId; details: Author }): Promise<Submission | null> {
             // TODO: stub for now
             return null;
         },
