@@ -100,14 +100,11 @@ describe('Knex Submission Repository', () => {
     describe('update', () => {
         it('updates the updated time of the entry', async (): Promise<void> => {
             const lastUpdated = databaseEntries[0].updated;
-            adapter.executor = jest.fn().mockReturnValue({
-                id: entryId,
-                title: 'The title',
-                status: 'INITIAL',
-                createdBy: '123',
-                articleType: 'newspaper',
-                updated: lastUpdated,
-            });
+            // https://jestjs.io/docs/en/mock-functions.html#mock-return-values
+            adapter.executor = jest
+                .fn()
+                .mockReturnValueOnce([testDatabaseEntry])
+                .mockReturnValueOnce(true);
             const repo = new XpubSubmissionRootRepository(adapter);
             const { updated } = await repo.update({
                 id: entryId,
@@ -119,16 +116,11 @@ describe('Knex Submission Repository', () => {
             expect(updated).not.toEqual(lastUpdated);
         });
         it('returns a complete DTO when passed a partial to update', async (): Promise<void> => {
-            const lastUpdated = databaseEntries[0].updated;
-            // TODO - use jest calledWith to mock multiple such as find and update
-            adapter.executor = jest.fn().mockReturnValue({
-                id: entryId,
-                title: 'The title',
-                status: 'INITIAL',
-                createdBy: '123',
-                articleType: 'newspaper',
-                updated: lastUpdated,
-            });
+            // https://jestjs.io/docs/en/mock-functions.html#mock-return-values
+            adapter.executor = jest
+                .fn()
+                .mockReturnValueOnce([testDatabaseEntry])
+                .mockReturnValueOnce(true);
             const repo = new XpubSubmissionRootRepository(adapter);
             const result = await repo.update({
                 id: entryId,

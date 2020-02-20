@@ -1,7 +1,7 @@
 import { createKnexAdapter, KnexTableAdapter } from '../knex-table-adapter';
 import Knex = require('knex');
 
-class MockKnex {
+export class MockKnex {
     insert(): MockKnex {
         return this;
     }

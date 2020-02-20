@@ -15,6 +15,8 @@ const testSurveyResponse = new SurveyResponse({
 });
 
 describe('Knex SurveyResponse Repository', () => {
+    // TODO: remove MockKnex in favour of newer mocking
+    // SEE xpub-submission-root.test
     let mockKnex: MockKnex;
 
     beforeEach(() => {
