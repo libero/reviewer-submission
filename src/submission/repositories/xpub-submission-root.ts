@@ -23,7 +23,7 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
     public constructor(private readonly knex: Knex<{}, unknown[]>) {}
 
     close(): void {
-        logger.log(`Closing KnexSubmissionRepository.`);
+        logger.log(`Closing XpubSubmissionRootRepository.`);
         this.knex.destroy();
     }
 
