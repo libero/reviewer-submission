@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import * as Knex from 'knex';
-import { InfraLogger as logger } from '../../logger';
 import { SubmissionId } from '../types';
 import { SubmissionRepository, SubmissionDTO } from './types';
+import { KnexTableAdapter } from '../../knex-table-adapter';
 
 type entryMeta = {
     articleType: string;
@@ -17,50 +16,22 @@ type DatabaseEntry = {
     meta: entryMeta;
 };
 
-const queryExecutor = async (query: Knex.QueryBuilder): Promise<DatabaseEntry[]> => {
-    return await query;
-};
-
-type SomeFactory = {
-    queryExecutor(query: Knex.QueryBuilder): Promise<DatabaseEntry[]>;
-    schemaBuiler(): Knex.QueryBuilder;
-};
-
-const someFactory = (knex: Knex<{}, unknown[]>, schemaName: string): SomeFactory => {
-    return {
-        queryExecutor,
-        schemaBuiler(): Knex.QueryBuilder {
-            return knex.withSchema(schemaName);
-        },
-    };
-};
-
 export default class XpubSubmissionRootRepository implements SubmissionRepository {
-    private _dbDetails: SomeFactory;
-    public constructor(private readonly knex: Knex<{}, unknown[]>) {
-        this._dbDetails = someFactory(knex, 'public');
-    }
-
-    close(): void {
-        logger.log(`Closing KnexSubmissionRepository.`);
-        this.knex.destroy();
-    }
+    public constructor(private readonly _query: KnexTableAdapter) {}
 
     public async findAll(): Promise<SubmissionDTO[]> {
-        const query = this._dbDetails
-            .schemaBuiler()
-            .select<DatabaseEntry[]>('id', 'updated', 'created_by', 'status', 'meta');
-        const result = await this._dbDetails.queryExecutor(query);
-        console.log(result);
+        const query = this._query.builder().select('id', 'updated', 'created_by', 'status', 'meta');
+        const result = await this._query.executor<DatabaseEntry[]>(query);
         return result.map(this.entryToDTO);
     }
 
     public async findById(id: SubmissionId): Promise<SubmissionDTO | null> {
-        const rows = await this.knex
-            .select<DatabaseEntry[]>('id', 'updated', 'created_by', 'status', 'meta')
+        const query = this._query
+            .builder()
+            .select('id', 'updated', 'created_by', 'status', 'meta')
             .where({ id });
-
-        return rows.length ? this.entryToDTO(rows[0]) : null;
+        const result = await this._query.executor<DatabaseEntry[]>(query);
+        return result.length ? this.entryToDTO(result[0]) : null;
     }
 
     public async update(dtoSubmission: Partial<SubmissionDTO> & { id: SubmissionId }): Promise<SubmissionDTO> {
@@ -68,25 +39,27 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
         const submission = await this.findById(dtoSubmission.id);
         if (submission === null) {
             throw new Error(`Unable to find entry with id: ${dtoSubmission.id}`);
-        } else {
-            const entryToSave = this.dtoToEntry({ ...submission, ...dtoSubmission, updated: new Date() });
-            await this.knex.withSchema('public').update(entryToSave);
-            return this.entryToDTO(entryToSave);
         }
+        const entryToSave = this.dtoToEntry({ ...submission, ...dtoSubmission, updated: new Date() });
+        const query = this._query.builder().update(entryToSave);
+        await this._query.executor<DatabaseEntry[]>(query);
+        return this.entryToDTO(entryToSave);
     }
 
     public async create(dtoSubmission: Omit<SubmissionDTO, 'updated'>): Promise<SubmissionDTO> {
         const entryToSave = this.dtoToEntry({ ...dtoSubmission, updated: new Date() });
-        await this.knex.withSchema('public').insert(entryToSave);
+        const query = this._query.builder().insert(entryToSave);
+        await this._query.executor<DatabaseEntry[]>(query);
         return this.entryToDTO(entryToSave);
     }
 
     public async delete(id: SubmissionId): Promise<boolean> {
-        const res = await this.knex
-            .withSchema('public')
+        const query = this._query
+            .builder()
             .where({ id })
             .delete();
-        return res >= 1 ? true : false;
+        const result = await this._query.executor<number>(query);
+        return result >= 1 ? true : false;
     }
 
     // These mapping functions are here because xpub schema isn't what we want the dto to look like but we need to convert data sent to something compatible with knex.insert

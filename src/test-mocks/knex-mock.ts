@@ -1,29 +1,17 @@
-export class MockKnex {
-    insert(): MockKnex {
-        return this;
-    }
-    withSchema(): MockKnex {
-        return this;
-    }
-    into(): MockKnex {
-        return this;
-    }
-    select(): MockKnex {
-        return this;
-    }
-    from(): MockKnex {
-        return this;
-    }
-    where(): MockKnex {
-        return this;
-    }
-    returning(): MockKnex {
-        return this;
-    }
-    delete(): boolean {
-        return true;
-    }
-    update(): MockKnex {
-        return this;
-    }
+import Knex = require('knex');
+import { KnexTableAdapter } from '../knex-table-adapter';
+
+export interface MockConnector {
+    getQueryBuilder(): Knex.QueryBuilder;
 }
+
+export const createMockAdapter = (mock: MockConnector): KnexTableAdapter => {
+    return {
+        async executor<T>(query: Knex.QueryBuilder): Promise<T> {
+            return (await query) as T;
+        },
+        builder(): Knex.QueryBuilder {
+            return mock.getQueryBuilder();
+        },
+    };
+};

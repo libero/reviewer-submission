@@ -4,12 +4,14 @@ import XpubSubmissionRootRepository from '../repositories/xpub-submission-root';
 import uuid = require('uuid');
 import Submission from './models/submission';
 import { SubmissionDTO } from '../repositories/types';
+import { createKnexAdapter } from '../../knex-table-adapter';
 
 export class SubmissionService {
     submissionRepository: XpubSubmissionRootRepository;
 
-    constructor(knexConnection: Knex<{}, unknown[]>) {
-        this.submissionRepository = new XpubSubmissionRootRepository(knexConnection);
+    constructor(knex: Knex<{}, unknown[]>) {
+        const adapter = createKnexAdapter(knex, 'public');
+        this.submissionRepository = new XpubSubmissionRootRepository(adapter);
     }
 
     async findAll(): Promise<Submission[]> {

@@ -6,7 +6,6 @@ export interface SubmissionRepository {
     findAll(): Promise<SubmissionDTO[]>;
     findById(id: SubmissionId): Promise<SubmissionDTO | null>;
     update(sub: Partial<SubmissionDTO> & { id: SubmissionId }): Promise<SubmissionDTO>;
-    close(): void;
 }
 export interface SubmissionDTO {
     id: SubmissionId;
