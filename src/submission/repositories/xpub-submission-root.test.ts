@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { v4 as uuid } from 'uuid';
 import * as Knex from 'knex';
+jest.mock('knex');
+
 import XpubSubmissionRootRepository from './xpub-submission-root';
 import { SubmissionId } from '../types';
 import { SubmissionDTO } from './types';
-import { MockKnex } from '../../test-mocks/knex-mock';
 
 const entryId = SubmissionId.fromUuid(uuid());
 const entryId2 = SubmissionId.fromUuid(uuid());
@@ -34,28 +35,9 @@ const testDatabaseEntry2 = {
 const databaseEntries = [testDatabaseEntry, testDatabaseEntry2];
 
 describe('Knex Submission Repository', () => {
-    let mockKnex: MockKnex;
-
-    beforeEach(() => {
-        jest.resetAllMocks();
-        mockKnex = new MockKnex();
-        mockKnex.insert = jest.fn().mockReturnValue(mockKnex);
-        mockKnex.withSchema = jest.fn().mockReturnValue(mockKnex);
-        mockKnex.into = jest.fn().mockReturnValue(mockKnex);
-        mockKnex.update = jest.fn().mockReturnValue(mockKnex);
-        mockKnex.select = jest.fn().mockReturnValue(mockKnex);
-        mockKnex.from = jest.fn().mockReturnValue(mockKnex);
-        mockKnex.where = jest.fn().mockReturnValue(mockKnex);
-        mockKnex.returning = jest.fn().mockReturnValue(mockKnex);
-    });
-
     describe('findAll', () => {
         it('returns the correct number of entries', async (): Promise<void> => {
-            mockKnex.from = jest.fn().mockReturnValue(databaseEntries);
-            const f = (name: string) => {
-                return mockKnex;
-            };
-            const repo = new XpubSubmissionRootRepository((f as unknown) as Knex);
+            const repo = new XpubSubmissionRootRepository((mockKnex as unknown) as Knex);
             const result = await repo.findAll();
             expect(result).toHaveLength(2);
         });
