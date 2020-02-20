@@ -120,6 +120,7 @@ describe('Knex Submission Repository', () => {
         });
         it('returns a complete DTO when passed a partial to update', async (): Promise<void> => {
             const lastUpdated = databaseEntries[0].updated;
+            // TODO - use jest calledWith to mock multiple such as find and update
             adapter.executor = jest.fn().mockReturnValue({
                 id: entryId,
                 title: 'The title',
