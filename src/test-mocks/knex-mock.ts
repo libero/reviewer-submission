@@ -1,29 +1,18 @@
+import { createKnexAdapter, KnexTableAdapter } from '../knex-table-adapter';
+import Knex = require('knex');
+
 export class MockKnex {
-    insert(): MockKnex {
-        return this;
-    }
-    withSchema(): MockKnex {
-        return this;
-    }
-    into(): MockKnex {
-        return this;
-    }
-    select(): MockKnex {
-        return this;
-    }
-    from(): MockKnex {
-        return this;
-    }
-    where(): MockKnex {
-        return this;
-    }
-    returning(): MockKnex {
-        return this;
-    }
-    delete(): boolean {
-        return true;
-    }
-    update(): MockKnex {
-        return this;
-    }
+    insert = jest.fn().mockReturnValue(this);
+    withSchema = jest.fn().mockReturnValue(this);
+    into = jest.fn().mockReturnValue(this);
+    select = jest.fn().mockReturnValue(this);
+    from = jest.fn().mockReturnValue(this);
+    where = jest.fn().mockReturnValue(this);
+    returning = jest.fn().mockReturnValue(this);
+    delete = jest.fn().mockReturnValue(this);
+    update = jest.fn().mockReturnValue(this);
+}
+
+export function createMockAdapter(mock: MockKnex): KnexTableAdapter {
+    return createKnexAdapter((mock as unknown) as Knex<{}, unknown[]>, 'mock-public-schema');
 }

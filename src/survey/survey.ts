@@ -1,5 +1,5 @@
-import { Question } from './models/question';
-import { Answer } from './models/answer';
+import { Question } from './services/models/question';
+import { Answer } from './services/models/answer';
 import { uuidType } from 'typesafe-uuid';
 import { SubmissionId } from '../submission/types';
 
@@ -7,8 +7,7 @@ export class SurveyId extends uuidType<'SurveyId'>() {}
 export class SurveyResponseId extends uuidType<'SurveyResponseId'>() {}
 
 export interface SurveyResponseRepository {
-    save(surveyResponse: ISurveyResponse): Promise<ISurveyResponse>;
-    close(): void;
+    create(surveyResponse: ISurveyResponse): Promise<ISurveyResponse>;
 }
 
 // eslint-disable-next-line @typescript-eslint/interface-name-prefix

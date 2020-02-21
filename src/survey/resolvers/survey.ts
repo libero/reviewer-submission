@@ -1,8 +1,8 @@
 import { IResolvers } from 'apollo-server-express';
-import { SurveyService } from '../models/survey-service';
+import { SurveyService } from '../services/survey-service';
 import { SurveyId, SurveyResponseDTO } from '../survey';
 import { SubmissionId } from '../../submission/types';
-import { SurveyAnswer } from '../models/survey-answer';
+import { SurveyAnswer } from '../services/models/survey-answer';
 
 const resolvers = (surveyService: SurveyService): IResolvers => ({
     Mutation: {

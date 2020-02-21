@@ -1,16 +1,18 @@
 import * as Knex from 'knex';
-import { KnexSurveyResponseRepository } from '../infrastructure/knex-survey-response';
-import { SurveyAnswer } from './survey-answer';
-import { SurveyResponse } from './survey-response';
+import { KnexSurveyResponseRepository } from '../repositories/knex-survey-response';
+import { SurveyAnswer } from './models/survey-answer';
+import { SurveyResponse } from './models/survey-response';
 import { SurveyId, SurveyResponseId } from '../survey';
 import { SubmissionId } from '../../submission/types';
 import uuid = require('uuid');
+import { createKnexAdapter } from '../../knex-table-adapter';
 
 export class SurveyService {
     surveyResponseRepository: KnexSurveyResponseRepository;
 
-    constructor(knexConnection: Knex<{}, unknown[]>) {
-        this.surveyResponseRepository = new KnexSurveyResponseRepository(knexConnection);
+    constructor(knex: Knex<{}, unknown[]>) {
+        const adapter = createKnexAdapter(knex, 'public');
+        this.surveyResponseRepository = new KnexSurveyResponseRepository(adapter);
     }
 
     async submitResponse(
@@ -29,6 +31,6 @@ export class SurveyService {
             surveyResponse.answerQuestion(questionId, text, answer);
         });
 
-        return await this.surveyResponseRepository.save(surveyResponse);
+        return await this.surveyResponseRepository.create(surveyResponse);
     }
 }

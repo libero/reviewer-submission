@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import * as Knex from 'knex';
-import { InfraLogger as logger } from '../../logger';
 import { SubmissionId } from '../types';
 import { SubmissionRepository, SubmissionDTO } from './types';
+import { KnexTableAdapter } from '../../knex-table-adapter';
 
 type entryMeta = {
     articleType: string;
@@ -20,30 +19,25 @@ type DatabaseEntry = {
 export default class XpubSubmissionRootRepository implements SubmissionRepository {
     private readonly TABLE_NAME = 'manuscript';
 
-    public constructor(private readonly knex: Knex<{}, unknown[]>) {}
-
-    close(): void {
-        logger.log(`Closing XpubSubmissionRootRepository.`);
-        this.knex.destroy();
-    }
+    public constructor(private readonly _query: KnexTableAdapter) {}
 
     public async findAll(): Promise<SubmissionDTO[]> {
-        const result = await this.knex
-            .withSchema('public')
-            .select<DatabaseEntry[]>('id', 'updated', 'created_by', 'status', 'meta')
+        const query = this._query
+            .builder()
+            .select('id', 'updated', 'created_by', 'status', 'meta')
             .from(this.TABLE_NAME);
-
+        const result = await this._query.executor<DatabaseEntry[]>(query);
         return result.map(this.entryToDTO);
     }
 
     public async findById(id: SubmissionId): Promise<SubmissionDTO | null> {
-        const rows = await this.knex
-            .withSchema('public')
-            .select<DatabaseEntry[]>('id', 'updated', 'created_by', 'status', 'meta')
+        const query = this._query
+            .builder()
+            .select('id', 'updated', 'created_by', 'status', 'meta')
             .from(this.TABLE_NAME)
             .where({ id });
-
-        return rows.length ? this.entryToDTO(rows[0]) : null;
+        const result = await this._query.executor<DatabaseEntry[]>(query);
+        return result.length ? this.entryToDTO(result[0]) : null;
     }
 
     public async update(dtoSubmission: Partial<SubmissionDTO> & { id: SubmissionId }): Promise<SubmissionDTO> {
@@ -51,32 +45,27 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
         const submission = await this.findById(dtoSubmission.id);
         if (submission === null) {
             throw new Error(`Unable to find entry with id: ${dtoSubmission.id}`);
-        } else {
-            const entryToSave = this.dtoToEntry({ ...submission, ...dtoSubmission, updated: new Date() });
-            await this.knex
-                .withSchema('public')
-                .update(entryToSave)
-                .into(this.TABLE_NAME);
-            return this.entryToDTO(entryToSave);
         }
+        const entryToSave = this.dtoToEntry({ ...submission, ...dtoSubmission, updated: new Date() });
+        const query = this._query.builder().update(entryToSave);
+        await this._query.executor<DatabaseEntry[]>(query);
+        return this.entryToDTO(entryToSave);
     }
 
     public async create(dtoSubmission: Omit<SubmissionDTO, 'updated'>): Promise<SubmissionDTO> {
         const entryToSave = this.dtoToEntry({ ...dtoSubmission, updated: new Date() });
-        await this.knex
-            .withSchema('public')
-            .insert(entryToSave)
-            .into(this.TABLE_NAME);
+        const query = this._query.builder().insert(entryToSave);
+        await this._query.executor<DatabaseEntry[]>(query);
         return this.entryToDTO(entryToSave);
     }
 
     public async delete(id: SubmissionId): Promise<boolean> {
-        const res = await this.knex
-            .withSchema('public')
-            .from(this.TABLE_NAME)
+        const query = this._query
+            .builder()
             .where({ id })
             .delete();
-        return res >= 1 ? true : false;
+        const result = await this._query.executor<number>(query);
+        return result >= 1 ? true : false;
     }
 
     // These mapping functions are here because xpub schema isn't what we want the dto to look like but we need to convert data sent to something compatible with knex.insert

@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { v4 as uuid } from 'uuid';
-import * as Knex from 'knex';
 import XpubSubmissionRootRepository from './xpub-submission-root';
 import { SubmissionId } from '../types';
 import { SubmissionDTO } from './types';
-import { MockKnex } from '../../test-mocks/knex-mock';
+import { createMockAdapter, MockKnex } from '../../test-mocks/knex-mock';
+import { KnexTableAdapter } from '../../knex-table-adapter';
 
 const entryId = SubmissionId.fromUuid(uuid());
 const entryId2 = SubmissionId.fromUuid(uuid());
@@ -34,32 +34,28 @@ const testDatabaseEntry2 = {
 const databaseEntries = [testDatabaseEntry, testDatabaseEntry2];
 
 describe('Knex Submission Repository', () => {
-    let mockKnex: MockKnex;
+    let adapter: KnexTableAdapter;
+    let mock: MockKnex;
 
     beforeEach(() => {
         jest.resetAllMocks();
-        mockKnex = new MockKnex();
-        mockKnex.insert = jest.fn().mockReturnValue(mockKnex);
-        mockKnex.withSchema = jest.fn().mockReturnValue(mockKnex);
-        mockKnex.into = jest.fn().mockReturnValue(mockKnex);
-        mockKnex.update = jest.fn().mockReturnValue(mockKnex);
-        mockKnex.select = jest.fn().mockReturnValue(mockKnex);
-        mockKnex.from = jest.fn().mockReturnValue(mockKnex);
-        mockKnex.where = jest.fn().mockReturnValue(mockKnex);
-        mockKnex.returning = jest.fn().mockReturnValue(mockKnex);
+        mock = new MockKnex();
+        adapter = createMockAdapter(mock);
     });
 
     describe('findAll', () => {
         it('returns the correct number of entries', async (): Promise<void> => {
-            mockKnex.from = jest.fn().mockReturnValue(databaseEntries);
-            const repo = new XpubSubmissionRootRepository((mockKnex as unknown) as Knex);
+            adapter.executor = jest.fn().mockReturnValue(databaseEntries);
+            const repo = new XpubSubmissionRootRepository(adapter);
             const result = await repo.findAll();
             expect(result).toHaveLength(2);
         });
         it('returns a converted DTO object from the database entries', async (): Promise<void> => {
-            mockKnex.from = jest.fn().mockReturnValue(databaseEntries);
-            const repo = new XpubSubmissionRootRepository((mockKnex as unknown) as Knex);
+            adapter.executor = jest.fn().mockReturnValue(databaseEntries);
+            const repo = new XpubSubmissionRootRepository(adapter);
             const result = await repo.findAll();
+            expect(mock.select).toBeCalled();
+            expect(mock.from).toBeCalled();
             expect(result[0]).toStrictEqual({
                 id: entryId,
                 title: 'The title',
@@ -78,18 +74,17 @@ describe('Knex Submission Repository', () => {
             });
         });
         it('calls the knex instance methods with the correct parameters', async (): Promise<void> => {
-            mockKnex.from = jest.fn().mockReturnValue(databaseEntries);
-            const repo = new XpubSubmissionRootRepository((mockKnex as unknown) as Knex);
+            adapter.executor = jest.fn().mockReturnValue(databaseEntries);
+            const repo = new XpubSubmissionRootRepository(adapter);
             await repo.findAll();
-            expect(mockKnex.withSchema).toBeCalledWith('public');
-            expect(mockKnex.select).toBeCalledWith('id', 'updated', 'created_by', 'status', 'meta');
-            expect(mockKnex.from).toBeCalledWith('manuscript');
+            expect(mock.select).toBeCalledWith('id', 'updated', 'created_by', 'status', 'meta');
+            expect(mock.from).toBeCalledWith('manuscript');
         });
     });
     describe('findById', () => {
         it('returns a converted DTO object from the database entry', () => {
-            mockKnex.where = jest.fn().mockReturnValue([databaseEntries[0]]);
-            const repo = new XpubSubmissionRootRepository((mockKnex as unknown) as Knex);
+            adapter.executor = jest.fn().mockReturnValue([databaseEntries[0]]);
+            const repo = new XpubSubmissionRootRepository(adapter);
             return expect(repo.findById(entryId)).resolves.toStrictEqual({
                 id: entryId,
                 title: 'The title',
@@ -100,33 +95,33 @@ describe('Knex Submission Repository', () => {
             });
         });
         it('returns the first entry if multiple entries are found by query', async (): Promise<void> => {
-            mockKnex.where = jest.fn().mockReturnValue(databaseEntries);
-            const repo = new XpubSubmissionRootRepository((mockKnex as unknown) as Knex);
+            adapter.executor = jest.fn().mockReturnValue(databaseEntries);
+            const repo = new XpubSubmissionRootRepository(adapter);
             const result = await repo.findById(entryId);
             expect((result as SubmissionDTO).id).toEqual(databaseEntries[0].id);
         });
         it('returns null on no submission found', async (): Promise<void> => {
-            mockKnex.where = jest.fn().mockReturnValue([]);
-            const repo = new XpubSubmissionRootRepository((mockKnex as unknown) as Knex);
+            adapter.executor = jest.fn().mockReturnValue([]);
+            const repo = new XpubSubmissionRootRepository(adapter);
             const result = await repo.findById(entryId);
             expect(result).toBeNull();
         });
         it('calls the knex instance methods with the correct parameters', async (): Promise<void> => {
-            mockKnex.where = jest.fn().mockReturnValue(databaseEntries);
-            const repo = new XpubSubmissionRootRepository((mockKnex as unknown) as Knex);
+            adapter.executor = jest.fn().mockReturnValue([]);
+            const repo = new XpubSubmissionRootRepository(adapter);
             await repo.findById(entryId);
-            expect(mockKnex.withSchema).toBeCalledWith('public');
-            expect(mockKnex.select).toBeCalledWith('id', 'updated', 'created_by', 'status', 'meta');
-            expect(mockKnex.from).toBeCalledWith('manuscript');
-            expect(mockKnex.where).toBeCalledWith({ id: entryId });
+            expect(mock.select).toBeCalledWith('id', 'updated', 'created_by', 'status', 'meta');
+            expect(mock.from).toBeCalledWith('manuscript');
+            expect(mock.where).toBeCalledWith({ id: entryId });
         });
     });
 
     describe('update', () => {
         it('calls update on knex if the entry exists', async (): Promise<void> => {
-            const repo = new XpubSubmissionRootRepository((mockKnex as unknown) as Knex);
+            adapter.executor = jest.fn();
+            const repo = new XpubSubmissionRootRepository(adapter);
             repo.findById = jest.fn().mockReturnValue({ id: '1' });
-            expect(mockKnex.update).toBeCalledTimes(0);
+            expect(mock.update).toBeCalledTimes(0);
             await repo.update({
                 id: entryId,
                 title: 'The title',
@@ -134,20 +129,17 @@ describe('Knex Submission Repository', () => {
                 createdBy: '123',
                 articleType: 'newspaper',
             });
-            expect(mockKnex.update).toBeCalledTimes(1);
-            expect(mockKnex.insert).toBeCalledTimes(0);
+            expect(mock.update).toBeCalledTimes(1);
+            expect(mock.insert).toBeCalledTimes(0);
         });
         it('updates the updated time of the entry', async (): Promise<void> => {
             const lastUpdated = databaseEntries[0].updated;
-            const repo = new XpubSubmissionRootRepository((mockKnex as unknown) as Knex);
-            repo.findById = jest.fn().mockReturnValue({
-                id: entryId,
-                title: 'The title',
-                status: 'INITIAL',
-                createdBy: '123',
-                articleType: 'newspaper',
-                updated: lastUpdated,
-            });
+            // https://jestjs.io/docs/en/mock-functions.html#mock-return-values
+            adapter.executor = jest
+                .fn()
+                .mockReturnValueOnce([testDatabaseEntry])
+                .mockReturnValueOnce(true);
+            const repo = new XpubSubmissionRootRepository(adapter);
             const { updated } = await repo.update({
                 id: entryId,
                 title: 'The title',
@@ -158,16 +150,12 @@ describe('Knex Submission Repository', () => {
             expect(updated).not.toEqual(lastUpdated);
         });
         it('returns a complete DTO when passed a partial to update', async (): Promise<void> => {
-            const lastUpdated = databaseEntries[0].updated;
-            const repo = new XpubSubmissionRootRepository((mockKnex as unknown) as Knex);
-            repo.findById = jest.fn().mockReturnValue({
-                id: entryId,
-                title: 'The title',
-                status: 'INITIAL',
-                createdBy: '123',
-                articleType: 'newspaper',
-                updated: lastUpdated,
-            });
+            // https://jestjs.io/docs/en/mock-functions.html#mock-return-values
+            adapter.executor = jest
+                .fn()
+                .mockReturnValueOnce([testDatabaseEntry])
+                .mockReturnValueOnce(true);
+            const repo = new XpubSubmissionRootRepository(adapter);
             const result = await repo.update({
                 id: entryId,
                 title: 'A Different Title',
@@ -183,9 +171,10 @@ describe('Knex Submission Repository', () => {
     });
     describe('create', () => {
         it('calls insert on knex', async (): Promise<void> => {
-            const repo = new XpubSubmissionRootRepository((mockKnex as unknown) as Knex);
+            adapter.executor = jest.fn();
+            const repo = new XpubSubmissionRootRepository(adapter);
             repo.findById = jest.fn().mockReturnValue(null);
-            expect(mockKnex.insert).toBeCalledTimes(0);
+            expect(mock.insert).toBeCalledTimes(0);
             await repo.create({
                 id: entryId,
                 title: 'The title',
@@ -193,11 +182,12 @@ describe('Knex Submission Repository', () => {
                 createdBy: '123',
                 articleType: 'newspaper',
             });
-            expect(mockKnex.insert).toBeCalledTimes(1);
-            expect(mockKnex.update).toBeCalledTimes(0);
+            expect(mock.insert).toBeCalledTimes(1);
+            expect(mock.update).toBeCalledTimes(0);
         });
         it('returns a complete DTO when passed a complete DTO to create', async (): Promise<void> => {
-            const repo = new XpubSubmissionRootRepository((mockKnex as unknown) as Knex);
+            adapter.executor = jest.fn().mockReturnValue([]);
+            const repo = new XpubSubmissionRootRepository(adapter);
             const result = await repo.create({
                 id: entryId,
                 title: 'A Different Title',
@@ -216,13 +206,13 @@ describe('Knex Submission Repository', () => {
     });
     describe('delete', () => {
         it('returns true when knex delete is successful', () => {
-            mockKnex.delete = jest.fn().mockReturnValue(true);
-            const repo = new XpubSubmissionRootRepository((mockKnex as unknown) as Knex);
+            adapter.executor = jest.fn().mockReturnValue(true);
+            const repo = new XpubSubmissionRootRepository(adapter);
             expect(repo.delete(SubmissionId.fromUuid(uuid()))).resolves.toEqual(true);
         });
         it('returns false when knex delete is not successful', () => {
-            mockKnex.delete = jest.fn().mockReturnValue(false);
-            const repo = new XpubSubmissionRootRepository((mockKnex as unknown) as Knex);
+            adapter.executor = jest.fn().mockReturnValue(false);
+            const repo = new XpubSubmissionRootRepository(adapter);
             expect(repo.delete(SubmissionId.fromUuid(uuid()))).resolves.toEqual(false);
         });
     });

@@ -1,10 +1,10 @@
 import { v4 as uuid } from 'uuid';
-import * as Knex from 'knex';
 import { KnexSurveyResponseRepository } from './knex-survey-response';
 import { SurveyId, SurveyResponseId } from '../survey';
 import { SubmissionId } from '../../submission/types';
-import { MockKnex } from '../../test-mocks/knex-mock';
-import { SurveyResponse } from '../models/survey-response';
+import { MockKnex, createMockAdapter } from '../../test-mocks/knex-mock';
+import { SurveyResponse } from '../services/models/survey-response';
+import { KnexTableAdapter } from '../../knex-table-adapter';
 
 const testSurveyResponse = new SurveyResponse({
     id: SurveyResponseId.fromUuid(uuid()),
@@ -15,19 +15,21 @@ const testSurveyResponse = new SurveyResponse({
 });
 
 describe('Knex SurveyResponse Repository', () => {
-    let mockKnex: MockKnex;
+    let adapter: KnexTableAdapter;
+    let mock: MockKnex;
 
     beforeEach(() => {
         jest.resetAllMocks();
-        mockKnex = new MockKnex();
-        mockKnex.insert = jest.fn().mockReturnValue(mockKnex);
-        mockKnex.withSchema = jest.fn().mockReturnValue(mockKnex);
-        mockKnex.into = jest.fn().mockReturnValue(mockKnex);
+        mock = new MockKnex();
+        adapter = createMockAdapter(mock);
     });
 
-    it('Can save', () => {
-        const repo = new KnexSurveyResponseRepository((mockKnex as unknown) as Knex);
-        return expect(repo.save(testSurveyResponse)).resolves.toMatchObject({
+    it('Can save', async () => {
+        adapter.executor = jest.fn();
+        const repo = new KnexSurveyResponseRepository(adapter);
+        const result = await repo.create(testSurveyResponse);
+        expect(mock.insert).toBeCalled();
+        expect(result).toMatchObject({
             id: testSurveyResponse.id,
             surveyId: testSurveyResponse.surveyId,
             submissionId: testSurveyResponse.submissionId,
