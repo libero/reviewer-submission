@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import * as Knex from 'knex';
-import { TeamRepository, TeamDTO } from '../../submission/repositories/types';
+import { TeamRepository, TeamDTO } from './types';
 import { InfraLogger as logger } from '../../logger';
-import { TeamId } from '../../submission/types';
+import { TeamId } from '../types';
 
 type DatabaseEntry = {
     id: TeamId;
