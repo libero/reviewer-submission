@@ -14,6 +14,6 @@ export class TeamService {
 
     // TODO: implement this
     find(id: string, role: string): Promise<TeamDTO | null> {
-        return null;
+        return Promise.resolve(null);
     }
 }
