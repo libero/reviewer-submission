@@ -1,5 +1,5 @@
-import { Question } from './models/question';
-import { Answer } from './models/answer';
+import { Question } from './services/models/question';
+import { Answer } from './services/models/answer';
 import { uuidType } from 'typesafe-uuid';
 import { SubmissionId } from '../submission/types';
 

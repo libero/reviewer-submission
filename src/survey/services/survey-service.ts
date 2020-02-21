@@ -1,7 +1,7 @@
 import * as Knex from 'knex';
-import { KnexSurveyResponseRepository } from '../infrastructure/knex-survey-response';
-import { SurveyAnswer } from './survey-answer';
-import { SurveyResponse } from './survey-response';
+import { KnexSurveyResponseRepository } from '../repositories/knex-survey-response';
+import { SurveyAnswer } from './models/survey-answer';
+import { SurveyResponse } from './models/survey-response';
 import { SurveyId, SurveyResponseId } from '../survey';
 import { SubmissionId } from '../../submission/types';
 import uuid = require('uuid');
@@ -31,6 +31,6 @@ export class SurveyService {
             surveyResponse.answerQuestion(questionId, text, answer);
         });
 
-        return await this.surveyResponseRepository.save(surveyResponse);
+        return await this.surveyResponseRepository.create(surveyResponse);
     }
 }

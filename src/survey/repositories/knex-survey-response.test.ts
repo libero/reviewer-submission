@@ -1,10 +1,9 @@
 import { v4 as uuid } from 'uuid';
-import * as Knex from 'knex';
 import { KnexSurveyResponseRepository } from './knex-survey-response';
 import { SurveyId, SurveyResponseId } from '../survey';
 import { SubmissionId } from '../../submission/types';
 import { MockKnex, createMockAdapter } from '../../test-mocks/knex-mock';
-import { SurveyResponse } from '../models/survey-response';
+import { SurveyResponse } from '../services/models/survey-response';
 import { KnexTableAdapter } from '../../knex-table-adapter';
 
 const testSurveyResponse = new SurveyResponse({

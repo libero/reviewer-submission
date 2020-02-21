@@ -16,7 +16,7 @@ import { separateOperations } from 'graphql';
 import { SubmissionService } from './submission/services/submission-service';
 import { SubmissionResolvers } from './submission/resolvers/submission';
 import { SurveyResolvers } from './survey/resolvers/survey';
-import { SurveyService } from './survey/models/survey-service';
+import { SurveyService } from './survey/services/survey-service';
 import { UserResolvers } from './user/resolvers/user';
 import { UserService } from './user/models/user-service';
 
