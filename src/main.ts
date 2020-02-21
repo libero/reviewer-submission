@@ -20,6 +20,7 @@ import { DashboardResolvers } from './application/dashboard/resolvers';
 import { DashboardService } from './application/dashboard/service';
 import { WizardService } from './application/wizard/service';
 import { WizardResolvers } from './application/wizard/resolvers';
+import { TeamService } from './domain/teams/services/team-service';
 
 // Apollo server express does not export this, but its express
 export interface ExpressContext {
@@ -47,10 +48,11 @@ const init = async (): Promise<void> => {
     const srvSubmission = new SubmissionService(knexConnection);
     const srvSurvey = new SurveyService(knexConnection);
     const srvUser = new UserService(config.user_adapter_url);
+    const srvTeam = new TeamService(knexConnection);
 
     // init application services
     const srvDashboard = new DashboardService(srvSubmission);
-    const srvWizard = new WizardService(srvSubmission);
+    const srvWizard = new WizardService(srvSubmission, srvTeam);
 
     // init resolvers
     const resolvers = [
