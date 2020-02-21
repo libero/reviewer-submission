@@ -1,8 +1,8 @@
 import * as Knex from 'knex';
 import { MockKnex } from '../../test-mocks/knex-mock';
-import XpubTeamRepository from './xpub-team';
 import { v4 } from 'uuid';
 import { TeamId } from '../types';
+import XpubTeamRepository from './xpub-team';
 
 const entryId1 = TeamId.fromUuid(v4());
 const entryId2 = TeamId.fromUuid(v4());
