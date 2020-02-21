@@ -19,15 +19,3 @@ input AuthorDetailsInput {
     email: String!
     institution: String!
 }
-
-type Query {
-    getSubmissions: [Submission!]!
-    getSubmission(id: ID!): Submission
-}
-
-type Mutation {
-    startSubmission(articleType: String!): Submission!
-    changeSubmissionTitle(id: ID!, title: String!): Submission!
-    deleteSubmission(id: ID!): Boolean
-    saveDetailsPage(id: ID!, details: AuthorDetailsInput!): Submission!
-}

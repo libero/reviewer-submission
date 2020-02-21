@@ -1,6 +1,6 @@
-import { SubmissionService } from '../services/submission-service';
-import Submission from '../services/models/submission';
-import { SubmissionId } from '../types';
+import { DashboardService } from './dashboard-service';
+import Submission from '../../domain/submission/services/models/submission';
+import { SubmissionId } from '../../domain/submission/types';
 import { IResolvers } from 'apollo-server-express';
 
 // TODO: move this out once work on this ticket start https://github.com/libero/reviewer-submission/issues/79
@@ -13,30 +13,26 @@ export interface Person {
 
 export type Author = Person;
 
-const resolvers = (submissionService: SubmissionService): IResolvers => ({
+const resolvers = (dashboard: DashboardService): IResolvers => ({
     Query: {
         async getSubmissions(): Promise<Submission[] | null> {
-            return await submissionService.findAll();
+            return await dashboard.find();
         },
         async getSubmission(id: string): Promise<Submission | null> {
-            return await submissionService.getSubmission(SubmissionId.fromUuid(id));
+            return await dashboard.getSubmission(SubmissionId.fromUuid(id));
         },
     },
     Mutation: {
         async startSubmission(_, args: { articleType: string }, context): Promise<Submission | null> {
-            return await submissionService.create(args.articleType, context.userId);
-        },
-
-        async changeSubmissionTitle(_, args: { id: string; title: string }): Promise<Submission | null> {
-            return await submissionService.changeTitle(SubmissionId.fromUuid(args.id), args.title);
+            return await dashboard.startSubmission(args.articleType, context.userId);
         },
 
         async deleteSubmission(_, { id }: { id: SubmissionId }): Promise<SubmissionId> {
-            await submissionService.deleteSubmission(id);
+            await dashboard.deleteSubmission(id);
             return id;
         },
 
-        // stub pending
+        // stub pending - move to autosave service
         async saveDetailsPage(_, { id, details }: { id: SubmissionId; details: Author }): Promise<Submission | null> {
             // TODO: stub for now
             return null;
@@ -44,4 +40,4 @@ const resolvers = (submissionService: SubmissionService): IResolvers => ({
     },
 });
 
-export const SubmissionResolvers = resolvers;
+export const DashboardResolvers = resolvers;

@@ -13,12 +13,11 @@ import * as hpp from 'hpp';
 import * as depthLimit from 'graphql-depth-limit';
 import { simpleEstimator, fieldExtensionsEstimator, directiveEstimator, getComplexity } from 'graphql-query-complexity';
 import { separateOperations } from 'graphql';
-import { SubmissionService } from './submission/services/submission-service';
-import { SubmissionResolvers } from './submission/resolvers/submission';
-import { SurveyResolvers } from './survey/resolvers/survey';
-import { SurveyService } from './survey/services/survey-service';
-import { UserResolvers } from './user/resolvers/user';
-import { UserService } from './user/models/user-service';
+import { SubmissionService } from './domain/submission';
+import { SurveyResolvers, SurveyService } from './domain/survey';
+import { UserResolvers, UserService } from './domain/user';
+import { DashboardResolvers } from './application/dashboard/submission';
+import { DashboardService } from './application/dashboard/dashboard-service';
 
 // Apollo server express does not export this, but its express
 export interface ExpressContext {
@@ -42,7 +41,7 @@ const init = async (): Promise<void> => {
     const app: Express = express();
     const knexConnection = knex(config.knex);
     const resolvers = [
-        SubmissionResolvers(new SubmissionService(knexConnection)),
+        DashboardResolvers(new DashboardService(new SubmissionService(knexConnection))),
         SurveyResolvers(new SurveyService(knexConnection)),
         UserResolvers(new UserService(config.user_adapter_url)),
     ];

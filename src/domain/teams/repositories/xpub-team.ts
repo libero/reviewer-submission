@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import * as Knex from 'knex';
 import { TeamRepository, TeamDTO } from './types';
-import { InfraLogger as logger } from '../../logger';
+import { InfraLogger as logger } from '../../../logger';
 import { TeamId } from '../types';
 
 type DatabaseEntry = {
