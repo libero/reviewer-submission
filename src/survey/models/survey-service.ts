@@ -5,12 +5,14 @@ import { SurveyResponse } from './survey-response';
 import { SurveyId, SurveyResponseId } from '../survey';
 import { SubmissionId } from '../../submission/types';
 import uuid = require('uuid');
+import { createKnexAdapter } from '../../knex-table-adapter';
 
 export class SurveyService {
     surveyResponseRepository: KnexSurveyResponseRepository;
 
-    constructor(knexConnection: Knex<{}, unknown[]>) {
-        this.surveyResponseRepository = new KnexSurveyResponseRepository(knexConnection);
+    constructor(knex: Knex<{}, unknown[]>) {
+        const adapter = createKnexAdapter(knex, 'public');
+        this.surveyResponseRepository = new KnexSurveyResponseRepository(adapter);
     }
 
     async submitResponse(
