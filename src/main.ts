@@ -16,8 +16,8 @@ import { separateOperations } from 'graphql';
 import { SubmissionService } from './domain/submission';
 import { SurveyResolvers, SurveyService } from './domain/survey';
 import { UserResolvers, UserService } from './domain/user';
-import { DashboardResolvers } from './application/dashboard/submission';
-import { DashboardService } from './application/dashboard/dashboard-service';
+import { DashboardResolvers } from './application/dashboard/resolvers';
+import { DashboardService } from './application/dashboard/service';
 
 // Apollo server express does not export this, but its express
 export interface ExpressContext {

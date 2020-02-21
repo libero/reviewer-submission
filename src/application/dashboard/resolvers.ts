@@ -1,4 +1,4 @@
-import { DashboardService } from './dashboard-service';
+import { DashboardService } from './service';
 import Submission from '../../domain/submission/services/models/submission';
 import { SubmissionId } from '../../domain/submission/types';
 import { IResolvers } from 'apollo-server-express';
