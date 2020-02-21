@@ -17,10 +17,15 @@ type DatabaseEntry = {
 };
 
 export default class XpubSubmissionRootRepository implements SubmissionRepository {
+    private readonly TABLE_NAME = 'manuscript';
+
     public constructor(private readonly _query: KnexTableAdapter) {}
 
     public async findAll(): Promise<SubmissionDTO[]> {
-        const query = this._query.builder().select('id', 'updated', 'created_by', 'status', 'meta');
+        const query = this._query
+            .builder()
+            .select('id', 'updated', 'created_by', 'status', 'meta')
+            .from(this.TABLE_NAME);
         const result = await this._query.executor<DatabaseEntry[]>(query);
         return result.map(this.entryToDTO);
     }
@@ -29,6 +34,7 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
         const query = this._query
             .builder()
             .select('id', 'updated', 'created_by', 'status', 'meta')
+            .from(this.TABLE_NAME)
             .where({ id });
         const result = await this._query.executor<DatabaseEntry[]>(query);
         return result.length ? this.entryToDTO(result[0]) : null;

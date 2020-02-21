@@ -1,4 +1,4 @@
-import Knex = require('knex');
+import * as Knex from 'knex';
 
 export type KnexTableAdapter = {
     executor<T>(query: Knex.QueryBuilder): Promise<T>;
