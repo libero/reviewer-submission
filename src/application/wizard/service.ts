@@ -7,6 +7,14 @@ export class WizardService {
     constructor(private readonly submissionService: SubmissionService, private readonly teamService: TeamService) {}
 
     async saveDetailsPage(id: SubmissionId, details: Author): Promise<Submission | null> {
-        return null;
+        // needs permissions checks
+        const submission = await this.submissionService.get(id);
+        const team = this.teamService.find(id.value, 'author');
+        if (team) {
+            // update
+        } else {
+            // create
+        }
+        return submission;
     }
 }

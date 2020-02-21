@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import * as Knex from 'knex';
 import { TeamRepository, TeamDTO } from './types';
-import { InfraLogger as logger } from '../../../logger';
 import { TeamId } from '../types';
 import { KnexTableAdapter } from 'src/domain/knex-table-adapter';
 
