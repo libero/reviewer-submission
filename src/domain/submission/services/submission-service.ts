@@ -35,7 +35,7 @@ export class SubmissionService {
         return new Submission(savedSubmissionDTO);
     }
 
-    async getSubmission(id: SubmissionId): Promise<Submission> {
+    async get(id: SubmissionId): Promise<Submission> {
         const submissionDTO = await this.submissionRepository.findById(id);
         if (!submissionDTO) {
             throw new Error('Unable to find submission with id: ' + id);
@@ -43,18 +43,7 @@ export class SubmissionService {
         return new Submission(submissionDTO);
     }
 
-    async changeTitle(id: SubmissionId, title: string): Promise<Submission> {
-        const result = await this.submissionRepository.findById(id);
-        if (result === null) {
-            throw new Error('Unable to find submission with id: ' + id);
-        }
-        const submission = new Submission(result);
-        submission.title = title;
-        const submissionDTO = await this.submissionRepository.update(submission);
-        return new Submission(submissionDTO);
-    }
-
-    async deleteSubmission(id: SubmissionId): Promise<boolean> {
+    async delete(id: SubmissionId): Promise<boolean> {
         return await this.submissionRepository.delete(id);
     }
 }

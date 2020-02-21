@@ -13,12 +13,13 @@ import * as hpp from 'hpp';
 import * as depthLimit from 'graphql-depth-limit';
 import { simpleEstimator, fieldExtensionsEstimator, directiveEstimator, getComplexity } from 'graphql-query-complexity';
 import { separateOperations } from 'graphql';
-import { SubmissionService } from './submission/services/submission-service';
-import { SubmissionResolvers } from './submission/resolvers/submission';
-import { SurveyResolvers } from './survey/resolvers/survey';
-import { SurveyService } from './survey/services/survey-service';
-import { UserResolvers } from './user/resolvers/user';
-import { UserService } from './user/models/user-service';
+import { SubmissionService } from './domain/submission';
+import { SurveyResolvers, SurveyService } from './domain/survey';
+import { UserResolvers, UserService } from './domain/user';
+import { DashboardResolvers } from './application/dashboard/resolvers';
+import { DashboardService } from './application/dashboard/service';
+import { WizardService } from './application/wizard/service';
+import { WizardResolvers } from './application/wizard/resolvers';
 
 // Apollo server express does not export this, but its express
 export interface ExpressContext {
@@ -41,11 +42,24 @@ const init = async (): Promise<void> => {
     // Start the application
     const app: Express = express();
     const knexConnection = knex(config.knex);
+
+    // init domain services
+    const srvSubmission = new SubmissionService(knexConnection);
+    const srvSurvey = new SurveyService(knexConnection);
+    const srvUser = new UserService(config.user_adapter_url);
+
+    // init application services
+    const srvDashboard = new DashboardService(srvSubmission);
+    const srvWizard = new WizardService(srvSubmission);
+
+    // init resolvers
     const resolvers = [
-        SubmissionResolvers(new SubmissionService(knexConnection)),
-        SurveyResolvers(new SurveyService(knexConnection)),
-        UserResolvers(new UserService(config.user_adapter_url)),
+        DashboardResolvers(srvDashboard),
+        SurveyResolvers(srvSurvey),
+        UserResolvers(srvUser),
+        WizardResolvers(srvWizard),
     ];
+
     // best to mount helmet so soon as possible to ensure headers are set: defaults - https://www.npmjs.com/package/helmet#how-it-works
     app.use(helmet());
     app.use(hpp());

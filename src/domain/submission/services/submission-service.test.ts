@@ -53,13 +53,13 @@ describe('Submission Service', () => {
         it('should return a Submission if one exists', async (): Promise<void> => {
             XpubSubmissionRootRepository.prototype.findById = jest.fn().mockReturnValue(submissionRootDTOs[0]);
             const service = new SubmissionService((null as unknown) as Knex);
-            const submission = await service.getSubmission(submissionRootDTOs[0].id);
+            const submission = await service.get(submissionRootDTOs[0].id);
             expect(submission).toBeInstanceOf(Submission);
         });
         it('throws an error when no submission foubnd', async (): Promise<void> => {
             XpubSubmissionRootRepository.prototype.findById = jest.fn().mockReturnValue(null);
             const service = new SubmissionService((null as unknown) as Knex);
-            await expect(service.getSubmission(submissionRootDTOs[0].id)).rejects.toThrow(
+            await expect(service.get(submissionRootDTOs[0].id)).rejects.toThrow(
                 'Unable to find submission with id: ' + submissionRootDTOs[0].id,
             );
         });
@@ -89,42 +89,16 @@ describe('Submission Service', () => {
         });
     });
 
-    describe('changeTitle', () => {
-        it('should change the title on the submission and send that to the repository', async () => {
-            XpubSubmissionRootRepository.prototype.findById = jest.fn().mockReturnValue(submissionRootDTOs[0]);
-            XpubSubmissionRootRepository.prototype.update = jest.fn(async (dto: SubmissionDTO) => dto);
-            const service = new SubmissionService((null as unknown) as Knex);
-            const title = 'There and back again, a Hobbits tale';
-            const newSub = await service.changeTitle(submissionRootDTOs[0].id, title);
-            expect(XpubSubmissionRootRepository.prototype.update).toHaveBeenCalledTimes(1);
-            expect(XpubSubmissionRootRepository.prototype.update).toHaveBeenCalledWith({
-                ...submissionRootDTOs[0],
-                title,
-            });
-            expect(newSub.title).toEqual(title);
-        });
-
-        it('should throw an error if there is no submission found by the passed in id', async () => {
-            XpubSubmissionRootRepository.prototype.findById = jest.fn().mockReturnValue(null);
-            XpubSubmissionRootRepository.prototype.update = jest.fn(async (dto: SubmissionDTO) => dto);
-            const service = new SubmissionService((null as unknown) as Knex);
-            const title = 'There and back again, a Hobbits tale';
-            await expect(service.changeTitle(submissionRootDTOs[0].id, title)).rejects.toThrow(
-                'Unable to find submission with id: ' + submissionRootDTOs[0].id,
-            );
-        });
-    });
-
     describe('deleteSubmission', () => {
         it('should return true if is deletes the submission', async (): Promise<void> => {
             XpubSubmissionRootRepository.prototype.delete = jest.fn().mockReturnValue(true);
             const service = new SubmissionService((null as unknown) as Knex);
-            await expect(service.deleteSubmission(submissionRootDTOs[0].id)).resolves.toBe(true);
+            await expect(service.delete(submissionRootDTOs[0].id)).resolves.toBe(true);
         });
         it('should return false if deletion fails', async (): Promise<void> => {
             XpubSubmissionRootRepository.prototype.delete = jest.fn().mockReturnValue(false);
             const service = new SubmissionService((null as unknown) as Knex);
-            await expect(service.deleteSubmission(submissionRootDTOs[0].id)).resolves.toBe(false);
+            await expect(service.delete(submissionRootDTOs[0].id)).resolves.toBe(false);
         });
     });
 });

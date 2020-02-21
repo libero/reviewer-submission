@@ -1,4 +1,4 @@
-import { InfraLogger as logger } from '../../logger';
+import { InfraLogger as logger } from '../../../logger';
 import { User, UserRepository } from '../user';
 import fetch from 'node-fetch';
 
