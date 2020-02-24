@@ -3,7 +3,7 @@ import { Author } from 'src/domain/submission/types';
 
 export interface TeamRepository {
     findByObjectIdAndRole(id: string, role: string): Promise<TeamDTO[]>;
-    create(dtoSubmission: Omit<TeamDTO, 'updated'>): Promise<TeamDTO>;
+    create(dtoTeam: Omit<TeamDTO, 'id' | 'created' | 'updated'>): Promise<TeamDTO>;
     update(dtoTeam: TeamDTO): Promise<TeamDTO>;
 }
 
