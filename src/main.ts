@@ -20,6 +20,7 @@ import { DashboardResolvers } from './application/dashboard/resolvers';
 import { DashboardService } from './application/dashboard/service';
 import { WizardService } from './application/wizard/service';
 import { WizardResolvers } from './application/wizard/resolvers';
+import { Server } from 'http';
 
 // Apollo server express does not export this, but its express
 export interface ExpressContext {
@@ -42,6 +43,12 @@ const init = async (): Promise<void> => {
     // Start the application
     const app: Express = express();
     const knexConnection = knex(config.knex);
+
+    const shutDown = async (server: Server): Promise<void> => {
+        await knexConnection.destroy();
+        server.close(() => logger.info(`server closed`));
+        process.exit();
+    };
 
     // init domain services
     const srvSubmission = new SubmissionService(knexConnection);
@@ -116,8 +123,9 @@ const init = async (): Promise<void> => {
         },
     });
     apolloServer.applyMiddleware({ app });
-
-    app.listen(config.port, () => logger.info(`Service listening on port ${config.port}`));
+    const server = app.listen(config.port, () => logger.info(`Service listening on port ${config.port}`));
+    process.on('SIGTERM', async () => await shutDown(server));
+    process.on('SIGINT', async () => await shutDown(server));
 };
 
 init();
