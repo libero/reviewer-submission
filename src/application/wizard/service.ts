@@ -9,9 +9,10 @@ export class WizardService {
     async saveDetailsPage(id: SubmissionId, details: Author): Promise<Submission | null> {
         // needs permissions checks
         const submission = await this.submissionService.get(id);
-        const team = this.teamService.find(id.value, 'author');
+        const team = await this.teamService.find(id.value, 'author');
         if (team) {
             // update
+            this.teamService.update();
         } else {
             // create
         }

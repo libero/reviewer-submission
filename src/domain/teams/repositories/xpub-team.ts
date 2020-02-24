@@ -13,37 +13,52 @@ export default class XpubTeamRepository implements TeamRepository {
 
     public constructor(private readonly _query: KnexTableAdapter) {}
 
-    public async findByObjectId(object_id: string): Promise<TeamDTO[]> {
+    public async findByObjectIdAndRole(object_id: string, role: string): Promise<TeamDTO[]> {
         const query = this._query
             .builder()
             .select<DatabaseEntry[]>('id', 'updated')
             .from(this.TABLE_NAME)
-            .where({ object_id });
-
-        return this._query.executor<TeamDTO[]>(query);
+            .where({ object_id, role });
+        return await this._query.executor<TeamDTO[]>(query);
     }
 
-    public async update(dtoTeam: Partial<TeamDTO> & { id: TeamId }): Promise<TeamDTO> {
-        // @todo: do we merge against remote state?
-        const team = await this.findByObjectId(dtoTeam.id.value);
+    public async findTeamById(id: TeamId): Promise<TeamDTO | null> {
+        const query = this._query
+            .builder()
+            .select<DatabaseEntry[]>('id', 'updated')
+            .from(this.TABLE_NAME)
+            .where({ id });
+        const [team = null] = await this._query.executor<TeamDTO[]>(query);
+        return team;
+    }
+
+    public async update(dtoTeam: TeamDTO): Promise<TeamDTO> {
+        const team = await this.findTeamById(dtoTeam.id);
         if (team === null) {
             throw new Error(`Unable to find entry with id: ${dtoTeam.id}`);
         }
-
         const entryToSave = { ...team, ...dtoTeam, updated: new Date() };
         const query = this._query
             .builder()
+            .table(this.TABLE_NAME)
             .update(entryToSave)
-            .into(this.TABLE_NAME);
-        return this._query.executor<TeamDTO>(query);
+            .where({ id: dtoTeam.id });
+        await this._query.executor(query);
+        return entryToSave;
     }
 
-    public async create(dtoSubmission: Omit<TeamDTO, 'updated'>): Promise<TeamDTO> {
-        const entryToSave = { ...dtoSubmission, updated: new Date() };
+    public async create(dtoTeam: Omit<TeamDTO, 'updated'>): Promise<TeamDTO> {
+        const entryToSave = { ...dtoTeam, updated: new Date() };
         const query = this._query
             .builder()
             .insert(entryToSave)
-            .into(this.TABLE_NAME);
-        return this._query.executor<TeamDTO>(query);
+            .into(this.TABLE_NAME)
+            .returning('id');
+        const id = await this._query.executor<TeamId>(query);
+        const team = await this.findTeamById(id);
+        if (team === null) {
+            throw new Error(`Unable to find entry with id: ${dtoTeam.id}`);
+        }
+        return team;
     }
 }

@@ -12,8 +12,16 @@ export class TeamService {
         this.teamRepository = new XpubTeamRepository(adapter);
     }
 
-    // TODO: implement this
-    find(id: string, role: string): Promise<TeamDTO | null> {
-        return Promise.resolve(null);
+    async find(id: string, role: string): Promise<TeamDTO | null> {
+        const results = await this.teamRepository.findByObjectIdAndRole(id, role);
+        return results.length > 0 ? results[0] : null;
+    }
+
+    async update(team: TeamDTO): Promise<TeamDTO> {
+        return await this.teamRepository.update(team);
+    }
+
+    async create(team: TeamDTO): Promise<TeamDTO> {
+        return await this.teamRepository.create(team);
     }
 }
