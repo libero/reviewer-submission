@@ -47,7 +47,7 @@ export default class XpubTeamRepository implements TeamRepository {
         return entryToSave;
     }
 
-    public async create(dtoTeam: Omit<TeamDTO, 'updated'>): Promise<TeamDTO> {
+    public async create(dtoTeam: Omit<TeamDTO, 'id' | 'created' | 'updated'>): Promise<TeamDTO> {
         const entryToSave = { ...dtoTeam, updated: new Date() };
         const query = this._query
             .builder()
@@ -55,10 +55,17 @@ export default class XpubTeamRepository implements TeamRepository {
             .into(this.TABLE_NAME)
             .returning('id');
         const id = await this._query.executor<TeamId>(query);
-        const team = await this.findTeamById(id);
-        if (team === null) {
-            throw new Error(`Unable to find entry with id: ${dtoTeam.id}`);
+
+        if (id === null) {
+            throw new Error('Unable to create team');
         }
+
+        const team = await this.findTeamById(id);
+
+        if (team === null) {
+            throw new Error(`Unable to find entry with id: ${id}`);
+        }
+
         return team;
     }
 }

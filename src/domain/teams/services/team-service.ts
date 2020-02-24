@@ -21,7 +21,7 @@ export class TeamService {
         return await this.teamRepository.update(team);
     }
 
-    async create(team: TeamDTO): Promise<TeamDTO> {
+    async create(team: Omit<TeamDTO, 'id' | 'created' | 'updated'>): Promise<TeamDTO> {
         return await this.teamRepository.create(team);
     }
 }

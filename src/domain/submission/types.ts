@@ -9,4 +9,9 @@ export interface Person {
     institution: string;
 }
 
-export type Author = Person;
+export type Author = {
+    firstName: string;
+    lastName: string;
+    email: string;
+    aff: string;
+};
