@@ -10,6 +10,9 @@ export class WizardService {
     async saveDetailsPage(id: SubmissionId, details: Author): Promise<Submission | null> {
         // needs permissions checks
         const submission = await this.submissionService.get(id);
+        if (submission === null) {
+            throw new Error('No submission found');
+        }
         const team = await this.teamService.find(id.value, 'author');
         const teamMembers: Array<AuthorTeamMember> = [
             {
