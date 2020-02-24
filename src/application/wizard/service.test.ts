@@ -63,4 +63,42 @@ describe('saveDetailsPage', () => {
             ],
         });
     });
+    it('should create when team does not exist', async () => {
+        const submissionServiceMock = ({
+            get: jest.fn().mockImplementationOnce(() => ({})),
+        } as unknown) as SubmissionService;
+        const existingTeam = null;
+        const teamServiceMock = ({
+            find: jest.fn().mockImplementationOnce(() => existingTeam),
+            update: jest.fn(),
+            create: jest.fn(),
+        } as unknown) as TeamService;
+
+        const wizardService = new WizardService(submissionServiceMock, teamServiceMock);
+        const subId = SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a');
+        await wizardService.saveDetailsPage(subId, {
+            firstName: 'John',
+            lastName: 'Smith',
+            email: 'john.smith@example.com',
+            aff: 'aff',
+        });
+
+        expect(teamServiceMock.create).toHaveBeenCalledTimes(1);
+        expect(teamServiceMock.create).toHaveBeenCalledWith({
+            role: 'author',
+            objectId: subId.value,
+            objectType: 'manuscript',
+            teamMembers: [
+                {
+                    alias: {
+                        firstName: 'John',
+                        lastName: 'Smith',
+                        email: 'john.smith@example.com',
+                        aff: 'aff',
+                    },
+                    meta: { corresponding: true },
+                },
+            ],
+        });
+    });
 });
