@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import * as Knex from 'knex';
 import { TeamRepository, TeamDTO } from './types';
-import { InfraLogger as logger } from '../../../logger';
 import { TeamId } from '../types';
+import { KnexTableAdapter } from 'src/domain/knex-table-adapter';
 
 type DatabaseEntry = {
     id: TeamId;
@@ -12,40 +11,61 @@ type DatabaseEntry = {
 export default class XpubTeamRepository implements TeamRepository {
     private readonly TABLE_NAME = 'team';
 
-    public constructor(private readonly knex: Knex<{}, unknown[]>) {}
+    public constructor(private readonly _query: KnexTableAdapter) {}
 
-    close(): void {
-        logger.log(`Closing XpubSubmissionRootRepository.`);
-        this.knex.destroy();
-    }
-
-    public async findByObjectId(object_id: string): Promise<TeamDTO[]> {
-        return this.knex
-            .withSchema('public')
+    public async findByObjectIdAndRole(object_id: string, role: string): Promise<TeamDTO[]> {
+        const query = this._query
+            .builder()
             .select<DatabaseEntry[]>('id', 'updated')
             .from(this.TABLE_NAME)
-            .where({ object_id });
+            .where({ object_id, role });
+        return await this._query.executor<TeamDTO[]>(query);
     }
 
-    public async update(dtoTeam: Partial<TeamDTO> & { id: TeamId }): Promise<TeamDTO> {
-        // @todo: do we merge against remote state?
-        const team = await this.findByObjectId(dtoTeam.id.value);
+    public async findTeamById(id: TeamId): Promise<TeamDTO | null> {
+        const query = this._query
+            .builder()
+            .select<DatabaseEntry[]>('id', 'updated')
+            .from(this.TABLE_NAME)
+            .where({ id });
+        const [team = null] = await this._query.executor<TeamDTO[]>(query);
+        return team;
+    }
+
+    public async update(dtoTeam: TeamDTO): Promise<TeamDTO> {
+        const team = await this.findTeamById(dtoTeam.id);
         if (team === null) {
             throw new Error(`Unable to find entry with id: ${dtoTeam.id}`);
-        } else {
-            const entryToSave = { ...team, ...dtoTeam, updated: new Date() };
-            return this.knex
-                .withSchema('public')
-                .update(entryToSave)
-                .into(this.TABLE_NAME);
         }
+        const entryToSave = { ...team, ...dtoTeam, updated: new Date() };
+        const query = this._query
+            .builder()
+            .table(this.TABLE_NAME)
+            .update(entryToSave)
+            .where({ id: dtoTeam.id });
+        await this._query.executor(query);
+        return entryToSave;
     }
 
-    public async create(dtoSubmission: Omit<TeamDTO, 'updated'>): Promise<TeamDTO> {
-        const entryToSave = { ...dtoSubmission, updated: new Date() };
-        return this.knex
-            .withSchema('public')
+    public async create(dtoTeam: Omit<TeamDTO, 'id' | 'created' | 'updated'>): Promise<TeamDTO> {
+        const entryToSave = { ...dtoTeam, updated: new Date() };
+        const query = this._query
+            .builder()
             .insert(entryToSave)
-            .into(this.TABLE_NAME);
+            .into(this.TABLE_NAME)
+            .returning('id');
+        const id = await this._query.executor<TeamId>(query);
+
+        if (id === null) {
+            throw new Error('Unable to create team');
+        }
+
+        const team = await this.findTeamById(id);
+
+        if (team === null) {
+            throw new Error(`Unable to find entry with id: ${id}`);
+        }
+
+        return team;
     }
 }

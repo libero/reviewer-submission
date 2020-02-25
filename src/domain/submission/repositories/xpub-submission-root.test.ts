@@ -183,6 +183,7 @@ describe('Knex Submission Repository', () => {
                 articleType: 'newspaper',
             });
             expect(mock.insert).toBeCalledTimes(1);
+            expect(mock.into).toBeCalledTimes(1);
             expect(mock.update).toBeCalledTimes(0);
         });
         it('returns a complete DTO when passed a complete DTO to create', async (): Promise<void> => {
