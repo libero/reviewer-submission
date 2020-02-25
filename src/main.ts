@@ -13,6 +13,7 @@ import * as hpp from 'hpp';
 import * as depthLimit from 'graphql-depth-limit';
 import { simpleEstimator, fieldExtensionsEstimator, directiveEstimator, getComplexity } from 'graphql-query-complexity';
 import { separateOperations } from 'graphql';
+import { Server } from 'http';
 import { SubmissionService } from './domain/submission';
 import { SurveyResolvers, SurveyService } from './domain/survey';
 import { UserResolvers, UserService } from './domain/user';
@@ -43,6 +44,12 @@ const init = async (): Promise<void> => {
     // Start the application
     const app: Express = express();
     const knexConnection = knex(config.knex);
+
+    const shutDown = async (server: Server): Promise<void> => {
+        await knexConnection.destroy();
+        server.close(() => logger.info(`server closed`));
+        process.exit();
+    };
 
     // init domain services
     const srvSubmission = new SubmissionService(knexConnection);
@@ -118,8 +125,9 @@ const init = async (): Promise<void> => {
         },
     });
     apolloServer.applyMiddleware({ app });
-
-    app.listen(config.port, () => logger.info(`Service listening on port ${config.port}`));
+    const server = app.listen(config.port, () => logger.info(`Service listening on port ${config.port}`));
+    process.on('SIGTERM', async () => await shutDown(server));
+    process.on('SIGINT', async () => await shutDown(server));
 };
 
 init();

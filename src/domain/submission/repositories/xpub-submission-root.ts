@@ -54,7 +54,10 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
 
     public async create(dtoSubmission: Omit<SubmissionDTO, 'updated'>): Promise<SubmissionDTO> {
         const entryToSave = this.dtoToEntry({ ...dtoSubmission, updated: new Date() });
-        const query = this._query.builder().insert(entryToSave);
+        const query = this._query
+            .builder()
+            .insert(entryToSave)
+            .into(this.TABLE_NAME);
         await this._query.executor<DatabaseEntry[]>(query);
         return this.entryToDTO(entryToSave);
     }
