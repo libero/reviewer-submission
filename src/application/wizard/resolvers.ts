@@ -13,6 +13,7 @@ const resolvers = (wizard: WizardService): IResolvers => ({
         async uploadManuscript(_, variables: { file: FileUpload; id: SubmissionId }, context): Promise<null> {
             const { file, id: submissionId } = variables;
             const userId = context.userId;
+            const {filename, mimetype, encoding } = await file;
 
             // extract data
             const stream = file.createReadStream();
