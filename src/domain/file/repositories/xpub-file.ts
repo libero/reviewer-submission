@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import { KnexTableAdapter } from '../../knex-table-adapter';
 import { SubmissionId } from '../../submission/types';
 import { FileId } from '../types';
@@ -14,6 +15,8 @@ interface FileDTO {
     url: string;
     mimeType: string;
     size: number;
+    created: Date;
+    updated: Date;
 }
 
 type DatabaseEntry = {
@@ -24,6 +27,8 @@ type DatabaseEntry = {
     url: string;
     mimeType: string;
     size: number;
+    created: Date;
+    updated: Date;
 };
 
 export default class XpubFileRepository implements FileRepository {
@@ -31,7 +36,6 @@ export default class XpubFileRepository implements FileRepository {
 
     public constructor(private readonly _query: KnexTableAdapter) {}
 
-    // TODO: stub for now
     async create(dtoFile: Omit<FileDTO, 'updated'>): Promise<FileDTO> {
         const entryToSave = this.dtoToEntry({ ...dtoFile, updated: new Date() });
         const query = this._query
@@ -44,14 +48,18 @@ export default class XpubFileRepository implements FileRepository {
     }
 
     dtoToEntry(dto: FileDTO): DatabaseEntry {
+        const { submissionId, ...rest } = dto;
         return {
-            id: dto.id,
+            ...rest,
+            manuscript_id: submissionId,
         } as DatabaseEntry;
     }
 
     entryToDto(record: DatabaseEntry): FileDTO {
+        const { manuscript_id, ...rest } = record;
         return {
-            id: record.id,
+            ...rest,
+            submissionId: manuscript_id,
         } as FileDTO;
     }
 }
