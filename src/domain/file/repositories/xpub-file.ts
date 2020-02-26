@@ -7,7 +7,7 @@ interface FileRepository {
 }
 
 interface FileDTO {
-    id: FileId,
+    id: FileId;
     submissionId: SubmissionId;
     status: string;
     filename: string;
@@ -43,13 +43,15 @@ export default class XpubFileRepository implements FileRepository {
         return this.entryToDto(entryToSave);
     }
 
-    async dtoToEntry(dto: FileDTO): DatabaseEntry {
+    dtoToEntry(dto: FileDTO): DatabaseEntry {
         return {
             id: dto.id,
-        }
+        } as DatabaseEntry;
     }
 
-    async entryToDto(record: DatabaseEntry): FileDTO {
-
+    entryToDto(record: DatabaseEntry): FileDTO {
+        return {
+            id: record.id,
+        } as FileDTO;
     }
 }
