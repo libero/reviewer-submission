@@ -1,12 +1,16 @@
+import { uuidType } from 'typesafe-uuid';
+
 // Status:
 // 'CREATED',
 // 'UPLOADED',
 // 'STORED',
 // 'CANCELLED'
 
+export class FileId extends uuidType<'FileId'>() {}
+
 export interface File {
-    id: string;
-    manuscriptId: string;
+    id: FileId;
+    submissionId: string;
     created: Date;
     updated: Date;
     type: string;
@@ -17,3 +21,4 @@ export interface File {
     size: number;
     status: string;
 }
+

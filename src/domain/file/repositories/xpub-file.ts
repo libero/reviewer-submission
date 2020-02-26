@@ -1,19 +1,14 @@
 import { KnexTableAdapter } from '../../knex-table-adapter';
-import { SubmissionId } from 'src/domain/submission/types';
+import { SubmissionId } from '../../submission/types';
+import { FileId } from '../types';
 
 interface FileRepository {
-    create(
-        submisisonId: SubmissionId,
-        status: string,
-        filename: string,
-        url: string,
-        mimeType: string,
-        size: number,
-    ): Promise<boolean>;
+    create(dtoFile: Omit<FileDTO, 'updated'>): Promise<FileDTO>;
 }
 
 interface FileDTO {
-    submisisonId: SubmissionId;
+    id: FileId,
+    submissionId: SubmissionId;
     status: string;
     filename: string;
     url: string;
@@ -21,18 +16,40 @@ interface FileDTO {
     size: number;
 }
 
+type DatabaseEntry = {
+    id: FileId;
+    manuscript_id: SubmissionId;
+    status: string;
+    filename: string;
+    url: string;
+    mimeType: string;
+    size: number;
+};
+
 export default class XpubFileRepository implements FileRepository {
     private readonly TABLE_NAME = 'manuscript';
 
     public constructor(private readonly _query: KnexTableAdapter) {}
 
     // TODO: stub for now
-    async create(file: Omit<FileDTO, 'updated' | 'created'>): Promise<boolean> {
-        const query = this._query;
-        return true;
+    async create(dtoFile: Omit<FileDTO, 'updated'>): Promise<FileDTO> {
+        const entryToSave = this.dtoToEntry({ ...dtoFile, updated: new Date() });
+        const query = this._query
+            .builder()
+            .insert(entryToSave)
+            .into(this.TABLE_NAME);
+
+        await this._query.executor<FileDTO[]>(query);
+        return this.entryToDto(entryToSave);
     }
 
-    async entryToDto(dto: FileDTO) {}
+    async dtoToEntry(dto: FileDTO): DatabaseEntry {
+        return {
+            id: dto.id,
+        }
+    }
 
-    async dtoToEntry(record: DatabaseEntry) {}
+    async entryToDto(record: DatabaseEntry): FileDTO {
+
+    }
 }
