@@ -16,7 +16,7 @@ const resolvers = (wizard: WizardService): IResolvers => ({
             const { filename, mimetype, encoding, createReadStream } = await file;
 
             // TODO: create
-            await wizard.createFile();
+            await wizard.createFile(file, id: submissionId);
 
             // extract data
             const stream = file.createReadStream();

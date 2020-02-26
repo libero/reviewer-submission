@@ -3,6 +3,7 @@ import { Author, SubmissionId } from '../../domain/submission/types';
 import Submission from '../../domain/submission/services/models/submission';
 import { TeamService } from 'src/domain/teams/services/team-service';
 import { AuthorTeamMember } from 'src/domain/teams/repositories/types';
+import { FileUpload } from 'graphql-upload';
 
 export class WizardService {
     constructor(private readonly submissionService: SubmissionService, private readonly teamService: TeamService) {}
@@ -35,5 +36,7 @@ export class WizardService {
         }
         return submission;
     }
-    async createFile() {}
+    async createFile(file: FileUpload, id: SubmissionId) {
+        const { filename, mimetype, encoding, createReadStream } = await file;
+    }
 }
