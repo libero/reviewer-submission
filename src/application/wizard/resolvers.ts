@@ -10,28 +10,16 @@ const resolvers = (wizard: WizardService): IResolvers => ({
         async saveDetailsPage(_, { id, details }: { id: SubmissionId; details: Author }): Promise<Submission | null> {
             return wizard.saveDetailsPage(id, details);
         },
-        async uploadManuscript(_, variables: { file: FileUpload; id: SubmissionId }, context): Promise<null> {
+        async uploadManuscript(_, variables: { file: FileUpload; fileSize: number, id: SubmissionId }, context): Promise<null> {
             const { file, id: submissionId } = variables;
             const userId = context.userId;
             const { filename, mimetype, encoding, createReadStream } = await file;
 
             // TODO: create
-            await wizard.createFile(file, id: submissionId);
+            await wizard.saveManuscriptFile(submissionId, file, fileSize);
 
             // extract data
             const stream = file.createReadStream();
-
-            const fileContents = await new Promise((resolve, reject) => {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const chunks: Array<any> = [];
-                stream.on('data', chunk => {
-                    chunks.push(chunk);
-                });
-                stream.on('error', reject);
-                stream.on('end', () => {
-                    resolve(Buffer.concat(chunks));
-                });
-            });
 
             // validate
 

@@ -2,21 +2,10 @@
 import { KnexTableAdapter } from '../../knex-table-adapter';
 import { SubmissionId } from '../../submission/types';
 import { FileId } from '../types';
+import { FileDTO } from './types';
 
 interface FileRepository {
     create(dtoFile: Omit<FileDTO, 'updated'>): Promise<FileDTO>;
-}
-
-interface FileDTO {
-    id: FileId;
-    submissionId: SubmissionId;
-    status: string;
-    filename: string;
-    url: string;
-    mimeType: string;
-    size: number;
-    created: Date;
-    updated: Date;
 }
 
 type DatabaseEntry = {
