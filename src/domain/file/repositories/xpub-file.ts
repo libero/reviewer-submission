@@ -47,6 +47,28 @@ export default class XpubFileRepository implements FileRepository {
         return this.entryToDto(entryToSave);
     }
 
+    async findById(id: FileId): Promise<FileDTO | null> {
+        const query = this._query
+            .builder()
+            .select('id', 'manuscript_id', 'status', 'filename', 'url', 'mimeType', 'size', 'created', 'updated')
+            .from(this.TABLE_NAME)
+            .where({ id });
+
+        const files = await this._query.executor<DatabaseEntry[]>(query);
+        return files.length > 0 ? this.entryToDto(files[0]) : null;
+    }
+
+    async findBySubmssionId(id: SubmissionId): Promise<FileDTO | null> {
+        const query = this._query
+            .builder()
+            .select('id', 'manuscript_id', 'status', 'filename', 'url', 'mimeType', 'size', 'created', 'updated')
+            .from(this.TABLE_NAME)
+            .where({ manuscript_id: id });
+
+        const files = await this._query.executor<DatabaseEntry[]>(query);
+        return files.length > 0 ? this.entryToDto(files[0]) : null;
+    }
+
     dtoToEntry(dto: FileDTO): DatabaseEntry {
         const { submissionId, ...rest } = dto;
         return {
