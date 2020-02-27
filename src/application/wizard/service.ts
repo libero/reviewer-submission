@@ -74,6 +74,8 @@ export class WizardService {
         // TODO: resolve alongside scienceBeam
         const uploadPromise = this.fileService.upload(fileContents, savedFile);
 
+        const semanticExtractionPromise = this.semanticExtractionService.extractTitle(???);
+
         const include = 'title';
         const scienceBeamApiUrl = 'https://sciencebeam-texture.elifesciences.org/api/convert';
         const scienceBeamTimeout = 20000;
