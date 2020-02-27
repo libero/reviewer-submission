@@ -1,3 +1,9 @@
+type WizardData {
+    submission: Submission!
+    manuscriptFile: File
+    supportingFiles: [File]
+}
+
 type Mutation {
     saveDetailsPage(id: ID!, details: AuthorDetailsInput!): Submission!
     uploadManuscript(id: ID!, file: Upload!, fileSize: Int!): Submission!

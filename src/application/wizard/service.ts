@@ -1,10 +1,8 @@
 import { FileUpload } from 'graphql-upload';
-import axios from 'axios';
-import xml2js from 'xml2js';
-import { promisify } from 'util';
 import { SubmissionService } from '../../domain/submission';
 import { TeamService } from '../../domain/teams/services/team-service';
 import { FileService } from '../../domain/file/services/file-service';
+import { SemanticExtractionService } from '../../domain/semantic-extraction/services/semantic-extraction-service';
 import { AuthorTeamMember } from '../../domain/teams/repositories/types';
 import { Author, SubmissionId } from '../../domain/submission/types';
 import Submission from '../../domain/submission/services/models/submission';
@@ -16,15 +14,14 @@ export class WizardService {
         private readonly submissionService: SubmissionService,
         private readonly teamService: TeamService,
         private readonly fileService: FileService,
+        private readonly semanticExtractionService: SemanticExtractionService,
     ) {}
 
-    async saveDetailsPage(id: SubmissionId, details: Author): Promise<Submission | null> {
-        // needs permissions checks
-        const submission = await this.submissionService.get(id);
-        if (submission === null) {
-            throw new Error('No submission found');
-        }
-        const team = await this.teamService.find(id.value, 'author');
+    async saveDetailsPage(submissionId: SubmissionId, userId: string, details: Author): Promise<Submission | null> {
+        const submission = await this.submissionService.get(submissionId);
+        this.checkOwnership(submission, userId);
+
+        const team = await this.teamService.find(submissionId.value, 'author');
         const teamMembers: Array<AuthorTeamMember> = [
             {
                 alias: details,
@@ -40,14 +37,22 @@ export class WizardService {
             this.teamService.create({
                 role: 'author',
                 teamMembers,
-                objectId: id.value,
+                objectId: submissionId.value,
                 objectType: 'manuscript',
             });
         }
         return submission;
     }
 
-    async saveManuscriptFile(submissionId: SubmissionId, file: FileUpload, fileSize: number): Promise<File> {
+    async saveManuscriptFile(
+        submissionId: SubmissionId,
+        userId: string,
+        file: FileUpload,
+        fileSize: number,
+    ): Promise<File> {
+        const submission = await this.submissionService.get(submissionId);
+        this.checkOwnership(submission, userId);
+
         const { filename, mimetype: mimeType, createReadStream } = await file;
         const stream = createReadStream();
 
@@ -74,10 +79,24 @@ export class WizardService {
         // TODO: resolve alongside scienceBeam
         const uploadPromise = this.fileService.upload(fileContents, savedFile);
 
-        const semanticExtractionPromise = this.semanticExtractionService.extractTitle(fileContents, mimeType, filename);
+        const semanticExtractionPromise = this.semanticExtractionService.extractTitle(
+            fileContents,
+            mimeType,
+            filename,
+            submissionId,
+        );
 
-        const results = await Promise.all([uploadPromise, semanticExtractionPromise]);
+        await Promise.all([uploadPromise, semanticExtractionPromise]);
 
         return savedFile;
+    }
+
+    private async checkOwnership(submission: Submission, userId: string): Promise<void> {
+        if (submission === null) {
+            throw new Error('No submission found');
+        }
+        if (submission.createdBy !== userId) {
+            throw new Error('Invalid submission owner');
+        }
     }
 }
