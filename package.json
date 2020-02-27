@@ -56,7 +56,8 @@
         "reflect-metadata": "^0.1.12",
         "rimraf": "^2.6.2",
         "typesafe-uuid": "^1.0.2",
-        "uuid": "^3.3.2"
+        "uuid": "^3.3.2",
+        "xml2js": "^0.4.23"
     },
     "devDependencies": {
         "@libero/eslint-config": "^0.0.1",
@@ -71,6 +72,7 @@
         "@types/node-fetch": "^2.5.4",
         "@types/pino": "^5.15.4",
         "@types/uuid": "^3.4.5",
+        "@types/xml2js": "^0.4.5",
         "@typescript-eslint/eslint-plugin": "^2.8.0",
         "@typescript-eslint/parser": "^2.8.0",
         "axios": "^0.19.2",
