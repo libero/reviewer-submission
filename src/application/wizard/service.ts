@@ -76,7 +76,7 @@ export class WizardService {
 
         const semanticExtractionPromise = this.semanticExtractionService.extractTitle(fileContents, mimeType, filename);
 
-        const results = Promise.all([uploadPromise, semanticExtractionPromise]);
+        const results = await Promise.all([uploadPromise, semanticExtractionPromise]);
 
         return savedFile;
     }

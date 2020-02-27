@@ -6,12 +6,12 @@ import { promisify } from 'util';
 import { createKnexAdapter } from '../../knex-table-adapter';
 import XpubSemanticExtractionRepository from '../repositories/xpub-semantic-extraction';
 
-export class SubmissionService {
-    submissionRepository: XpubSemanticExtractionRepository;
+export class SemanticExtractionService {
+    semanticExtraction: XpubSemanticExtractionRepository;
 
     constructor(knex: Knex<{}, unknown[]>) {
         const adapter = createKnexAdapter(knex, 'public');
-        this.submissionRepository = new XpubSemanticExtractionRepository(adapter);
+        this.semanticExtraction = new XpubSemanticExtractionRepository(adapter);
     }
 
     async extractTitle(fileContents: Buffer, mimeType: string, filename: string): Promise<string> {
@@ -43,6 +43,7 @@ export class SubmissionService {
             titleArray = firstTitleGroup['article-title'];
             title = titleArray[0];
         }
+        await this.submissionRepository(title, subms);
         return title;
     }
 }
