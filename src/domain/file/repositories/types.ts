@@ -9,7 +9,7 @@ export interface FileDTO {
     url: string;
     mimeType: string;
     size: number;
-    updated: Date;
+    updated?: Date;
+    created?: Date;
     type: string;
-    label?: string;
 }
