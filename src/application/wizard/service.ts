@@ -48,7 +48,7 @@ export class WizardService {
         const { filename, mimetype: mimeType, createReadStream } = await file;
         const stream = createReadStream();
 
-        const fileContents = await new Promise((resolve, reject) => {
+        const fileContents: Buffer = await new Promise((resolve, reject) => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const chunks: Array<any> = [];
             stream.on('data', chunk => {
@@ -60,12 +60,17 @@ export class WizardService {
             });
         });
 
-        return await this.fileService.create(
+        const savedFile = await this.fileService.create(
             submissionId,
             filename,
             mimeType,
             fileSize,
             FileType.MANUSCRIPT_SOURCE_PENDING,
         );
+
+        // TODO: resolve alongside scienceBeam
+        const uploadPromise = this.fileService.upload(fileContents, savedFile);
+
+        return savedFile;
     }
 }
