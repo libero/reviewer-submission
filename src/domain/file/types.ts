@@ -1,10 +1,17 @@
 import { uuidType } from 'typesafe-uuid';
 
-// Status:
-// 'CREATED',
-// 'UPLOADED',
-// 'STORED',
-// 'CANCELLED'
+export enum FileStatus {
+    CREATED = 'CREATED',
+    UPLOADED = 'UPLOADED',
+    STORED = 'STORED',
+    CANCELLED = 'CANCELLED',
+}
+
+export enum FileType {
+    MANUSCRIPT_SOURCE_PENDING = 'MANUSCRIPT_SOURCE_PENDING',
+    MANUSCRIPT_SOURCE = 'MANUSCRIPT_SOURCE',
+    SUPPORTING_FILE = 'SUPPORTING_FILE',
+}
 
 export class FileId extends uuidType<'FileId'>() {}
 
@@ -21,4 +28,3 @@ export interface File {
     size: number;
     status: string;
 }
-

@@ -47,7 +47,7 @@ export default class XpubFileRepository implements FileRepository {
         return this.entryToDto(entryToSave);
     }
 
-    async findById(id: FileId): Promise<FileDTO | null> {
+    async findFileById(id: FileId): Promise<FileDTO | null> {
         const query = this._query
             .builder()
             .select('id', 'manuscript_id', 'status', 'filename', 'url', 'mimeType', 'size', 'created', 'updated')
@@ -58,7 +58,7 @@ export default class XpubFileRepository implements FileRepository {
         return files.length > 0 ? this.entryToDto(files[0]) : null;
     }
 
-    async findBySubmssionId(id: SubmissionId): Promise<FileDTO | null> {
+    async findManuscriptBySubmssionId(id: SubmissionId): Promise<FileDTO | null> {
         const query = this._query
             .builder()
             .select('id', 'manuscript_id', 'status', 'filename', 'url', 'mimeType', 'size', 'created', 'updated')
@@ -67,6 +67,21 @@ export default class XpubFileRepository implements FileRepository {
 
         const files = await this._query.executor<DatabaseEntry[]>(query);
         return files.length > 0 ? this.entryToDto(files[0]) : null;
+    }
+
+    async update(dtoFile: FileDTO): Promise<FileDTO> {
+        const file = await this.findFileById(dtoFile.id);
+        if (file === null) {
+            throw new Error(`Unable to find entry with id: ${dtoFile.id}`);
+        }
+        const entryToSave = { ...file, ...dtoFile, updated: new Date() };
+        const query = this._query
+            .builder()
+            .table(this.TABLE_NAME)
+            .update(entryToSave)
+            .where({ id: dtoFile.id });
+        await this._query.executor(query);
+        return entryToSave;
     }
 
     dtoToEntry(dto: FileDTO): DatabaseEntry {
