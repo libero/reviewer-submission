@@ -49,7 +49,7 @@ export class WizardService {
         userId: string,
         file: FileUpload,
         fileSize: number,
-    ): Promise<File> {
+    ): Promise<Submission> {
         const submission = await this.submissionService.get(submissionId);
         this.checkOwnership(submission, userId);
 
@@ -76,7 +76,6 @@ export class WizardService {
             FileType.MANUSCRIPT_SOURCE_PENDING,
         );
 
-        // TODO: resolve alongside scienceBeam
         const uploadPromise = this.fileService.upload(fileContents, savedFile);
 
         const semanticExtractionPromise = this.semanticExtractionService.extractTitle(
@@ -88,7 +87,7 @@ export class WizardService {
 
         await Promise.all([uploadPromise, semanticExtractionPromise]);
 
-        return savedFile;
+        return submission;
     }
 
     private async checkOwnership(submission: Submission, userId: string): Promise<void> {

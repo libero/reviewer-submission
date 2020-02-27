@@ -18,11 +18,10 @@ const resolvers = (wizard: WizardService): IResolvers => ({
             _,
             variables: { file: FileUpload; fileSize: number; id: SubmissionId },
             { userId },
-        ): Promise<null> {
+        ): Promise<Submission> {
             const { file, id: submissionId, fileSize } = variables;
-            await wizard.saveManuscriptFile(submissionId, userId, file, fileSize);
-
-            return null;
+            const submission = await wizard.saveManuscriptFile(submissionId, userId, file, fileSize);
+            return submission;
         },
         async uploadSupportingFile(_, variables: { file: FileUpload; id: SubmissionId }, context): Promise<null> {
             const { file, id: submissionId } = variables;
