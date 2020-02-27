@@ -14,8 +14,6 @@ export class FileService {
         this.fileRepository = new XpubFileRepository(adapter);
     }
 
-    // async create(file: Omit<FileDTO, 'id' | 'created' | 'updated'>): Promise<File> {
-    // async create(file: FileDTO): Promise<File> {
     async create(
         submissionId: SubmissionId,
         filename: string,
@@ -39,4 +37,6 @@ export class FileService {
 
         return new File(newFile);
     }
+
+    async upload() {}
 }

@@ -5,8 +5,8 @@ import { FileService } from '../../domain/file/services/file-service';
 import { AuthorTeamMember } from '../../domain/teams/repositories/types';
 import { Author, SubmissionId } from '../../domain/submission/types';
 import Submission from '../../domain/submission/services/models/submission';
-import { FileDTO } from 'src/domain/file/repositories/types';
-import { FileType } from 'src/domain/file/types';
+import { FileType } from '../../domain/file/types';
+import File from '../../domain/file/services/models/file';
 
 export class WizardService {
     constructor(
@@ -44,7 +44,7 @@ export class WizardService {
         return submission;
     }
 
-    async saveManuscriptFile(submissionId: SubmissionId, file: FileUpload, fileSize: number): Promise<File | null> {
+    async saveManuscriptFile(submissionId: SubmissionId, file: FileUpload, fileSize: number): Promise<File> {
         const { filename, mimetype: mimeType, createReadStream } = await file;
         const stream = createReadStream();
 
@@ -60,19 +60,12 @@ export class WizardService {
             });
         });
 
-        this.fileService.create(submissionId, filename, mimeType, fileSize, FileType.MANUSCRIPT_SOURCE_PENDING);
-        // {
-        //     id: FileId;
-        //     submissionId: SubmissionId;
-        //     status: string;
-        //     filename: string;
-        //     url: string;
-        //     mimeType: string;
-        //     size: number;
-        //     created: Date;
-        //     updated: Date;
-        //     type: string;
-        // })
-
+        return await this.fileService.create(
+            submissionId,
+            filename,
+            mimeType,
+            fileSize,
+            FileType.MANUSCRIPT_SOURCE_PENDING,
+        );
     }
 }
