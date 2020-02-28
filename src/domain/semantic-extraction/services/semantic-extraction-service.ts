@@ -26,7 +26,7 @@ export class SemanticExtractionService {
         const scienceBeamApiUrl = 'https://sciencebeam-texture.elifesciences.org/api/convert';
         const scienceBeamTimeout = 20000;
         let title = '';
-        let titleArray = 'timed-out';
+        let titleArray;
         const xmlBuffer = await axios.post(scienceBeamApiUrl, {
             body: fileContents,
             qs: {

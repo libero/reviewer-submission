@@ -39,7 +39,7 @@ export default class Submission {
         this.articleType = this.articleTypeFromString(articleType);
         this.status = status;
         this.createdBy = createdBy;
-        this.manuscriptFile = this.manuscriptFile;
+        this.manuscriptFile = manuscriptFile;
     }
 
     private articleTypeFromString(type: string): ArticleType {
