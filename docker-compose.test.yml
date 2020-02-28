@@ -44,6 +44,7 @@ services:
       /usr/bin/mc config host add submission http://s3:9000 minio minio123;
       /usr/bin/mc rm -r --force submission/test;
       /usr/bin/mc mb submission/test;
+      /usr/bin/mc policy set download submission/test;
       /usr/bin/mc policy set public submission/test;
       exit 0;
       "

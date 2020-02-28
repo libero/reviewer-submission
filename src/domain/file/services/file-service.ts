@@ -51,15 +51,16 @@ export class FileService {
         return new File(newFile);
     }
 
-    async upload(fileContents: Buffer, file: File): Promise<S3.ManagedUpload.SendData> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async upload(fileContents: Buffer, file: File): Promise<any> {
         const { url, id, mimeType, size } = file;
         return this.s3
-            .upload({
+            .putObject({
                 Bucket: this.bucket,
                 Key: `${url}/${id}`,
-                Body: fileContents,
+                Body: fileContents.toString(),
                 ContentType: mimeType,
-                ContentLength: size,
+                // ContentLength: size, // this makes it break
                 ACL: 'private',
             })
             .promise();

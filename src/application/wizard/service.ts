@@ -77,14 +77,16 @@ export class WizardService {
 
         const uploadPromise = this.fileService.upload(fileContents, manuscriptFile);
 
-        const semanticExtractionPromise = this.semanticExtractionService.extractTitle(
-            fileContents,
-            mimeType,
-            filename,
-            submissionId,
-        );
+        // const semanticExtractionPromise = this.semanticExtractionService.extractTitle(
+        //     fileContents,
+        //     mimeType,
+        //     filename,
+        //     submissionId,
+        // );
 
-        await Promise.all([uploadPromise, semanticExtractionPromise]);
+        // await Promise.all([uploadPromise, semanticExtractionPromise]);
+
+        await uploadPromise;
 
         // this is not elegant but its the best we can do given the fact that files are now a concept
         // outside of Submission, so we patch it in ¯\_(ツ)_/¯
