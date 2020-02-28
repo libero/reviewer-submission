@@ -58,7 +58,7 @@ const init = async (): Promise<void> => {
     const srvSurvey = new SurveyService(knexConnection);
     const srvUser = new UserService(config.user_adapter_url);
     const srvTeam = new TeamService(knexConnection);
-    const srvFile = new FileService(knexConnection);
+    const srvFile = new FileService(knexConnection, config.s3);
     const srvExtractionService = new SemanticExtractionService(knexConnection);
 
     // init application services

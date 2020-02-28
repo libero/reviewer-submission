@@ -1,6 +1,13 @@
 import { readFileSync } from 'fs';
 import { Config as KnexConfig } from 'knex';
 
+export interface S3Config {
+    accessKeyId: string;
+    secretAccessKey: string;
+    s3ForcePathStyle: boolean;
+    fileBucket: string;
+    awsEndPoint: string;
+}
 export interface Config {
     port: number;
     knex: KnexConfig;
@@ -8,6 +15,7 @@ export interface Config {
     authentication_jwt_secret: string;
     max_ql_complexity: number;
     max_ql_depth: number;
+    s3: S3Config;
 }
 
 const configPath = process.env.CONFIG_PATH ? process.env.CONFIG_PATH : '/etc/reviewer/config.json';
