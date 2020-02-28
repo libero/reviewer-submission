@@ -1,6 +1,6 @@
 import * as Knex from 'knex';
 import uuid from 'uuid';
-import S3 from 'aws-sdk/clients/s3';
+import * as S3 from 'aws-sdk/clients/s3';
 import { createKnexAdapter } from '../../knex-table-adapter';
 import XpubFileRepository from '../repositories/xpub-file';
 import { FileId, FileType, FileStatus } from '../types';
@@ -54,7 +54,7 @@ export class FileService {
 
     async upload(fileContents: Buffer, file: File): Promise<S3.ManagedUpload.SendData> {
         const { url, id, mimeType, size } = file;
-        return s3
+        return this.s3
             .upload({
                 Bucket: 'config.bucket', // TODO: use config.
                 Key: `${url}/${id}`,
