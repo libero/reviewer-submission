@@ -24,6 +24,7 @@ export default class Submission {
         articleType,
         status,
         createdBy,
+        manuscriptFile,
     }: {
         id: SubmissionId;
         title: string;
