@@ -82,3 +82,24 @@ jobs:
         run: make setup
       - name: Start services & Integration tests
         run: make test_integration
+  deploy-image:
+    runs-on: ubuntu-latest
+    needs: browser-test
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          submodules: true
+      - name: Download Docker image artifact
+        uses: actions/download-artifact@v1
+        with:
+          name: docker-image
+      - name: Load Docker image
+        run: |
+          gunzip docker-image/reviewer-submission.tar.gz
+          docker load -i docker-image/reviewer-submission.tar
+      - name: Push image
+        run: .scripts/github/push-image.sh reviewer-submission
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
