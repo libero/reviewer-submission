@@ -84,7 +84,7 @@ jobs:
         run: make test_integration
   deploy-image:
     runs-on: ubuntu-latest
-    needs: browser-test
+    needs: integration-test
     if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v1
