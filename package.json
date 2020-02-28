@@ -76,6 +76,7 @@
         "@typescript-eslint/eslint-plugin": "^2.8.0",
         "@typescript-eslint/parser": "^2.8.0",
         "axios": "^0.19.2",
+        "form-data": "^3.0.0",
         "graphql-schema-linter": "^0.2.4",
         "husky": "^3.0.9",
         "jest": "^24.9.0",

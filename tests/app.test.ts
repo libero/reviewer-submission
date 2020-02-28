@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { sign } from 'jsonwebtoken';
+import * as FormData from 'form-data';
 import config from '../src/config';
 
 const jwtToken = sign({ sub: '123' }, config.authentication_jwt_secret);
@@ -23,7 +24,6 @@ describe('Application Integration Tests', () => {
             { headers: { Authorization: `Bearer ${jwtToken}` } },
         );
         expect(response.status).toBe(200);
-        console.log(JSON.stringify(response.data.errors, null, 2));
         expect(response.data.data.startSubmission.id).toHaveLength(36);
     });
 
@@ -102,5 +102,54 @@ describe('Application Integration Tests', () => {
                 expect(e.response.data.errors[0].message).toBe("'QueryIsTooDeep' exceeds maximum operation depth of 5");
                 expect(e.response.status).toBe(400);
             });
+    });
+
+    it.only('uploads a manuscript file', async () => {
+        const buffer = Buffer.from('Hello World');
+        const body = new FormData();
+
+        const loginResponse = await axios.post(
+            'http://localhost:3000/graphql',
+            {
+                query: `
+                    mutation StartSubmission($articleType: String!) {
+                        startSubmission(articleType: $articleType) {
+                            id
+                        }
+                    }
+                `,
+                variables: {
+                    articleType: 'researchArticle',
+                },
+            },
+            { headers: { Authorization: `Bearer ${jwtToken}` } },
+        );
+
+        const id = loginResponse.data.data.startSubmission.id;
+        const query = `mutation UploadManuscript($id: ID!, $file: Upload!, $fileSize: Int!) {
+            uploadManuscript(id: $id, file: $file, fileSize: $fileSize) {
+                id
+            }
+        }`;
+
+        const operations = {
+            query,
+            variables: {
+                id,
+                file: null,
+                fileSize: 2,
+            },
+        };
+
+        body.append('operations', JSON.stringify(operations));
+        body.append('map', '{ "1": ["variables.file"] }');
+        body.append('1', 'a', { filename: 'a.txt' });
+
+        const response = await axios.post('http://localhost:3000/graphql', body, {
+            headers: { Authorization: `Bearer ${jwtToken}`, ...body.getHeaders() },
+        });
+
+        expect(response.status).toBe(200);
+        expect(response.data.data.uploadManuscript.id).toBe(id);
     });
 });
