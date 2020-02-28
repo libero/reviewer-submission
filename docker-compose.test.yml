@@ -17,6 +17,22 @@ services:
       interval: 3s
       timeout: 10s
       retries: 3
+
+  s3:
+    image: minio/minio:latest
+    container_name: test_s3
+    ports:
+      - "9004:9000"
+    environment:
+      MINIO_ACCESS_KEY: minio
+      MINIO_SECRET_KEY: minio123
+    command: server /data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 2s
+      timeout: 30s
+      retries: 10
+
   postgres:
     image: liberoadmin/reviewer-xpub-postgres:latest
     container_name: test_postgres
