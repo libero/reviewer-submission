@@ -167,4 +167,40 @@ describe('saveDetailsPage', () => {
             ],
         });
     });
+
+    it('should throw when userId is not owner', async () => {
+        const userId = '89e0aec8-b9fc-4413-8a37-5cc775edqe27';
+        const submissionServiceMock = ({
+            get: jest.fn().mockImplementationOnce(() => ({
+                createdBy: '89e0aec8-b9fc-4413-8a37-5cc775edqe67',
+            })),
+        } as unknown) as SubmissionService;
+        const existingTeam = {
+            id: TeamId.fromUuid('cda3aef6-0034-4620-b843-1d15b7e815d1'),
+        };
+        const teamServiceMock = ({
+            find: jest.fn().mockImplementationOnce(() => existingTeam),
+            update: jest.fn(),
+            create: jest.fn(),
+        } as unknown) as TeamService;
+
+        const fileServiceMock = (jest.fn() as unknown) as FileService;
+        const semanticExtractionServiceMock = (jest.fn() as unknown) as SemanticExtractionService;
+
+        const wizardService = new WizardService(
+            submissionServiceMock,
+            teamServiceMock,
+            fileServiceMock,
+            semanticExtractionServiceMock,
+        );
+
+        await expect(
+            wizardService.saveDetailsPage(SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'), userId, {
+                firstName: 'John',
+                lastName: 'Smith',
+                email: 'john.smith@example.com',
+                aff: 'aff',
+            }),
+        ).rejects.toThrow();
+    });
 });
