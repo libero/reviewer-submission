@@ -1,5 +1,5 @@
 import * as Knex from 'knex';
-import uuid from 'uuid';
+import { v4 as uuid } from 'uuid';
 import * as S3 from 'aws-sdk/clients/s3';
 import { createKnexAdapter } from '../../knex-table-adapter';
 import XpubFileRepository from '../repositories/xpub-file';

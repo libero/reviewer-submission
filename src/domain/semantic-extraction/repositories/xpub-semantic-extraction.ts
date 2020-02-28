@@ -14,7 +14,7 @@ type DatabaseEntry = {
 };
 
 export default class XpubSemanticExtractionRepository implements SemanticExtractionRepository {
-    private readonly TABLE_NAME = 'semantic_expression';
+    private readonly TABLE_NAME = 'semantic_extraction';
 
     public constructor(private readonly _query: KnexTableAdapter) {}
 

@@ -125,6 +125,7 @@ const init = async (): Promise<void> => {
         },
         formatError: (error: GraphQLError): GraphQLFormattedError => {
             // @todo: revisit how we handle errors
+            logger.error(error.message, (error.originalError && error.originalError.stack) || '');
             return error;
         },
     });

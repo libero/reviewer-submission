@@ -14,14 +14,14 @@ type DatabaseEntry = {
     status: string;
     filename: string;
     url: string;
-    mimeType: string;
+    mime_type: string;
     size: number;
     created: Date;
     updated: Date;
 };
 
 export default class XpubFileRepository implements FileRepository {
-    private readonly TABLE_NAME = 'manuscript';
+    private readonly TABLE_NAME = 'file';
 
     public constructor(private readonly _query: KnexTableAdapter) {}
 
@@ -74,18 +74,20 @@ export default class XpubFileRepository implements FileRepository {
     }
 
     dtoToEntry(dto: FileDTO): DatabaseEntry {
-        const { submissionId, ...rest } = dto;
+        const { submissionId, mimeType, ...rest } = dto;
         return {
             ...rest,
             manuscript_id: submissionId,
+            mime_type: mimeType,
         } as DatabaseEntry;
     }
 
     entryToDto(record: DatabaseEntry): FileDTO {
-        const { manuscript_id, ...rest } = record;
+        const { manuscript_id, mime_type, ...rest } = record;
         return {
             ...rest,
             submissionId: manuscript_id,
+            mimeType: mime_type,
         } as FileDTO;
     }
 }

@@ -1,5 +1,5 @@
 import * as Knex from 'knex';
-import uuid from 'uuid';
+import { v4 as uuid } from 'uuid';
 import axios from 'axios';
 import xml2js from 'xml2js';
 import { promisify } from 'util';
