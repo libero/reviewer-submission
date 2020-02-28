@@ -7,7 +7,6 @@ import { AuthorTeamMember } from '../../domain/teams/repositories/types';
 import { Author, SubmissionId } from '../../domain/submission/types';
 import Submission from '../../domain/submission/services/models/submission';
 import { FileType } from '../../domain/file/types';
-import File from '../../domain/file/services/models/file';
 
 export class WizardService {
     constructor(
@@ -68,7 +67,7 @@ export class WizardService {
             });
         });
 
-        const savedFile = await this.fileService.create(
+        const manuscriptFile = await this.fileService.create(
             submissionId,
             filename,
             mimeType,
@@ -76,7 +75,7 @@ export class WizardService {
             FileType.MANUSCRIPT_SOURCE_PENDING,
         );
 
-        const uploadPromise = this.fileService.upload(fileContents, savedFile);
+        const uploadPromise = this.fileService.upload(fileContents, manuscriptFile);
 
         const semanticExtractionPromise = this.semanticExtractionService.extractTitle(
             fileContents,
@@ -87,10 +86,12 @@ export class WizardService {
 
         await Promise.all([uploadPromise, semanticExtractionPromise]);
 
-        return submission;
+        // this is not elegant but its the best we can do given the fact that files are now a concept
+        // outside of Submission, so we patch it in ¯\_(ツ)_/¯
+        return new Submission({ ...submission, manuscriptFile });
     }
 
-    private async checkOwnership(submission: Submission, userId: string): Promise<void> {
+    private checkOwnership(submission: Submission, userId: string): void {
         if (submission === null) {
             throw new Error('No submission found');
         }

@@ -1,9 +1,31 @@
+scalar Upload
+
 type Submission {
     id: ID!
     title: String!
     updated: String!
     articleType: String!
     author: AuthorDetails!
+    manuscriptFile: File
+    supportingFiles: [File]
+    coverLetter: String
+    suggestions: [String]!
+}
+
+type File {
+    id: ID!
+    created: DateTime!
+    updated: DateTime
+    type: String
+    label: String
+    filename: String
+    url: String
+    mimeType: String
+    size: Int
+    lastChangeDate: DateTime!
+    lastChangeUser: User!
+    status: String!
+    downloadLink: String!
 }
 
 type AuthorDetails {
