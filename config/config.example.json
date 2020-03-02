@@ -16,7 +16,7 @@
         "accessKeyId": "minio",
         "secretAccessKey": "minio123",
         "s3ForcePathStyle": true,
-        "fileBucket": "test",
+        "fileBucket": "submission/test",
         "awsEndPoint": "http://s3:9004"
     },
     "authentication_jwt_secret": "super_secret_jam",
