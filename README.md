@@ -26,10 +26,18 @@ make setup
 yarn run start:dev
 ```
 
+## Run integration tests
+
+Build the docker container first
+```sh
+make build
+make test_integration
+```
 
 ## Run integration tests locally
 
-This can be handy when debugging the submission service and avoid rebuilds
+This can be handy when debugging the submission service and avoid rebuilding the container every
+time you make a change.
 
 Start the services
 ```sh
