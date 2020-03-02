@@ -3,6 +3,7 @@ import { SubmissionService } from '../../domain/submission';
 import { TeamService } from '../../domain/teams/services/team-service';
 import { SubmissionId } from '../../domain/submission/types';
 import { TeamId } from '../../domain/teams/types';
+import { PermissionService } from '../permission/service';
 
 describe('saveDetailsPage', () => {
     it('should throw if submission not found', async () => {
@@ -15,7 +16,9 @@ describe('saveDetailsPage', () => {
             create: jest.fn(),
         } as unknown) as TeamService;
 
-        const wizardService = new WizardService(submissionServiceMock, teamServiceMock);
+        const permissionService = new PermissionService();
+
+        const wizardService = new WizardService(submissionServiceMock, teamServiceMock, permissionService);
         await expect(
             wizardService.saveDetailsPage(SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'), {
                 firstName: 'John',

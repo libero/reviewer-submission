@@ -19,6 +19,11 @@ export class SubmissionService {
         return submissions.map((dto: SubmissionDTO) => new Submission(dto));
     }
 
+    async findByUserId(userId: string): Promise<Submission[]> {
+        const submissions = await this.submissionRepository.findByUserId(userId);
+        return submissions.map((dto: SubmissionDTO) => new Submission(dto));
+    }
+
     async create(articleType: string, userId: string): Promise<Submission> {
         const id = SubmissionId.fromUuid(uuid());
         const submission = new Submission({

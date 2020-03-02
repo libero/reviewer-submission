@@ -8,6 +8,14 @@ export class UserService {
     }
 
     async getCurrentUser(header: string): Promise<User> {
-        return this.restUserRepository.getCurrentUser(header);
+        const user = await this.restUserRepository.getCurrentUser(header);
+        switch (user.role) {
+            case 'executive':
+                user.role = 'staff';
+                break;
+            default:
+                user.role = 'user';
+        }
+        return user;
     }
 }

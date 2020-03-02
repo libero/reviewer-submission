@@ -22,6 +22,7 @@ import { DashboardService } from './application/dashboard/service';
 import { WizardService } from './application/wizard/service';
 import { WizardResolvers } from './application/wizard/resolvers';
 import { TeamService } from './domain/teams/services/team-service';
+import { PermissionService } from './application/permission/service';
 
 // Apollo server express does not export this, but its express
 export interface ExpressContext {
@@ -58,15 +59,16 @@ const init = async (): Promise<void> => {
     const srvTeam = new TeamService(knexConnection);
 
     // init application services
-    const srvDashboard = new DashboardService(srvSubmission);
-    const srvWizard = new WizardService(srvSubmission, srvTeam);
+    const srvPermission = new PermissionService();
+    const srvDashboard = new DashboardService(srvSubmission, srvPermission);
+    const srvWizard = new WizardService(srvSubmission, srvTeam, srvPermission);
 
     // init resolvers
     const resolvers = [
-        DashboardResolvers(srvDashboard),
+        DashboardResolvers(srvDashboard, srvUser),
         SurveyResolvers(srvSurvey),
         UserResolvers(srvUser),
-        WizardResolvers(srvWizard),
+        WizardResolvers(srvWizard, srvUser),
     ];
 
     // best to mount helmet so soon as possible to ensure headers are set: defaults - https://www.npmjs.com/package/helmet#how-it-works
