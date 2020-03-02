@@ -7,6 +7,7 @@ import { createKnexAdapter } from '../../knex-table-adapter';
 import XpubSemanticExtractionRepository from '../repositories/xpub-semantic-extraction';
 import { SemanticExtractionId } from '../types';
 import { SubmissionId } from 'src/domain/submission/types';
+import { InfraLogger as logger } from '../../../logger';
 
 export class SemanticExtractionService {
     semanticExtractionRepository: XpubSemanticExtractionRepository;
@@ -60,7 +61,7 @@ export class SemanticExtractionService {
                 value: title,
             });
         } catch (e) {
-            console.log('issue with semantic extraction');
+            logger.error('issue with semantic extraction');
         }
 
         return title;
