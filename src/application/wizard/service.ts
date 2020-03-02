@@ -80,7 +80,7 @@ export class WizardService {
         manuscriptFile.setTypeToSource();
         manuscriptFile.setStatusToStored();
 
-        this.fileService.update({ ...manuscriptFile });
+        await this.fileService.update({ ...manuscriptFile });
 
         const semanticExtractionPromise = this.semanticExtractionService.extractTitle(
             fileContents,
