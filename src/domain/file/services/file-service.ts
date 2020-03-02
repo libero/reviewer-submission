@@ -56,7 +56,7 @@ export class FileService {
     async upload(fileContents: Buffer, file: File): Promise<any> {
         const { url, id, mimeType } = file;
         return this.s3
-            .putObject({
+            .upload({
                 Bucket: this.bucket,
                 Key: `${url}/${id}`,
                 Body: fileContents.toString(),
