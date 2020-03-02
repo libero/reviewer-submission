@@ -77,6 +77,11 @@ export class WizardService {
 
         const uploadPromise = this.fileService.upload(fileContents, manuscriptFile);
 
+        manuscriptFile.setTypeToSource();
+        manuscriptFile.setStatusToStored();
+
+        this.fileService.update({ ...manuscriptFile });
+
         const semanticExtractionPromise = this.semanticExtractionService.extractTitle(
             fileContents,
             mimeType,

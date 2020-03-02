@@ -1,4 +1,4 @@
-import { FileId } from '../../types';
+import { FileId, FileType, FileStatus } from '../../types';
 import { SubmissionId } from '../../../submission/types';
 import { FileDTO } from '../../repositories/types';
 
@@ -25,5 +25,31 @@ export default class File {
         this.mimeType = mimeType;
         this.size = size;
         this.status = status;
+    }
+
+    public setTypeToSource(): void {
+        if (this.type === FileType.SUPPORTING_FILE) {
+            throw new Error('Cannot set to source');
+        }
+
+        if (this.type === FileType.MANUSCRIPT_SOURCE_PENDING) {
+            this.type = FileType.MANUSCRIPT_SOURCE;
+        }
+    }
+
+    public setStatusToUploaded(): void {
+        if (this.type === FileStatus.CREATED) {
+            this.type = FileStatus.UPLOADED;
+        }
+    }
+
+    public setStatusToStored(): void {
+        if (this.type === FileStatus.CREATED || FileStatus.UPLOADED) {
+            this.type = FileStatus.STORED;
+        }
+    }
+
+    public setStatusToCancelled(): void {
+        this.type = FileStatus.CANCELLED;
     }
 }

@@ -7,6 +7,7 @@ import { FileId, FileType, FileStatus } from '../types';
 import File from './models/file';
 import { SubmissionId } from '../../../domain/submission/types';
 import { S3Config } from '../../../config';
+import { FileDTO } from '../repositories/types';
 
 export class FileService {
     fileRepository: XpubFileRepository;
@@ -50,6 +51,10 @@ export class FileService {
         });
 
         return new File(newFile);
+    }
+
+    async update(fileDTO: FileDTO): Promise<FileDTO> {
+        return this.fileRepository.update(fileDTO);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
