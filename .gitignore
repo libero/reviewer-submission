@@ -79,3 +79,5 @@ config/*
 !config/newrelic.example.js
 
 lint-schemas/
+
+tests/.minio
