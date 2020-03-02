@@ -17,8 +17,8 @@ services:
     volumes:
       - ./:/src/:z
       - ./config/:/etc/reviewer/:z
-    # networks:
-    #   - "infra_api"
+    networks:
+      - "infra_api"
 
   postgres:
     image: liberoadmin/reviewer-xpub-postgres:latest
