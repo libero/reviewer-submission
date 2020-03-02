@@ -7,7 +7,6 @@ export interface SemanticExtractionRepository {
 
 export type SemanticExtractionDTO = {
     id: SemanticExtractionId;
-    createdBy?: string;
     updated?: Date;
     created?: Date;
     submissionId: SubmissionId;

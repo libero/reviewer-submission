@@ -29,11 +29,10 @@ export default class XpubSemanticExtractionRepository implements SemanticExtract
     }
 
     private dtoToEntry(dto: SemanticExtractionDTO): DatabaseEntry {
-        const { submissionId, createdBy, fieldName, ...rest } = dto;
+        const { submissionId, fieldName, ...rest } = dto;
         return {
             ...rest,
             manuscript_id: submissionId,
-            created_by: createdBy,
             field_name: fieldName,
         } as DatabaseEntry;
     }
