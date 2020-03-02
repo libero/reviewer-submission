@@ -9,6 +9,7 @@ LOAD_SCHEMA = psql -U postgres -f xpub-schema.sql
 
 setup:
 	if [ ! -e ./config/config.json ] ; then cp config/config.example.json config/config.json ; fi
+	if [ ! -e ./config/config.local.json ] ; then cp config/config.local.example.json config/config.local.json ; fi
 	git submodule update --init --recursive
 	$(MAKE) get_deps
 

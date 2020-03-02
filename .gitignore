@@ -76,6 +76,7 @@ data.db
 # config
 config/*
 !config/config.example.json
+!config/config.local.example.json
 !config/newrelic.example.js
 
 lint-schemas/
