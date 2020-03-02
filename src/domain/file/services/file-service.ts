@@ -21,6 +21,7 @@ export class FileService {
             secretAccessKey: s3config.secretAccessKey,
             apiVersion: '2006-03-01',
             signatureVersion: 'v4',
+            s3ForcePathStyle: s3config.s3ForcePathStyle,
         };
         const s3Options = s3config.awsEndPoint ? { ...defaultOptions, endpoint: s3config.awsEndPoint } : defaultOptions;
         this.bucket = s3config.fileBucket;
