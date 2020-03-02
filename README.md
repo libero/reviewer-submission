@@ -42,7 +42,7 @@ time you make a change.
 Start the services
 ```sh
 docker-compose -f docker-compose.test.yml up -d postgres s3
-docker-compose -f docker-compose.test.yml up -d postgres s3_create-bucket
+docker-compose -f docker-compose.test.yml up -d s3_create-bucket
 yarn run start:dev
 ```
 
