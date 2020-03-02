@@ -27,6 +27,7 @@ export class SemanticExtractionService {
         const scienceBeamTimeout = 20000;
         let title = '';
         let titleArray;
+
         try {
             const xmlBuffer = await axios.post(scienceBeamApiUrl, {
                 body: fileContents,
@@ -51,16 +52,16 @@ export class SemanticExtractionService {
                 titleArray = firstTitleGroup['article-title'];
                 title = titleArray[0];
             }
+
+            await this.semanticExtractionRepository.create({
+                id: SemanticExtractionId.fromUuid(uuid()),
+                submissionId,
+                fieldName: 'title',
+                value: title,
+            });
         } catch (e) {
             console.log('issue with semantic extraction');
         }
-
-        await this.semanticExtractionRepository.create({
-            id: SemanticExtractionId.fromUuid(uuid()),
-            submissionId,
-            fieldName: 'title',
-            value: title,
-        });
 
         return title;
     }
