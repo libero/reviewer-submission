@@ -55,18 +55,6 @@ export class WizardService {
         const { filename, mimetype: mimeType, createReadStream } = await file;
         const stream = createReadStream();
 
-        const fileContents: Buffer = await new Promise((resolve, reject) => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const chunks: Array<any> = [];
-            stream.on('data', chunk => {
-                chunks.push(chunk);
-            });
-            stream.on('error', reject);
-            stream.on('end', () => {
-                resolve(Buffer.concat(chunks));
-            });
-        });
-
         const manuscriptFile = await this.fileService.create(
             submissionId,
             filename,
@@ -75,12 +63,17 @@ export class WizardService {
             FileType.MANUSCRIPT_SOURCE_PENDING,
         );
 
+        const fileContents: Buffer = await new Promise((resolve, reject) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const chunks: Array<any> = [];
+            stream.on('data', chunk => chunks.push(chunk));
+            stream.on('error', reject);
+            stream.on('end', () => resolve(Buffer.concat(chunks)));
+        });
+
         const uploadPromise = this.fileService.upload(fileContents, manuscriptFile);
 
-        manuscriptFile.setTypeToSource();
         manuscriptFile.setStatusToStored();
-
-        await this.fileService.update({ ...manuscriptFile });
 
         const semanticExtractionPromise = this.semanticExtractionService.extractTitle(
             fileContents,
@@ -89,7 +82,20 @@ export class WizardService {
             submissionId,
         );
 
-        await Promise.all([uploadPromise, semanticExtractionPromise]);
+        try {
+            await Promise.all([uploadPromise, semanticExtractionPromise]);
+        } catch (e) {
+            manuscriptFile.setStatusToCancelled();
+        }
+
+        // @todo: decide what to do with previous manuscript
+        // option 1: client needs to call delete manuscript mutation and we assume only one current manuscript
+        // option 2: handle this in this mutation
+
+        manuscriptFile.setTypeToSource();
+
+        await this.fileService.update({ ...manuscriptFile });
+
         // this is not elegant but its the best we can do given the fact that files are now a concept
         // outside of Submission, so we patch it in ¯\_(ツ)_/¯
         return new Submission({ ...submission, manuscriptFile });
