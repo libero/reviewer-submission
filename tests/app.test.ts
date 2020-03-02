@@ -104,7 +104,7 @@ describe('Application Integration Tests', () => {
             });
     });
 
-    it.only('uploads a manuscript file', async () => {
+    it('uploads a manuscript file', async () => {
         const body = new FormData();
 
         const loginResponse = await axios.post(
@@ -124,7 +124,6 @@ describe('Application Integration Tests', () => {
             { headers: { Authorization: `Bearer ${jwtToken}` } },
         );
 
-        console.log('loginResponse.data', loginResponse.data);
 
         const id = loginResponse.data.data.startSubmission.id;
         const query = `mutation UploadManuscript($id: ID!, $file: Upload!, $fileSize: Int!) {
