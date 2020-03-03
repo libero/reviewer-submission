@@ -30,6 +30,7 @@ yarn run start:dev
 
 Build the docker container first
 ```sh
+make setup
 make build
 make test_integration
 ```
