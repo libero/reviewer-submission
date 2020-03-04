@@ -20,5 +20,9 @@
         "awsEndPoint": "http://localhost:9004"
     },
     "authentication_jwt_secret": "super_secret_jam",
-    "user_adapter_url": "http://localhost:3003/current-user"
+    "user_adapter_url": "http://localhost:3003/current-user",
+    "science_beam": {
+        "api_url": "http://reviewer-mocks:3003/science-beam/convert",
+        "timeout": 20000
+    }
 }

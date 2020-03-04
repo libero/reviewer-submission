@@ -6,15 +6,18 @@ import { promisify } from 'util';
 import { createKnexAdapter } from '../../knex-table-adapter';
 import XpubSemanticExtractionRepository from '../repositories/xpub-semantic-extraction';
 import { SemanticExtractionId } from '../types';
-import { SubmissionId } from 'src/domain/submission/types';
 import { InfraLogger as logger } from '../../../logger';
+import { SubmissionId } from '../../submission/types';
+import { ScienceBeamConfig } from '../../../config';
 
 export class SemanticExtractionService {
     semanticExtractionRepository: XpubSemanticExtractionRepository;
+    scienceBeamConfig: ScienceBeamConfig;
 
-    constructor(knex: Knex<{}, unknown[]>) {
+    constructor(knex: Knex<{}, unknown[]>, scienceBeamConfig: ScienceBeamConfig) {
         const adapter = createKnexAdapter(knex, 'public');
         this.semanticExtractionRepository = new XpubSemanticExtractionRepository(adapter);
+        this.scienceBeamConfig = scienceBeamConfig;
     }
 
     async extractTitle(
@@ -24,20 +27,18 @@ export class SemanticExtractionService {
         submissionId: SubmissionId,
     ): Promise<string> {
         const include = 'title';
-        const scienceBeamApiUrl = 'https://sciencebeam-texture.elifesciences.org/api/convert';
-        const scienceBeamTimeout = 20000;
         let title = '';
         let titleArray;
 
         try {
-            const xmlBuffer = await axios.post(scienceBeamApiUrl, {
+            const xmlBuffer = await axios.post(this.scienceBeamConfig.api_url, {
                 body: fileContents,
                 qs: {
                     filename,
                     include,
                 },
                 headers: { 'content-type': mimeType },
-                timeout: scienceBeamTimeout,
+                timeout: this.scienceBeamConfig.timeout,
             });
 
             const parseString = promisify(xml2js.parseString);
