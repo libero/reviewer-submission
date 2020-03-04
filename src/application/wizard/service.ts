@@ -52,7 +52,10 @@ export class WizardService {
         const submission = await this.submissionService.get(submissionId);
         this.checkOwnership(submission, userId);
 
+        console.log('blah blah blah');
         const { filename, mimetype: mimeType, createReadStream } = await file;
+        console.log('filename', createReadStream);
+        console.log('mimeType', mimeType);
         const stream = createReadStream();
 
         const manuscriptFile = await this.fileService.create(

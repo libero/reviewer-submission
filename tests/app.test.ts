@@ -3,40 +3,23 @@ import { sign } from 'jsonwebtoken';
 import config from '../src/config';
 import ApolloClient from 'apollo-client';
 import { InMemoryCache } from 'apollo-cache-inmemory';
-import { ApolloLink, FetchResult } from 'apollo-link';
-import { onError } from 'apollo-link-error';
-import { HttpLink } from 'apollo-link-http';
-import { setContext } from 'apollo-link-context';
+import { FetchResult } from 'apollo-link';
+import { createUploadLink } from 'apollo-upload-client';
 import gql from 'graphql-tag';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const Blob = require('cross-blob');
 
 const jwtToken = sign({ sub: '123' }, config.authentication_jwt_secret);
 
-const authLink = setContext((_, { headers }) => {
-    return {
-        headers: {
-            ...headers,
-            authorization: `Bearer ${jwtToken}`,
-        },
-    };
-});
-
 const createApolloClient = (): ApolloClient<unknown> => {
     return new ApolloClient<unknown>({
-        link: ApolloLink.from([
-            onError(({ graphQLErrors, networkError }) => {
-                if (graphQLErrors)
-                    graphQLErrors.forEach(({ message, locations, path }) =>
-                        console.log(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`),
-                    );
-                if (networkError) console.log(`[Network error]: ${networkError}`);
-            }),
-            authLink.concat(
-                new HttpLink({
-                    uri: 'http://localhost:3000/graphql',
-                    credentials: 'same-origin',
-                }),
-            ),
-        ]),
+        link: createUploadLink({
+            uri: 'http://localhost:3000/graphql',
+            headers: {
+                authorization: `Bearer ${jwtToken}`,
+            },
+        }),
         cache: new InMemoryCache(),
     });
 };
@@ -59,8 +42,8 @@ const startSubmission = async (apollo: ApolloClient<unknown>, articleType: strin
 };
 
 const uploadManuscript = async (apollo: ApolloClient<unknown>, id: string): Promise<FetchResult> => {
-    const buffer = Buffer.from('test');
-    const file = Uint8Array.from(buffer).buffer;
+    const file = new Blob(['hi', 'constructing', 'a', 'blob'], { type: 'text/plain' });
+    file.name = 'test.txt';
     const fileSize = 2;
     const uploadManuscript = gql`
         mutation UploadManuscript($id: ID!, $file: Upload!, $fileSize: Int!) {
@@ -135,7 +118,7 @@ describe('Application Integration Tests', () => {
             });
     });
 
-    it.skip('uploads a manuscript file', async () => {
+    it.only('uploads a manuscript file', async () => {
         const respStart = await startSubmission(apollo, 'researchArticle');
         const id = respStart.data && respStart.data.startSubmission ? respStart.data.startSubmission.id : '';
         expect(id).toHaveLength(36);
