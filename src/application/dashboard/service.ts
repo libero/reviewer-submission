@@ -1,8 +1,8 @@
 import { SubmissionId } from '../../domain/submission/types';
 import Submission from '../../domain/submission/services/models/submission';
-import { SubmissionService } from 'src/domain/submission';
 import { PermissionService, SubmissionOperation } from '../permission/service';
-import { User } from 'src/domain/user/user';
+import { User } from '../../domain/user/user';
+import { SubmissionService } from '../../domain/submission';
 
 export class DashboardService {
     constructor(

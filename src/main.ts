@@ -23,6 +23,8 @@ import { WizardService } from './application/wizard/service';
 import { WizardResolvers } from './application/wizard/resolvers';
 import { TeamService } from './domain/teams/services/team-service';
 import { PermissionService } from './application/permission/service';
+import { SemanticExtractionService } from './domain/semantic-extraction/services/semantic-extraction-service';
+import { FileService } from './domain/file/services/file-service';
 
 // Apollo server express does not export this, but its express
 export interface ExpressContext {
@@ -57,11 +59,13 @@ const init = async (): Promise<void> => {
     const srvSurvey = new SurveyService(knexConnection);
     const srvUser = new UserService(config.user_adapter_url);
     const srvTeam = new TeamService(knexConnection);
+    const srvFile = new FileService(knexConnection, config.s3);
+    const srvExtractionService = new SemanticExtractionService(knexConnection, config.scienceBeam);
 
     // init application services
     const srvPermission = new PermissionService();
-    const srvDashboard = new DashboardService(srvSubmission, srvPermission);
-    const srvWizard = new WizardService(srvSubmission, srvTeam, srvPermission);
+    const srvDashboard = new DashboardService(srvPermission, srvSubmission);
+    const srvWizard = new WizardService(srvPermission, srvSubmission, srvTeam, srvFile, srvExtractionService);
 
     // init resolvers
     const resolvers = [
@@ -123,6 +127,7 @@ const init = async (): Promise<void> => {
         },
         formatError: (error: GraphQLError): GraphQLFormattedError => {
             // @todo: revisit how we handle errors
+            logger.error(error.message, (error.originalError && error.originalError.stack) || '');
             return error;
         },
     });

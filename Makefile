@@ -9,6 +9,7 @@ LOAD_SCHEMA = psql -U postgres -f xpub-schema.sql
 
 setup:
 	if [ ! -e ./config/config.json ] ; then cp config/config.example.json config/config.json ; fi
+	if [ ! -e ./config/config.local.json ] ; then cp config/config.local.example.json config/config.local.json ; fi
 	git submodule update --init --recursive
 	$(MAKE) get_deps
 
@@ -23,8 +24,10 @@ test: get_deps
 
 test_integration:
 	${DOCKER_COMPOSE_TEST} down
-	${DOCKER_COMPOSE_TEST} up -d postgres
+	${DOCKER_COMPOSE_TEST} up -d postgres s3
 	./.scripts/docker/wait-healthy.sh test_postgres 20
+	./.scripts/docker/wait-healthy.sh test_s3 30
+	${DOCKER_COMPOSE_TEST} up -d s3_create-bucket
 	${DOCKER_COMPOSE_TEST} up -d application
 	./.scripts/docker/wait-healthy.sh test_reviewer-submission 20
 	CONFIG_PATH=./config/config.json yarn run test:integration

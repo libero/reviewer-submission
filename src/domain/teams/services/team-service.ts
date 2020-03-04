@@ -1,5 +1,4 @@
 import * as Knex from 'knex';
-
 import { createKnexAdapter } from '../../knex-table-adapter';
 import XpubTeamRepository from '../repositories/xpub-team';
 import { TeamDTO } from '../repositories/types';
