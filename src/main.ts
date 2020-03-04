@@ -59,7 +59,7 @@ const init = async (): Promise<void> => {
     const srvUser = new UserService(config.user_adapter_url);
     const srvTeam = new TeamService(knexConnection);
     const srvFile = new FileService(knexConnection, config.s3);
-    const srvExtractionService = new SemanticExtractionService(knexConnection);
+    const srvExtractionService = new SemanticExtractionService(knexConnection, config.scienceBeam);
 
     // init application services
     const srvDashboard = new DashboardService(srvSubmission);
