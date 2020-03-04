@@ -97,7 +97,7 @@ describe('Application Integration Tests', () => {
     });
 
     it('returns error on invalid research article', async () => {
-        await expect(startSubmission(apollo, 'Bedtime story')).rejects.toThrow('GraphQL error: Invalid article type');
+        return expect(startSubmission(apollo, 'Bedtime story')).rejects.toThrow('GraphQL error: Invalid article type');
     });
 
     // This is left using axios - as we are simulating a bad-actor
