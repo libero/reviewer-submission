@@ -2,7 +2,7 @@ import { MockKnex, createMockAdapter } from '../../test-mocks/knex-mock';
 import { v4 } from 'uuid';
 import { TeamId } from '../types';
 import XpubTeamRepository from './xpub-team';
-import { KnexTableAdapter } from 'src/domain/knex-table-adapter';
+import { KnexTableAdapter } from '../../../domain/knex-table-adapter';
 import { AuthorTeamMember } from './types';
 
 const entryId1 = TeamId.fromUuid(v4());
