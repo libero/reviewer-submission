@@ -1,6 +1,6 @@
 import { SubmissionId } from '../../domain/submission/types';
 import Submission from '../../domain/submission/services/models/submission';
-import { SubmissionService } from 'src/domain/submission';
+import { SubmissionService } from '../../domain/submission';
 
 export class DashboardService {
     constructor(private readonly submissionService: SubmissionService) {}

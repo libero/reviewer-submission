@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { TeamRepository, TeamDTO } from './types';
 import { TeamId } from '../types';
-import { KnexTableAdapter } from 'src/domain/knex-table-adapter';
+import { KnexTableAdapter } from '../../knex-table-adapter';
 
 type DatabaseEntry = {
     id: TeamId;

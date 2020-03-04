@@ -1,7 +1,7 @@
 import * as Knex from 'knex';
 import { SubmissionId } from '../types';
 import XpubSubmissionRootRepository from '../repositories/xpub-submission-root';
-import uuid = require('uuid');
+import { v4 as uuid } from 'uuid';
 import Submission from './models/submission';
 import { SubmissionDTO } from '../repositories/types';
 import { createKnexAdapter } from '../../knex-table-adapter';

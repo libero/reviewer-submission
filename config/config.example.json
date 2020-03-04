@@ -6,12 +6,23 @@
         "client": "pg",
         "connection": {
             "host": "postgres",
-            "database": "reviewer_submission",
+            "database": "postgres",
             "user": "postgres",
             "password": "postgres",
             "port": 5432
         }
     },
+    "s3": {
+        "accessKeyId": "minio",
+        "secretAccessKey": "minio123",
+        "s3ForcePathStyle": true,
+        "fileBucket": "test",
+        "awsEndPoint": "http://s3:9000"
+    },
     "authentication_jwt_secret": "super_secret_jam",
-    "user_adapter_url": "http://localhost:3003/current-user"
+    "user_adapter_url": "http://localhost:3003/current-user",
+    "science_beam": {
+        "api_url": "http://reviewer-mocks:3003/science-beam/convert",
+        "timeout": 20000
+    }
 }

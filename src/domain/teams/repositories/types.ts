@@ -1,5 +1,5 @@
 import { TeamId } from '../types';
-import { Author } from 'src/domain/submission/types';
+import { Author } from '../../submission/types';
 
 export interface TeamRepository {
     findByObjectIdAndRole(id: string, role: string): Promise<TeamDTO[]>;

@@ -1,4 +1,5 @@
 import { SubmissionId } from '../../types';
+import File from '../../../file/services/models/file';
 
 export enum ArticleType {
     RESEARCH_ARTICLE = 'researchArticle',
@@ -13,6 +14,7 @@ export default class Submission {
     articleType: ArticleType;
     status: string;
     createdBy: string;
+    manuscriptFile?: File;
 
     // This is wired up so that you can create an entity from the DTO described by ISubmission
     constructor({
@@ -22,6 +24,7 @@ export default class Submission {
         articleType,
         status,
         createdBy,
+        manuscriptFile,
     }: {
         id: SubmissionId;
         title: string;
@@ -29,16 +32,18 @@ export default class Submission {
         articleType: string;
         status: string;
         createdBy: string;
+        manuscriptFile?: File;
     }) {
         this.id = id;
         this.title = title;
         this.updated = updated || new Date();
-        this.articleType = this.articletTypeFromString(articleType);
+        this.articleType = this.articleTypeFromString(articleType);
         this.status = status;
         this.createdBy = createdBy;
+        this.manuscriptFile = manuscriptFile;
     }
 
-    private articletTypeFromString(type: string): ArticleType {
+    private articleTypeFromString(type: string): ArticleType {
         switch (type) {
             case 'researchArticle':
                 return ArticleType.RESEARCH_ARTICLE;
