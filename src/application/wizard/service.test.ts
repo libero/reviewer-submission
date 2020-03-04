@@ -4,7 +4,7 @@ import { TeamService } from '../../domain/teams/services/team-service';
 import { SubmissionId } from '../../domain/submission/types';
 import { TeamId } from '../../domain/teams/types';
 import { FileService } from '../../domain/file/services/file-service';
-import { SemanticExtractionService } from 'src/domain/semantic-extraction/services/semantic-extraction-service';
+import { SemanticExtractionService } from '../../domain/semantic-extraction/services/semantic-extraction-service';
 
 describe('saveDetailsPage', () => {
     it('should throw if submission not found', async () => {
