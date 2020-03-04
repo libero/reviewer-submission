@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { SemanticExtractionRepository, SemanticExtractionDTO } from '../repositories/types';
-import { KnexTableAdapter } from 'src/domain/knex-table-adapter';
-import { SubmissionId } from 'src/domain/submission/types';
+import { KnexTableAdapter } from '../../domain/knex-table-adapter';
+import { SubmissionId } from '../../domain/submission/types';
 import { SemanticExtractionId } from '../types';
 
 type DatabaseEntry = {
