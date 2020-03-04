@@ -1,24 +1,35 @@
 import axios from 'axios';
 import { sign } from 'jsonwebtoken';
-import * as FormData from 'form-data';
 import config from '../src/config';
-import ApolloClient, { InMemoryCache, gql, FetchResult } from 'apollo-boost';
+import ApolloClient from 'apollo-client';
+import { InMemoryCache } from 'apollo-cache-inmemory';
+import { ApolloLink, FetchResult } from 'apollo-link';
+import { onError } from 'apollo-link-error';
+import { HttpLink } from 'apollo-link-http';
+import gql from 'graphql-tag';
+import { GraphQLError } from 'graphql';
 
 const jwtToken = sign({ sub: '123' }, config.authentication_jwt_secret);
 
-const createApolloClient = (): ApolloClient<unknown> => {
-    const uri = `http://localhost:3000/graphql`;
+let lastGQLError: string = '';
 
-    return new ApolloClient({
+const createApolloClient = (): ApolloClient<unknown> => {
+    return new ApolloClient<unknown>({
+        link: ApolloLink.from([
+            onError(({ graphQLErrors, networkError }) => {
+                if (graphQLErrors)
+                    graphQLErrors.forEach(({ message, locations, path }) => {
+                        lastGQLError = message;
+                        console.log(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`),
+                    });
+                if (networkError) console.log(`[Network error]: ${networkError}`);
+            }),
+            new HttpLink({
+                uri: 'http://localhost:3000/graphql',
+                credentials: 'same-origin',
+            }),
+        ]),
         cache: new InMemoryCache(),
-        uri,
-        request: async (operation): Promise<void> => {
-            operation.setContext({
-                headers: {
-                    authorization: `Bearer ${jwtToken}`,
-                },
-            });
-        },
     });
 };
 
@@ -40,61 +51,33 @@ const startSubmission = async (apollo: ApolloClient<unknown>, articleType: strin
 };
 
 const uploadManuscript = async (apollo: ApolloClient<unknown>, id: string): Promise<FetchResult> => {
-    const file = null;
+    const buffer = Buffer.from('test');
+    const file = Uint8Array.from(buffer).buffer;
     const fileSize = 2;
-    const uploadManuscript = gql`mutation UploadManuscript($id: ID!, $file: Upload!, $fileSize: Int!) {
-        uploadManuscript(id: $id, file: $file, fileSize: $fileSize) {
-            id
+    const uploadManuscript = gql`
+        mutation UploadManuscript($id: ID!, $file: Upload!, $fileSize: Int!) {
+            uploadManuscript(id: $id, file: $file, fileSize: $fileSize) {
+                id
+            }
         }
-    }`;
+    `;
 
     return apollo.mutate({
         mutation: uploadManuscript,
         variables: {
             id,
-            file: null,
-            fileSize: 2,
+            file,
+            fileSize,
         },
     });
 };
-
-// addPhoto(file: File, description: string, tags: string) {
-//     const addPhoto = gql`
-//       mutation addPhoto(
-//         $file: Upload!,
-//         $description: String,
-//         $tags: String
-//       ){
-//         addPhoto(
-//           file: $file,
-//           description: $description,
-//           tags: $tags
-//         ) {
-//           id,
-//           fileLocation,
-//           description,
-//           tags
-//         }
-//       }
-//     `;
-//     return this.apollo.mutate({
-//       mutation: addPhoto,
-//       variables: {
-//         file,
-//         description,
-//         tags
-//       },
-//       context: {
-//         useMultipart: true
-//       }
-//     })
-//   }
 
 describe('Application Integration Tests', () => {
     let apollo: ApolloClient<unknown>;
 
     beforeEach(() => {
         apollo = createApolloClient();
+        lastGQLError = '';
     });
 
     it('returns no errors on valid research article', async () => {
@@ -106,8 +89,9 @@ describe('Application Integration Tests', () => {
         expect(id).toHaveLength(36);
     });
 
-    it('returns error on invalid research article', async () => {
-        return expect(startSubmission(apollo, 'Bedtime story')).rejects.toThrow('GraphQL error: Invalid article type');
+    it.only('returns error on invalid research article', async () => {
+        expect(await startSubmission(apollo, 'Bedtime story')).rejects.toThrow('Network error: Response not successful: Received status code 400');
+        expect(lastGQLError).toBe('GraphQL error: Invalid article type');
     });
 
     // This is left using axios - as we are simulating a bad-actor
@@ -145,15 +129,13 @@ describe('Application Integration Tests', () => {
             });
     });
 
-    it('uploads a manuscript file', async () => {
-        const r1 = await startSubmission(apollo, 'researchArticle');
-        // assert good
-
-        const id = r1.data && r1.data.startSubmission ? r1.data.startSubmission.id : '';
+    it.skip('uploads a manuscript file', async () => {
+        const respStart = await startSubmission(apollo, 'researchArticle');
+        const id = respStart.data && respStart.data.startSubmission ? respStart.data.startSubmission.id : '';
         expect(id).toHaveLength(36);
-        const r2 = await uploadManuscript(apollo, id);
 
-        const data = r2.data ? r2.data : {};
+        const response = await uploadManuscript(apollo, id);
+        const data = response.data ? response.data : {};
         expect(data.uploadManuscript.id).toBe(id);
     });
 });
