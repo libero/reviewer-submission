@@ -24,9 +24,10 @@ test: get_deps
 
 test_integration:
 	${DOCKER_COMPOSE_TEST} down
-	${DOCKER_COMPOSE_TEST} up -d postgres s3
+	${DOCKER_COMPOSE_TEST} up -d postgres s3 reviewer-mocks
 	./.scripts/docker/wait-healthy.sh test_postgres 20
 	./.scripts/docker/wait-healthy.sh test_s3 30
+	./.scripts/docker/wait-healthy.sh test_reviewer_mocks 30
 	${DOCKER_COMPOSE_TEST} up -d s3_create-bucket
 	${DOCKER_COMPOSE_TEST} up -d application
 	./.scripts/docker/wait-healthy.sh test_reviewer-submission 20

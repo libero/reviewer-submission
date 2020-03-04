@@ -6,8 +6,8 @@ import { SubmissionService } from '../../domain/submission';
 
 export class DashboardService {
     constructor(
-        private readonly submissionService: SubmissionService,
         private readonly permissionService: PermissionService,
+        private readonly submissionService: SubmissionService,
     ) {}
 
     async findMySubmissions(user: User): Promise<Submission[]> {
