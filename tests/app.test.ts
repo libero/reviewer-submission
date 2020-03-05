@@ -8,6 +8,7 @@ import { onError } from 'apollo-link-error';
 import { HttpLink } from 'apollo-link-http';
 import { setContext } from 'apollo-link-context';
 import gql from 'graphql-tag';
+import * as FormData from 'form-data';
 
 const jwtToken = sign({ sub: '123' }, config.authentication_jwt_secret);
 
@@ -54,28 +55,6 @@ const startSubmission = async (apollo: ApolloClient<unknown>, articleType: strin
         mutation: startSubmission,
         variables: {
             articleType,
-        },
-    });
-};
-
-const uploadManuscript = async (apollo: ApolloClient<unknown>, id: string): Promise<FetchResult> => {
-    const buffer = Buffer.from('test');
-    const file = Uint8Array.from(buffer).buffer;
-    const fileSize = 2;
-    const uploadManuscript = gql`
-        mutation UploadManuscript($id: ID!, $file: Upload!, $fileSize: Int!) {
-            uploadManuscript(id: $id, file: $file, fileSize: $fileSize) {
-                id
-            }
-        }
-    `;
-
-    return apollo.mutate({
-        mutation: uploadManuscript,
-        variables: {
-            id,
-            file,
-            fileSize,
         },
     });
 };
@@ -136,13 +115,52 @@ describe('Application Integration Tests', () => {
             });
     });
 
-    it.skip('uploads a manuscript file', async () => {
-        const respStart = await startSubmission(apollo, 'researchArticle');
-        const id = respStart.data && respStart.data.startSubmission ? respStart.data.startSubmission.id : '';
-        expect(id).toHaveLength(36);
+    // see https://github.com/libero/reviewer-submission/issues/109
+    it('uploads a manuscript file', async () => {
+        const body = new FormData();
 
-        const response = await uploadManuscript(apollo, id);
-        const data = response.data ? response.data : {};
-        expect(data.uploadManuscript.id).toBe(id);
+        const loginResponse = await axios.post(
+            'http://localhost:3000/graphql',
+            {
+                query: `
+                    mutation StartSubmission($articleType: String!) {
+                        startSubmission(articleType: $articleType) {
+                            id
+                        }
+                    }
+                `,
+                variables: {
+                    articleType: 'researchArticle',
+                },
+            },
+            { headers: { Authorization: `Bearer ${jwtToken}` } },
+        );
+
+        const id = loginResponse.data.data.startSubmission.id;
+        const query = `mutation UploadManuscript($id: ID!, $file: Upload!, $fileSize: Int!) {
+            uploadManuscript(id: $id, file: $file, fileSize: $fileSize) {
+                id
+            }
+        }`;
+
+        const operations = {
+            query,
+            variables: {
+                id,
+                file: null,
+                fileSize: 2,
+            },
+        };
+
+        body.append('operations', JSON.stringify(operations));
+        body.append('map', '{ "1": ["variables.file"] }');
+        body.append('1', 'a', { filename: 'a.txt' });
+
+        const response = await axios.post('http://localhost:3000/graphql', body, {
+            headers: { Authorization: `Bearer ${jwtToken}`, ...body.getHeaders() },
+        });
+
+        expect(response.status).toBe(200);
+        expect(response.data.data.uploadManuscript.id).toBe(id);
     });
 });
