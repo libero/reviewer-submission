@@ -37,5 +37,34 @@ describe('File Service', () => {
                 service.create(SubmissionId.fromUuid(submissionId), '', '', 0, FileType.MANUSCRIPT_SOURCE),
             ).rejects.toThrow();
         });
+
+        it('should create is no manuscript exists and no files', async () => {
+            XpubFileRepository.prototype.findManuscriptBySubmssionId = jest.fn().mockReturnValue(null);
+            XpubFileRepository.prototype.create = jest.fn().mockReturnValue(files[0]);
+            const service = new FileService((null as unknown) as Knex, ({} as unknown) as S3Config);
+            const result = await service.create(
+                SubmissionId.fromUuid(submissionId),
+                '',
+                '',
+                0,
+                FileType.MANUSCRIPT_SOURCE,
+            );
+            expect(result).toBeTruthy();
+        });
+        it('should create is no manuscript exists but manauscripts do', async () => {
+            XpubFileRepository.prototype.findManuscriptBySubmssionId = jest
+                .fn()
+                .mockReturnValue([{ ...files[0], type: FileType.SUPPORTING_FILE }]);
+            XpubFileRepository.prototype.create = jest.fn().mockReturnValue(files[0]);
+            const service = new FileService((null as unknown) as Knex, ({} as unknown) as S3Config);
+            const result = await service.create(
+                SubmissionId.fromUuid(submissionId),
+                '',
+                '',
+                0,
+                FileType.MANUSCRIPT_SOURCE,
+            );
+            expect(result).toBeTruthy();
+        });
     });
 });
