@@ -22,6 +22,7 @@ import { DashboardService } from './application/dashboard/service';
 import { WizardService } from './application/wizard/service';
 import { WizardResolvers } from './application/wizard/resolvers';
 import { TeamService } from './domain/teams/services/team-service';
+import { PermissionService } from './application/permission/service';
 import { SemanticExtractionService } from './domain/semantic-extraction/services/semantic-extraction-service';
 import { FileService } from './domain/file/services/file-service';
 
@@ -62,15 +63,16 @@ const init = async (): Promise<void> => {
     const srvExtractionService = new SemanticExtractionService(knexConnection, config.scienceBeam);
 
     // init application services
-    const srvDashboard = new DashboardService(srvSubmission);
-    const srvWizard = new WizardService(srvSubmission, srvTeam, srvFile, srvExtractionService);
+    const srvPermission = new PermissionService();
+    const srvDashboard = new DashboardService(srvPermission, srvSubmission);
+    const srvWizard = new WizardService(srvPermission, srvSubmission, srvTeam, srvFile, srvExtractionService);
 
     // init resolvers
     const resolvers = [
-        DashboardResolvers(srvDashboard),
+        DashboardResolvers(srvDashboard, srvUser),
         SurveyResolvers(srvSurvey),
         UserResolvers(srvUser),
-        WizardResolvers(srvWizard),
+        WizardResolvers(srvWizard, srvUser),
     ];
 
     // best to mount helmet so soon as possible to ensure headers are set: defaults - https://www.npmjs.com/package/helmet#how-it-works

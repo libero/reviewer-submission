@@ -97,6 +97,7 @@ describe('Application Integration Tests', () => {
     });
 
     it('returns error on invalid research article', async () => {
+        expect.assertions(1);
         await expect(startSubmission(apollo, 'Bedtime story')).rejects.toThrow('GraphQL error: Invalid article type');
     });
 

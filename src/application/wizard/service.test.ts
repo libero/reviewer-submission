@@ -3,6 +3,7 @@ import { SubmissionService } from '../../domain/submission';
 import { TeamService } from '../../domain/teams/services/team-service';
 import { SubmissionId } from '../../domain/submission/types';
 import { TeamId } from '../../domain/teams/types';
+import { PermissionService } from '../permission/service';
 import { FileService } from '../../domain/file/services/file-service';
 import { SemanticExtractionService } from '../../domain/semantic-extraction/services/semantic-extraction-service';
 
@@ -17,18 +18,25 @@ describe('saveDetailsPage', () => {
             create: jest.fn(),
         } as unknown) as TeamService;
 
+        const permissionService = new PermissionService();
+
         const fileServiceMock = (jest.fn() as unknown) as FileService;
         const semanticExtractionServiceMock = (jest.fn() as unknown) as SemanticExtractionService;
 
         const wizardService = new WizardService(
+            permissionService,
             submissionServiceMock,
             teamServiceMock,
             fileServiceMock,
             semanticExtractionServiceMock,
         );
-        const userId = '89e0aec8-b9fc-4413-8a37-5cc775edqe67';
+        const user = {
+            id: '89e0aec8-b9fc-4413-8a37-5cc77567',
+            name: 'Bob',
+            role: 'user',
+        };
         await expect(
-            wizardService.saveDetailsPage(SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'), userId, {
+            wizardService.saveDetailsPage(user, SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'), {
                 firstName: 'John',
                 lastName: 'Smith',
                 email: 'john.smith@example.com',
@@ -49,18 +57,24 @@ describe('saveDetailsPage', () => {
             create: jest.fn(),
         } as unknown) as TeamService;
 
+        const permissionService = new PermissionService();
         const fileServiceMock = (jest.fn() as unknown) as FileService;
         const semanticExtractionServiceMock = (jest.fn() as unknown) as SemanticExtractionService;
 
         const wizardService = new WizardService(
+            permissionService,
             submissionServiceMock,
             teamServiceMock,
             fileServiceMock,
             semanticExtractionServiceMock,
         );
-        const userId = '89e0aec8-b9fc-4413-8a37-5cc775edqe67';
+        const user = {
+            id: '89e0aec8-b9fc-4413-8a37-5cc77567',
+            name: 'Bob',
+            role: 'user',
+        };
         await expect(
-            wizardService.saveDetailsPage(SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'), userId, {
+            wizardService.saveDetailsPage(user, SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'), {
                 firstName: 'John',
                 lastName: 'Smith',
                 email: 'john.smith@example.com',
@@ -70,10 +84,15 @@ describe('saveDetailsPage', () => {
     });
 
     it('should update when team exists', async () => {
-        const userId = '89e0aec8-b9fc-4413-8a37-5cc775edqe67';
+        const user = {
+            id: '89e0aec8-b9fc-4413-8a37-5cc77567',
+            name: 'Bob',
+            role: 'user',
+        };
+
         const submissionServiceMock = ({
             get: jest.fn().mockImplementationOnce(() => ({
-                createdBy: userId,
+                createdBy: user.id,
             })),
         } as unknown) as SubmissionService;
         const existingTeam = {
@@ -85,16 +104,18 @@ describe('saveDetailsPage', () => {
             create: jest.fn(),
         } as unknown) as TeamService;
 
+        const permissionService = new PermissionService();
         const fileServiceMock = (jest.fn() as unknown) as FileService;
         const semanticExtractionServiceMock = (jest.fn() as unknown) as SemanticExtractionService;
 
         const wizardService = new WizardService(
+            permissionService,
             submissionServiceMock,
             teamServiceMock,
             fileServiceMock,
             semanticExtractionServiceMock,
         );
-        await wizardService.saveDetailsPage(SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'), userId, {
+        await wizardService.saveDetailsPage(user, SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'), {
             firstName: 'John',
             lastName: 'Smith',
             email: 'john.smith@example.com',
@@ -118,10 +139,14 @@ describe('saveDetailsPage', () => {
         });
     });
     it('should create when team does not exist', async () => {
-        const userId = '3028aab5-ef74-484f-9dfd-aba3f8103f09';
+        const user = {
+            id: '89e0aec8-b9fc-4413-8a37-5cc77567',
+            name: 'Bob',
+            role: 'user',
+        };
         const submissionServiceMock = ({
             get: jest.fn().mockImplementationOnce(() => ({
-                createdBy: userId,
+                createdBy: user.id,
             })),
         } as unknown) as SubmissionService;
         const existingTeam = null;
@@ -131,18 +156,20 @@ describe('saveDetailsPage', () => {
             create: jest.fn(),
         } as unknown) as TeamService;
 
+        const permissionService = new PermissionService();
         const fileServiceMock = (jest.fn() as unknown) as FileService;
         const semanticExtractionServiceMock = (jest.fn() as unknown) as SemanticExtractionService;
+        const subId = SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a');
 
         const wizardService = new WizardService(
+            permissionService,
             submissionServiceMock,
             teamServiceMock,
             fileServiceMock,
             semanticExtractionServiceMock,
         );
 
-        const subId = SubmissionId.fromUuid(userId);
-        await wizardService.saveDetailsPage(subId, userId, {
+        await wizardService.saveDetailsPage(user, subId, {
             firstName: 'John',
             lastName: 'Smith',
             email: 'john.smith@example.com',
@@ -169,10 +196,14 @@ describe('saveDetailsPage', () => {
     });
 
     it('should throw when userId is not owner', async () => {
-        const userId = '89e0aec8-b9fc-4413-8a37-5cc775edqe27';
+        const user = {
+            id: '89e0aec8-b9fc-4413-8a37-cccccccc',
+            name: 'Bob',
+            role: 'user',
+        };
         const submissionServiceMock = ({
             get: jest.fn().mockImplementationOnce(() => ({
-                createdBy: '89e0aec8-b9fc-4413-8a37-5cc775edqe67',
+                createdBy: '89e0aec8-b9fc-4413-8a37-5cc77567',
             })),
         } as unknown) as SubmissionService;
         const existingTeam = {
@@ -184,10 +215,12 @@ describe('saveDetailsPage', () => {
             create: jest.fn(),
         } as unknown) as TeamService;
 
+        const permissionService = new PermissionService();
         const fileServiceMock = (jest.fn() as unknown) as FileService;
         const semanticExtractionServiceMock = (jest.fn() as unknown) as SemanticExtractionService;
 
         const wizardService = new WizardService(
+            permissionService,
             submissionServiceMock,
             teamServiceMock,
             fileServiceMock,
@@ -195,7 +228,7 @@ describe('saveDetailsPage', () => {
         );
 
         await expect(
-            wizardService.saveDetailsPage(SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'), userId, {
+            wizardService.saveDetailsPage(user, SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'), {
                 firstName: 'John',
                 lastName: 'Smith',
                 email: 'john.smith@example.com',

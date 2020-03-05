@@ -30,6 +30,17 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
         return result.map(this.entryToDTO);
     }
 
+    public async findByUserId(userId: string): Promise<SubmissionDTO[]> {
+        const query = this._query
+            .builder()
+            .select('id', 'updated', 'created_by', 'status', 'meta')
+            .from(this.TABLE_NAME)
+            .where({ created_by: userId });
+
+        const result = await this._query.executor<DatabaseEntry[]>(query);
+        return result.map(this.entryToDTO);
+    }
+
     public async findById(id: SubmissionId): Promise<SubmissionDTO | null> {
         const query = this._query
             .builder()
