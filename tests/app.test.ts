@@ -115,6 +115,7 @@ describe('Application Integration Tests', () => {
             });
     });
 
+    // see https://github.com/libero/reviewer-submission/issues/109
     it('uploads a manuscript file', async () => {
         const body = new FormData();
 
