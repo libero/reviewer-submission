@@ -36,6 +36,12 @@ export class FileService {
         size: number,
         type: FileType,
     ): Promise<File> {
+        if (type === FileType.MANUSCRIPT_SOURCE || type === FileType.MANUSCRIPT_SOURCE_PENDING) {
+            const hasFile = await this.hasManuscriptFile(submissionId);
+            if (hasFile === true) {
+                throw new Error('Submission already has manuscript');
+            }
+        }
         const id = FileId.fromUuid(uuid());
         const status = FileStatus.CREATED;
         const url = `manuscripts/${submissionId}`;
@@ -55,6 +61,11 @@ export class FileService {
 
     async update(fileDTO: FileDTO): Promise<FileDTO> {
         return this.fileRepository.update(fileDTO);
+    }
+
+    async hasManuscriptFile(submissionId: SubmissionId): Promise<boolean> {
+        const file = await this.fileRepository.findManuscriptBySubmssionId(submissionId);
+        return file !== null;
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -66,7 +66,6 @@ export class WizardService {
         }
         const { filename, mimetype: mimeType, createReadStream } = await file;
         const stream = createReadStream();
-
         const manuscriptFile = await this.fileService.create(
             submissionId,
             filename,
