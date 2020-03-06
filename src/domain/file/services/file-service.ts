@@ -29,6 +29,10 @@ export class FileService {
         this.s3 = new S3(s3Options);
     }
 
+    async deleteManuscript(fileId: FileId, submissionId: SubmissionId): Promise<boolean> {
+        return true;
+    }
+
     async create(
         submissionId: SubmissionId,
         filename: string,

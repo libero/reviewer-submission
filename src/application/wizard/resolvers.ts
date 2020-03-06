@@ -4,6 +4,7 @@ import Submission from '../../domain/submission/services/models/submission';
 import { SubmissionId, Author } from '../../domain/submission/types';
 import { UserService } from 'src/domain/user';
 import { WizardService } from './service';
+import { FileId } from '../../domain/file/types';
 
 const resolvers = (wizard: WizardService, userService: UserService): IResolvers => ({
     Query: {},
@@ -26,6 +27,14 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
             const submission = await wizard.saveManuscriptFile(user, submissionId, context.userId, file, fileSize);
 
             return submission;
+        },
+        async deleteManuscriptFile(
+            _,
+            variables: { fileId: FileId; submissionId: SubmissionId },
+            context,
+        ): Promise<boolean> {
+            const { fileId, submissionId } = variables;
+            return await wizard.deleteManuscriptFile(fileId, submissionId, context.userId);
         },
     },
 });

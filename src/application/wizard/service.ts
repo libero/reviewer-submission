@@ -8,7 +8,7 @@ import Submission from '../../domain/submission/services/models/submission';
 import { AuthorTeamMember } from '../../domain/teams/repositories/types';
 import { PermissionService, SubmissionOperation } from '../permission/service';
 import { User } from 'src/domain/user/user';
-import { FileType } from '../../domain/file/types';
+import { FileType, FileId } from '../../domain/file/types';
 
 export class WizardService {
     constructor(
@@ -50,6 +50,14 @@ export class WizardService {
             });
         }
         return submission;
+    }
+
+    async deleteManuscriptFile(fileId: FileId, submissionId: SubmissionId, userId: string): Promise<boolean> {
+        const submission = await this.submissionService.get(submissionId);
+        if (submission.createdBy !== userId) {
+            throw new Error('User not allowed to delete files');
+        }
+        return await this.fileService.deleteManuscript(fileId, submissionId);
     }
 
     async saveManuscriptFile(
