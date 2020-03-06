@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { KnexTableAdapter } from '../../knex-table-adapter';
 import { SubmissionId } from '../../submission/types';
-import { FileId } from '../types';
+import { FileId, FileType } from '../types';
 import { FileDTO } from './types';
 
 interface FileRepository {
@@ -52,7 +52,7 @@ export default class XpubFileRepository implements FileRepository {
             .builder()
             .select('id', 'manuscript_id', 'status', 'filename', 'url', 'mime_type', 'size', 'created', 'updated')
             .from(this.TABLE_NAME)
-            .where({ manuscript_id: id });
+            .where({ manuscript_id: id, type: FileType.MANUSCRIPT_SOURCE });
 
         const files = await this._query.executor<DatabaseEntry[]>(query);
         return files.length > 0 ? this.entryToDto(files[0]) : null;
