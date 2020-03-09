@@ -64,7 +64,8 @@ CREATE TYPE public.filestatus AS ENUM (
     'CREATED',
     'UPLOADED',
     'STORED',
-    'CANCELLED'
+    'CANCELLED',
+    'DELETED'
 );
 
 
