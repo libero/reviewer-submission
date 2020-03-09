@@ -105,15 +105,6 @@ export class WizardService {
         } catch (e) {
             manuscriptFile.setStatusToCancelled();
         }
-
-        // @todo: decide what to do with previous manuscript
-        // option 1: client needs to call delete manuscript mutation and we assume only one current manuscript
-        // option 2: handle this in this mutation
-
-        manuscriptFile.setTypeToSource();
-
-        await this.fileService.update({ ...manuscriptFile });
-
         // this is not elegant but its the best we can do given the fact that files are now a concept
         // outside of Submission, so we patch it in ¯\_(ツ)_/¯
         return new Submission({ ...submission, manuscriptFile });
