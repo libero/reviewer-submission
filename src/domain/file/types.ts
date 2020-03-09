@@ -5,6 +5,7 @@ export enum FileStatus {
     UPLOADED = 'UPLOADED',
     STORED = 'STORED',
     CANCELLED = 'CANCELLED',
+    DELETED = 'DELETED',
 }
 
 export enum FileType {

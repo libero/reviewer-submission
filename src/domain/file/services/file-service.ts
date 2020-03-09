@@ -29,7 +29,20 @@ export class FileService {
         this.s3 = new S3(s3Options);
     }
 
+    private generateManuscriptS3Key(submissionId: SubmissionId, fileId: FileId): string {
+        return `manuscripts/${submissionId}/${fileId}`;
+    }
+
+    private generateSupportFileS3Key(submissionId: SubmissionId, fileId: FileId): string {
+        return `supporting/${submissionId}/${fileId}`;
+    }
+
     async deleteManuscript(fileId: FileId, submissionId: SubmissionId): Promise<boolean> {
+        await this.fileRepository.deleteById(fileId);
+        await this.s3.deleteObject({
+            Bucket: this.bucket,
+            Key: this.generateManuscriptS3Key(submissionId, fileId),
+        });
         return true;
     }
 
@@ -72,8 +85,7 @@ export class FileService {
         return file !== null;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async upload(fileContents: Buffer, file: File): Promise<any> {
+    async upload(fileContents: Buffer, file: File): Promise<S3.ManagedUpload.SendData> {
         const { url, id, mimeType } = file;
         return this.s3
             .upload({
