@@ -63,7 +63,6 @@ export class WizardService {
     async saveManuscriptFile(
         user: User,
         submissionId: SubmissionId,
-        userId: string,
         file: FileUpload,
         fileSize: number,
     ): Promise<Submission> {
@@ -79,7 +78,7 @@ export class WizardService {
             filename,
             mimeType,
             fileSize,
-            FileType.MANUSCRIPT_SOURCE_PENDING,
+            FileType.MANUSCRIPT_SOURCE,
         );
 
         const fileContents: Buffer = await new Promise((resolve, reject) => {
