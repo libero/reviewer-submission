@@ -116,7 +116,7 @@ describe('Application Integration Tests', () => {
     });
 
     // see https://github.com/libero/reviewer-submission/issues/109
-    it.only('uploads a manuscript file', async () => {
+    it('uploads a manuscript file', async () => {
         const body = new FormData();
 
         const loginResponse = await axios.post(
@@ -164,7 +164,7 @@ describe('Application Integration Tests', () => {
         expect(response.data.data.uploadManuscript.id).toBe(id);
     });
 
-    it('deletes a manuscript file', async () => {
+    it.only('deletes a manuscript file', async () => {
         const body = new FormData();
 
         const loginResponse = await axios.post(
@@ -187,7 +187,10 @@ describe('Application Integration Tests', () => {
         const submissionId = loginResponse.data.data.startSubmission.id;
         const uploadQuery = `mutation UploadManuscript($id: ID!, $file: Upload!, $fileSize: Int!) {
             uploadManuscript(id: $id, file: $file, fileSize: $fileSize) {
-                id
+                id,
+                manuscriptFile {
+                    id
+                }
             }
         }`;
 
@@ -210,26 +213,27 @@ describe('Application Integration Tests', () => {
 
         expect(uploadResponse.status).toBe(200);
 
+        console.log(uploadResponse.data.data.uploadManuscript);
+
         const deleteResponse = await axios.post(
             'http://localhost:3000/graphql',
             {
                 query: `
-                    mutation DeleteManusucript($fileId: String!, $submissionId: String!) {
-                        deleteMansucript(fileId: $fileId, submissionId: $submissionId) {
-                            id
-                        }
+                    mutation DeleteManuscript($fileId: ID!, $submissionId: ID!) {
+                        deleteManuscript(fileId: $fileId, submissionId: $submissionId) 
                     }
                 `,
                 variables: {
-                    fileId: uploadResponse.data.data.submission.manuscriptFile.id,
+                    fileId: uploadResponse.data.data.uploadManuscript.manuscriptFile.id,
                     submissionId,
                 },
             },
             {
-                headers: { Authorization: `Bearer ${jwtToken}`, ...body.getHeaders() },
+                headers: { Authorization: `Bearer ${jwtToken}` },
             },
         );
 
         expect(deleteResponse.status).toBe(200);
+        expect(deleteResponse.data.errors).toBeUndefined();
     });
 });

@@ -26,6 +26,8 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
             const user = await userService.getCurrentUser(context.authorizationHeader);
             const submission = await wizard.saveManuscriptFile(user, submissionId, file, fileSize);
 
+            console.log(submission);
+
             return submission;
         },
         async deleteManuscript(
