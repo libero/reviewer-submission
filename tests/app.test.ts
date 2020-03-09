@@ -10,7 +10,7 @@ import { setContext } from 'apollo-link-context';
 import gql from 'graphql-tag';
 import * as FormData from 'form-data';
 
-const jwtToken = sign({ sub: '123' }, config.authentication_jwt_secret);
+const jwtToken = sign({ sub: 'c0e64a86-2feb-435d-a40f-01f920334bc4' }, config.authentication_jwt_secret);
 
 const authLink = setContext((_, { headers }) => {
     return {
@@ -212,8 +212,6 @@ describe('Application Integration Tests', () => {
         });
 
         expect(uploadResponse.status).toBe(200);
-
-        console.log(uploadResponse.data.data.uploadManuscript);
 
         const deleteResponse = await axios.post(
             'http://localhost:3000/graphql',
