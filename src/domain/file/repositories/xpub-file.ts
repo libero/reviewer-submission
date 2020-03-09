@@ -41,7 +41,7 @@ export default class XpubFileRepository implements FileRepository {
             .builder()
             .select('id', 'manuscript_id', 'status', 'filename', 'url', 'mime_type', 'size', 'created', 'updated')
             .from(this.TABLE_NAME)
-            .where({ id, status: FileStatus.STORED });
+            .where({ id });
 
         const files = await this._query.executor<DatabaseEntry[]>(query);
         return files.length > 0 ? this.entryToDto(files[0]) : null;

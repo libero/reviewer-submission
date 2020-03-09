@@ -28,7 +28,7 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
 
             return submission;
         },
-        async deleteManuscriptFile(
+        async deleteManuscript(
             _,
             variables: { fileId: FileId; submissionId: SubmissionId },
             context,

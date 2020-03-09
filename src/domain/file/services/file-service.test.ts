@@ -6,6 +6,7 @@ import { FileDTO } from '../repositories/types';
 import { FileId, FileType } from '../types';
 import { FileService } from './file-service';
 import { S3Config } from '../../../config';
+import * as S3 from 'aws-sdk/clients/s3';
 
 const submissionId = v4();
 
@@ -22,6 +23,7 @@ const files: FileDTO[] = [
     },
 ];
 
+jest.mock('aws-sdk/clients/s3');
 jest.mock('../repositories/xpub-file');
 
 describe('File Service', () => {
@@ -50,6 +52,29 @@ describe('File Service', () => {
                 FileType.MANUSCRIPT_SOURCE,
             );
             expect(result).toBeTruthy();
+        });
+    });
+
+    describe('deleteManuscript', () => {
+        it('should delete manuscript', async () => {
+            const fileId = v4();
+            XpubFileRepository.prototype.findFileById = jest
+                .fn()
+                .mockReturnValue({ id: fileId, url: `manuscripts/${submissionId}` });
+            XpubFileRepository.prototype.deleteById = jest.fn().mockReturnValue(true);
+            S3.prototype.deleteObject = jest.fn().mockImplementationOnce(() => true);
+            const service = new FileService((null as unknown) as Knex, ({} as unknown) as S3Config);
+            const result = await service.deleteManuscript(FileId.fromUuid(fileId), SubmissionId.fromUuid(submissionId));
+            expect(result).toBeTruthy();
+        });
+
+        it('should throw if manuscript not found', async () => {
+            XpubFileRepository.prototype.findFileById = jest.fn().mockReturnValue(null);
+            const service = new FileService((null as unknown) as Knex, ({} as unknown) as S3Config);
+            const fileId = v4();
+            await expect(
+                service.deleteManuscript(FileId.fromUuid(fileId), SubmissionId.fromUuid(submissionId)),
+            ).rejects.toThrow();
         });
     });
 });
