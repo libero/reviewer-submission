@@ -38,7 +38,7 @@ export class FileService {
     }
 
     async deleteManuscript(fileId: FileId, submissionId: SubmissionId): Promise<boolean> {
-        await this.fileRepository.deleteById(fileId);
+        await this.fileRepository.deleteByIdAndSubmissionId(fileId, submissionId);
         await this.s3.deleteObject({
             Bucket: this.bucket,
             Key: this.generateManuscriptS3Key(submissionId, fileId),

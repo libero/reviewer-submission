@@ -47,7 +47,7 @@ export default class XpubFileRepository implements FileRepository {
         return files.length > 0 ? this.entryToDto(files[0]) : null;
     }
 
-    async deleteById(id: FileId): Promise<boolean> {
+    async deleteByIdAndSubmissionId(id: FileId, submissionId: SubmissionId): Promise<boolean> {
         const file = await this.findFileById(id);
         if (file === null) {
             throw new Error(`Unable to find entry with id: ${id}`);
@@ -57,7 +57,7 @@ export default class XpubFileRepository implements FileRepository {
             .builder()
             .table(this.TABLE_NAME)
             .update(entryToSave)
-            .where({ id: id });
+            .where({ id: id, manuscript_id: submissionId });
         await this._query.executor(query);
         return true;
     }
