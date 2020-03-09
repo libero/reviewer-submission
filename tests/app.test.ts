@@ -164,7 +164,7 @@ describe('Application Integration Tests', () => {
         expect(response.data.data.uploadManuscript.id).toBe(id);
     });
 
-    it.only('deletes a manuscript file', async () => {
+    it('deletes a manuscript file', async () => {
         const body = new FormData();
 
         const loginResponse = await axios.post(
@@ -232,6 +232,81 @@ describe('Application Integration Tests', () => {
         );
 
         expect(deleteResponse.status).toBe(200);
+        console.log('deleteResponse.data.errors', deleteResponse.data.errors);
         expect(deleteResponse.data.errors).toBeUndefined();
+    });
+
+    it('it should throw a user tries to delete a file unrelated to their submission', async () => {
+        const body = new FormData();
+
+        const loginResponse = await axios.post(
+            'http://localhost:3000/graphql',
+            {
+                query: `
+                    mutation StartSubmission($articleType: String!) {
+                        startSubmission(articleType: $articleType) {
+                            id
+                        }
+                    }
+                `,
+                variables: {
+                    articleType: 'researchArticle',
+                },
+            },
+            { headers: { Authorization: `Bearer ${jwtToken}` } },
+        );
+
+        const submissionId = loginResponse.data.data.startSubmission.id;
+        const uploadQuery = `mutation UploadManuscript($id: ID!, $file: Upload!, $fileSize: Int!) {
+            uploadManuscript(id: $id, file: $file, fileSize: $fileSize) {
+                id,
+                manuscriptFile {
+                    id
+                }
+            }
+        }`;
+
+        const operations = {
+            query: uploadQuery,
+            variables: {
+                id: submissionId,
+                file: null,
+                fileSize: 2,
+            },
+        };
+
+        body.append('operations', JSON.stringify(operations));
+        body.append('map', '{ "1": ["variables.file"] }');
+        body.append('1', 'a', { filename: 'a.txt' });
+
+        const uploadResponse = await axios.post('http://localhost:3000/graphql', body, {
+            headers: { Authorization: `Bearer ${jwtToken}`, ...body.getHeaders() },
+        });
+
+        expect(uploadResponse.status).toBe(200);
+
+        const imposterToken = sign({ sub: 'c0e74a86-2feb-435d-a50f-01f920334bc4' }, config.authentication_jwt_secret);
+
+        const deleteResponse = await axios.post(
+            'http://localhost:3000/graphql',
+            {
+                query: `
+                    mutation DeleteManuscript($fileId: ID!, $submissionId: ID!) {
+                        deleteManuscript(fileId: $fileId, submissionId: $submissionId) 
+                    }
+                `,
+                variables: {
+                    fileId: uploadResponse.data.data.uploadManuscript.manuscriptFile.id,
+                    submissionId,
+                },
+            },
+            {
+                headers: { Authorization: `Bearer ${imposterToken}` },
+            },
+        );
+
+        expect(deleteResponse.status).toBe(200);
+        expect(deleteResponse.data.errors).toBeDefined();
+        expect(deleteResponse.data.errors[0].message).toBe('User not allowed to delete files');
     });
 });
