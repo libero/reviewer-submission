@@ -40,7 +40,7 @@ export class FileService {
         size: number,
         type: FileType,
     ): Promise<File> {
-        if (type === FileType.MANUSCRIPT_SOURCE || type === FileType.MANUSCRIPT_SOURCE_PENDING) {
+        if (type === FileType.MANUSCRIPT_SOURCE) {
             const hasFile = await this.hasManuscriptFile(submissionId);
             if (hasFile === true) {
                 throw new Error('Submission already has manuscript');
