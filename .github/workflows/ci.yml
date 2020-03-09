@@ -43,12 +43,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-client-
       - name: Build
-        run: make build
+        run: |
+          make build
+          make build_xpub_postgres
       - name: Save Docker images
         run: |
           mkdir -p docker-image
           docker save -o docker-image/reviewer-submission.tar libero/reviewer-submission:${IMAGE_TAG}
           gzip docker-image/reviewer-submission.tar
+          mkdir -p docker-xpub-postgres-image
+          docker save -o docker-image/reviewer-xpub-postgres.tar libero/reviewer-xpub-postgres:${IMAGE_TAG}
+          gzip docker-image/reviewer-xpub-postgres.tar
       - name: Upload prod Docker image
         uses: actions/upload-artifact@v1
         with:
@@ -98,8 +103,12 @@ jobs:
         run: |
           gunzip docker-image/reviewer-submission.tar.gz
           docker load -i docker-image/reviewer-submission.tar
+          gunzip docker-image/reviewer-xpub-postgres.tar.gz
+          docker load -i docker-image/reviewer-xpub-postgres.tar
       - name: Push image
-        run: .scripts/github/push-image.sh reviewer-submission
+        run: |
+          .scripts/github/push-image.sh reviewer-submission
+          .scripts/github/push-image.sh reviewer-xpub-postgres
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
