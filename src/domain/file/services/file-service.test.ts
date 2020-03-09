@@ -61,7 +61,7 @@ describe('File Service', () => {
             XpubFileRepository.prototype.findFileById = jest
                 .fn()
                 .mockReturnValue({ id: fileId, url: `manuscripts/${submissionId}` });
-            XpubFileRepository.prototype.deleteById = jest.fn().mockReturnValue(true);
+            XpubFileRepository.prototype.deleteByIdAndSubmissionId = jest.fn().mockReturnValueOnce(true);
             S3.prototype.deleteObject = jest.fn().mockImplementationOnce(() => true);
             const service = new FileService((null as unknown) as Knex, ({} as unknown) as S3Config);
             const result = await service.deleteManuscript(FileId.fromUuid(fileId), SubmissionId.fromUuid(submissionId));
