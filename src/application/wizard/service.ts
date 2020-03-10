@@ -54,7 +54,8 @@ export class WizardService {
 
     async deleteManuscriptFile(fileId: FileId, submissionId: SubmissionId, user: User): Promise<boolean> {
         const submission = await this.submissionService.get(submissionId);
-        if (submission.createdBy !== user.id) {
+        const allowed = this.permissionService.userCan(user, SubmissionOperation.DELETE, submission);
+        if (!allowed) {
             throw new Error('User not allowed to delete files');
         }
         return await this.fileService.deleteManuscript(fileId, submissionId);
