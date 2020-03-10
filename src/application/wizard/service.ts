@@ -92,6 +92,7 @@ export class WizardService {
 
         const uploadPromise = this.fileService.upload(fileContents, manuscriptFile);
 
+        // TODO: shouldn't this be stored in the DB?
         manuscriptFile.setStatusToStored();
 
         const semanticExtractionPromise = this.semanticExtractionService.extractTitle(
@@ -109,5 +110,44 @@ export class WizardService {
         // this is not elegant but its the best we can do given the fact that files are now a concept
         // outside of Submission, so we patch it in ¯\_(ツ)_/¯
         return new Submission({ ...submission, manuscriptFile });
+    }
+
+    async saveSupportingFile(
+        user: User,
+        submissionId: SubmissionId,
+        file: FileUpload,
+        fileSize: number,
+    ): Promise<Submission> {
+        const submission = await this.submissionService.get(submissionId);
+        const allowed = this.permissionService.userCan(user, SubmissionOperation.UPDATE, submission);
+        if (!allowed) {
+            throw new Error('User not allowed to save submission');
+        }
+        const { filename, mimetype: mimeType, createReadStream } = await file;
+        const stream = createReadStream();
+        const supportingFile = await this.fileService.create(
+            submissionId,
+            filename,
+            mimeType,
+            fileSize,
+            FileType.SUPPORTING_FILE,
+        );
+
+        const fileContents: Buffer = await new Promise((resolve, reject) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const chunks: Array<any> = [];
+            stream.on('data', chunk => chunks.push(chunk));
+            stream.on('error', reject);
+            stream.on('end', () => resolve(Buffer.concat(chunks)));
+        });
+
+        await this.fileService.upload(fileContents, supportingFile);
+
+        // TODO: shouldn't this be stored in the DB?
+        supportingFile.setStatusToStored();
+
+        // TODO: what should be returned here?
+
+        return submission;
     }
 }
