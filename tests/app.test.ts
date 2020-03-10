@@ -308,4 +308,88 @@ describe('Application Integration Tests', () => {
         expect(deleteResponse.data.errors).toBeDefined();
         expect(deleteResponse.data.errors[0].message).toBe('User not allowed to delete files');
     });
+
+    it('it should allow a user to delete their submission', async () => {
+        const startSubmissionResponse = await axios.post(
+            'http://localhost:3000/graphql',
+            {
+                query: `
+                    mutation StartSubmission($articleType: String!) {
+                        startSubmission(articleType: $articleType) {
+                            id
+                        }
+                    }
+                `,
+                variables: {
+                    articleType: 'researchArticle',
+                },
+            },
+            { headers: { Authorization: `Bearer ${jwtToken}` } },
+        );
+
+        const submissionId = startSubmissionResponse.data.data.startSubmission.id;
+
+        const deleteResponse = await axios.post(
+            'http://localhost:3000/graphql',
+            {
+                query: `
+                    mutation DeleteSubmission($id: ID!) {
+                        deleteSubmission(id: $id) 
+                    }
+                `,
+                variables: {
+                    id: submissionId,
+                },
+            },
+            {
+                headers: { Authorization: `Bearer ${jwtToken}` },
+            },
+        );
+
+        expect(deleteResponse.status).toBe(200);
+        expect(deleteResponse.data.errors).toBeUndefined();
+    });
+
+    it('it should throw if the user tries to delete a submission that is not their own', async () => {
+        const startSubmissionResponse = await axios.post(
+            'http://localhost:3000/graphql',
+            {
+                query: `
+                    mutation StartSubmission($articleType: String!) {
+                        startSubmission(articleType: $articleType) {
+                            id
+                        }
+                    }
+                `,
+                variables: {
+                    articleType: 'researchArticle',
+                },
+            },
+            { headers: { Authorization: `Bearer ${jwtToken}` } },
+        );
+
+        const submissionId = startSubmissionResponse.data.data.startSubmission.id;
+        const imposterToken = sign({ sub: 'c0e74a86-2feb-435d-a50f-01f920334bc4' }, config.authentication_jwt_secret);
+
+        const deleteResponse = await axios.post(
+            'http://localhost:3000/graphql',
+            {
+                query: `
+                    mutation DeleteSubmission($id: ID!) {
+                        deleteSubmission(id: $id) 
+                    }
+                `,
+                variables: {
+                    id: submissionId,
+                },
+            },
+            {
+                headers: { Authorization: `Bearer ${imposterToken}` },
+            },
+        );
+
+        expect(deleteResponse.status).toBe(200);
+        expect(deleteResponse.data.errors).toBeDefined();
+        expect(deleteResponse.data.errors[0].message).toBe('User not allowed to delete submission');
+    });
 });

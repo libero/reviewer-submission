@@ -76,6 +76,7 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
     public async delete(id: SubmissionId): Promise<boolean> {
         const query = this._query
             .builder()
+            .table(this.TABLE_NAME)
             .where({ id })
             .delete();
         const result = await this._query.executor<number>(query);
