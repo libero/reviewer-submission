@@ -394,6 +394,44 @@ describe('Application Integration Tests', () => {
         expect(getResponse.data.data.researchArticle).toBe('researchArticle');
     });
 
+    it('it should allow a user to get their submissions', async () => {
+        await axios.post(
+            'http://localhost:3000/graphql',
+            {
+                query: `
+                    mutation StartSubmission($articleType: String!) {
+                        startSubmission(articleType: $articleType) {
+                            id
+                        }
+                    }
+                `,
+                variables: {
+                    articleType: 'researchArticle',
+                },
+            },
+            { headers: { Authorization: `Bearer ${jwtToken}` } },
+        );
+        const getResponse = await axios.post(
+            'http://localhost:3000/graphql',
+            {
+                query: `
+                    query getSubmissions {
+                        getSubmissions {
+                            id,
+                            articleType
+                        }
+                    }
+                `,
+            },
+            {
+                headers: { Authorization: `Bearer ${jwtToken}` },
+            },
+        );
+        expect(getResponse.status).toBe(200);
+        expect(Array.isArray(getResponse.data.data.getSubmissions)).toBe(true);
+        expect(getResponse.data.data.getSubmissions.length).toBeGreaterThan(1);
+    });
+
     it('it should throw if the user tries to delete a submission that is not their own', async () => {
         const startSubmissionResponse = await axios.post(
             'http://localhost:3000/graphql',
