@@ -29,6 +29,23 @@ export class FileService {
         this.s3 = new S3(s3Options);
     }
 
+    private generateManuscriptS3Key(submissionId: SubmissionId, fileId: FileId): string {
+        return `manuscripts/${submissionId}/${fileId}`;
+    }
+
+    private generateSupportFileS3Key(submissionId: SubmissionId, fileId: FileId): string {
+        return `supporting/${submissionId}/${fileId}`;
+    }
+
+    async deleteManuscript(fileId: FileId, submissionId: SubmissionId): Promise<boolean> {
+        await this.fileRepository.deleteByIdAndSubmissionId(fileId, submissionId);
+        await this.s3.deleteObject({
+            Bucket: this.bucket,
+            Key: this.generateManuscriptS3Key(submissionId, fileId),
+        });
+        return true;
+    }
+
     async create(
         submissionId: SubmissionId,
         filename: string,
@@ -36,6 +53,12 @@ export class FileService {
         size: number,
         type: FileType,
     ): Promise<File> {
+        if (type === FileType.MANUSCRIPT_SOURCE) {
+            const hasFile = await this.hasManuscriptFile(submissionId);
+            if (hasFile === true) {
+                throw new Error('Submission already has manuscript');
+            }
+        }
         const id = FileId.fromUuid(uuid());
         const status = FileStatus.CREATED;
         const url = `manuscripts/${submissionId}`;
@@ -57,8 +80,12 @@ export class FileService {
         return this.fileRepository.update(fileDTO);
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async upload(fileContents: Buffer, file: File): Promise<any> {
+    async hasManuscriptFile(submissionId: SubmissionId): Promise<boolean> {
+        const file = await this.fileRepository.findManuscriptBySubmssionId(submissionId);
+        return file !== null;
+    }
+
+    async upload(fileContents: Buffer, file: File): Promise<S3.ManagedUpload.SendData> {
         const { url, id, mimeType } = file;
         return this.s3
             .upload({

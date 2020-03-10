@@ -8,7 +8,7 @@ import Submission from '../../domain/submission/services/models/submission';
 import { AuthorTeamMember } from '../../domain/teams/repositories/types';
 import { PermissionService, SubmissionOperation } from '../permission/service';
 import { User } from 'src/domain/user/user';
-import { FileType } from '../../domain/file/types';
+import { FileType, FileId } from '../../domain/file/types';
 
 export class WizardService {
     constructor(
@@ -52,10 +52,18 @@ export class WizardService {
         return submission;
     }
 
+    async deleteManuscriptFile(fileId: FileId, submissionId: SubmissionId, user: User): Promise<boolean> {
+        const submission = await this.submissionService.get(submissionId);
+        const allowed = this.permissionService.userCan(user, SubmissionOperation.DELETE, submission);
+        if (!allowed) {
+            throw new Error('User not allowed to delete files');
+        }
+        return await this.fileService.deleteManuscript(fileId, submissionId);
+    }
+
     async saveManuscriptFile(
         user: User,
         submissionId: SubmissionId,
-        userId: string,
         file: FileUpload,
         fileSize: number,
     ): Promise<Submission> {
@@ -66,13 +74,12 @@ export class WizardService {
         }
         const { filename, mimetype: mimeType, createReadStream } = await file;
         const stream = createReadStream();
-
         const manuscriptFile = await this.fileService.create(
             submissionId,
             filename,
             mimeType,
             fileSize,
-            FileType.MANUSCRIPT_SOURCE_PENDING,
+            FileType.MANUSCRIPT_SOURCE,
         );
 
         const fileContents: Buffer = await new Promise((resolve, reject) => {
@@ -99,15 +106,6 @@ export class WizardService {
         } catch (e) {
             manuscriptFile.setStatusToCancelled();
         }
-
-        // @todo: decide what to do with previous manuscript
-        // option 1: client needs to call delete manuscript mutation and we assume only one current manuscript
-        // option 2: handle this in this mutation
-
-        manuscriptFile.setTypeToSource();
-
-        await this.fileService.update({ ...manuscriptFile });
-
         // this is not elegant but its the best we can do given the fact that files are now a concept
         // outside of Submission, so we patch it in ¯\_(ツ)_/¯
         return new Submission({ ...submission, manuscriptFile });

@@ -23,19 +23,20 @@ export class DashboardService {
     }
 
     async getSubmission(user: User, id: SubmissionId): Promise<Submission> {
-        const allowed = this.permissionService.userCan(user, SubmissionOperation.READ, null);
+        const submission = await this.submissionService.get(id);
+        const allowed = this.permissionService.userCan(user, SubmissionOperation.READ, submission);
         if (!allowed) {
             throw new Error('User not allowed to read submission');
         }
-        return this.submissionService.get(id);
+        return submission;
     }
 
     async deleteSubmission(user: User, id: SubmissionId): Promise<boolean> {
-        const allowed = this.permissionService.userCan(user, SubmissionOperation.DELETE, null);
+        const submission = await this.getSubmission(user, id);
+        const allowed = this.permissionService.userCan(user, SubmissionOperation.DELETE, submission);
         if (!allowed) {
             throw new Error('User not allowed to delete submission');
         }
-
         return this.submissionService.delete(id);
     }
 }

@@ -20,7 +20,7 @@ export class PermissionService {
             case SubmissionOperation.READ:
             case SubmissionOperation.UPDATE:
             case SubmissionOperation.DELETE:
-                return this.isStaff(user) || (submission !== null && submission.createdBy == user.id);
+                return this.isStaff(user) || (submission !== null && submission.createdBy === user.id);
             default:
                 return false;
         }

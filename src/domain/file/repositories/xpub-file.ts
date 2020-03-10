@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { KnexTableAdapter } from '../../knex-table-adapter';
 import { SubmissionId } from '../../submission/types';
-import { FileId } from '../types';
+import { FileId, FileType, FileStatus } from '../types';
 import { FileDTO } from './types';
 
 interface FileRepository {
@@ -47,12 +47,27 @@ export default class XpubFileRepository implements FileRepository {
         return files.length > 0 ? this.entryToDto(files[0]) : null;
     }
 
+    async deleteByIdAndSubmissionId(id: FileId, submissionId: SubmissionId): Promise<boolean> {
+        const file = await this.findFileById(id);
+        if (file === null) {
+            throw new Error(`Unable to find entry with id: ${id}`);
+        }
+        const entryToSave = this.dtoToEntry({ ...file, updated: new Date(), status: FileStatus.DELETED });
+        const query = this._query
+            .builder()
+            .table(this.TABLE_NAME)
+            .update(entryToSave)
+            .where({ id: id, manuscript_id: submissionId });
+        await this._query.executor(query);
+        return true;
+    }
+
     async findManuscriptBySubmssionId(id: SubmissionId): Promise<FileDTO | null> {
         const query = this._query
             .builder()
             .select('id', 'manuscript_id', 'status', 'filename', 'url', 'mime_type', 'size', 'created', 'updated')
             .from(this.TABLE_NAME)
-            .where({ manuscript_id: id });
+            .where({ manuscript_id: id, type: FileType.MANUSCRIPT_SOURCE, status: FileStatus.STORED });
 
         const files = await this._query.executor<DatabaseEntry[]>(query);
         return files.length > 0 ? this.entryToDto(files[0]) : null;
