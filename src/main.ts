@@ -118,10 +118,8 @@ const init = async (): Promise<void> => {
         context: ({ req }: ExpressContext): { userId: string; authorizationHeader: string } => {
             try {
                 // @todo: we need to use the correct libero auth token
-                console.log('req.headers.authorization', req.headers.authorization);
                 const token = (req.headers.authorization || '').split(' ')[1];
                 const decodedToken = verify(token, config.authentication_jwt_secret) as { sub: string };
-                console.log('decodedToken', decodedToken);
                 return { userId: decodedToken.sub, authorizationHeader: req.headers.authorization || '' };
             } catch (e) {
                 throw new AuthenticationError('You must be logged in');

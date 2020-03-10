@@ -232,7 +232,6 @@ describe('Application Integration Tests', () => {
         );
 
         expect(deleteResponse.status).toBe(200);
-        console.log('deleteResponse.data.errors', deleteResponse.data.errors);
         expect(deleteResponse.data.errors).toBeUndefined();
     });
 
