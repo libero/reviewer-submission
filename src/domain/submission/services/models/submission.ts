@@ -44,6 +44,7 @@ export default class Submission {
     }
 
     private articleTypeFromString(type: string): ArticleType {
+        console.log('type', type);
         switch (type) {
             case 'researchArticle':
                 return ArticleType.RESEARCH_ARTICLE;

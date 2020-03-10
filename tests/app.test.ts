@@ -164,7 +164,7 @@ describe('Application Integration Tests', () => {
         expect(response.data.data.uploadManuscript.id).toBe(id);
     });
 
-    it('deletes a manuscript file', async () => {
+    it.skip('deletes a manuscript file', async () => {
         const body = new FormData();
 
         const loginResponse = await axios.post(
@@ -348,6 +348,50 @@ describe('Application Integration Tests', () => {
 
         expect(deleteResponse.status).toBe(200);
         expect(deleteResponse.data.errors).toBeUndefined();
+    });
+
+    it('it should allow a user to get their submission', async () => {
+        const startSubmissionResponse = await axios.post(
+            'http://localhost:3000/graphql',
+            {
+                query: `
+                    mutation StartSubmission($articleType: String!) {
+                        startSubmission(articleType: $articleType) {
+                            id
+                        }
+                    }
+                `,
+                variables: {
+                    articleType: 'researchArticle',
+                },
+            },
+            { headers: { Authorization: `Bearer ${jwtToken}` } },
+        );
+
+        const submissionId = startSubmissionResponse.data.data.startSubmission.id;
+
+        const getResponse = await axios.post(
+            'http://localhost:3000/graphql',
+            {
+                query: `
+                    query GetSubmission($id: ID!) {
+                        getSubmission(id: $id) {
+                            id,
+                            articleType
+                        }
+                    }
+                `,
+                variables: {
+                    id: submissionId,
+                },
+            },
+            {
+                headers: { Authorization: `Bearer ${jwtToken}` },
+            },
+        );
+        expect(getResponse.status).toBe(200);
+        expect(getResponse.data.data.id).toBe(submissionId);
+        expect(getResponse.data.data.researchArticle).toBe('researchArticle');
     });
 
     it('it should throw if the user tries to delete a submission that is not their own', async () => {
