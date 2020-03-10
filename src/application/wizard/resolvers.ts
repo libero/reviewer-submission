@@ -28,6 +28,7 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
 
             return submission;
         },
+        // @todo: swap to user once reviewer mocks can handle more than one user.
         async deleteManuscript(
             _,
             variables: { fileId: FileId; submissionId: SubmissionId },
