@@ -35,7 +35,8 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
             context,
         ): Promise<boolean> {
             const { fileId, submissionId } = variables;
-            return await wizard.deleteManuscriptFile(fileId, submissionId, context.userId);
+            const user = await userService.getCurrentUser(context.authorizationHeader);
+            return await wizard.deleteManuscriptFile(fileId, submissionId, user);
         },
     },
 });
