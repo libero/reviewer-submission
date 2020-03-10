@@ -164,7 +164,7 @@ describe('Application Integration Tests', () => {
         expect(response.data.data.uploadManuscript.id).toBe(id);
     });
 
-    it.skip('deletes a manuscript file', async () => {
+    it('deletes a manuscript file', async () => {
         const body = new FormData();
 
         const loginResponse = await axios.post(
@@ -390,8 +390,8 @@ describe('Application Integration Tests', () => {
             },
         );
         expect(getResponse.status).toBe(200);
-        expect(getResponse.data.data.id).toBe(submissionId);
-        expect(getResponse.data.data.researchArticle).toBe('researchArticle');
+        expect(getResponse.data.data.getSubmission.id).toBe(submissionId);
+        expect(getResponse.data.data.getSubmission.articleType).toBe('researchArticle');
     });
 
     it('it should allow a user to get their submissions', async () => {
