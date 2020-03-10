@@ -390,6 +390,7 @@ describe('Application Integration Tests', () => {
 
         expect(deleteResponse.status).toBe(200);
         expect(deleteResponse.data.errors).toBeDefined();
-        expect(deleteResponse.data.errors[0].message).toBe('User not allowed to delete submission');
+        // It's read rather than delete because of the permission service
+        expect(deleteResponse.data.errors[0].message).toBe('User not allowed to read submission');
     });
 });
