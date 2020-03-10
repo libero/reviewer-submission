@@ -14,7 +14,6 @@ export class RestUserRepository implements UserRepository {
                 headers: [['authorization', header]],
             });
             const json = await response.json();
-            console.log(json);
             return json;
         } catch (error) {
             logger.error(error);
