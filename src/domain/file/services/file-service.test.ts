@@ -52,7 +52,33 @@ describe('File Service', () => {
             expect(result).toBeTruthy();
         });
 
-        // it('should create correct url for manuscript')
+        it('should create correct url for manuscript', async () => {
+            XpubFileRepository.prototype.findManuscriptBySubmissionId = jest.fn().mockReturnValue(null);
+            XpubFileRepository.prototype.create = jest.fn().mockImplementationOnce(file => file);
+            const service = new FileService((null as unknown) as Knex, ({} as unknown) as S3Config);
+            const result = await service.create(
+                SubmissionId.fromUuid(submissionId),
+                '',
+                '',
+                0,
+                FileType.MANUSCRIPT_SOURCE,
+            );
+            expect(result.url).toBe(`manuscripts/${submissionId}/${result.id}`);
+        });
+
+        it('should create correct url for supporting file', async () => {
+            XpubFileRepository.prototype.findManuscriptBySubmissionId = jest.fn().mockReturnValue(null);
+            XpubFileRepository.prototype.create = jest.fn().mockImplementationOnce(file => file);
+            const service = new FileService((null as unknown) as Knex, ({} as unknown) as S3Config);
+            const result = await service.create(
+                SubmissionId.fromUuid(submissionId),
+                '',
+                '',
+                0,
+                FileType.SUPPORTING_FILE,
+            );
+            expect(result.url).toBe(`supporting/${submissionId}/${result.id}`);
+        });
     });
 
     describe('deleteManuscript', () => {
