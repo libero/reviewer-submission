@@ -7,7 +7,7 @@ import { PermissionService } from '../permission/service';
 import { FileService } from '../../domain/file/services/file-service';
 import { SemanticExtractionService } from '../../domain/semantic-extraction/services/semantic-extraction-service';
 
-describe('saveDetailsPage', () => {
+describe('saveAuthorPage', () => {
     it('should throw if submission not found', async () => {
         const submissionServiceMock = ({
             get: jest.fn().mockImplementationOnce(() => null),

@@ -9,7 +9,7 @@ import { FileId } from '../../domain/file/types';
 const resolvers = (wizard: WizardService, userService: UserService): IResolvers => ({
     Query: {},
     Mutation: {
-        async saveDetailsPage(
+        async saveAuthorPage(
             _,
             { id: submissionId, details }: { id: SubmissionId; details: Author },
             context,
