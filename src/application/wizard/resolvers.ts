@@ -15,7 +15,7 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
             context,
         ): Promise<Submission | null> {
             const user = await userService.getCurrentUser(context.authorizationHeader);
-            return wizard.saveDetailsPage(user, submissionId, details);
+            return wizard.saveAuthorPage(user, submissionId, details);
         },
         async uploadManuscript(
             _,

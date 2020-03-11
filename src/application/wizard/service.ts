@@ -19,7 +19,7 @@ export class WizardService {
         private readonly semanticExtractionService: SemanticExtractionService,
     ) {}
 
-    async saveDetailsPage(user: User, submissionId: SubmissionId, details: Author): Promise<Submission | null> {
+    async saveAuthorPage(user: User, submissionId: SubmissionId, details: Author): Promise<Submission | null> {
         const submission = await this.submissionService.get(submissionId);
         if (submission === null) {
             throw new Error('No submission found');
