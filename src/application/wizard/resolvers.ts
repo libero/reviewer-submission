@@ -9,13 +9,13 @@ import { FileId } from '../../domain/file/types';
 const resolvers = (wizard: WizardService, userService: UserService): IResolvers => ({
     Query: {},
     Mutation: {
-        async saveDetailsPage(
+        async saveAuthorPage(
             _,
             { id: submissionId, details }: { id: SubmissionId; details: Author },
             context,
         ): Promise<Submission | null> {
             const user = await userService.getCurrentUser(context.authorizationHeader);
-            return wizard.saveDetailsPage(user, submissionId, details);
+            return wizard.saveAuthorPage(user, submissionId, details);
         },
         async uploadManuscript(
             _,

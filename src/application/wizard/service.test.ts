@@ -7,7 +7,7 @@ import { PermissionService } from '../permission/service';
 import { FileService } from '../../domain/file/services/file-service';
 import { SemanticExtractionService } from '../../domain/semantic-extraction/services/semantic-extraction-service';
 
-describe('saveDetailsPage', () => {
+describe('saveAuthorPage', () => {
     it('should throw if submission not found', async () => {
         const submissionServiceMock = ({
             get: jest.fn().mockImplementationOnce(() => null),
@@ -36,7 +36,7 @@ describe('saveDetailsPage', () => {
             role: 'user',
         };
         await expect(
-            wizardService.saveDetailsPage(user, SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'), {
+            wizardService.saveAuthorPage(user, SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'), {
                 firstName: 'John',
                 lastName: 'Smith',
                 email: 'john.smith@example.com',
@@ -74,7 +74,7 @@ describe('saveDetailsPage', () => {
             role: 'user',
         };
         await expect(
-            wizardService.saveDetailsPage(user, SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'), {
+            wizardService.saveAuthorPage(user, SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'), {
                 firstName: 'John',
                 lastName: 'Smith',
                 email: 'john.smith@example.com',
@@ -115,7 +115,7 @@ describe('saveDetailsPage', () => {
             fileServiceMock,
             semanticExtractionServiceMock,
         );
-        await wizardService.saveDetailsPage(user, SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'), {
+        await wizardService.saveAuthorPage(user, SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'), {
             firstName: 'John',
             lastName: 'Smith',
             email: 'john.smith@example.com',
@@ -169,7 +169,7 @@ describe('saveDetailsPage', () => {
             semanticExtractionServiceMock,
         );
 
-        await wizardService.saveDetailsPage(user, subId, {
+        await wizardService.saveAuthorPage(user, subId, {
             firstName: 'John',
             lastName: 'Smith',
             email: 'john.smith@example.com',
@@ -228,7 +228,7 @@ describe('saveDetailsPage', () => {
         );
 
         await expect(
-            wizardService.saveDetailsPage(user, SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'), {
+            wizardService.saveAuthorPage(user, SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'), {
                 firstName: 'John',
                 lastName: 'Smith',
                 email: 'john.smith@example.com',
