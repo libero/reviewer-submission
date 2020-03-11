@@ -31,7 +31,7 @@ describe('File Service', () => {
 
     describe('create', () => {
         it('should throw is manuscript already exists', async () => {
-            XpubFileRepository.prototype.findManuscriptBySubmssionId = jest.fn().mockReturnValue(files);
+            XpubFileRepository.prototype.findManuscriptBySubmissionId = jest.fn().mockReturnValue(files);
             const service = new FileService((null as unknown) as Knex, ({} as unknown) as S3Config);
             await expect(
                 service.create(SubmissionId.fromUuid(submissionId), '', '', 0, FileType.MANUSCRIPT_SOURCE),
@@ -39,7 +39,7 @@ describe('File Service', () => {
         });
 
         it('should create if no manuscript exists', async () => {
-            XpubFileRepository.prototype.findManuscriptBySubmssionId = jest.fn().mockReturnValue(null);
+            XpubFileRepository.prototype.findManuscriptBySubmissionId = jest.fn().mockReturnValue(null);
             XpubFileRepository.prototype.create = jest.fn().mockReturnValue(files[0]);
             const service = new FileService((null as unknown) as Knex, ({} as unknown) as S3Config);
             const result = await service.create(
@@ -51,6 +51,8 @@ describe('File Service', () => {
             );
             expect(result).toBeTruthy();
         });
+
+        // it('should create correct url for manuscript')
     });
 
     describe('deleteManuscript', () => {

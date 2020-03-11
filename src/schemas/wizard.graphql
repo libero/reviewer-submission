@@ -2,4 +2,5 @@ type Mutation {
     saveDetailsPage(id: ID!, details: AuthorDetailsInput!): Submission!
     uploadManuscript(id: ID!, file: Upload!, fileSize: Int!): Submission!
     deleteManuscript(fileId: ID!, submissionId: ID!): Boolean!
+    uploadSupportingFile(id: ID!, file: Upload!, fileSize: Int!): Submission!
 }

@@ -38,6 +38,17 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
             const user = await userService.getCurrentUser(context.authorizationHeader);
             return await wizard.deleteManuscriptFile(fileId, submissionId, user);
         },
+        async uploadSupportingFile(
+            _,
+            variables: { file: FileUpload; fileSize: number; id: SubmissionId },
+            context,
+        ): Promise<Submission> {
+            const { file, id: submissionId, fileSize } = variables;
+            const user = await userService.getCurrentUser(context.authorizationHeader);
+            const submission = await wizard.saveSupportingFile(user, submissionId, file, fileSize);
+
+            return submission;
+        },
     },
 });
 

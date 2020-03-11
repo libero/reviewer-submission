@@ -1,3 +1,4 @@
+import { FileUpload } from 'graphql-upload';
 import { WizardService } from './service';
 import { SubmissionService } from '../../domain/submission';
 import { TeamService } from '../../domain/teams/services/team-service';
@@ -6,6 +7,7 @@ import { TeamId } from '../../domain/teams/types';
 import { PermissionService } from '../permission/service';
 import { FileService } from '../../domain/file/services/file-service';
 import { SemanticExtractionService } from '../../domain/semantic-extraction/services/semantic-extraction-service';
+import File from '../../domain/file/services/models/file';
 
 describe('saveDetailsPage', () => {
     it('should throw if submission not found', async () => {
@@ -237,3 +239,56 @@ describe('saveDetailsPage', () => {
         ).rejects.toThrow();
     });
 });
+
+// describe('saveSupportingFile', () => {
+//     it.only('should upload a supporting file', async () => {
+//         const user = {
+//             id: '89e0aec8-b9fc-4413-8a37-cccccccc',
+//             name: 'Bob',
+//             role: 'user',
+//         };
+//         const supportingFile = ({
+//             setStatusToStored: jest.fn(),
+//         } as unknown) as File;
+//         const submissionServiceMock = ({
+//             get: jest.fn().mockImplementationOnce(() => ({
+//                 createdBy: '89e0aec8-b9fc-4413-8a37-5cc77567',
+//             })),
+//         } as unknown) as SubmissionService;
+//         const teamServiceMock = ({} as unknown) as TeamService;
+//         const permissionServiceMock = ({
+//             userCan: jest.fn().mockReturnValue(true),
+//         } as unknown) as PermissionService;
+//         const fileServiceMock = ({
+//             create: jest.fn().mockReturnValue(supportingFile),
+//             upload: jest.fn(),
+//             findManuscriptFile: jest.fn(),
+//             getSupportingFiles: jest.fn().mockReturnValue()
+//         } as unknown) as FileService;
+//         const semanticExtractionServiceMock = (jest.fn() as unknown) as SemanticExtractionService;
+//         const file = ({
+//             createReadStream: jest.fn().mockReturnValue({
+//                 on: (event: string, cb: () => void) => {
+//                     if (event === 'end') cb();
+//                 },
+//             }),
+//         } as unknown) as FileUpload;
+
+//         const wizardService = new WizardService(
+//             permissionServiceMock,
+//             submissionServiceMock,
+//             teamServiceMock,
+//             fileServiceMock,
+//             semanticExtractionServiceMock,
+//         );
+
+//         const submission = await wizardService.saveSupportingFile(
+//             user,
+//             SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'),
+//             file,
+//             100,
+//         );
+
+//         expect(submission).toBeTruthy();
+//     });
+// });

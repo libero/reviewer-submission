@@ -475,4 +475,92 @@ describe('Application Integration Tests', () => {
         // It's read rather than delete because of the permission service
         expect(deleteResponse.data.errors[0].message).toBe('User not allowed to read submission');
     });
+
+    it('should upload a supporting file', async () => {
+        const body1 = new FormData();
+        const body = new FormData();
+
+        const loginResponse = await axios.post(
+            'http://localhost:3000/graphql',
+            {
+                query: `
+                    mutation StartSubmission($articleType: String!) {
+                        startSubmission(articleType: $articleType) {
+                            id
+                        }
+                    }
+                `,
+                variables: {
+                    articleType: 'researchArticle',
+                },
+            },
+            { headers: { Authorization: `Bearer ${jwtToken}` } },
+        );
+
+        const submissionId = loginResponse.data.data.startSubmission.id;
+        const uploadManuscriptQuery = `mutation UploadManuscript($id: ID!, $file: Upload!, $fileSize: Int!) {
+            uploadManuscript(id: $id, file: $file, fileSize: $fileSize) {
+                id,
+                manuscriptFile {
+                    id
+                }
+            }
+        }`;
+
+        const manuscriptOperations = {
+            query: uploadManuscriptQuery,
+            variables: {
+                id: submissionId,
+                file: null,
+                fileSize: 2,
+            },
+        };
+
+        body1.append('operations', JSON.stringify(manuscriptOperations));
+        body1.append('map', '{ "1": ["variables.file"] }');
+        body1.append('1', 'a', { filename: 'a.txt' });
+
+        const uploadManuscriptResponse = await axios.post('http://localhost:3000/graphql', body1, {
+            headers: { Authorization: `Bearer ${jwtToken}`, ...body1.getHeaders() },
+        });
+
+        expect(uploadManuscriptResponse.status).toBe(200);
+        expect(uploadManuscriptResponse.data.errors).toBeUndefined();
+
+        const uploadQuery = `mutation UploadSupportingFile($id: ID!, $file: Upload!, $fileSize: Int!) {
+            uploadSupportingFile(id: $id, file: $file, fileSize: $fileSize) {
+                id,
+                manuscriptFile {
+                    id
+                },
+                supportingFiles {
+                    id
+                }
+            }
+        }`;
+
+        const operations = {
+            query: uploadQuery,
+            variables: {
+                id: submissionId,
+                file: null,
+                fileSize: 2,
+            },
+        };
+
+        body.append('operations', JSON.stringify(operations));
+        body.append('map', '{ "1": ["variables.file"] }');
+        body.append('1', 'a', { filename: 'a.txt' });
+
+        const uploadResponse = await axios.post('http://localhost:3000/graphql', body, {
+            headers: { Authorization: `Bearer ${jwtToken}`, ...body.getHeaders() },
+        });
+
+        expect(uploadResponse.status).toBe(200);
+        expect(uploadResponse.data.errors).toBeUndefined();
+        expect(uploadResponse.data.data.uploadSupportingFile.manuscriptFile.id).toBe(
+            uploadManuscriptResponse.data.data.uploadManuscript.manuscriptFile.id,
+        );
+        expect(uploadResponse.data.data.uploadSupportingFile.supportingFiles).toHaveLength(1);
+    });
 });
