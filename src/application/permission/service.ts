@@ -10,17 +10,30 @@ export enum SubmissionOperation {
 
 export class PermissionService {
     isStaff(user: User): boolean {
-        return user.role == 'staff';
+        return user.role === 'staff';
     }
 
-    userCan(user: User, operation: SubmissionOperation, submission: Submission | null): boolean {
+    userCan(user: User, operation: SubmissionOperation): boolean {
         switch (operation) {
             case SubmissionOperation.CREATE:
                 return true;
             case SubmissionOperation.READ:
             case SubmissionOperation.UPDATE:
             case SubmissionOperation.DELETE:
-                return this.isStaff(user) || (submission !== null && submission.createdBy === user.id);
+                return this.isStaff(user);
+            default:
+                return false;
+        }
+    }
+
+    userCanWithSubmission(user: User, operation: SubmissionOperation, submission: Submission): boolean {
+        switch (operation) {
+            case SubmissionOperation.CREATE:
+                return true;
+            case SubmissionOperation.READ:
+            case SubmissionOperation.UPDATE:
+            case SubmissionOperation.DELETE:
+                return this.isStaff(user) || submission.createdBy === user.id;
             default:
                 return false;
         }
