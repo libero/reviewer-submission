@@ -11,11 +11,12 @@ export class DashboardService {
     ) {}
 
     async findMySubmissions(user: User): Promise<Submission[]> {
+        // we don't need to check permissions to perform this operation.
         return this.submissionService.findByUserId(user.id);
     }
 
     async startSubmission(user: User, articleType: string): Promise<Submission> {
-        const allowed = this.permissionService.userCan(user, SubmissionOperation.CREATE, null);
+        const allowed = this.permissionService.userCan(user, SubmissionOperation.CREATE);
         if (!allowed) {
             throw new Error('User not allowed to create submission');
         }
@@ -24,7 +25,7 @@ export class DashboardService {
 
     async getSubmission(user: User, id: SubmissionId): Promise<Submission> {
         const submission = await this.submissionService.get(id);
-        const allowed = this.permissionService.userCan(user, SubmissionOperation.READ, submission);
+        const allowed = this.permissionService.userCanWithSubmission(user, SubmissionOperation.READ, submission);
         if (!allowed) {
             throw new Error('User not allowed to read submission');
         }
@@ -33,7 +34,7 @@ export class DashboardService {
 
     async deleteSubmission(user: User, id: SubmissionId): Promise<boolean> {
         const submission = await this.getSubmission(user, id);
-        const allowed = this.permissionService.userCan(user, SubmissionOperation.DELETE, submission);
+        const allowed = this.permissionService.userCanWithSubmission(user, SubmissionOperation.DELETE, submission);
         if (!allowed) {
             throw new Error('User not allowed to delete submission');
         }
