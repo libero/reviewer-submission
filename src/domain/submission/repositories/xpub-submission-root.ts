@@ -2,6 +2,7 @@
 import { SubmissionId } from '../types';
 import { SubmissionRepository, SubmissionDTO } from './types';
 import { KnexTableAdapter } from '../../knex-table-adapter';
+import { FileType, FileStatus } from 'src/domain/file/types';
 
 type entryMeta = {
     articleType: string;
@@ -52,15 +53,58 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
     }
 
     public async update(dtoSubmission: Partial<SubmissionDTO> & { id: SubmissionId }): Promise<SubmissionDTO> {
-        // @todo: do we merge against remote state?
         const submission = await this.findById(dtoSubmission.id);
         if (submission === null) {
             throw new Error(`Unable to find entry with id: ${dtoSubmission.id}`);
         }
-        const entryToSave = this.dtoToEntry({ ...submission, ...dtoSubmission, updated: new Date() });
-        const query = this._query.builder().update(entryToSave);
-        await this._query.executor<DatabaseEntry[]>(query);
-        return this.entryToDTO(entryToSave);
+
+        const { manuscriptFile, supportingFiles, id, updated, createdBy, status, articleType, title } = dtoSubmission;
+
+        const manuscriptQuery = this._query
+            .builder()
+            .update({
+                id,
+                updated,
+                created_by: createdBy,
+                status: status,
+                meta: {
+                    articleType: articleType,
+                    title: title,
+                },
+            })
+            .table(this.TABLE_NAME);
+
+        await this._query.executor<DatabaseEntry[]>(manuscriptQuery);
+
+        const manuscriptFileEntry = this._query
+            .builder()
+            .select('id', 'manuscript_id', 'status', 'filename', 'url', 'mime_type', 'size', 'created', 'updated')
+            .from('file')
+            .where({
+                id: manuscriptFile.id,
+                manuscript_id: id,
+                type: FileType.MANUSCRIPT_SOURCE,
+                status: FileStatus.STORED,
+            });
+
+        if (manuscriptFileEntry) {
+            this._query
+                .builder()
+                .table(this.TABLE_NAME)
+                .update({
+                    id: manuscriptFile.id,
+                    manuscript_id: manuscriptFile.submissionId,
+                })
+                .where({ id: manuscriptFile.id });
+        }
+
+
+        // // const manuscriptFileQuery = this._query.builder().insert(manuscriptFileEntry);
+
+        // const entryToSave = this.dtoToEntry({ ...submission, ...dtoSubmission, updated: new Date() });
+        // const query = this._query.builder().update(entryToSave);
+        // await this._query.executor<DatabaseEntry[]>(query);
+        // return this.entryToDTO(entryToSave);
     }
 
     public async create(dtoSubmission: Omit<SubmissionDTO, 'updated'>): Promise<SubmissionDTO> {

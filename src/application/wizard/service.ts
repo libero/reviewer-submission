@@ -8,7 +8,10 @@ import Submission from '../../domain/submission/services/models/submission';
 import { AuthorTeamMember } from '../../domain/teams/repositories/types';
 import { PermissionService, SubmissionOperation } from '../permission/service';
 import { User } from 'src/domain/user/user';
-import { FileType, FileId } from '../../domain/file/types';
+import { FileType, FileId, FileStatus } from '../../domain/file/types';
+import File from '../../domain/file/services/models/file';
+import { v4 as uuid } from 'uuid';
+
 
 export class WizardService {
     constructor(
@@ -74,13 +77,8 @@ export class WizardService {
         }
         const { filename, mimetype: mimeType, createReadStream } = await file;
         const stream = createReadStream();
-        const manuscriptFile = await this.fileService.create(
-            submissionId,
-            filename,
-            mimeType,
-            fileSize,
-            FileType.MANUSCRIPT_SOURCE,
-        );
+
+        submission.setManuscriptFile(FileId.fromUuid(uuid()), filename, mimeType, fileSize);
 
         const fileContents: Buffer = await new Promise((resolve, reject) => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -90,9 +88,15 @@ export class WizardService {
             stream.on('end', () => resolve(Buffer.concat(chunks)));
         });
 
-        const uploadPromise = this.fileService.upload(fileContents, manuscriptFile);
+        const manuscriptFileDTO = submission.getManuscriptFile();
 
-        manuscriptFile.setStatusToStored();
+        if (!manuscriptFileDTO) {
+            throw new Error('Manuscript file does not exist');
+        }
+
+        const uploadPromise = this.fileService.upload(fileContents, manuscriptFileDTO);
+
+        submission.setManuscriptFileStatusToStored();
 
         const semanticExtractionPromise = this.semanticExtractionService.extractTitle(
             fileContents,
@@ -104,14 +108,12 @@ export class WizardService {
         try {
             await Promise.all([uploadPromise, semanticExtractionPromise]);
         } catch (e) {
-            manuscriptFile.setStatusToCancelled();
+            submission.setManuscriptFileStatusToCancelled();
         }
 
-        this.fileService.update(manuscriptFile);
+        this.submissionService.update(submission);
 
-        // this is not elegant but its the best we can do given the fact that files are now a concept
-        // outside of Submission, so we patch it in ¯\_(ツ)_/¯
-        return new Submission({ ...submission, manuscriptFile });
+        return submission;
     }
 
     async saveSupportingFile(

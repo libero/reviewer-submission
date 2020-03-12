@@ -51,4 +51,8 @@ export class SubmissionService {
     async delete(id: SubmissionId): Promise<boolean> {
         return await this.submissionRepository.delete(id);
     }
+
+    async update(submission: Submission): Promise<SubmissionDTO> {
+        return await this.submissionRepository.update(submission.toDTO());
+    }
 }

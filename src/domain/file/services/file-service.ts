@@ -112,7 +112,7 @@ export class FileService {
         );
     }
 
-    async upload(fileContents: Buffer, file: File): Promise<S3.ManagedUpload.SendData> {
+    async upload(fileContents: Buffer, file: FileDTO): Promise<S3.ManagedUpload.SendData> {
         const { url, id, mimeType } = file;
         return this.s3
             .upload({
