@@ -23,94 +23,162 @@ describe('userCan', () => {
     });
 
     describe('SubmissionOperation.UPDATE', () => {
-        it('should return true if staff', () => {
-            const op = SubmissionOperation.UPDATE;
-            user.role = 'staff';
-            user.id = 'not important';
-            expect(permission.userCan(user, op, submission)).toBe(true);
-        });
+        describe('Single submission', () => {
+            it('should return true if staff', () => {
+                const op = SubmissionOperation.UPDATE;
+                user.role = 'staff';
+                user.id = 'not important';
+                expect(permission.userCan(user, op, submission)).toBe(true);
+            });
 
-        it('should return true if created by user', () => {
-            const op = SubmissionOperation.UPDATE;
-            user.role = 'user';
-            user.id = 'user-id';
-            expect(permission.userCan(user, op, submission)).toBe(true);
-        });
+            it('should return true if created by user', () => {
+                const op = SubmissionOperation.UPDATE;
+                user.role = 'user';
+                user.id = 'user-id';
+                expect(permission.userCan(user, op, submission)).toBe(true);
+            });
 
-        it('should return false if not created by user', () => {
-            const op = SubmissionOperation.UPDATE;
-            user.role = 'user';
-            user.id = 'not created by me';
-            expect(permission.userCan(user, op, submission)).toBe(false);
+            it('should return false if not created by user', () => {
+                const op = SubmissionOperation.UPDATE;
+                user.role = 'user';
+                user.id = 'not created by me';
+                expect(permission.userCan(user, op, submission)).toBe(false);
+            });
+        });
+        describe('Any submission', () => {
+            it('should return true if staff', () => {
+                const op = SubmissionOperation.UPDATE;
+                user.role = 'staff';
+                user.id = 'not important';
+                expect(permission.userCan(user, op, null)).toBe(true);
+            });
+
+            it('should return false for any user', () => {
+                const op = SubmissionOperation.UPDATE;
+                user.role = 'user';
+                user.id = 'user-id';
+                expect(permission.userCan(user, op, null)).toBe(false);
+            });
         });
     });
 
     describe('SubmissionOperation.READ', () => {
-        it('should return true if staff', () => {
-            const op = SubmissionOperation.READ;
-            user.role = 'staff';
-            user.id = 'not important';
-            expect(permission.userCan(user, op, submission)).toBe(true);
-        });
+        describe('Single submission', () => {
+            it('should return true if staff', () => {
+                const op = SubmissionOperation.READ;
+                user.role = 'staff';
+                user.id = 'not important';
+                expect(permission.userCan(user, op, submission)).toBe(true);
+            });
 
-        it('should return true if created by user', () => {
-            const op = SubmissionOperation.READ;
-            user.role = 'user';
-            user.id = 'user-id';
-            expect(permission.userCan(user, op, submission)).toBe(true);
-        });
+            it('should return true if created by user', () => {
+                const op = SubmissionOperation.READ;
+                user.role = 'user';
+                user.id = 'user-id';
+                expect(permission.userCan(user, op, submission)).toBe(true);
+            });
 
-        it('should return false if not created by user', () => {
-            const op = SubmissionOperation.READ;
-            user.role = 'user';
-            user.id = 'not created by me';
-            expect(permission.userCan(user, op, submission)).toBe(false);
+            it('should return false if not created by user', () => {
+                const op = SubmissionOperation.READ;
+                user.role = 'user';
+                user.id = 'not created by me';
+                expect(permission.userCan(user, op, submission)).toBe(false);
+            });
+        });
+        describe('Any submission', () => {
+            it('should return true if staff', () => {
+                const op = SubmissionOperation.READ;
+                user.role = 'staff';
+                user.id = 'not important';
+                expect(permission.userCan(user, op, null)).toBe(true);
+            });
+
+            it('should return false for any user', () => {
+                const op = SubmissionOperation.READ;
+                user.role = 'user';
+                user.id = 'user-id';
+                expect(permission.userCan(user, op, null)).toBe(false);
+            });
         });
     });
 
     describe('SubmissionOperation.DELETE', () => {
-        it('should return true if staff', () => {
-            const op = SubmissionOperation.DELETE;
-            user.role = 'staff';
-            user.id = 'not important';
-            expect(permission.userCan(user, op, submission)).toBe(true);
-        });
+        describe('Single submission', () => {
+            it('should return true if staff', () => {
+                const op = SubmissionOperation.DELETE;
+                user.role = 'staff';
+                user.id = 'not important';
+                expect(permission.userCan(user, op, submission)).toBe(true);
+            });
 
-        it('should return true if created by user', () => {
-            const op = SubmissionOperation.DELETE;
-            user.role = 'user';
-            user.id = 'user-id';
-            expect(permission.userCan(user, op, submission)).toBe(true);
-        });
+            it('should return true if created by user', () => {
+                const op = SubmissionOperation.DELETE;
+                user.role = 'user';
+                user.id = 'user-id';
+                expect(permission.userCan(user, op, submission)).toBe(true);
+            });
 
-        it('should return false if not created by user', () => {
-            const op = SubmissionOperation.DELETE;
-            user.role = 'user';
-            user.id = 'not created by me';
-            expect(permission.userCan(user, op, submission)).toBe(false);
+            it('should return false if not created by user', () => {
+                const op = SubmissionOperation.DELETE;
+                user.role = 'user';
+                user.id = 'not created by me';
+                expect(permission.userCan(user, op, submission)).toBe(false);
+            });
+        });
+        describe('Any submission', () => {
+            it('should return true if staff', () => {
+                const op = SubmissionOperation.DELETE;
+                user.role = 'staff';
+                user.id = 'not important';
+                expect(permission.userCan(user, op, null)).toBe(true);
+            });
+
+            it('should return false for any user', () => {
+                const op = SubmissionOperation.DELETE;
+                user.role = 'user';
+                user.id = 'user-id';
+                expect(permission.userCan(user, op, null)).toBe(false);
+            });
         });
     });
 
     describe('SubmissionOperation.CREATE', () => {
-        it('should return true if staff', () => {
-            const op = SubmissionOperation.CREATE;
-            user.role = 'staff';
-            user.id = 'not important';
-            expect(permission.userCan(user, op, submission)).toBe(true);
-        });
+        describe('Single submission', () => {
+            it('should return true if staff', () => {
+                const op = SubmissionOperation.CREATE;
+                user.role = 'staff';
+                user.id = 'not important';
+                expect(permission.userCan(user, op, submission)).toBe(true);
+            });
 
-        it('should return true if created by user', () => {
-            const op = SubmissionOperation.CREATE;
-            user.role = 'user';
-            user.id = 'user-id';
-            expect(permission.userCan(user, op, submission)).toBe(true);
-        });
+            it('should return true if created by user', () => {
+                const op = SubmissionOperation.CREATE;
+                user.role = 'user';
+                user.id = 'user-id';
+                expect(permission.userCan(user, op, submission)).toBe(true);
+            });
 
-        it('should return true if not created by user', () => {
-            const op = SubmissionOperation.CREATE;
-            user.role = 'user';
-            user.id = 'not created by me';
-            expect(permission.userCan(user, op, submission)).toBe(true);
+            it('should return true if not created by user', () => {
+                const op = SubmissionOperation.CREATE;
+                user.role = 'user';
+                user.id = 'not created by me';
+                expect(permission.userCan(user, op, submission)).toBe(true);
+            });
+        });
+        describe('Any submission', () => {
+            it('should return true if staff', () => {
+                const op = SubmissionOperation.CREATE;
+                user.role = 'staff';
+                user.id = 'not important';
+                expect(permission.userCan(user, op, null)).toBe(true);
+            });
+
+            it('should return true for any user', () => {
+                const op = SubmissionOperation.CREATE;
+                user.role = 'user';
+                user.id = 'user-id';
+                expect(permission.userCan(user, op, null)).toBe(true);
+            });
         });
     });
 });
