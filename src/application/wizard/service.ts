@@ -145,12 +145,11 @@ export class WizardService {
 
         try {
             await this.fileService.upload(fileContents, supportingFile);
+            supportingFile.setStatusToStored();
         } catch (e) {
             // @todo should this not be setStatusToDeleted ?
             supportingFile.setStatusToCancelled();
         }
-
-        supportingFile.setStatusToStored();
 
         this.fileService.update(supportingFile);
 
