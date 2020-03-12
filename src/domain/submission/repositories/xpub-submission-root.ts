@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { SubmissionId } from '../types';
+import { SubmissionId, Details } from '../types';
 import { SubmissionRepository, SubmissionDTO } from './types';
 import { KnexTableAdapter } from '../../knex-table-adapter';
 
@@ -14,6 +14,10 @@ type DatabaseEntry = {
     created_by: string;
     status: string;
     meta: entryMeta;
+    subjects: string[];
+    previouslyDiscussed: string;
+    previouslySubmitted: string[];
+    cosubmission: string[];
 };
 
 export default class XpubSubmissionRootRepository implements SubmissionRepository {
@@ -53,6 +57,7 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
 
     public async update(dtoSubmission: Partial<SubmissionDTO> & { id: SubmissionId }): Promise<SubmissionDTO> {
         // @todo: do we merge against remote state?
+        // ... ISSUE use select for update
         const submission = await this.findById(dtoSubmission.id);
         if (submission === null) {
             throw new Error(`Unable to find entry with id: ${dtoSubmission.id}`);
@@ -94,11 +99,16 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
                 articleType: dto.articleType,
                 title: dto.title,
             },
+            previouslyDiscussed: dto.previouslyDiscussed,
+            previouslySubmitted: dto.previouslySubmitted,
+            subjects: dto.subjects,
+            cosubmission: dto.cosubmission,
         };
     }
 
     private entryToDTO(record: DatabaseEntry): SubmissionDTO {
         const { created_by, meta, ...rest } = record;
+        // @todo: This should fetch all the other data too
         return {
             ...rest,
             createdBy: created_by,

@@ -3,7 +3,7 @@ import { SubmissionService } from '../../domain/submission';
 import { TeamService } from '../../domain/teams/services/team-service';
 import { FileService } from '../../domain/file/services/file-service';
 import { SemanticExtractionService } from '../../domain/semantic-extraction/services/semantic-extraction-service';
-import { Author, SubmissionId } from '../../domain/submission/types';
+import { Author, SubmissionId, Details } from '../../domain/submission/types';
 import Submission from '../../domain/submission/services/models/submission';
 import { AuthorTeamMember } from '../../domain/teams/repositories/types';
 import { PermissionService, SubmissionOperation } from '../permission/service';
@@ -18,6 +18,18 @@ export class WizardService {
         private readonly fileService: FileService,
         private readonly semanticExtractionService: SemanticExtractionService,
     ) {}
+
+    async saveDetailsPage(user: User, submissionId: SubmissionId, details: Details): Promise<Submission | null> {
+        const submission = await this.submissionService.get(submissionId);
+        if (submission === null) {
+            throw new Error('No submission found');
+        }
+        const allowed = this.permissionService.userCan(user, SubmissionOperation.UPDATE, submission);
+        if (!allowed) {
+            throw new Error('User not allowed to save submission');
+        }
+        return this.submissionService.saveManuscriptDetails(submissionId, details);
+    }
 
     async saveAuthorPage(user: User, submissionId: SubmissionId, details: Author): Promise<Submission | null> {
         const submission = await this.submissionService.get(submissionId);

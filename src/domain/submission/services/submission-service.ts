@@ -1,5 +1,5 @@
 import * as Knex from 'knex';
-import { SubmissionId } from '../types';
+import { SubmissionId, Details } from '../types';
 import XpubSubmissionRootRepository from '../repositories/xpub-submission-root';
 import { v4 as uuid } from 'uuid';
 import Submission from './models/submission';
@@ -14,6 +14,10 @@ export class SubmissionService {
         this.submissionRepository = new XpubSubmissionRootRepository(adapter);
     }
 
+    async getEntireSubmission(): Promise<Submission> {
+        // get via many services
+    }
+
     async findAll(): Promise<Submission[]> {
         const submissions = await this.submissionRepository.findAll();
         return submissions.map((dto: SubmissionDTO) => new Submission(dto));
@@ -26,18 +30,21 @@ export class SubmissionService {
 
     async create(articleType: string, userId: string): Promise<Submission> {
         const id = SubmissionId.fromUuid(uuid());
-        const submission = new Submission({
-            id,
-            title: '',
-            updated: new Date(),
-            articleType,
-            status: 'INITIAL',
-            createdBy: userId,
-        });
-        // this works because Submission interface == SubmissionDTO interface. In future we will probably ned a toDto on the submission or some mapper class
-        const savedSubmissionDTO = await this.submissionRepository.create(submission);
-
+        const submission = Submission.getBlank(id, userId, articleType);
+        const savedSubmissionDTO = await this.submissionRepository.create(submission.toDTO());
         return new Submission(savedSubmissionDTO);
+    }
+
+    async saveManuscriptDetails(id: SubmissionId, details: Details): Promise<Submission> {
+        const submissionDTO = await this.getEntireSubmission(id); // uses other services to get the DTO's and then construct a Submission
+
+        // const submissionDTO = await this.submissionRepository.findById(id);
+        if (!submissionDTO) {
+            throw new Error('Unable to find submission with id: ' + id);
+        }
+        const newDTO = { ...submissionDTO, ...details };
+        const returnedDTO = await this.submissionRepository.update(newDTO);
+        return new Submission(returnedDTO);
     }
 
     async get(id: SubmissionId): Promise<Submission> {

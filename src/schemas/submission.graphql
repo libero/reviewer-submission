@@ -40,3 +40,20 @@ input AuthorDetailsInput {
     email: String!
     institution: String!
 }
+
+type ManuscriptDetails {
+    title: String
+    subjects: [String]
+    previouslyDiscussed: String
+    previouslySubmitted: [String!]
+    cosubmission: [String!]
+}
+
+input ManuscriptDetailsInput {
+    title: String
+    subjects: [String]
+    previouslyDiscussed: String
+    previouslySubmitted: [String!]
+    cosubmission: [String!]
+}
+

@@ -1,5 +1,6 @@
-import { SubmissionId } from '../../types';
+import { SubmissionId, Details } from '../../types';
 import File from '../../../file/services/models/file';
+import { SubmissionDTO } from '../../repositories/types';
 
 export enum ArticleType {
     RESEARCH_ARTICLE = 'researchArticle',
@@ -8,14 +9,6 @@ export enum ArticleType {
 }
 
 export default class Submission {
-    id: SubmissionId;
-    title: string;
-    updated: Date;
-    articleType: ArticleType;
-    status: string;
-    createdBy: string;
-    manuscriptFile?: File;
-
     // This is wired up so that you can create an entity from the DTO described by ISubmission
     constructor({
         id,
@@ -25,6 +18,7 @@ export default class Submission {
         status,
         createdBy,
         manuscriptFile,
+        manuscriptDetails,
     }: {
         id: SubmissionId;
         title: string;
@@ -33,17 +27,40 @@ export default class Submission {
         status: string;
         createdBy: string;
         manuscriptFile?: File;
+        manuscriptDetails?: Details;
     }) {
         this.id = id;
         this.title = title;
         this.updated = updated || new Date();
-        this.articleType = this.articleTypeFromString(articleType);
+        this.articleType = Submission.articleTypeFromString(articleType);
         this.status = status;
         this.createdBy = createdBy;
         this.manuscriptFile = manuscriptFile;
+        this.manuscriptDetails = manuscriptDetails;
     }
 
-    private articleTypeFromString(type: string): ArticleType {
+    public static getBlank(id: SubmissionId, userId: string, aType: string): Submission {
+        const articleType = Submission.articleTypeFromString(aType);
+        return new Submission({
+            id,
+            title: '',
+            updated: new Date(),
+            articleType,
+            status: 'INITIAL',
+            createdBy: userId,
+        });
+    }
+
+    public toDTO(): SubmissionDTO {
+        return new SubmissionDTO({
+
+        });
+    }
+
+    public static fromRepo(submission: SubmissionDTO, manuscriptfile, supporting): Submission {
+    }
+
+    private static articleTypeFromString(type: string): ArticleType {
         switch (type) {
             case 'researchArticle':
                 return ArticleType.RESEARCH_ARTICLE;

@@ -8,6 +8,8 @@ export interface SubmissionRepository {
     update(sub: Partial<SubmissionDTO> & { id: SubmissionId }): Promise<SubmissionDTO>;
 }
 
+// The DTO can contain any data (across all tables in the database) pertaining to the Submission Domain concept.
+// Beware: that an instance may not contain all the data.
 export interface SubmissionDTO {
     id: SubmissionId;
     updated: Date;
@@ -15,4 +17,9 @@ export interface SubmissionDTO {
     status: string;
     articleType: string;
     title: string;
+    subjects: string[];
+    previouslyDiscussed: string;
+    previouslySubmitted: string[];
+    cosubmission: string[];
+    // put in manuscriptfileDTO ???
 }
