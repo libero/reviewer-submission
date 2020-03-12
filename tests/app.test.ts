@@ -141,7 +141,7 @@ const uploadSupportingFile = async (submissionId: string): Promise<AxiosResponse
     return await axios.post('http://localhost:3000/graphql', body, {
         headers: { Authorization: `Bearer ${jwtToken}`, ...body.getHeaders() },
     });
-}
+};
 
 describe('Application Integration Tests', () => {
     let apollo: ApolloClient<unknown>;
@@ -391,5 +391,84 @@ describe('Application Integration Tests', () => {
             uploadManuscriptResponse.data.data.uploadManuscript.manuscriptFile.id,
         );
         expect(uploadResponse.data.data.uploadSupportingFile.supportingFiles).toHaveLength(1);
+    });
+
+    it('it should throw if a user tries to delete a supporting file unrelated to their submission', async () => {
+        const startResponse = await startSubmissionAlt('researchArticle');
+        const submissionId = startResponse.data.data.startSubmission.id;
+
+        const uploadManuscriptResponse = await uploadManuscript(submissionId);
+        expect(uploadManuscriptResponse.status).toBe(200);
+        expect(uploadManuscriptResponse.data.errors).toBeUndefined();
+
+        const uploadResponse = await uploadSupportingFile(submissionId);
+        expect(uploadResponse.status).toBe(200);
+        expect(uploadResponse.data.errors).toBeUndefined();
+        expect(uploadResponse.data.data.uploadSupportingFile.manuscriptFile.id).toBe(
+            uploadManuscriptResponse.data.data.uploadManuscript.manuscriptFile.id,
+        );
+        expect(uploadResponse.data.data.uploadSupportingFile.supportingFiles).toHaveLength(1);
+        const imposterToken = sign({ sub: 'c0e74a86-2feb-435d-a50f-01f920334bc4' }, config.authentication_jwt_secret);
+
+        const deleteResponse = await axios.post(
+            'http://localhost:3000/graphql',
+            {
+                query: `
+                    mutation deleteSupportingFile($fileId: ID!, $submissionId: ID!) {
+                        deleteSupportingFile(fileId: $fileId, submissionId: $submissionId) 
+                    }
+                `,
+                variables: {
+                    fileId: uploadResponse.data.data.uploadSupportingFile.supportingFiles[0].id,
+                    submissionId,
+                },
+            },
+            {
+                headers: { Authorization: `Bearer ${imposterToken}` },
+            },
+        );
+
+        expect(deleteResponse.status).toBe(200);
+        expect(deleteResponse.data.errors).toBeDefined();
+        expect(deleteResponse.data.errors[0].message).toBe('User not allowed to delete files');
+    });
+
+    it('it should allow a user to delete a supporting file ', async () => {
+        const startResponse = await startSubmissionAlt('researchArticle');
+        const submissionId = startResponse.data.data.startSubmission.id;
+
+        const uploadManuscriptResponse = await uploadManuscript(submissionId);
+        expect(uploadManuscriptResponse.status).toBe(200);
+        expect(uploadManuscriptResponse.data.errors).toBeUndefined();
+
+        const uploadResponse = await uploadSupportingFile(submissionId);
+        expect(uploadResponse.status).toBe(200);
+        expect(uploadResponse.data.errors).toBeUndefined();
+        expect(uploadResponse.data.data.uploadSupportingFile.manuscriptFile.id).toBe(
+            uploadManuscriptResponse.data.data.uploadManuscript.manuscriptFile.id,
+        );
+        expect(uploadResponse.data.data.uploadSupportingFile.supportingFiles).toHaveLength(1);
+
+        const deleteResponse = await axios.post(
+            'http://localhost:3000/graphql',
+            {
+                query: `
+                    mutation deleteSupportingFile($fileId: ID!, $submissionId: ID!) {
+                        deleteSupportingFile(fileId: $fileId, submissionId: $submissionId) 
+                    }
+                `,
+                variables: {
+                    fileId: uploadResponse.data.data.uploadSupportingFile.supportingFiles[0].id,
+                    submissionId,
+                },
+            },
+            {
+                headers: { Authorization: `Bearer ${jwtToken}` },
+            },
+        );
+
+        expect(deleteResponse.status).toBe(200);
+        expect(deleteResponse.data.errors).toBeDefined();
+        expect(deleteResponse.data.errors[0].message).toBe('User not allowed to delete files');
     });
 });
