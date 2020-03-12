@@ -29,19 +29,31 @@ export class FileService {
         this.s3 = new S3(s3Options);
     }
 
-    private generateManuscriptS3Key(submissionId: SubmissionId, fileId: FileId): string {
-        return `manuscripts/${submissionId}/${fileId}`;
-    }
-
-    private generateSupportFileS3Key(submissionId: SubmissionId, fileId: FileId): string {
-        return `supporting/${submissionId}/${fileId}`;
+    private getFileS3Key(fileType: FileType, submissionId: SubmissionId, fileId: FileId): string {
+        switch (fileType) {
+            case FileType.MANUSCRIPT_SOURCE:
+                return `manuscripts/${submissionId}/${fileId}`;
+            case FileType.SUPPORTING_FILE:
+                return `supporting/${submissionId}/${fileId}`;
+            default:
+                throw new Error('Invalid FileType');
+        }
     }
 
     async deleteManuscript(fileId: FileId, submissionId: SubmissionId): Promise<boolean> {
         await this.fileRepository.deleteByIdAndSubmissionId(fileId, submissionId);
         await this.s3.deleteObject({
             Bucket: this.bucket,
-            Key: this.generateManuscriptS3Key(submissionId, fileId),
+            Key: this.getFileS3Key(FileType.MANUSCRIPT_SOURCE, submissionId, fileId),
+        });
+        return true;
+    }
+
+    async deleteSupportingFile(fileId: FileId, submissionId: SubmissionId): Promise<boolean> {
+        await this.fileRepository.deleteByIdAndSubmissionId(fileId, submissionId);
+        await this.s3.deleteObject({
+            Bucket: this.bucket,
+            Key: this.getFileS3Key(FileType.SUPPORTING_FILE, submissionId, fileId),
         });
         return true;
     }
@@ -61,7 +73,7 @@ export class FileService {
         }
         const id = FileId.fromUuid(uuid());
         const status = FileStatus.CREATED;
-        const url = `manuscripts/${submissionId}`;
+        const url = this.getFileS3Key(type, submissionId, id);
         const newFile = await this.fileRepository.create({
             id,
             submissionId,
@@ -80,9 +92,24 @@ export class FileService {
         return this.fileRepository.update(fileDTO);
     }
 
+    async findManuscriptFile(submissionId: SubmissionId): Promise<File | null> {
+        const fileDTO = await this.fileRepository.findManuscriptBySubmissionId(submissionId);
+        if (!fileDTO) {
+            return null;
+        }
+
+        return new File(fileDTO);
+    }
+
     async hasManuscriptFile(submissionId: SubmissionId): Promise<boolean> {
-        const file = await this.fileRepository.findManuscriptBySubmssionId(submissionId);
+        const file = await this.fileRepository.findManuscriptBySubmissionId(submissionId);
         return file !== null;
+    }
+
+    async getSupportingFiles(submissionId: SubmissionId): Promise<Array<File>> {
+        return (await this.fileRepository.getSupportingFilesBySubmissionId(submissionId)).map(
+            (file: FileDTO) => new File(file),
+        );
     }
 
     async upload(fileContents: Buffer, file: File): Promise<S3.ManagedUpload.SendData> {

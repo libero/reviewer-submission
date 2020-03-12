@@ -27,6 +27,14 @@ export default class File {
         this.status = status;
     }
 
+    public isCancelled(): boolean {
+        return this.status === FileStatus.CANCELLED;
+    }
+
+    public isDeleted(): unknown {
+        return this.status === FileStatus.DELETED;
+    }
+
     public setTypeToSource(): void {
         if (this.type === FileType.SUPPORTING_FILE) {
             throw new Error('Cannot set to source');
@@ -38,18 +46,18 @@ export default class File {
     }
 
     public setStatusToUploaded(): void {
-        if (this.type === FileStatus.CREATED) {
-            this.type = FileStatus.UPLOADED;
+        if (this.status === FileStatus.CREATED) {
+            this.status = FileStatus.UPLOADED;
         }
     }
 
     public setStatusToStored(): void {
-        if (this.type === FileStatus.CREATED || FileStatus.UPLOADED) {
-            this.type = FileStatus.STORED;
+        if (this.status === FileStatus.CREATED || FileStatus.UPLOADED) {
+            this.status = FileStatus.STORED;
         }
     }
 
     public setStatusToCancelled(): void {
-        this.type = FileStatus.CANCELLED;
+        this.status = FileStatus.CANCELLED;
     }
 }

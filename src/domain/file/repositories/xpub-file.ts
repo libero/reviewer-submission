@@ -62,7 +62,7 @@ export default class XpubFileRepository implements FileRepository {
         return true;
     }
 
-    async findManuscriptBySubmssionId(id: SubmissionId): Promise<FileDTO | null> {
+    async findManuscriptBySubmissionId(id: SubmissionId): Promise<FileDTO | null> {
         const query = this._query
             .builder()
             .select('id', 'manuscript_id', 'status', 'filename', 'url', 'mime_type', 'size', 'created', 'updated')
@@ -71,6 +71,18 @@ export default class XpubFileRepository implements FileRepository {
 
         const files = await this._query.executor<DatabaseEntry[]>(query);
         return files.length > 0 ? this.entryToDto(files[0]) : null;
+    }
+
+    async getSupportingFilesBySubmissionId(id: SubmissionId): Promise<Array<FileDTO>> {
+        const query = this._query
+            .builder()
+            .select('id', 'manuscript_id', 'status', 'filename', 'url', 'mime_type', 'size', 'created', 'updated')
+            .from(this.TABLE_NAME)
+            .where({ manuscript_id: id, type: FileType.SUPPORTING_FILE });
+
+        const files = await this._query.executor<DatabaseEntry[]>(query);
+
+        return files.map(this.entryToDto);
     }
 
     async update(dtoFile: FileDTO): Promise<FileDTO> {

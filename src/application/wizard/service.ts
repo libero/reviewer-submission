@@ -106,8 +106,71 @@ export class WizardService {
         } catch (e) {
             manuscriptFile.setStatusToCancelled();
         }
+
+        this.fileService.update(manuscriptFile);
+
         // this is not elegant but its the best we can do given the fact that files are now a concept
         // outside of Submission, so we patch it in ¯\_(ツ)_/¯
         return new Submission({ ...submission, manuscriptFile });
+    }
+
+    async saveSupportingFile(
+        user: User,
+        submissionId: SubmissionId,
+        file: FileUpload,
+        fileSize: number,
+    ): Promise<Submission> {
+        const submission = await this.submissionService.get(submissionId);
+        const allowed = this.permissionService.userCan(user, SubmissionOperation.UPDATE, submission);
+        if (!allowed) {
+            throw new Error('User not allowed to save submission');
+        }
+        const { filename, mimetype: mimeType, createReadStream } = await file;
+        const stream = createReadStream();
+        const supportingFile = await this.fileService.create(
+            submissionId,
+            filename,
+            mimeType,
+            fileSize,
+            FileType.SUPPORTING_FILE,
+        );
+
+        const fileContents: Buffer = await new Promise((resolve, reject) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const chunks: Array<any> = [];
+            stream.on('data', chunk => chunks.push(chunk));
+            stream.on('error', reject);
+            stream.on('end', () => resolve(Buffer.concat(chunks)));
+        });
+
+        try {
+            await this.fileService.upload(fileContents, supportingFile);
+            supportingFile.setStatusToStored();
+        } catch (e) {
+            // @todo should this not be setStatusToDeleted ?
+            supportingFile.setStatusToCancelled();
+        }
+
+        this.fileService.update(supportingFile);
+
+        // Again because we are not following a DDD approach for the submission, i.e. we are not loading
+        // the files when fetching a Submission, we need to load them separately and patch them in ¯\_(ツ)_/¯
+        // this is bad because a developer needs to remember to do this every time a submission is manipulated
+        // Submission is an anemic data model as all our logic pretty much now resides in services.
+        const manuscriptFile = await this.fileService.findManuscriptFile(submissionId);
+        const supportingFiles = (await this.fileService.getSupportingFiles(submissionId)).filter(
+            file => !file.isCancelled() && !file.isDeleted(),
+        );
+
+        return new Submission({ ...submission, manuscriptFile, supportingFiles });
+    }
+
+    async deleteSupportingFile(fileId: FileId, submissionId: SubmissionId, user: User): Promise<boolean> {
+        const submission = await this.submissionService.get(submissionId);
+        const allowed = this.permissionService.userCan(user, SubmissionOperation.DELETE, submission);
+        if (!allowed) {
+            throw new Error('User not allowed to delete files');
+        }
+        return await this.fileService.deleteSupportingFile(fileId, submissionId);
     }
 }
