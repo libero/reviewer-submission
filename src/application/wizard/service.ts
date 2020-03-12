@@ -12,7 +12,6 @@ import { FileType, FileId, FileStatus } from '../../domain/file/types';
 import File from '../../domain/file/services/models/file';
 import { v4 as uuid } from 'uuid';
 
-
 export class WizardService {
     constructor(
         private readonly permissionService: PermissionService,
@@ -111,6 +110,8 @@ export class WizardService {
             submission.setManuscriptFileStatusToCancelled();
         }
 
+        // is this too generic in came
+        // could be // submissionService.addManucript etc
         this.submissionService.update(submission);
 
         return submission;

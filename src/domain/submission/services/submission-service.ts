@@ -55,4 +55,17 @@ export class SubmissionService {
     async update(submission: Submission): Promise<SubmissionDTO> {
         return await this.submissionRepository.update(submission.toDTO());
     }
+
+    async updateExample1(submission: Submission): Promise<SubmissionDTO> {
+        this.fileRepository.createManuscript(submission.getManuscriptFile);
+        // other repos being called
+        return await this.submissionRepository.update(submission.toDTO());
+    }
+
+    async updateExample2(submission: Submission): Promise<SubmissionDTO> {
+        this.fileService.createManuscript(submission.getManuscriptFile);
+        // other services services being called
+        // advantage, service can perform additiona validation, checks etc
+        return await this.submissionRepository.update(submission.toDTO());
+    }
 }
