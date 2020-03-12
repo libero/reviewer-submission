@@ -468,7 +468,6 @@ describe('Application Integration Tests', () => {
         );
 
         expect(deleteResponse.status).toBe(200);
-        expect(deleteResponse.data.errors).toBeDefined();
-        expect(deleteResponse.data.errors[0].message).toBe('User not allowed to delete files');
+        expect(uploadManuscriptResponse.data.errors).toBeUndefined();
     });
 });
