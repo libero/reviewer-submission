@@ -13,13 +13,7 @@ const createSurveyResponse = (): SurveyResponse => {
     const question2 = new Question('2', 'question2');
     const answer1 = new Answer('1', 'answer1');
     const answer2 = new Answer('2', 'answer2');
-    const surveyResponse = new SurveyResponse({
-        id,
-        surveyId,
-        submissionId,
-        questions: [question1, question2],
-        answers: [answer1, answer2],
-    });
+    const surveyResponse = new SurveyResponse(id, surveyId, submissionId, [question1, question2], [answer1, answer2]);
     return surveyResponse;
 };
 
@@ -27,26 +21,25 @@ describe('Survey Entity', () => {
     it('creates a new entity', () => {
         const survey = createSurveyResponse();
 
-        expect(survey).toBeInstanceOf(SurveyResponse);
         expect(survey.answers).toBeDefined();
         expect(survey.questions.length).toBe(2);
         expect(survey.answers.length).toBe(2);
     });
 
-    it('creates the dto', () => {
-        const surveyResponse = createSurveyResponse();
-        const surveyResponseDTO = surveyResponse.toDTO();
+    it('stores answers correctly', () => {
+        const survey = new SurveyResponse(
+            SurveyResponseId.fromUuid(uuid()),
+            SurveyId.fromUuid(uuid()),
+            SubmissionId.fromUuid(uuid()),
+        );
 
-        expect(surveyResponseDTO.response.questions.length).toBe(2);
-        expect(surveyResponseDTO.response.answers.length).toBe(2);
-        expect(surveyResponseDTO.response.questions[0].id).toBe('1');
-        expect(surveyResponseDTO.response.questions[0].question).toBe('question1');
-        expect(surveyResponseDTO.response.questions[1].id).toBe('2');
-        expect(surveyResponseDTO.response.questions[1].question).toBe('question2');
+        survey.answerQuestion('1', 'question1', 'answer0');
+        survey.answerQuestion('1', 'question1', 'answer1');
+        survey.answerQuestion('2', 'question2', 'answer2');
 
-        expect(surveyResponseDTO.response.answers[0].questionId).toBe('1');
-        expect(surveyResponseDTO.response.answers[0].answer).toBe('answer1');
-        expect(surveyResponseDTO.response.answers[1].questionId).toBe('2');
-        expect(surveyResponseDTO.response.answers[1].answer).toBe('answer2');
+        expect(survey.answers[0]).toStrictEqual(new Answer('1', 'answer1'));
+        expect(survey.answers[1]).toStrictEqual(new Answer('2', 'answer2'));
+        expect(survey.questions[0]).toStrictEqual(new Question('1', 'question1'));
+        expect(survey.questions[1]).toStrictEqual(new Question('2', 'question2'));
     });
 });

@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { TeamRepository, TeamDTO } from './types';
+import { TeamRepository } from './types';
 import { TeamId } from '../types';
 import { KnexTableAdapter } from '../../knex-table-adapter';
+import Team from '../services/models/team';
 
 type DatabaseEntry = {
     id: TeamId;
@@ -13,26 +14,26 @@ export default class XpubTeamRepository implements TeamRepository {
 
     public constructor(private readonly _query: KnexTableAdapter) {}
 
-    public async findByObjectIdAndRole(object_id: string, role: string): Promise<TeamDTO[]> {
+    public async findByObjectIdAndRole(object_id: string, role: string): Promise<Team[]> {
         const query = this._query
             .builder()
             .select<DatabaseEntry[]>('id', 'updated')
             .from(this.TABLE_NAME)
             .where({ object_id, role });
-        return await this._query.executor<TeamDTO[]>(query);
+        return await this._query.executor<Team[]>(query);
     }
 
-    public async findTeamById(id: TeamId): Promise<TeamDTO | null> {
+    public async findTeamById(id: TeamId): Promise<Team | null> {
         const query = this._query
             .builder()
             .select<DatabaseEntry[]>('id', 'updated')
             .from(this.TABLE_NAME)
             .where({ id });
-        const [team = null] = await this._query.executor<TeamDTO[]>(query);
+        const [team = null] = await this._query.executor<Team[]>(query);
         return team;
     }
 
-    public async update(dtoTeam: TeamDTO): Promise<TeamDTO> {
+    public async update(dtoTeam: Team): Promise<Team> {
         const team = await this.findTeamById(dtoTeam.id);
         if (team === null) {
             throw new Error(`Unable to find entry with id: ${dtoTeam.id}`);
@@ -47,7 +48,7 @@ export default class XpubTeamRepository implements TeamRepository {
         return entryToSave;
     }
 
-    public async create(dtoTeam: Omit<TeamDTO, 'id' | 'created' | 'updated'>): Promise<TeamDTO> {
+    public async create(dtoTeam: Omit<Team, 'id' | 'created' | 'updated'>): Promise<Team> {
         const entryToSave = { ...dtoTeam, updated: new Date() };
         const query = this._query
             .builder()

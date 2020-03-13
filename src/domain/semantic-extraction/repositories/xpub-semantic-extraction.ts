@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { SemanticExtractionRepository, SemanticExtractionDTO } from '../repositories/types';
+import { SemanticExtractionRepository } from '../repositories/types';
 import { KnexTableAdapter } from '../../knex-table-adapter';
 import { SubmissionId } from '../../submission/types';
 import { SemanticExtractionId } from '../types';
+import SemanticExtraction from '../services/models/semantic-extraction';
 
 type DatabaseEntry = {
     id: SemanticExtractionId;
@@ -18,8 +19,8 @@ export default class XpubSemanticExtractionRepository implements SemanticExtract
 
     public constructor(private readonly _query: KnexTableAdapter) {}
 
-    public async create(dtoSemanticExtraction: SemanticExtractionDTO): Promise<SemanticExtractionDTO> {
-        const entryToSave = this.dtoToEntry({ ...dtoSemanticExtraction, updated: new Date() });
+    public async create(semanticExtraction: SemanticExtraction): Promise<SemanticExtraction> {
+        const entryToSave = this.modelToEntry({ ...semanticExtraction, updated: new Date() });
         const query = this._query
             .builder()
             .insert(entryToSave)
@@ -28,8 +29,8 @@ export default class XpubSemanticExtractionRepository implements SemanticExtract
         return this.entryToDTO(entryToSave);
     }
 
-    private dtoToEntry(dto: SemanticExtractionDTO): DatabaseEntry {
-        const { submissionId, fieldName, ...rest } = dto;
+    private modelToEntry(SemanticExtraction: SemanticExtraction): DatabaseEntry {
+        const { submissionId, fieldName, ...rest } = SemanticExtraction;
         return {
             ...rest,
             manuscript_id: submissionId,
@@ -37,13 +38,13 @@ export default class XpubSemanticExtractionRepository implements SemanticExtract
         } as DatabaseEntry;
     }
 
-    private entryToDTO(record: DatabaseEntry): SemanticExtractionDTO {
+    private entryToDTO(record: DatabaseEntry): SemanticExtraction {
         const { manuscript_id, created_by, field_name, ...rest } = record;
         return {
             ...rest,
             submissionId: manuscript_id,
             createdBy: created_by,
             fieldName: field_name,
-        } as SemanticExtractionDTO;
+        } as SemanticExtraction;
     }
 }

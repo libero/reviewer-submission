@@ -1,10 +1,20 @@
 import { SubmissionId } from '../../types';
 import File from '../../../file/services/models/file';
+import { FileId } from 'src/domain/file/types';
 
 export enum ArticleType {
     RESEARCH_ARTICLE = 'researchArticle',
     FEATURE_ARTICLE = 'featureArticle',
     RESEARCH_ADVANCE = 'researchAdvance',
+}
+
+export enum SubmissionStatus {
+    INITIAL = 'INITIAL',
+    MECA_EXPORT_PENDING = 'MECA_EXPORT_PENDING',
+    MECA_EXPORT_FAILED = 'MECA_EXPORT_FAILED',
+    MECA_EXPORT_SUCCEEDED = 'MECA_EXPORT_SUCCEEDED',
+    MECA_IMPORT_FAILED = 'MECA_IMPORT_FAILED',
+    MECA_IMPORT_SUCCEEDED = 'MECA_IMPORT_SUCCEEDED',
 }
 
 export default class Submission {
@@ -57,6 +67,34 @@ export default class Submission {
                 return ArticleType.RESEARCH_ADVANCE;
             default:
                 throw new Error('Invalid article type');
+        }
+    }
+
+    public setManuscriptFile(fileId: FileId, filename: string, mimeType: string, fileSize: number): void {
+        if (!this.manuscriptFile) {
+            throw new Error('Manuscript file already present');
+        }
+
+        this.manuscriptFile = File.makeManuscriptFile(fileId, this.id, filename, mimeType, fileSize);
+    }
+
+    public getManuscriptFile(): File | null {
+        if (!this.manuscriptFile) {
+            return null;
+        }
+
+        return this.manuscriptFile;
+    }
+
+    public setManuscriptFileStatusToStored(): void {
+        if (this.manuscriptFile) {
+            this.manuscriptFile.setStatusToStored();
+        }
+    }
+
+    public setManuscriptFileStatusToCancelled(): void {
+        if (this.manuscriptFile) {
+            this.manuscriptFile.setStatusToCancelled();
         }
     }
 }

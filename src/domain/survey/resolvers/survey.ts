@@ -1,8 +1,9 @@
 import { IResolvers } from 'apollo-server-express';
 import { SurveyService } from '../services/survey-service';
-import { SurveyId, SurveyResponseDTO } from '../survey';
+import { SurveyId } from '../survey';
 import { SubmissionId } from '../../submission/types';
 import { SurveyAnswer } from '../services/models/survey-answer';
+import { SurveyResponse } from '../services/models/survey-response';
 
 const resolvers = (surveyService: SurveyService): IResolvers => ({
     Mutation: {
@@ -10,7 +11,7 @@ const resolvers = (surveyService: SurveyService): IResolvers => ({
         async submitSurveyResponse(
             _,
             args: { surveyId: string; submissionId: string; answers: SurveyAnswer[] },
-        ): Promise<SurveyResponseDTO> {
+        ): Promise<SurveyResponse> {
             const { surveyId, submissionId, answers } = args;
             const surveyResponse = await surveyService.submitResponse(
                 SurveyId.fromUuid(surveyId),
@@ -18,7 +19,7 @@ const resolvers = (surveyService: SurveyService): IResolvers => ({
                 answers,
             );
 
-            return surveyResponse.toDTO();
+            return surveyResponse;
         },
     },
 });
