@@ -14,17 +14,27 @@ export default class File {
     size: number;
     status: string;
 
-    constructor(
-        id: FileId,
-        submissionId: SubmissionId,
-        created: Date,
-        updated: Date,
-        type: FileType,
-        filename: string,
-        mimeType: string,
-        size: number,
-        status: string,
-    ) {
+    constructor({
+        id,
+        submissionId,
+        created,
+        updated,
+        type,
+        filename,
+        mimeType,
+        size,
+        status,
+    }: {
+        id: FileId;
+        submissionId: SubmissionId;
+        created?: Date;
+        updated?: Date;
+        type: FileType;
+        filename: string;
+        mimeType: string;
+        size: number;
+        status: string;
+    }) {
         this.id = id;
         this.submissionId = submissionId;
         this.created = created;
@@ -35,24 +45,6 @@ export default class File {
         this.mimeType = mimeType;
         this.size = size;
         this.status = status;
-    }
-
-    public static fromDTO(fileDTO: FileDTO): File {
-        return new File(
-            fileDTO.id,
-            fileDTO.submissionId,
-            fileDTO.created || new Date(),
-            fileDTO.updated || new Date(),
-            fileDTO.type as FileType,
-            fileDTO.filename,
-            fileDTO.mimeType,
-            fileDTO.size,
-            fileDTO.status,
-        );
-    }
-
-    public toDTO(): FileDTO {
-        return this;
     }
 
     private getFileS3Key(fileType: FileType, submissionId: SubmissionId, fileId: FileId): string {
@@ -73,17 +65,17 @@ export default class File {
         mimeType: string,
         size: number,
     ): File {
-        return new File(
+        return new File({
             id,
             submissionId,
-            new Date(),
-            new Date(),
-            FileType.MANUSCRIPT_SOURCE,
+            created: new Date(),
+            updated: new Date(),
+            type: FileType.MANUSCRIPT_SOURCE,
             filename,
             mimeType,
             size,
-            FileStatus.CREATED,
-        );
+            status: FileStatus.CREATED,
+        });
     }
 
     public isCancelled(): boolean {
