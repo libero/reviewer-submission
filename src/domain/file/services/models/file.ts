@@ -1,6 +1,5 @@
 import { FileId, FileType, FileStatus } from '../../types';
 import { SubmissionId } from '../../../submission/types';
-import { FileDTO } from '../../repositories/types';
 
 export default class File {
     id: FileId;

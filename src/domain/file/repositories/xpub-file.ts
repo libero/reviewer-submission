@@ -2,12 +2,7 @@
 import { KnexTableAdapter } from '../../knex-table-adapter';
 import { SubmissionId } from '../../submission/types';
 import { FileId, FileType, FileStatus } from '../types';
-import { FileDTO } from './types';
 import File from '../services/models/file';
-
-interface FileRepository {
-    create(dtoFile: Omit<FileDTO, 'updated'>): Promise<FileDTO>;
-}
 
 type Meta = {
     [key: string]: any;
@@ -27,7 +22,7 @@ type DatabaseEntry = {
     type: FileType;
 };
 
-export default class XpubFileRepository implements FileRepository {
+export default class XpubFileRepository {
     private readonly TABLE_NAME = 'file';
 
     public constructor(private readonly _query: KnexTableAdapter) {}
