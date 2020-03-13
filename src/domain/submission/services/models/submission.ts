@@ -1,7 +1,6 @@
 import { SubmissionId } from '../../types';
 import File from '../../../file/services/models/file';
 import { FileId } from 'src/domain/file/types';
-import { FileDTO } from 'src/domain/file/repositories/types';
 
 export enum ArticleType {
     RESEARCH_ARTICLE = 'researchArticle',
@@ -79,7 +78,7 @@ export default class Submission {
         this.manuscriptFile = File.makeManuscriptFile(fileId, this.id, filename, mimeType, fileSize);
     }
 
-    public getManuscriptFile(): FileDTO | null {
+    public getManuscriptFile(): File | null {
         if (!this.manuscriptFile) {
             return null;
         }
