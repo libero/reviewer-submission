@@ -57,14 +57,16 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
         if (existingSubmission === null) {
             throw new Error(`Unable to find entry with id: ${submission.id}`);
         }
-        const entryToSave = this.modelToEntry({ ...submission, updated: new Date() });
+        submission.updated = new Date();
+        const entryToSave = this.modelToEntry(submission);
         const query = this._query.builder().update(entryToSave);
         await this._query.executor<DatabaseEntry[]>(query);
         return this.entryToModel(entryToSave);
     }
 
     public async create(submission: Submission): Promise<Submission> {
-        const entryToSave = this.modelToEntry({ ...submission, updated: new Date() });
+        submission.updated = new Date();
+        const entryToSave = this.modelToEntry(submission);
         const query = this._query
             .builder()
             .insert(entryToSave)
