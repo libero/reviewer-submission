@@ -198,15 +198,15 @@ describe('Knex Submission Repository', () => {
         });
     });
     describe('delete', () => {
-        it('returns true when knex delete is successful', () => {
+        it('returns true when knex delete is successful', async () => {
             adapter.executor = jest.fn().mockReturnValue(true);
             const repo = new XpubSubmissionRootRepository(adapter);
-            expect(repo.delete(SubmissionId.fromUuid(uuid()))).resolves.toEqual(true);
+            await expect(repo.delete(SubmissionId.fromUuid(uuid()))).resolves.toEqual(true);
         });
-        it('returns false when knex delete is not successful', () => {
+        it('returns false when knex delete is not successful', async () => {
             adapter.executor = jest.fn().mockReturnValue(false);
             const repo = new XpubSubmissionRootRepository(adapter);
-            expect(repo.delete(SubmissionId.fromUuid(uuid()))).resolves.toEqual(false);
+            await expect(repo.delete(SubmissionId.fromUuid(uuid()))).resolves.toEqual(false);
         });
     });
 });
