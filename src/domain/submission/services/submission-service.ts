@@ -3,7 +3,6 @@ import { SubmissionId, SubmissionWriter, SubmissionExporter } from '../types';
 import XpubSubmissionRootRepository from '../repositories/xpub-submission-root';
 import { v4 as uuid } from 'uuid';
 import Submission from './models/submission';
-import { SubmissionDTO } from '../repositories/types';
 import { createKnexAdapter } from '../../knex-table-adapter';
 import { MecaExporter } from './meca-exporter';
 import { S3Store } from './s3-store';
@@ -24,13 +23,11 @@ export class SubmissionService {
     }
 
     async findAll(): Promise<Submission[]> {
-        const submissions = await this.submissionRepository.findAll();
-        return submissions.map((dto: SubmissionDTO) => new Submission(dto));
+        return await this.submissionRepository.findAll();
     }
 
     async findByUserId(userId: string): Promise<Submission[]> {
-        const submissions = await this.submissionRepository.findByUserId(userId);
-        return submissions.map((dto: SubmissionDTO) => new Submission(dto));
+        return await this.submissionRepository.findByUserId(userId);
     }
 
     async create(articleType: string, userId: string): Promise<Submission> {
@@ -43,18 +40,15 @@ export class SubmissionService {
             status: 'INITIAL',
             createdBy: userId,
         });
-        // this works because Submission interface == SubmissionDTO interface. In future we will probably ned a toDto on the submission or some mapper class
-        const savedSubmissionDTO = await this.submissionRepository.create(submission);
-
-        return new Submission(savedSubmissionDTO);
+        return await this.submissionRepository.create(submission);
     }
 
     async get(id: SubmissionId): Promise<Submission> {
-        const submissionDTO = await this.submissionRepository.findById(id);
-        if (!submissionDTO) {
+        const submission = await this.submissionRepository.findById(id);
+        if (!submission) {
             throw new Error('Unable to find submission with id: ' + id);
         }
-        return new Submission(submissionDTO);
+        return submission;
     }
 
     async delete(id: SubmissionId): Promise<boolean> {

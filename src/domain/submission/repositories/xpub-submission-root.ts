@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { SubmissionId } from '../types';
-import { SubmissionRepository, SubmissionDTO } from './types';
+import { SubmissionRepository } from './types';
 import { KnexTableAdapter } from '../../knex-table-adapter';
+import Submission from '../services/models/submission';
 
 type entryMeta = {
     articleType: string;
@@ -21,16 +22,16 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
 
     public constructor(private readonly _query: KnexTableAdapter) {}
 
-    public async findAll(): Promise<SubmissionDTO[]> {
+    public async findAll(): Promise<Submission[]> {
         const query = this._query
             .builder()
             .select('id', 'updated', 'created_by', 'status', 'meta')
             .from(this.TABLE_NAME);
         const result = await this._query.executor<DatabaseEntry[]>(query);
-        return result.map(this.entryToDTO);
+        return result.map(this.entryToModel);
     }
 
-    public async findByUserId(userId: string): Promise<SubmissionDTO[]> {
+    public async findByUserId(userId: string): Promise<Submission[]> {
         const query = this._query
             .builder()
             .select('id', 'updated', 'created_by', 'status', 'meta')
@@ -38,39 +39,40 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
             .where({ created_by: userId });
 
         const result = await this._query.executor<DatabaseEntry[]>(query);
-        return result.map(this.entryToDTO);
+        return result.map(this.entryToModel);
     }
 
-    public async findById(id: SubmissionId): Promise<SubmissionDTO | null> {
+    public async findById(id: SubmissionId): Promise<Submission | null> {
         const query = this._query
             .builder()
             .select('id', 'updated', 'created_by', 'status', 'meta')
             .from(this.TABLE_NAME)
             .where({ id });
         const result = await this._query.executor<DatabaseEntry[]>(query);
-        return result.length ? this.entryToDTO(result[0]) : null;
+        return result.length ? this.entryToModel(result[0]) : null;
     }
 
-    public async update(dtoSubmission: Partial<SubmissionDTO> & { id: SubmissionId }): Promise<SubmissionDTO> {
-        // @todo: do we merge against remote state?
-        const submission = await this.findById(dtoSubmission.id);
-        if (submission === null) {
-            throw new Error(`Unable to find entry with id: ${dtoSubmission.id}`);
+    public async update(submission: Submission): Promise<Submission> {
+        const existingSubmission = await this.findById(submission.id);
+        if (existingSubmission === null) {
+            throw new Error(`Unable to find entry with id: ${submission.id}`);
         }
-        const entryToSave = this.dtoToEntry({ ...submission, ...dtoSubmission, updated: new Date() });
+        submission.updated = new Date();
+        const entryToSave = this.modelToEntry(submission);
         const query = this._query.builder().update(entryToSave);
         await this._query.executor<DatabaseEntry[]>(query);
-        return this.entryToDTO(entryToSave);
+        return this.entryToModel(entryToSave);
     }
 
-    public async create(dtoSubmission: Omit<SubmissionDTO, 'updated'>): Promise<SubmissionDTO> {
-        const entryToSave = this.dtoToEntry({ ...dtoSubmission, updated: new Date() });
+    public async create(submission: Submission): Promise<Submission> {
+        submission.updated = new Date();
+        const entryToSave = this.modelToEntry(submission);
         const query = this._query
             .builder()
             .insert(entryToSave)
             .into(this.TABLE_NAME);
         await this._query.executor<DatabaseEntry[]>(query);
-        return this.entryToDTO(entryToSave);
+        return this.entryToModel(entryToSave);
     }
 
     public async delete(id: SubmissionId): Promise<boolean> {
@@ -84,26 +86,31 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
     }
 
     // These mapping functions are here because xpub schema isn't what we want the dto to look like but we need to convert data sent to something compatible with knex.insert
-    private dtoToEntry(dto: SubmissionDTO): DatabaseEntry {
+    private modelToEntry(submission: Submission): DatabaseEntry {
         return {
-            id: dto.id,
-            updated: dto.updated as Date,
-            created_by: dto.createdBy,
-            status: dto.status,
+            id: submission.id,
+            updated: submission.updated as Date,
+            created_by: submission.createdBy,
+            status: submission.status,
             meta: {
-                articleType: dto.articleType,
-                title: dto.title,
+                articleType: submission.articleType,
+                title: submission.title,
             },
         };
     }
 
-    private entryToDTO(record: DatabaseEntry): SubmissionDTO {
-        const { created_by, meta, ...rest } = record;
-        return {
+    private entryToModel(record: DatabaseEntry): Submission {
+        const {
+            created_by: createdBy,
+            meta: { title, articleType },
+            ...rest
+        } = record;
+
+        return new Submission({
             ...rest,
-            createdBy: created_by,
-            title: meta.title,
-            articleType: meta.articleType,
-        } as SubmissionDTO;
+            createdBy,
+            title,
+            articleType,
+        });
     }
 }

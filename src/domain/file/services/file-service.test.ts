@@ -2,14 +2,14 @@ import XpubFileRepository from '../repositories/xpub-file';
 import { v4 } from 'uuid';
 import Knex = require('knex');
 import { SubmissionId } from '../../submission/types';
-import { FileDTO } from '../repositories/types';
 import { FileId, FileType } from '../types';
 import { FileService } from './file-service';
 import { S3Config } from '../../../config';
 import * as S3 from 'aws-sdk/clients/s3';
+import File from '../services/models/file';
 
 const submissionId = v4();
-const files: FileDTO[] = [
+const files = [
     {
         id: FileId.fromUuid(v4()),
         submissionId: SubmissionId.fromUuid(submissionId),
@@ -86,9 +86,7 @@ describe('File Service', () => {
             const fileId = v4();
             const findFileByIdSpy = jest
                 .spyOn(XpubFileRepository.prototype, 'findFileById')
-                .mockReturnValue(
-                    Promise.resolve(({ id: fileId, url: `manuscripts/${submissionId}` } as unknown) as FileDTO),
-                );
+                .mockReturnValue(Promise.resolve(new File(files[0])));
             const deleteByIdAndSubmissionIdSpy = jest
                 .spyOn(XpubFileRepository.prototype, 'deleteByIdAndSubmissionId')
                 .mockReturnValueOnce(Promise.resolve(true));

@@ -2,9 +2,9 @@
 import { v4 as uuid } from 'uuid';
 import XpubSubmissionRootRepository from './xpub-submission-root';
 import { SubmissionId } from '../types';
-import { SubmissionDTO } from './types';
 import { createMockAdapter, MockKnex } from '../../test-mocks/knex-mock';
 import { KnexTableAdapter } from '../../knex-table-adapter';
+import Submission, { ArticleType, SubmissionStatus } from '../services/models/submission';
 
 const entryId = SubmissionId.fromUuid(uuid());
 const entryId2 = SubmissionId.fromUuid(uuid());
@@ -13,9 +13,9 @@ const testDatabaseEntry = {
     id: entryId,
     meta: {
         title: 'The title',
-        articleType: 'newspaper',
+        articleType: ArticleType.FEATURE_ARTICLE,
     },
-    status: 'INITIAL',
+    status: SubmissionStatus.INITIAL,
     created_by: '123',
     updated: new Date('2020-02-18T15:14:53.155Z'),
 };
@@ -24,9 +24,9 @@ const testDatabaseEntry2 = {
     id: entryId2,
     meta: {
         title: 'Another title',
-        articleType: 'journal',
+        articleType: ArticleType.RESEARCH_ADVANCE,
     },
-    status: 'INITIAL',
+    status: SubmissionStatus.INITIAL,
     created_by: '124',
     updated: new Date('2020-02-18T15:14:53.155Z'),
 };
@@ -50,27 +50,31 @@ describe('Knex Submission Repository', () => {
             const result = await repo.findAll();
             expect(result).toHaveLength(2);
         });
-        it('returns a converted DTO object from the database entries', async (): Promise<void> => {
+        it('returns a submission model from the database entries', async (): Promise<void> => {
             adapter.executor = jest.fn().mockReturnValue(databaseEntries);
             const repo = new XpubSubmissionRootRepository(adapter);
             const result = await repo.findAll();
             expect(mock.select).toBeCalled();
             expect(mock.from).toBeCalled();
-            expect(result[0]).toStrictEqual({
+            expect({ ...result[0] }).toStrictEqual({
                 id: entryId,
                 title: 'The title',
-                status: 'INITIAL',
+                status: SubmissionStatus.INITIAL,
                 createdBy: '123',
-                articleType: 'newspaper',
+                articleType: ArticleType.FEATURE_ARTICLE,
                 updated: new Date('2020-02-18T15:14:53.155Z'),
+                manuscriptFile: undefined,
+                supportingFiles: undefined,
             });
-            expect(result[1]).toStrictEqual({
+            expect({ ...result[1] }).toStrictEqual({
                 id: entryId2,
                 title: 'Another title',
-                status: 'INITIAL',
+                status: SubmissionStatus.INITIAL,
                 createdBy: '124',
-                articleType: 'journal',
+                articleType: ArticleType.RESEARCH_ADVANCE,
                 updated: new Date('2020-02-18T15:14:53.155Z'),
+                manuscriptFile: undefined,
+                supportingFiles: undefined,
             });
         });
         it('calls the knex instance methods with the correct parameters', async (): Promise<void> => {
@@ -82,23 +86,26 @@ describe('Knex Submission Repository', () => {
         });
     });
     describe('findById', () => {
-        it('returns a converted DTO object from the database entry', () => {
+        it('returns a submission model from the database entry', async (): Promise<void> => {
             adapter.executor = jest.fn().mockReturnValue([databaseEntries[0]]);
             const repo = new XpubSubmissionRootRepository(adapter);
-            return expect(repo.findById(entryId)).resolves.toStrictEqual({
+            const submission = await repo.findById(entryId);
+            expect({ ...submission }).toStrictEqual({
                 id: entryId,
                 title: 'The title',
-                status: 'INITIAL',
+                status: SubmissionStatus.INITIAL,
                 createdBy: '123',
-                articleType: 'newspaper',
+                articleType: ArticleType.FEATURE_ARTICLE,
                 updated: new Date('2020-02-18T15:14:53.155Z'),
+                manuscriptFile: undefined,
+                supportingFiles: undefined,
             });
         });
         it('returns the first entry if multiple entries are found by query', async (): Promise<void> => {
             adapter.executor = jest.fn().mockReturnValue(databaseEntries);
             const repo = new XpubSubmissionRootRepository(adapter);
             const result = await repo.findById(entryId);
-            expect((result as SubmissionDTO).id).toEqual(databaseEntries[0].id);
+            expect((result as Submission).id).toEqual(databaseEntries[0].id);
         });
         it('returns null on no submission found', async (): Promise<void> => {
             adapter.executor = jest.fn().mockReturnValue([]);
@@ -118,21 +125,29 @@ describe('Knex Submission Repository', () => {
 
     describe('update', () => {
         it('calls update on knex if the entry exists', async (): Promise<void> => {
+            const submission = new Submission({
+                id: entryId,
+                title: 'The title',
+                status: SubmissionStatus.INITIAL,
+                createdBy: '123',
+                articleType: ArticleType.FEATURE_ARTICLE,
+            });
             adapter.executor = jest.fn();
             const repo = new XpubSubmissionRootRepository(adapter);
             repo.findById = jest.fn().mockReturnValue({ id: '1' });
             expect(mock.update).toBeCalledTimes(0);
-            await repo.update({
-                id: entryId,
-                title: 'The title',
-                status: 'INITIAL',
-                createdBy: '123',
-                articleType: 'newspaper',
-            });
+            await repo.update(submission);
             expect(mock.update).toBeCalledTimes(1);
             expect(mock.insert).toBeCalledTimes(0);
         });
         it('updates the updated time of the entry', async (): Promise<void> => {
+            const submission = new Submission({
+                id: entryId,
+                title: 'The title',
+                status: SubmissionStatus.INITIAL,
+                createdBy: '123',
+                articleType: ArticleType.FEATURE_ARTICLE,
+            });
             const lastUpdated = databaseEntries[0].updated;
             // https://jestjs.io/docs/en/mock-functions.html#mock-return-values
             adapter.executor = jest
@@ -140,81 +155,58 @@ describe('Knex Submission Repository', () => {
                 .mockReturnValueOnce([testDatabaseEntry])
                 .mockReturnValueOnce(true);
             const repo = new XpubSubmissionRootRepository(adapter);
-            const { updated } = await repo.update({
-                id: entryId,
-                title: 'The title',
-                status: 'INITIAL',
-                createdBy: '123',
-                articleType: 'newspaper',
-            });
+            const { updated } = await repo.update(submission);
             expect(updated).not.toEqual(lastUpdated);
-        });
-        it('returns a complete DTO when passed a partial to update', async (): Promise<void> => {
-            // https://jestjs.io/docs/en/mock-functions.html#mock-return-values
-            adapter.executor = jest
-                .fn()
-                .mockReturnValueOnce([testDatabaseEntry])
-                .mockReturnValueOnce(true);
-            const repo = new XpubSubmissionRootRepository(adapter);
-            const result = await repo.update({
-                id: entryId,
-                title: 'A Different Title',
-            });
-            expect(result).toMatchObject({
-                id: entryId,
-                title: 'A Different Title',
-                status: 'INITIAL',
-                createdBy: '123',
-                articleType: 'newspaper',
-            });
         });
     });
     describe('create', () => {
         it('calls insert on knex', async (): Promise<void> => {
+            const submission = new Submission({
+                id: entryId,
+                title: 'The title',
+                status: SubmissionStatus.INITIAL,
+                createdBy: '123',
+                articleType: ArticleType.FEATURE_ARTICLE,
+            });
             adapter.executor = jest.fn();
             const repo = new XpubSubmissionRootRepository(adapter);
             repo.findById = jest.fn().mockReturnValue(null);
             expect(mock.insert).toBeCalledTimes(0);
-            await repo.create({
-                id: entryId,
-                title: 'The title',
-                status: 'INITIAL',
-                createdBy: '123',
-                articleType: 'newspaper',
-            });
+            await repo.create(submission);
             expect(mock.insert).toBeCalledTimes(1);
             expect(mock.into).toBeCalledTimes(1);
             expect(mock.update).toBeCalledTimes(0);
         });
-        it('returns a complete DTO when passed a complete DTO to create', async (): Promise<void> => {
-            adapter.executor = jest.fn().mockReturnValue([]);
-            const repo = new XpubSubmissionRootRepository(adapter);
-            const result = await repo.create({
+        it('returns a Submission when passed a Submission to create', async (): Promise<void> => {
+            const submission = new Submission({
                 id: entryId,
                 title: 'A Different Title',
-                status: 'INITIAL',
+                status: SubmissionStatus.INITIAL,
                 createdBy: '123',
-                articleType: 'newspaper',
+                articleType: ArticleType.FEATURE_ARTICLE,
             });
+            adapter.executor = jest.fn().mockReturnValue([]);
+            const repo = new XpubSubmissionRootRepository(adapter);
+            const result = await repo.create(submission);
             expect(result).toMatchObject({
                 id: entryId,
                 title: 'A Different Title',
-                status: 'INITIAL',
+                status: SubmissionStatus.INITIAL,
                 createdBy: '123',
-                articleType: 'newspaper',
+                articleType: ArticleType.FEATURE_ARTICLE,
             });
         });
     });
     describe('delete', () => {
-        it('returns true when knex delete is successful', () => {
+        it('returns true when knex delete is successful', async () => {
             adapter.executor = jest.fn().mockReturnValue(true);
             const repo = new XpubSubmissionRootRepository(adapter);
-            expect(repo.delete(SubmissionId.fromUuid(uuid()))).resolves.toEqual(true);
+            await expect(repo.delete(SubmissionId.fromUuid(uuid()))).resolves.toEqual(true);
         });
-        it('returns false when knex delete is not successful', () => {
+        it('returns false when knex delete is not successful', async () => {
             adapter.executor = jest.fn().mockReturnValue(false);
             const repo = new XpubSubmissionRootRepository(adapter);
-            expect(repo.delete(SubmissionId.fromUuid(uuid()))).resolves.toEqual(false);
+            await expect(repo.delete(SubmissionId.fromUuid(uuid()))).resolves.toEqual(false);
         });
     });
 });

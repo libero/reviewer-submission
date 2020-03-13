@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid';
-import Submission from './submission';
+import Submission, { SubmissionStatus } from './submission';
 import { SubmissionId } from '../../types';
 
 describe('Submission Entity', () => {
@@ -9,7 +9,7 @@ describe('Submission Entity', () => {
             const submission = new Submission({
                 id: id,
                 title: '',
-                status: 'INITIAL',
+                status: SubmissionStatus.INITIAL,
                 createdBy: '123',
                 updated: new Date(),
                 articleType: 'researchArticle',
@@ -30,7 +30,7 @@ describe('Submission Entity', () => {
                 new Submission({
                     id: id,
                     title: '',
-                    status: 'INITIAL',
+                    status: SubmissionStatus.INITIAL,
                     createdBy: '123',
                     updated: new Date(),
                     articleType: 'foo',

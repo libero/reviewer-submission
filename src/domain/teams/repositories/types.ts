@@ -1,23 +1,13 @@
-import { TeamId } from '../types';
 import { Author } from '../../submission/types';
+import Team from '../services/models/team';
 
 export interface TeamRepository {
-    findByObjectIdAndRole(id: string, role: string): Promise<TeamDTO[]>;
-    create(dtoTeam: Omit<TeamDTO, 'id' | 'created' | 'updated'>): Promise<TeamDTO>;
-    update(dtoTeam: TeamDTO): Promise<TeamDTO>;
+    findByObjectIdAndRole(id: string, role: string): Promise<Team[]>;
+    create(dtoTeam: Omit<Team, 'id' | 'created' | 'updated'>): Promise<Team>;
+    update(dtoTeam: Team): Promise<Team>;
 }
 
 export type AuthorTeamMember = {
     alias: Author;
     meta: { corresponding: true };
-};
-
-export type TeamDTO = {
-    id: TeamId;
-    created: Date;
-    updated?: Date;
-    teamMembers: Array<AuthorTeamMember>;
-    role: string;
-    objectId: string;
-    objectType: string;
 };

@@ -1,18 +1,10 @@
 import { SubmissionId } from '../types';
+import Submission from '../services/models/submission';
 
 export interface SubmissionRepository {
-    create(sub: Omit<SubmissionDTO, 'updated'>): Promise<SubmissionDTO>;
+    create(submission: Submission): Promise<Submission>;
     delete(id: SubmissionId): Promise<boolean>;
-    findAll(): Promise<SubmissionDTO[]>;
-    findById(id: SubmissionId): Promise<SubmissionDTO | null>;
-    update(sub: Partial<SubmissionDTO> & { id: SubmissionId }): Promise<SubmissionDTO>;
-}
-
-export interface SubmissionDTO {
-    id: SubmissionId;
-    updated: Date;
-    createdBy: string;
-    status: string;
-    articleType: string;
-    title: string;
+    findAll(): Promise<Submission[]>;
+    findById(id: SubmissionId): Promise<Submission | null>;
+    update(sub: Partial<Submission> & { id: SubmissionId }): Promise<Submission>;
 }

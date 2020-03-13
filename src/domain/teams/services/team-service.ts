@@ -1,7 +1,7 @@
 import * as Knex from 'knex';
 import { createKnexAdapter } from '../../knex-table-adapter';
 import XpubTeamRepository from '../repositories/xpub-team';
-import { TeamDTO } from '../repositories/types';
+import Team from './models/team';
 
 export class TeamService {
     teamRepository: XpubTeamRepository;
@@ -11,16 +11,16 @@ export class TeamService {
         this.teamRepository = new XpubTeamRepository(adapter);
     }
 
-    async find(id: string, role: string): Promise<TeamDTO | null> {
+    async find(id: string, role: string): Promise<Team | null> {
         const results = await this.teamRepository.findByObjectIdAndRole(id, role);
         return results.length > 0 ? results[0] : null;
     }
 
-    async update(team: TeamDTO): Promise<TeamDTO> {
+    async update(team: Team): Promise<Team> {
         return await this.teamRepository.update(team);
     }
 
-    async create(team: Omit<TeamDTO, 'id' | 'created' | 'updated'>): Promise<TeamDTO> {
+    async create(team: Omit<Team, 'id' | 'created' | 'updated'>): Promise<Team> {
         return await this.teamRepository.create(team);
     }
 }

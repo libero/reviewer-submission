@@ -2,49 +2,57 @@
 import { KnexTableAdapter } from '../../knex-table-adapter';
 import { SubmissionId } from '../../submission/types';
 import { FileId, FileType, FileStatus } from '../types';
-import { FileDTO } from './types';
-
-interface FileRepository {
-    create(dtoFile: Omit<FileDTO, 'updated'>): Promise<FileDTO>;
-}
+import File from '../services/models/file';
 
 type DatabaseEntry = {
     id: FileId;
     manuscript_id: SubmissionId;
-    status: string;
     filename: string;
     url: string;
     mime_type: string;
     size: number;
     created: Date;
     updated: Date;
+    status: string;
+    type: FileType;
 };
 
-export default class XpubFileRepository implements FileRepository {
+export default class XpubFileRepository {
     private readonly TABLE_NAME = 'file';
 
     public constructor(private readonly _query: KnexTableAdapter) {}
 
-    async create(dtoFile: Omit<FileDTO, 'updated'>): Promise<FileDTO> {
-        const entryToSave = this.dtoToEntry({ ...dtoFile, updated: new Date() });
+    async create(file: File): Promise<File> {
+        // const entryToSave = this.dtoToEntry({ ...dtoFile, updated: new Date() });
         const query = this._query
             .builder()
-            .insert(entryToSave)
+            .insert(this.modelToEntry(file))
             .into(this.TABLE_NAME);
 
-        await this._query.executor<FileDTO[]>(query);
-        return this.entryToDto(entryToSave);
+        await this._query.executor(query);
+        return file;
     }
 
-    async findFileById(id: FileId): Promise<FileDTO | null> {
+    async findFileById(id: FileId): Promise<File | null> {
         const query = this._query
             .builder()
-            .select('id', 'manuscript_id', 'status', 'filename', 'url', 'mime_type', 'size', 'created', 'updated')
+            .select(
+                'id',
+                'manuscript_id',
+                'status',
+                'filename',
+                'url',
+                'mime_type',
+                'size',
+                'type',
+                'created',
+                'updated',
+            )
             .from(this.TABLE_NAME)
             .where({ id });
 
         const files = await this._query.executor<DatabaseEntry[]>(query);
-        return files.length > 0 ? this.entryToDto(files[0]) : null;
+        return files.length > 0 ? this.entryToModel(files[0]) : null;
     }
 
     async deleteByIdAndSubmissionId(id: FileId, submissionId: SubmissionId): Promise<boolean> {
@@ -52,7 +60,9 @@ export default class XpubFileRepository implements FileRepository {
         if (file === null) {
             throw new Error(`Unable to find entry with id: ${id}`);
         }
-        const entryToSave = this.dtoToEntry({ ...file, updated: new Date(), status: FileStatus.DELETED });
+        file.updated = new Date();
+        file.status = FileStatus.DELETED;
+        const entryToSave = this.modelToEntry(file);
         const query = this._query
             .builder()
             .table(this.TABLE_NAME)
@@ -62,46 +72,69 @@ export default class XpubFileRepository implements FileRepository {
         return true;
     }
 
-    async findManuscriptBySubmissionId(id: SubmissionId): Promise<FileDTO | null> {
+    async findManuscriptBySubmissionId(id: SubmissionId): Promise<File | null> {
         const query = this._query
             .builder()
-            .select('id', 'manuscript_id', 'status', 'filename', 'url', 'mime_type', 'size', 'created', 'updated')
+            .select(
+                'id',
+                'manuscript_id',
+                'status',
+                'filename',
+                'url',
+                'mime_type',
+                'size',
+                'type',
+                'created',
+                'updated',
+            )
             .from(this.TABLE_NAME)
             .where({ manuscript_id: id, type: FileType.MANUSCRIPT_SOURCE, status: FileStatus.STORED });
 
         const files = await this._query.executor<DatabaseEntry[]>(query);
-        return files.length > 0 ? this.entryToDto(files[0]) : null;
+        return files.length > 0 ? this.entryToModel(files[0]) : null;
     }
 
-    async getSupportingFilesBySubmissionId(id: SubmissionId): Promise<Array<FileDTO>> {
+    async getSupportingFilesBySubmissionId(id: SubmissionId): Promise<Array<File>> {
         const query = this._query
             .builder()
-            .select('id', 'manuscript_id', 'status', 'filename', 'url', 'mime_type', 'size', 'created', 'updated')
+            .select(
+                'id',
+                'manuscript_id',
+                'status',
+                'filename',
+                'url',
+                'mime_type',
+                'size',
+                'type',
+                'created',
+                'updated',
+            )
             .from(this.TABLE_NAME)
             .where({ manuscript_id: id, type: FileType.SUPPORTING_FILE });
 
         const files = await this._query.executor<DatabaseEntry[]>(query);
 
-        return files.map(this.entryToDto);
+        return files.map(this.entryToModel);
     }
 
-    async update(dtoFile: FileDTO): Promise<FileDTO> {
-        const file = await this.findFileById(dtoFile.id);
-        if (file === null) {
-            throw new Error(`Unable to find entry with id: ${dtoFile.id}`);
+    async update(file: File): Promise<File> {
+        const existingFile = await this.findFileById(file.id);
+        if (existingFile === null) {
+            throw new Error(`Unable to find entry with id: ${file.id}`);
         }
-        const entryToSave = this.dtoToEntry({ ...file, ...dtoFile, updated: new Date() });
+        file.updated = new Date();
+        const entryToSave = this.modelToEntry(file);
         const query = this._query
             .builder()
             .table(this.TABLE_NAME)
             .update(entryToSave)
-            .where({ id: dtoFile.id });
+            .where({ id: file.id });
         await this._query.executor(query);
-        return this.entryToDto(entryToSave);
+        return this.entryToModel(entryToSave);
     }
 
-    dtoToEntry(dto: FileDTO): DatabaseEntry {
-        const { submissionId, mimeType, ...rest } = dto;
+    modelToEntry(file: File): DatabaseEntry {
+        const { submissionId, mimeType, ...rest } = file;
         return {
             ...rest,
             manuscript_id: submissionId,
@@ -109,12 +142,18 @@ export default class XpubFileRepository implements FileRepository {
         } as DatabaseEntry;
     }
 
-    entryToDto(record: DatabaseEntry): FileDTO {
-        const { manuscript_id, mime_type, ...rest } = record;
-        return {
-            ...rest,
-            submissionId: manuscript_id,
-            mimeType: mime_type,
-        } as FileDTO;
+    entryToModel(record: DatabaseEntry): File {
+        const {
+            manuscript_id: submissionId,
+            type,
+            mime_type: mimeType,
+            id,
+            created,
+            updated,
+            filename,
+            size,
+            status,
+        } = record;
+        return new File({ id, submissionId, created, updated, type, filename, mimeType, size, status });
     }
 }

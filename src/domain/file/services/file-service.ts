@@ -7,7 +7,6 @@ import { FileId, FileType, FileStatus } from '../types';
 import File from './models/file';
 import { SubmissionId } from '../../../domain/submission/types';
 import { S3Config } from '../../../config';
-import { FileDTO } from '../repositories/types';
 
 export class FileService {
     fileRepository: XpubFileRepository;
@@ -73,32 +72,32 @@ export class FileService {
         }
         const id = FileId.fromUuid(uuid());
         const status = FileStatus.CREATED;
-        const url = this.getFileS3Key(type, submissionId, id);
-        const newFile = await this.fileRepository.create({
+        const currentDate = new Date();
+        const file = new File({
             id,
             submissionId,
+            created: currentDate,
+            updated: currentDate,
+            type,
             filename,
             mimeType,
             size,
-            type,
             status,
-            url,
         });
-
-        return new File(newFile);
+        return await this.fileRepository.create(file);
     }
 
-    async update(fileDTO: FileDTO): Promise<FileDTO> {
-        return this.fileRepository.update(fileDTO);
+    async update(file: File): Promise<File> {
+        return this.fileRepository.update(file);
     }
 
     async findManuscriptFile(submissionId: SubmissionId): Promise<File | null> {
-        const fileDTO = await this.fileRepository.findManuscriptBySubmissionId(submissionId);
-        if (!fileDTO) {
+        const file = await this.fileRepository.findManuscriptBySubmissionId(submissionId);
+        if (!file) {
             return null;
         }
 
-        return new File(fileDTO);
+        return file;
     }
 
     async hasManuscriptFile(submissionId: SubmissionId): Promise<boolean> {
@@ -107,9 +106,7 @@ export class FileService {
     }
 
     async getSupportingFiles(submissionId: SubmissionId): Promise<Array<File>> {
-        return (await this.fileRepository.getSupportingFilesBySubmissionId(submissionId)).map(
-            (file: FileDTO) => new File(file),
-        );
+        return await this.fileRepository.getSupportingFilesBySubmissionId(submissionId);
     }
 
     async upload(fileContents: Buffer, file: File): Promise<S3.ManagedUpload.SendData> {

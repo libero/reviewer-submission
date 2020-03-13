@@ -6,13 +6,13 @@ import { MockKnex, createMockAdapter } from '../../test-mocks/knex-mock';
 import { SurveyResponse } from '../services/models/survey-response';
 import { KnexTableAdapter } from '../../knex-table-adapter';
 
-const testSurveyResponse = new SurveyResponse({
-    id: SurveyResponseId.fromUuid(uuid()),
-    surveyId: SurveyId.fromUuid(uuid()),
-    submissionId: SubmissionId.fromUuid(uuid()),
-    questions: [],
-    answers: [],
-});
+const testSurveyResponse = new SurveyResponse(
+    SurveyResponseId.fromUuid(uuid()),
+    SurveyId.fromUuid(uuid()),
+    SubmissionId.fromUuid(uuid()),
+    [],
+    [],
+);
 
 describe('Knex SurveyResponse Repository', () => {
     let adapter: KnexTableAdapter;
