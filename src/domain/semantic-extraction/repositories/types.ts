@@ -1,15 +1,5 @@
-import { SubmissionId } from '../../submission/types';
-import { SemanticExtractionId } from '../types';
+import SemanticExtraction from '../services/models/semantic-extraction';
 
 export interface SemanticExtractionRepository {
-    create(dtoSemanticExtraction: SemanticExtractionDTO): Promise<SemanticExtractionDTO>;
+    create(dtoSemanticExtraction: SemanticExtraction): Promise<SemanticExtraction>;
 }
-
-export type SemanticExtractionDTO = {
-    id: SemanticExtractionId;
-    updated?: Date;
-    created?: Date;
-    submissionId: SubmissionId;
-    fieldName: string;
-    value: string;
-};

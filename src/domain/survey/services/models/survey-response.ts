@@ -1,32 +1,22 @@
-import { ISurveyResponse, SurveyResponseDTO, SurveyId, SurveyResponseId } from '../../survey';
+import { SurveyId, SurveyResponseId } from '../../survey';
 import { Question } from './question';
 import { Answer } from './answer';
 import { SubmissionId } from '../../../submission/types';
 
-export class SurveyResponse implements ISurveyResponse {
+export class SurveyResponse {
     id: SurveyResponseId;
-
     surveyId: SurveyId;
-
     submissionId: SubmissionId;
-
     questions: Question[];
-
     answers: Answer[];
 
-    constructor({
-        id,
-        surveyId,
-        submissionId,
-        questions = [],
-        answers = [],
-    }: {
-        id: SurveyResponseId;
-        surveyId: SurveyId;
-        submissionId: SubmissionId;
-        questions?: Question[];
-        answers?: Answer[];
-    }) {
+    constructor(
+        id: SurveyResponseId,
+        surveyId: SurveyId,
+        submissionId: SubmissionId,
+        questions: Question[] = [],
+        answers: Answer[] = [],
+    ) {
         this.id = id;
         this.surveyId = surveyId;
         this.submissionId = submissionId;
@@ -46,16 +36,4 @@ export class SurveyResponse implements ISurveyResponse {
         questionIndex !== -1 ? this.questions.splice(questionIndex, 1, newQuestion) : this.questions.push(newQuestion);
     }
 
-    // should we maybe have a SurveyResponseDTO ?
-    toDTO(): SurveyResponseDTO {
-        return {
-            id: this.id,
-            surveyId: this.surveyId,
-            submissionId: this.submissionId,
-            response: {
-                questions: this.questions,
-                answers: this.answers,
-            },
-        };
-    }
 }
