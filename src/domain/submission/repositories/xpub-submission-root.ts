@@ -4,7 +4,7 @@ import { SubmissionRepository } from './types';
 import { KnexTableAdapter } from '../../knex-table-adapter';
 import Submission from '../services/models/submission';
 
-type entryMeta = {
+type EntryMeta = {
     articleType: string;
     title: string;
 };
@@ -14,7 +14,8 @@ type DatabaseEntry = {
     updated: Date;
     created_by: string;
     status: string;
-    meta: entryMeta;
+    meta: EntryMeta;
+    cover_letter?: string;
 };
 
 export default class XpubSubmissionRootRepository implements SubmissionRepository {
@@ -92,6 +93,7 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
             updated: submission.updated as Date,
             created_by: submission.createdBy,
             status: submission.status,
+            cover_letter: submission.coverLetter,
             meta: {
                 articleType: submission.articleType,
                 title: submission.title,
