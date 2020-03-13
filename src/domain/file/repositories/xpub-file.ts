@@ -117,10 +117,10 @@ export default class XpubFileRepository {
             id,
             created,
             updated,
-            meta,
             filename,
             size,
+            status,
         } = record;
-        return new File({ id, submissionId, created, updated, type, filename, mimeType, size, status: meta.status });
+        return new File({ id, submissionId, created, updated, type, filename, mimeType, size, status });
     }
 }
