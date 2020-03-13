@@ -63,7 +63,8 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
         const query = this._query
             .builder()
             .update(entryToSave)
-            .table(this.TABLE_NAME);
+            .table(this.TABLE_NAME)
+            .where({ id: submission.id });
         await this._query.executor<DatabaseEntry[]>(query);
         return this.entryToModel(entryToSave);
     }
