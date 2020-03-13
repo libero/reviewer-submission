@@ -15,7 +15,7 @@ const testDatabaseEntry = {
         title: 'The title',
         articleType: ArticleType.FEATURE_ARTICLE,
     },
-    coverLetter: 'test cover',
+    cover_letter: 'test cover',
     status: SubmissionStatus.INITIAL,
     created_by: '123',
     updated: new Date('2020-02-18T15:14:53.155Z'),
@@ -27,7 +27,7 @@ const testDatabaseEntry2 = {
         title: 'Another title',
         articleType: ArticleType.RESEARCH_ADVANCE,
     },
-    coverLetter: 'test cover',
+    cover_letter: 'test cover',
     status: SubmissionStatus.INITIAL,
     created_by: '124',
     updated: new Date('2020-02-18T15:14:53.155Z'),
@@ -85,7 +85,7 @@ describe('Knex Submission Repository', () => {
             adapter.executor = jest.fn().mockReturnValue(databaseEntries);
             const repo = new XpubSubmissionRootRepository(adapter);
             await repo.findAll();
-            expect(mock.select).toBeCalledWith('id', 'updated', 'created_by', 'status', 'meta');
+            expect(mock.select).toBeCalledWith('id', 'updated', 'created_by', 'status', 'meta', 'cover_letter');
             expect(mock.from).toBeCalledWith('manuscript');
         });
     });
@@ -122,7 +122,7 @@ describe('Knex Submission Repository', () => {
             adapter.executor = jest.fn().mockReturnValue([]);
             const repo = new XpubSubmissionRootRepository(adapter);
             await repo.findById(entryId);
-            expect(mock.select).toBeCalledWith('id', 'updated', 'created_by', 'status', 'meta');
+            expect(mock.select).toBeCalledWith('id', 'updated', 'created_by', 'status', 'meta', 'cover_letter');
             expect(mock.from).toBeCalledWith('manuscript');
             expect(mock.where).toBeCalledWith({ id: entryId });
         });
