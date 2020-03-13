@@ -21,11 +21,7 @@ export class SurveyService {
         answers: SurveyAnswer[],
     ): Promise<SurveyResponse> {
         const id: SurveyResponseId = SurveyResponseId.fromUuid(uuid());
-        const surveyResponse = new SurveyResponse({
-            id,
-            surveyId,
-            submissionId,
-        });
+        const surveyResponse = new SurveyResponse(id, surveyId, submissionId);
 
         answers.forEach(({ questionId, text, answer }: SurveyAnswer) => {
             surveyResponse.answerQuestion(questionId, text, answer);

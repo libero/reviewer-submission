@@ -11,7 +11,6 @@ type Meta = {
 type DatabaseEntry = {
     id: FileId;
     manuscript_id: SubmissionId;
-    status: string;
     filename: string;
     url: string;
     mime_type: string;
@@ -31,10 +30,10 @@ export default class XpubFileRepository {
         // const entryToSave = this.dtoToEntry({ ...dtoFile, updated: new Date() });
         const query = this._query
             .builder()
-            .insert(file)
+            .insert(this.modelToEntry(file))
             .into(this.TABLE_NAME);
 
-        await this._query.executor<File[]>(query);
+        await this._query.executor(query);
         return file;
     }
 
@@ -106,11 +105,14 @@ export default class XpubFileRepository {
     }
 
     modelToEntry(file: File): DatabaseEntry {
-        const { submissionId, mimeType, ...rest } = file;
+        const { submissionId, mimeType, status, ...rest } = file;
         return {
             ...rest,
             manuscript_id: submissionId,
             mime_type: mimeType,
+            meta: {
+                status,
+            },
         } as DatabaseEntry;
     }
 
