@@ -36,7 +36,18 @@ export default class XpubFileRepository {
     async findFileById(id: FileId): Promise<File | null> {
         const query = this._query
             .builder()
-            .select('id', 'manuscript_id', 'status', 'filename', 'url', 'mime_type', 'size', 'created', 'updated')
+            .select(
+                'id',
+                'manuscript_id',
+                'status',
+                'filename',
+                'url',
+                'mime_type',
+                'size',
+                'type',
+                'created',
+                'updated',
+            )
             .from(this.TABLE_NAME)
             .where({ id });
 
@@ -64,7 +75,18 @@ export default class XpubFileRepository {
     async findManuscriptBySubmissionId(id: SubmissionId): Promise<File | null> {
         const query = this._query
             .builder()
-            .select('id', 'manuscript_id', 'status', 'filename', 'url', 'mime_type', 'size', 'created', 'updated')
+            .select(
+                'id',
+                'manuscript_id',
+                'status',
+                'filename',
+                'url',
+                'mime_type',
+                'size',
+                'type',
+                'created',
+                'updated',
+            )
             .from(this.TABLE_NAME)
             .where({ manuscript_id: id, type: FileType.MANUSCRIPT_SOURCE, status: FileStatus.STORED });
 
@@ -75,7 +97,18 @@ export default class XpubFileRepository {
     async getSupportingFilesBySubmissionId(id: SubmissionId): Promise<Array<File>> {
         const query = this._query
             .builder()
-            .select('id', 'manuscript_id', 'status', 'filename', 'url', 'mime_type', 'size', 'created', 'updated')
+            .select(
+                'id',
+                'manuscript_id',
+                'status',
+                'filename',
+                'url',
+                'mime_type',
+                'size',
+                'type',
+                'created',
+                'updated',
+            )
             .from(this.TABLE_NAME)
             .where({ manuscript_id: id, type: FileType.SUPPORTING_FILE });
 
