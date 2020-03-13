@@ -297,7 +297,7 @@ describe('Application Integration Tests', () => {
         expect(deleteResponse.data.errors).toBeUndefined();
     });
 
-    it('it should allow a user to set a a cover letter for their submission', async () => {
+    it.only('it should allow a user to set a a cover letter for their submission', async () => {
         const startSubmissionResponse = await startSubmissionAlt('researchArticle');
         const submissionId = startSubmissionResponse.data.data.startSubmission.id;
         const coverLetter = 'I am a cover';
@@ -306,7 +306,7 @@ describe('Application Integration Tests', () => {
             'http://localhost:3000/graphql',
             {
                 query: `
-                    mutation SaveFilesPage($id: ID!, $coverLetter: String) {
+                    mutation SaveFilesPage($id: ID!, $coverLetter: String!) {
                         saveFilesPage(id: $id, coverLetter: $coverLetter) {
                             id,
                             coverLetter
