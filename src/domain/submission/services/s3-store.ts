@@ -2,7 +2,7 @@ import { SubmissionWriter, PackageLocation, SubmissionId } from '../types';
 
 export class S3Store implements SubmissionWriter {
     private remotePath = 'somewhere-in-AWS';
-    private mecaPostfix = '-meca.zip'
+    private mecaPostfix = '-meca.zip';
 
     write(id: SubmissionId, buffer: Buffer): Promise<PackageLocation> {
         // @todo: Implement

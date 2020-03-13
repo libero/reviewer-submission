@@ -9,11 +9,7 @@ import { FileId } from '../../domain/file/types';
 const resolvers = (wizard: WizardService, userService: UserService): IResolvers => ({
     Query: {},
     Mutation: {
-        async submit(
-            _,
-            { id: submissionId }: { id: SubmissionId; },
-            context,
-        ): Promise<Submission | null> {
+        async submit(_, { id: submissionId }: { id: SubmissionId }, context): Promise<Submission | null> {
             const user = await userService.getCurrentUser(context.authorizationHeader);
             return wizard.submit(user, submissionId);
         },
