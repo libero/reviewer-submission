@@ -173,4 +173,13 @@ export class WizardService {
         }
         return await this.fileService.deleteSupportingFile(fileId, submissionId);
     }
+
+    async saveFilesPage(user: User, submissionId: SubmissionId, coverLetter: string): Promise<Submission> {
+        const submission = await this.submissionService.get(submissionId);
+        const allowed = this.permissionService.userCanWithSubmission(user, SubmissionOperation.UPDATE, submission);
+        if (!allowed) {
+            throw new Error('User not allowed to update submission');
+        }
+        return await this.submissionService.changeCoverLetter(submissionId, coverLetter);
+    }
 }

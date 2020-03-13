@@ -15,4 +15,5 @@ export interface SubmissionDTO {
     status: string;
     articleType: string;
     title: string;
+    coverLetter?: string;
 }
