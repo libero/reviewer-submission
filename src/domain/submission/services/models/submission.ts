@@ -26,6 +26,7 @@ export default class Submission {
     createdBy: string;
     manuscriptFile?: File | null;
     supportingFiles?: Array<File>;
+    coverLetter?: string;
 
     // This is wired up so that you can create an entity from the DTO described by ISubmission
     constructor({
@@ -37,6 +38,7 @@ export default class Submission {
         createdBy,
         manuscriptFile,
         supportingFiles,
+        coverLetter,
     }: {
         id: SubmissionId;
         title: string;
@@ -46,6 +48,7 @@ export default class Submission {
         createdBy: string;
         manuscriptFile?: File | null;
         supportingFiles?: Array<File>;
+        coverLetter?: string;
     }) {
         this.id = id;
         this.title = title;
@@ -55,6 +58,7 @@ export default class Submission {
         this.createdBy = createdBy;
         this.manuscriptFile = manuscriptFile;
         this.supportingFiles = supportingFiles;
+        this.coverLetter = coverLetter;
     }
 
     private articleTypeFromString(type: string): ArticleType {

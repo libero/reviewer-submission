@@ -45,4 +45,13 @@ export class SubmissionService {
     async delete(id: SubmissionId): Promise<boolean> {
         return await this.submissionRepository.delete(id);
     }
+
+    async changeCoverLetter(id: SubmissionId, coverLetter: string): Promise<Submission> {
+        const submission = await this.submissionRepository.findById(id);
+        if (!submission) {
+            throw new Error('Unable to find submission with id: ' + id);
+        }
+        submission.coverLetter = coverLetter;
+        return await this.submissionRepository.update(submission);
+    }
 }
