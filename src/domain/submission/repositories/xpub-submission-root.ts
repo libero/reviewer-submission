@@ -26,7 +26,7 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
     public async findAll(): Promise<Submission[]> {
         const query = this._query
             .builder()
-            .select('id', 'updated', 'created_by', 'status', 'meta')
+            .select('id', 'updated', 'created_by', 'status', 'meta', 'cover_letter')
             .from(this.TABLE_NAME);
         const result = await this._query.executor<DatabaseEntry[]>(query);
         return result.map(this.entryToModel);
@@ -35,7 +35,7 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
     public async findByUserId(userId: string): Promise<Submission[]> {
         const query = this._query
             .builder()
-            .select('id', 'updated', 'created_by', 'status', 'meta')
+            .select('id', 'updated', 'created_by', 'status', 'meta', 'cover_letter')
             .from(this.TABLE_NAME)
             .where({ created_by: userId });
 
@@ -46,7 +46,7 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
     public async findById(id: SubmissionId): Promise<Submission | null> {
         const query = this._query
             .builder()
-            .select('id', 'updated', 'created_by', 'status', 'meta')
+            .select('id', 'updated', 'created_by', 'status', 'meta', 'cover_letter')
             .from(this.TABLE_NAME)
             .where({ id });
         const result = await this._query.executor<DatabaseEntry[]>(query);
@@ -60,7 +60,10 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
         }
         submission.updated = new Date();
         const entryToSave = this.modelToEntry(submission);
-        const query = this._query.builder().update(entryToSave);
+        const query = this._query
+            .builder()
+            .update(entryToSave)
+            .table(this.TABLE_NAME);
         await this._query.executor<DatabaseEntry[]>(query);
         return this.entryToModel(entryToSave);
     }
