@@ -18,7 +18,6 @@ type DatabaseEntry = {
     updated?: Date;
 };
 
-
 export class KnexSurveyResponseRepository implements SurveyResponseRepository {
     private readonly TABLE_NAME = 'survey_response';
 

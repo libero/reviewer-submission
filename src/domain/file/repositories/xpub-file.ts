@@ -4,10 +4,6 @@ import { SubmissionId } from '../../submission/types';
 import { FileId, FileType, FileStatus } from '../types';
 import File from '../services/models/file';
 
-type Meta = {
-    [key: string]: any;
-};
-
 type DatabaseEntry = {
     id: FileId;
     manuscript_id: SubmissionId;
@@ -17,7 +13,7 @@ type DatabaseEntry = {
     size: number;
     created: Date;
     updated: Date;
-    meta: Meta;
+    status: string;
     type: FileType;
 };
 
@@ -105,14 +101,11 @@ export default class XpubFileRepository {
     }
 
     modelToEntry(file: File): DatabaseEntry {
-        const { submissionId, mimeType, status, ...rest } = file;
+        const { submissionId, mimeType, ...rest } = file;
         return {
             ...rest,
             manuscript_id: submissionId,
             mime_type: mimeType,
-            meta: {
-                status,
-            },
         } as DatabaseEntry;
     }
 

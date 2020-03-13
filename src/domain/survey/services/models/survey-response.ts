@@ -35,5 +35,4 @@ export class SurveyResponse {
         const questionIndex = this.questions.findIndex(question => question.id === questionId);
         questionIndex !== -1 ? this.questions.splice(questionIndex, 1, newQuestion) : this.questions.push(newQuestion);
     }
-
 }
