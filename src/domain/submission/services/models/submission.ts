@@ -2,7 +2,6 @@ import { SubmissionId } from '../../types';
 import File from '../../../file/services/models/file';
 import { FileId } from 'src/domain/file/types';
 import { FileDTO } from 'src/domain/file/repositories/types';
-import { SubmissionDTO } from '../../repositories/types';
 
 export enum ArticleType {
     RESEARCH_ARTICLE = 'researchArticle',
@@ -57,16 +56,6 @@ export default class Submission {
         this.createdBy = createdBy;
         this.manuscriptFile = manuscriptFile;
         this.supportingFiles = supportingFiles;
-    }
-
-    public toDTO(): SubmissionDTO {
-        const { manuscriptFile, supportingFiles, ...rest } = this;
-
-        return {
-            ...rest,
-            manuscriptFile: manuscriptFile?.toDTO(),
-            supportingFiles: supportingFiles ? supportingFiles.forEach(file => file.toDTO()) : [],
-        };
     }
 
     private articleTypeFromString(type: string): ArticleType {
