@@ -34,7 +34,6 @@ export default class File {
         size: number;
         status: string;
     }) {
-        console.log('++++', type);
         this.id = id;
         this.submissionId = submissionId;
         this.created = created;
@@ -48,7 +47,6 @@ export default class File {
     }
 
     private getFileS3Key(fileType: FileType, submissionId: SubmissionId, fileId: FileId): string {
-        console.log(fileType);
         switch (fileType) {
             case FileType.MANUSCRIPT_SOURCE:
                 return `manuscripts/${submissionId}/${fileId}`;
