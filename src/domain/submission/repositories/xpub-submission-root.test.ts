@@ -50,13 +50,13 @@ describe('Knex Submission Repository', () => {
             const result = await repo.findAll();
             expect(result).toHaveLength(2);
         });
-        it('returns a submission model from the database entries', async (): Promise<void> => {
+        it.only('returns a submission model from the database entries', async (): Promise<void> => {
             adapter.executor = jest.fn().mockReturnValue(databaseEntries);
             const repo = new XpubSubmissionRootRepository(adapter);
             const result = await repo.findAll();
             expect(mock.select).toBeCalled();
             expect(mock.from).toBeCalled();
-            expect(result[0]).toStrictEqual({
+            expect({ ...result[0] }).toStrictEqual({
                 id: entryId,
                 title: 'The title',
                 status: SubmissionStatus.INITIAL,
@@ -65,8 +65,8 @@ describe('Knex Submission Repository', () => {
                 updated: new Date('2020-02-18T15:14:53.155Z'),
                 manuscriptFile: undefined,
                 supportingFiles: undefined,
-            } as Submission);
-            expect(result[1]).toStrictEqual({
+            });
+            expect({ ...result[1] }).toStrictEqual({
                 id: entryId2,
                 title: 'Another title',
                 status: SubmissionStatus.INITIAL,
@@ -75,7 +75,7 @@ describe('Knex Submission Repository', () => {
                 updated: new Date('2020-02-18T15:14:53.155Z'),
                 manuscriptFile: undefined,
                 supportingFiles: undefined,
-            } as Submission);
+            });
         });
         it('calls the knex instance methods with the correct parameters', async (): Promise<void> => {
             adapter.executor = jest.fn().mockReturnValue(databaseEntries);
