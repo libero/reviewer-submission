@@ -108,12 +108,14 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
     private entryToModel(record: DatabaseEntry): Submission {
         const {
             created_by: createdBy,
+            cover_letter: coverLetter,
             meta: { title, articleType },
             ...rest
         } = record;
 
         return new Submission({
             ...rest,
+            coverLetter,
             createdBy,
             title,
             articleType,

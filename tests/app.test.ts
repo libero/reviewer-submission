@@ -297,7 +297,7 @@ describe('Application Integration Tests', () => {
         expect(deleteResponse.data.errors).toBeUndefined();
     });
 
-    it.only('it should allow a user to set a a cover letter for their submission', async () => {
+    it('it should allow a user to set a a cover letter for their submission', async () => {
         const startSubmissionResponse = await startSubmissionAlt('researchArticle');
         const submissionId = startSubmissionResponse.data.data.startSubmission.id;
         const coverLetter = 'I am a cover';
