@@ -1,6 +1,5 @@
 import { SemanticExtractionId } from '../../types';
 import { SubmissionId } from '../../../submission/types';
-import { SemanticExtractionId } from '../../types';
 
 export default class SemanticExtraction {
     id: SemanticExtractionId;
