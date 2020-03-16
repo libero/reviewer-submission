@@ -8,7 +8,7 @@ import { MecaExporter } from './exporter/meca-exporter';
 import { S3Store } from './storage/s3-store';
 import { SftpStore } from './storage/sftp-store';
 import { SubmissionStore } from './storage/submission-store';
-import { InfraLogger as logger } from './logger';
+import { InfraLogger as logger } from '../../../logger';
 
 export class SubmissionService {
     submissionRepository: XpubSubmissionRootRepository;
