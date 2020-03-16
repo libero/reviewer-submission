@@ -133,11 +133,12 @@ const init = async (): Promise<void> => {
         subscriptions: {
             onConnect: (connectionParams: any, webSocket) => {
                 console.log('connectionParams', connectionParams);
-                if (connectionParams.authToken) {
-                    const decodedToken = verify(connectionParams.authToken, config.authentication_jwt_secret) as {
+                if (connectionParams.Authorization) {
+                    const token = (connectionParams.Authorization || '').split(' ')[1];
+                    const decodedToken = verify(token, config.authentication_jwt_secret) as {
                         sub: string;
                     };
-                    return { userId: decodedToken.sub, authorizationHeader: connectionParams.authToken || '' };
+                    return { userId: decodedToken.sub, authorizationHeader: connectionParams.Authorization || '' };
                 }
 
                 throw new Error('Missing auth token!');
