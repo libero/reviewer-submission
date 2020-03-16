@@ -136,6 +136,8 @@ const init = async (): Promise<void> => {
         subscriptions: {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             onConnect: (connectionParams: any): any => {
+                console.log('onConnection');
+                console.log(connectionParams);
                 if (connectionParams.Authorization) {
                     const token = (connectionParams.Authorization || '').split(' ')[1];
                     const decodedToken = verify(token, config.authentication_jwt_secret) as {

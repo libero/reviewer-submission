@@ -79,10 +79,14 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
             subscribe: withFilter(
                 () => pubsub.asyncIterator('UPLOAD_STATUS'),
                 (payload, variables, context) => {
-                    return (
+                    console.log(payload, variables, context);
+                    const r = (
                         payload.manuscriptUploadProgress.filename === variables.filename &&
                         payload.manuscriptUploadProgress.userId === context.userId
                     );
+                    console.log('filter', r);
+
+                    return r;
                 },
             ),
         },

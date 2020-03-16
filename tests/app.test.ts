@@ -507,13 +507,49 @@ describe('Application Integration Tests', () => {
         const startResponse = await startSubmissionAlt('researchArticle');
         const submissionId = startResponse.data.data.startSubmission.id;
 
-        const client = new WebSocket('ws://localhost:3000/graphql');
-        client.on('open', () => console.log('open'));
-        client.on('message', body => console.log(body));
+        const client = new WebSocket('ws://localhost:3000/graphql', 'graphql-ws', {
+            headers: { Authorization: `Bearer ${jwtToken}` },
+        });
+        client.on('open', () => {
+            console.log('open');
+            client.send(
+                JSON.stringify({
+                    type: 'connection_init',
+                    payload: {
+                        Authorization: `Bearer ${jwtToken}`,
+                    },
+                }),
+            );
+        });
+        client.on('message', (message: string) => {
+            const result = JSON.parse(message);
+            console.log(result);
+            if (result.type === 'connection_ack') {
+                console.log('start');
+                client.send(
+                    JSON.stringify({
+                        type: 'start',
+                        payload: {
+                            query: `
+                                subscription ManuscriptUploadProgress($filename: String!) {
+                                    manuscriptUploadProgress(filename: $filename) {
+                                        percentage
+                                    }
+                                }
+                            `,
+                            variables: {
+                                filename: 'a.txt',
+                            },
+                        },
+                    }),
+                );
+            }
+        });
+        client.on('error', error => console.log(error));
         client.on('close', () => console.log('close'));
 
         await uploadManuscript(submissionId);
 
-        setTimeout(done, 1000);
+        setTimeout(done, 6000);
     });
 });

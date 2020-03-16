@@ -120,14 +120,15 @@ export class FileService {
             ACL: 'private',
         });
 
-        fileUploadManager.on('httpUploadProgress', ({ loaded, total }) =>
+        fileUploadManager.on('httpUploadProgress', ({ loaded, total }) => {
+            console.log('publishing progress', file);
             pubsub.publish('UPLOAD_STATUS', {
                 userId,
                 filename: file.filename,
                 fileId: file.id,
                 percentage: Math.floor((loaded / total) * 100),
-            }),
-        );
+            });
+        });
 
         return fileUploadManager.promise();
     }
