@@ -146,6 +146,7 @@ const init = async (): Promise<void> => {
     });
     apolloServer.applyMiddleware({ app });
     const server = app.listen(config.port, () => logger.info(`Service listening on port ${config.port}`));
+    apolloServer.installSubscriptionHandlers(server);
     process.on('SIGTERM', async () => await shutDown(server));
     process.on('SIGINT', async () => await shutDown(server));
 };
