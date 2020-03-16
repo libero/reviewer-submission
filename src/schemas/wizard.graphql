@@ -6,3 +6,7 @@ type Mutation {
     deleteSupportingFile(fileId: ID!, submissionId: ID!): Boolean!
     saveFilesPage(id: ID!, coverLetter: String!): Submission!
 }
+
+type Subscription  {
+  manuscriptUploadProgress(fileId: ID!): Int!
+}
