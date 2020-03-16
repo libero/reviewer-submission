@@ -7,6 +7,6 @@ type Mutation {
     saveFilesPage(id: ID!, coverLetter: String!): Submission!
 }
 
-type Subscription  {
-  manuscriptUploadProgress(fileId: ID!): Int!
+type Subscription {
+    manuscriptUploadProgress(filename: String!): Int!
 }
