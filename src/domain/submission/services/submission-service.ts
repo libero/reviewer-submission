@@ -1,25 +1,20 @@
 import * as Knex from 'knex';
-import { SubmissionId, SubmissionWriter, SubmissionExporter } from '../types';
+import { SubmissionId } from '../types';
 import XpubSubmissionRootRepository from '../repositories/xpub-submission-root';
 import { v4 as uuid } from 'uuid';
 import Submission from './models/submission';
 import { createKnexAdapter } from '../../knex-table-adapter';
-import { MecaExporter } from './meca-exporter';
-import { S3Store } from './s3-store';
-import { SftpStore } from './sftp-store';
+import { MecaExporter } from './exporter/meca-exporter';
+import { S3Store } from './storage/s3-store';
+import { SftpStore } from './storage/sftp-store';
+import { SubmissionStore } from './storage/submission-store';
 
 export class SubmissionService {
     submissionRepository: XpubSubmissionRootRepository;
-    submissionExporter: SubmissionExporter;
-    s3Store: SubmissionWriter;
-    sftpStore: SubmissionWriter;
 
     constructor(knex: Knex<{}, unknown[]>) {
         const adapter = createKnexAdapter(knex, 'public');
         this.submissionRepository = new XpubSubmissionRootRepository(adapter);
-        this.submissionExporter = new MecaExporter();
-        this.s3Store = new S3Store();
-        this.sftpStore = new SftpStore();
     }
 
     async findAll(): Promise<Submission[]> {
@@ -57,13 +52,15 @@ export class SubmissionService {
 
     async submit(id: SubmissionId): Promise<Submission> {
         // @todo: Validate the submission?
-        const buffer = await this.submissionExporter.export(id);
+        const exporter = new MecaExporter();
+        const buffer = await exporter.export(id);
 
-        // Upload
-        const internalLocation = this.s3Store.write(id, buffer);
-        const externalLocation = this.externalWriter.write(id, buffer);
-        await Promise.all([internalLocation, externalLocation]);
+        // @todo: initialise with config
+        const store = new SubmissionStore([new S3Store(), new SftpStore()]);
+        const locations = await store.write(id, buffer);
 
         // @todo: email notification to author
+
+        return this.get(id);
     }
 }

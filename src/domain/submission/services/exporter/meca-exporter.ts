@@ -1,4 +1,5 @@
-import { SubmissionId, SubmissionExporter } from '../../types';
+import { SubmissionId } from '../../types';
+import { SubmissionExporter } from './types';
 
 export class MecaExporter implements SubmissionExporter {
     export(id: SubmissionId): Promise<Buffer> {

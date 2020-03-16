@@ -1,4 +1,5 @@
-import { SubmissionWriter, PackageLocation, SubmissionId } from '../types';
+import { SubmissionId } from '../../types';
+import { PackageLocation, SubmissionWriter } from './types';
 
 export class S3Store implements SubmissionWriter {
     private remotePath = 'somewhere-in-AWS';

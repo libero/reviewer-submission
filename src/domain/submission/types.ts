@@ -15,17 +15,3 @@ export type Author = {
     email: string;
     aff: string;
 };
-
-export interface PackageLocation {
-    location: string;
-    type: string; // @todo: Make this an enumeration.
-    submissionId: SubmissionId;
-}
-
-export interface SubmissionWriter {
-    write(id: SubmissionId, buffer: Buffer): Promise<PackageLocation>;
-}
-
-export interface SubmissionExporter {
-    export(id: SubmissionId): Promise<Buffer>;
-}
