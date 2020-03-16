@@ -1,6 +1,8 @@
 import { v4 as uuid } from 'uuid';
 import Submission, { SubmissionStatus } from './submission';
 import { SubmissionId } from '../../types';
+import File from '../../../file/services/models/file';
+import { FileId, FileType } from '../../../file/types';
 
 describe('Submission Entity', () => {
     let id: SubmissionId;
@@ -52,6 +54,19 @@ describe('Submission Entity', () => {
     it('new submission is submittable when fields set', () => {
         submission.title = 'Test';
         submission.coverLetter = 'Accept please!';
+        const file = new File({
+            id: FileId.fromUuid(uuid()),
+            submissionId: id,
+            created: new Date(),
+            updated: new Date(),
+            type: FileType.MANUSCRIPT_SOURCE,
+            filename: 'readme',
+            mimeType: 'text',
+            size: 100,
+            status: 'ok',
+        });
+        submission.manuscriptFile = file;
+
         expect(submission.isSubmittable()).toBe(true);
     });
 });
