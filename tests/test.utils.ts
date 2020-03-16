@@ -60,7 +60,7 @@ export const startSubmission = async (apollo: ApolloClient<unknown>, articleType
 
 export const submit = async (apollo: ApolloClient<unknown>, id: string): Promise<FetchResult> => {
     const submit = gql`
-        mutation submit($id: String!) {
+        mutation submit($id: ID!) {
             submit(id: $id) {
                 id
             }

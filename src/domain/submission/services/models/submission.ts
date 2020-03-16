@@ -1,7 +1,7 @@
 import { SubmissionId } from '../../types';
 import File from '../../../file/services/models/file';
 import { FileId } from 'src/domain/file/types';
-import Joi from 'joi';
+import * as Joi from 'joi';
 import { manuscriptInputSchema } from './manuscriptInputValidationSchema';
 import logger from '../../../../logger';
 
@@ -106,7 +106,6 @@ export default class Submission {
     }
 
     public isSubmittable(): boolean {
-        // @todo: Validate the submission - better than below...
         const { error: errorManuscript } = Joi.validate(this, manuscriptInputSchema);
         if (errorManuscript) {
             logger.error(`Bad manuscript data: ${errorManuscript}`);

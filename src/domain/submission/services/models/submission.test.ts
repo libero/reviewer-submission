@@ -3,18 +3,23 @@ import Submission, { SubmissionStatus } from './submission';
 import { SubmissionId } from '../../types';
 
 describe('Submission Entity', () => {
+    let id: SubmissionId;
+    let submission: Submission;
+
+    beforeEach(() => {
+        id = SubmissionId.fromUuid(uuid());
+        submission = new Submission({
+            id: id,
+            title: '',
+            status: SubmissionStatus.INITIAL,
+            createdBy: '123',
+            updated: new Date(),
+            articleType: 'researchArticle',
+        });
+    });
+
     describe('constructor', () => {
         it('creates a new entity and correctly sets properties from constructor params', () => {
-            const id = SubmissionId.fromUuid(uuid());
-            const submission = new Submission({
-                id: id,
-                title: '',
-                status: SubmissionStatus.INITIAL,
-                createdBy: '123',
-                updated: new Date(),
-                articleType: 'researchArticle',
-            });
-
             expect(submission).toBeInstanceOf(Submission);
             expect(submission.title).toBe('');
             expect(submission.id).toBe(id);
@@ -25,10 +30,9 @@ describe('Submission Entity', () => {
         });
 
         it('throws if an invalid articleType is passed', () => {
-            const id = SubmissionId.fromUuid(uuid());
             expect(() => {
                 new Submission({
-                    id: id,
+                    id,
                     title: '',
                     status: SubmissionStatus.INITIAL,
                     createdBy: '123',
@@ -38,4 +42,10 @@ describe('Submission Entity', () => {
             }).toThrow('Invalid article type');
         });
     });
+
+    it('new submission is not submittable', () => {
+        // This will need to be change when all attributes are on the submission/
+        expect(() => submission.isSubmittable()).toThrow('Invalid schema content');
+    });
+
 });
