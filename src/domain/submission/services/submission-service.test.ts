@@ -55,7 +55,7 @@ describe('Submission Service', () => {
             const submission = await service.get(submissionModels[0].id);
             expect(submission).toBeInstanceOf(Submission);
         });
-        it('throws an error when no submission foubnd', async (): Promise<void> => {
+        it('throws an error when no submission found', async (): Promise<void> => {
             XpubSubmissionRootRepository.prototype.findById = jest.fn().mockReturnValue(null);
             const service = new SubmissionService((null as unknown) as Knex);
             await expect(service.get(submissionModels[0].id)).rejects.toThrow(

@@ -4,6 +4,11 @@ import XpubSubmissionRootRepository from '../repositories/xpub-submission-root';
 import { v4 as uuid } from 'uuid';
 import Submission from './models/submission';
 import { createKnexAdapter } from '../../knex-table-adapter';
+import { MecaExporter } from './exporter/meca-exporter';
+import { S3Store } from './storage/s3-store';
+import { SftpStore } from './storage/sftp-store';
+import { SubmissionStore } from './storage/submission-store';
+import { InfraLogger as logger } from '../../../logger';
 
 export class SubmissionService {
     submissionRepository: XpubSubmissionRootRepository;
@@ -44,6 +49,21 @@ export class SubmissionService {
 
     async delete(id: SubmissionId): Promise<boolean> {
         return await this.submissionRepository.delete(id);
+    }
+
+    async submit(id: SubmissionId): Promise<Submission> {
+        // @todo: Validate the submission?
+        const exporter = new MecaExporter();
+        const buffer = await exporter.export(id);
+
+        // @todo: initialise with config
+        const store = new SubmissionStore([new S3Store(), new SftpStore()]);
+        const locations = await store.write(id, buffer);
+        logger.info(`Submission ${id} saved to ${locations}`);
+
+        // @todo: email notification to author
+
+        return this.get(id);
     }
 
     async changeCoverLetter(id: SubmissionId, coverLetter: string): Promise<Submission> {
