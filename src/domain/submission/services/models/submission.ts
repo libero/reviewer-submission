@@ -30,7 +30,6 @@ export default class Submission {
     manuscriptFile?: File | null;
     supportingFiles?: Array<File>;
     coverLetter?: string;
-    disclosureConsent?: boolean;
 
     // This is wired up so that you can create an entity from the DTO described by ISubmission
     constructor({
@@ -43,7 +42,6 @@ export default class Submission {
         manuscriptFile,
         supportingFiles,
         coverLetter,
-        disclosureConsent,
     }: {
         id: SubmissionId;
         title: string;
@@ -54,7 +52,6 @@ export default class Submission {
         manuscriptFile?: File | null;
         supportingFiles?: Array<File>;
         coverLetter?: string;
-        disclosureConsent?: boolean;
     }) {
         this.id = id;
         this.title = title;
@@ -65,7 +62,6 @@ export default class Submission {
         this.manuscriptFile = manuscriptFile;
         this.supportingFiles = supportingFiles;
         this.coverLetter = coverLetter;
-        this.disclosureConsent = disclosureConsent;
     }
 
     private articleTypeFromString(type: string): ArticleType {
@@ -117,6 +113,6 @@ export default class Submission {
             throw new Error(errorManuscript.message);
         }
 
-        return this.disclosureConsent === true;
+        return true;
     }
 }
