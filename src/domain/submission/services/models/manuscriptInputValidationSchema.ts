@@ -25,7 +25,6 @@ const fileSchema = Joi.object({
 // todo: change this schema to reflect the actual one in use
 export const submissionSchema = Joi.object({
     id: Joi.string().required(),
-    created: Joi.date().required(),
     updated: Joi.date().required(),
     title: Joi.string().required(),
     status: Joi.string().required(),

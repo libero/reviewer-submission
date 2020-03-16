@@ -24,7 +24,6 @@ export default class Submission {
     id: SubmissionId;
     title: string;
     updated: Date;
-    created: Date;
     articleType: ArticleType;
     status: string;
     createdBy: string;
@@ -36,7 +35,6 @@ export default class Submission {
     constructor({
         id,
         title,
-        created,
         updated,
         articleType,
         status,
@@ -47,7 +45,6 @@ export default class Submission {
     }: {
         id: SubmissionId;
         title: string;
-        created?: Date;
         updated?: Date;
         articleType: string;
         status: string;
@@ -58,7 +55,6 @@ export default class Submission {
     }) {
         this.id = id;
         this.title = title;
-        this.created = created || new Date();
         this.updated = updated || new Date();
         this.articleType = this.articleTypeFromString(articleType);
         this.status = status;
