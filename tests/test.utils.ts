@@ -58,6 +58,23 @@ export const startSubmission = async (apollo: ApolloClient<unknown>, articleType
     });
 };
 
+export const submit = async (apollo: ApolloClient<unknown>, id: string): Promise<FetchResult> => {
+    const submit = gql`
+        mutation submit($id: String!) {
+            submit(id: $id) {
+                id
+            }
+        }
+    `;
+
+    return apollo.mutate({
+        mutation: submit,
+        variables: {
+            id,
+        },
+    });
+};
+
 /**
  * This one is easier than above as you don't need to check for data not null etc...
  * in the returned response

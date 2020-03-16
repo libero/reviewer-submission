@@ -52,7 +52,14 @@ export class SubmissionService {
     }
 
     async submit(id: SubmissionId): Promise<Submission> {
-        // @todo: Validate the submission?
+        const submission = await this.submissionRepository.findById(id);
+        if (!submission) {
+            throw new Error('Unable to find submission with id: ' + id);
+        }
+        if (!submission.isSubmittable()) {
+            throw new Error(`The submission ${id} cannot be submitted.`);
+        }
+
         const exporter = new MecaExporter();
         const buffer = await exporter.export(id);
 

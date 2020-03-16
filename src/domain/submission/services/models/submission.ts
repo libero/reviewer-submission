@@ -1,6 +1,9 @@
 import { SubmissionId } from '../../types';
 import File from '../../../file/services/models/file';
 import { FileId } from 'src/domain/file/types';
+import Joi from 'joi';
+import { manuscriptInputSchema } from './manuscriptInputValidationSchema';
+import logger from '../../../../logger';
 
 export enum ArticleType {
     RESEARCH_ARTICLE = 'researchArticle',
@@ -27,6 +30,7 @@ export default class Submission {
     manuscriptFile?: File | null;
     supportingFiles?: Array<File>;
     coverLetter?: string;
+    disclosureConsent?: boolean;
 
     // This is wired up so that you can create an entity from the DTO described by ISubmission
     constructor({
@@ -39,6 +43,7 @@ export default class Submission {
         manuscriptFile,
         supportingFiles,
         coverLetter,
+        disclosureConsent,
     }: {
         id: SubmissionId;
         title: string;
@@ -49,6 +54,7 @@ export default class Submission {
         manuscriptFile?: File | null;
         supportingFiles?: Array<File>;
         coverLetter?: string;
+        disclosureConsent?: boolean;
     }) {
         this.id = id;
         this.title = title;
@@ -59,6 +65,7 @@ export default class Submission {
         this.manuscriptFile = manuscriptFile;
         this.supportingFiles = supportingFiles;
         this.coverLetter = coverLetter;
+        this.disclosureConsent = disclosureConsent;
     }
 
     private articleTypeFromString(type: string): ArticleType {
@@ -100,5 +107,16 @@ export default class Submission {
         if (this.manuscriptFile) {
             this.manuscriptFile.setStatusToCancelled();
         }
+    }
+
+    public isSubmittable(): boolean {
+        // @todo: Validate the submission - better than below...
+        const { error: errorManuscript } = Joi.validate(this, manuscriptInputSchema);
+        if (errorManuscript) {
+            logger.error(`Bad manuscript data: ${errorManuscript}`);
+            throw new Error(errorManuscript.message);
+        }
+
+        return this.disclosureConsent === true;
     }
 }
