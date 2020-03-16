@@ -69,7 +69,7 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
         },
     },
     Subscription: {
-        uploadStatus: {
+        manuscriptUploadProgress: {
             subscribe: withFilter(
                 () => pubsub.asyncIterator('UPLOAD_STATUS'),
                 (payload, variables, context) => {
