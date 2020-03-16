@@ -9,6 +9,7 @@ import { HttpLink } from 'apollo-link-http';
 import { setContext } from 'apollo-link-context';
 import gql from 'graphql-tag';
 import * as FormData from 'form-data';
+import * as WebSocket from 'ws';
 
 const jwtToken = sign({ sub: 'c0e64a86-2feb-435d-a40f-01f920334bc4' }, config.authentication_jwt_secret);
 
@@ -500,5 +501,19 @@ describe('Application Integration Tests', () => {
 
         expect(deleteResponse.status).toBe(200);
         expect(uploadManuscriptResponse.data.errors).toBeUndefined();
+    });
+
+    it.only('should give back progress on manuscript upload', async done => {
+        const startResponse = await startSubmissionAlt('researchArticle');
+        const submissionId = startResponse.data.data.startSubmission.id;
+
+        const client = new WebSocket('ws://localhost:3000/graphql');
+        client.on('open', () => console.log('open'));
+        client.on('message', body => console.log(body));
+        client.on('close', () => console.log('close'));
+
+        await uploadManuscript(submissionId);
+
+        setTimeout(done, 1000);
     });
 });
