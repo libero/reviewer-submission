@@ -115,7 +115,10 @@ const init = async (): Promise<void> => {
         validationRules: [depthLimit(config.max_ql_depth)],
         // @todo: Introspection queries will be blocked unless you are authenticated.
         // The point to consider - is this expected behaviour or should it allow Introspection regardless of auth status.
-        context: ({ req }: ExpressContext): { userId: string; authorizationHeader: string } => {
+        context: ({ req, connection }): { userId: string; authorizationHeader: string } => {
+            if (connection) {
+                return connection.context;
+            }
             try {
                 // @todo: we need to use the correct libero auth token
                 const token = (req.headers.authorization || '').split(' ')[1];
@@ -132,7 +135,6 @@ const init = async (): Promise<void> => {
         },
         subscriptions: {
             onConnect: (connectionParams: any, webSocket) => {
-                console.log('connectionParams', connectionParams);
                 if (connectionParams.Authorization) {
                     const token = (connectionParams.Authorization || '').split(' ')[1];
                     const decodedToken = verify(token, config.authentication_jwt_secret) as {
