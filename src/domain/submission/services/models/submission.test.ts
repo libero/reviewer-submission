@@ -47,5 +47,4 @@ describe('Submission Entity', () => {
         // This will need to be change when all attributes are on the submission/
         expect(() => submission.isSubmittable()).toThrow('Invalid schema content');
     });
-
 });
