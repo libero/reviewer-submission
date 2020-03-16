@@ -44,7 +44,14 @@ describe('Submission Entity', () => {
     });
 
     it('new submission is not submittable', () => {
-        // This will need to be change when all attributes are on the submission/
-        expect(() => submission.isSubmittable()).toThrow('Invalid schema content');
+        expect(() => submission.isSubmittable()).toThrow(
+            'child "title" fails because ["title" is not allowed to be empty]',
+        );
+    });
+
+    it('new submission is submittable when fields set', () => {
+        submission.title = 'Test';
+        submission.coverLetter = 'Accept please!';
+        expect(submission.isSubmittable()).toBe(true);
     });
 });
