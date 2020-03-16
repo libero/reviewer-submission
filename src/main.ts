@@ -25,6 +25,10 @@ import { TeamService } from './domain/teams/services/team-service';
 import { PermissionService } from './application/permission/service';
 import { SemanticExtractionService } from './domain/semantic-extraction/services/semantic-extraction-service';
 import { FileService } from './domain/file/services/file-service';
+import { SubscriptionServer } from 'subscriptions-transport-ws';
+import { execute, subscribe } from 'graphql';
+
+// export const pubsub = new PubSub();
 
 // Apollo server express does not export this, but its express
 export interface ExpressContext {
@@ -133,6 +137,17 @@ const init = async (): Promise<void> => {
     });
     apolloServer.applyMiddleware({ app });
     const server = app.listen(config.port, () => logger.info(`Service listening on port ${config.port}`));
+    SubscriptionServer.create(
+        {
+            // schema: graphqlSchema,
+            execute,
+            subscribe,
+        },
+        {
+            server,
+            path: '/subscriptions',
+        },
+    );
     process.on('SIGTERM', async () => await shutDown(server));
     process.on('SIGINT', async () => await shutDown(server));
 };
