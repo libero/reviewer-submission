@@ -79,11 +79,10 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
             subscribe: withFilter(
                 () => pubsub.asyncIterator('UPLOAD_STATUS'),
                 (payload, variables, context) => {
-                    console.log('hahah');
-                    if (payload.filename === variables.filename && payload.userId === context.userId) {
-                        return payload.percentage;
-                    }
-                    return 0;
+                    return (
+                        payload.manuscriptUploadProgress.filename === variables.filename &&
+                        payload.manuscriptUploadProgress.userId === context.userId
+                    );
                 },
             ),
         },
