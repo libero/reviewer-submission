@@ -35,6 +35,12 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
             variables: { fileId: FileId; submissionId: SubmissionId },
             context,
         ): Promise<boolean> {
+            await pubsub.publish('UPLOAD_STATUS', {
+                userId: 'c0e64a86-2feb-435d-a40f-01f920334bc4',
+                filename: 'name',
+                fileId: '12',
+                percentage: '10',
+            });
             const { fileId, submissionId } = variables;
             const user = await userService.getCurrentUser(context.authorizationHeader);
             return await wizard.deleteManuscriptFile(fileId, submissionId, user);
@@ -73,7 +79,11 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
             subscribe: withFilter(
                 () => pubsub.asyncIterator('UPLOAD_STATUS'),
                 (payload, variables, context) => {
-                    return payload.filename === variables.filename && payload.userId === context.userId;
+                    console.log('hahah');
+                    if (payload.filename === variables.filename && payload.userId === context.userId) {
+                        return payload.percentage;
+                    }
+                    return 0;
                 },
             ),
         },
