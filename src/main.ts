@@ -134,7 +134,8 @@ const init = async (): Promise<void> => {
             return error;
         },
         subscriptions: {
-            onConnect: (connectionParams: any, webSocket) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            onConnect: (connectionParams: any): any => {
                 if (connectionParams.Authorization) {
                     const token = (connectionParams.Authorization || '').split(' ')[1];
                     const decodedToken = verify(token, config.authentication_jwt_secret) as {
