@@ -63,4 +63,13 @@ export class SubmissionService {
 
         return this.get(id);
     }
+
+    async changeCoverLetter(id: SubmissionId, coverLetter: string): Promise<Submission> {
+        const submission = await this.submissionRepository.findById(id);
+        if (!submission) {
+            throw new Error('Unable to find submission with id: ' + id);
+        }
+        submission.coverLetter = coverLetter;
+        return await this.submissionRepository.update(submission);
+    }
 }

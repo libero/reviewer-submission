@@ -61,6 +61,14 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
             const user = await userService.getCurrentUser(context.authorizationHeader);
             return await wizard.deleteSupportingFile(fileId, submissionId, user);
         },
+        async saveFilesPage(
+            _,
+            { id: submissionId, coverLetter }: { id: SubmissionId; coverLetter: string },
+            context,
+        ): Promise<Submission | null> {
+            const user = await userService.getCurrentUser(context.authorizationHeader);
+            return wizard.saveFilesPage(user, submissionId, coverLetter);
+        },
     },
 });
 
