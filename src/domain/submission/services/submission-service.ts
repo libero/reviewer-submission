@@ -8,6 +8,7 @@ import { MecaExporter } from './exporter/meca-exporter';
 import { S3Store } from './storage/s3-store';
 import { SftpStore } from './storage/sftp-store';
 import { SubmissionStore } from './storage/submission-store';
+import { InfraLogger as logger } from './logger';
 
 export class SubmissionService {
     submissionRepository: XpubSubmissionRootRepository;
@@ -58,6 +59,7 @@ export class SubmissionService {
         // @todo: initialise with config
         const store = new SubmissionStore([new S3Store(), new SftpStore()]);
         const locations = await store.write(id, buffer);
+        logger.info(`Submission ${id} saved to ${locations}`);
 
         // @todo: email notification to author
 
