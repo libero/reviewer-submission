@@ -5,6 +5,7 @@ type Mutation {
     uploadSupportingFile(id: ID!, file: Upload!, fileSize: Int!): Submission!
     deleteSupportingFile(fileId: ID!, submissionId: ID!): Boolean!
     saveFilesPage(id: ID!, coverLetter: String!): Submission!
+    submit(id: ID!): Submission!
 }
 
 type UploadProgress {

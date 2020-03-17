@@ -53,6 +53,15 @@ export class WizardService {
         return submission;
     }
 
+    async submit(user: User, submissionId: SubmissionId): Promise<Submission> {
+        const submission = await this.submissionService.get(submissionId);
+        const allowed = this.permissionService.userCanWithSubmission(user, SubmissionOperation.UPDATE, submission);
+        if (!allowed) {
+            throw new Error('User not allowed to submit');
+        }
+        return await this.submissionService.submit(submissionId);
+    }
+
     async deleteManuscriptFile(fileId: FileId, submissionId: SubmissionId, user: User): Promise<boolean> {
         const submission = await this.submissionService.get(submissionId);
         const allowed = this.permissionService.userCanWithSubmission(user, SubmissionOperation.DELETE, submission);
