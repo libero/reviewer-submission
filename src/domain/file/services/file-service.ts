@@ -110,7 +110,7 @@ export class FileService {
         return await this.fileRepository.getSupportingFilesBySubmissionId(submissionId);
     }
 
-    async uploadSupportManuscript(
+    async uploadManuscript(
         fileContents: Buffer,
         file: File,
         userId: string,

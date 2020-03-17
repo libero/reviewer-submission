@@ -101,7 +101,7 @@ export class WizardService {
             stream.on('end', () => resolve(Buffer.concat(chunks)));
         });
 
-        const uploadPromise = this.fileService.uploadSupportManuscript(fileContents, manuscriptFile, user.id, pubsub);
+        const uploadPromise = this.fileService.uploadManuscript(fileContents, manuscriptFile, user.id, pubsub);
 
         manuscriptFile.setStatusToStored();
 
