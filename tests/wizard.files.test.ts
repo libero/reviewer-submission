@@ -196,7 +196,7 @@ describe('Wizard->Files Integration Tests', () => {
         expect(deleteResponse.data.errors[0].message).toBe('User not allowed to delete files');
     });
 
-    it.only('it should allow a user to delete a supporting file ', async () => {
+    it('it should allow a user to delete a supporting file ', async () => {
         const startResponse = await startSubmissionAlt('researchArticle');
         const submissionId = startResponse.data.data.startSubmission.id;
 
@@ -243,7 +243,6 @@ describe('Wizard->Files Integration Tests', () => {
             headers: { Authorization: `Bearer ${jwtToken}` },
         });
         client.on('open', () => {
-            console.log('open');
             client.send(
                 JSON.stringify({
                     id: 1,
