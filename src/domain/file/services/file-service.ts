@@ -110,7 +110,12 @@ export class FileService {
         return await this.fileRepository.getSupportingFilesBySubmissionId(submissionId);
     }
 
-    async upload(fileContents: Buffer, file: File, userId: string, pubsub: PubSub): Promise<S3.ManagedUpload.SendData> {
+    async uploadSupportManuscript(
+        fileContents: Buffer,
+        file: File,
+        userId: string,
+        pubsub: PubSub,
+    ): Promise<S3.ManagedUpload.SendData> {
         const { url, id, mimeType } = file;
         const fileUploadManager = this.s3.upload({
             Bucket: this.bucket,
@@ -123,6 +128,35 @@ export class FileService {
         fileUploadManager.on('httpUploadProgress', async ({ loaded, total }) => {
             await pubsub.publish('UPLOAD_STATUS', {
                 manuscriptUploadProgress: {
+                    userId,
+                    filename: file.filename,
+                    fileId: file.id,
+                    percentage: Math.floor((loaded / total) * 100),
+                },
+            });
+        });
+
+        return fileUploadManager.promise();
+    }
+
+    async uploadSupportingFile(
+        fileContents: Buffer,
+        file: File,
+        userId: string,
+        pubsub: PubSub,
+    ): Promise<S3.ManagedUpload.SendData> {
+        const { url, id, mimeType } = file;
+        const fileUploadManager = this.s3.upload({
+            Bucket: this.bucket,
+            Key: `${url}/${id}`,
+            Body: fileContents.toString(),
+            ContentType: mimeType,
+            ACL: 'private',
+        });
+
+        fileUploadManager.on('httpUploadProgress', async ({ loaded, total }) => {
+            await pubsub.publish('UPLOAD_STATUS', {
+                supportingUploadProgress: {
                     userId,
                     filename: file.filename,
                     fileId: file.id,

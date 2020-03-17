@@ -92,7 +92,7 @@ export class WizardService {
             stream.on('end', () => resolve(Buffer.concat(chunks)));
         });
 
-        const uploadPromise = this.fileService.upload(fileContents, manuscriptFile, user.id, pubsub);
+        const uploadPromise = this.fileService.uploadSupportManuscript(fileContents, manuscriptFile, user.id, pubsub);
 
         manuscriptFile.setStatusToStored();
 
@@ -147,7 +147,7 @@ export class WizardService {
         });
 
         try {
-            await this.fileService.upload(fileContents, supportingFile, user.id, pubsub);
+            await this.fileService.uploadSupportingFile(fileContents, supportingFile, user.id, pubsub);
             supportingFile.setStatusToStored();
         } catch (e) {
             // @todo should this not be setStatusToDeleted ?
