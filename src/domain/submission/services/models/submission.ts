@@ -1,6 +1,9 @@
 import { SubmissionId } from '../../types';
 import File from '../../../file/services/models/file';
 import { FileId } from 'src/domain/file/types';
+import * as Joi from 'joi';
+import { submissionSchema } from './submission-schema';
+import logger from '../../../../logger';
 
 export enum ArticleType {
     RESEARCH_ARTICLE = 'researchArticle',
@@ -100,5 +103,14 @@ export default class Submission {
         if (this.manuscriptFile) {
             this.manuscriptFile.setStatusToCancelled();
         }
+    }
+
+    public isSubmittable(): boolean {
+        const { error: errorManuscript } = Joi.validate(this, submissionSchema);
+        if (errorManuscript) {
+            logger.error(`Bad manuscript data: ${errorManuscript}`);
+            throw new Error(errorManuscript.message);
+        }
+        return true;
     }
 }

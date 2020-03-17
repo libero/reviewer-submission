@@ -8,6 +8,7 @@ import { setContext } from 'apollo-link-context';
 import gql from 'graphql-tag';
 import { sign } from 'jsonwebtoken';
 import config from '../src/config';
+import * as FormData from 'form-data';
 
 export const jwtToken = sign({ sub: 'c0e64a86-2feb-435d-a40f-01f920334bc4' }, config.authentication_jwt_secret);
 
@@ -41,6 +42,35 @@ export const createApolloClient = (): ApolloClient<unknown> => {
     });
 };
 
+export const uploadManuscript = async (submissionId: string): Promise<AxiosResponse> => {
+    const body = new FormData();
+    const query = `mutation UploadManuscript($id: ID!, $file: Upload!, $fileSize: Int!) {
+        uploadManuscript(id: $id, file: $file, fileSize: $fileSize) {
+            id,
+            manuscriptFile {
+                id
+            }
+        }
+    }`;
+
+    const operations = {
+        query: query,
+        variables: {
+            id: submissionId,
+            file: null,
+            fileSize: 2,
+        },
+    };
+
+    body.append('operations', JSON.stringify(operations));
+    body.append('map', '{ "1": ["variables.file"] }');
+    body.append('1', 'a', { filename: 'a.txt' });
+
+    return await axios.post('http://localhost:3000/graphql', body, {
+        headers: { Authorization: `Bearer ${jwtToken}`, ...body.getHeaders() },
+    });
+};
+
 export const startSubmission = async (apollo: ApolloClient<unknown>, articleType: string): Promise<FetchResult> => {
     const startSubmission = gql`
         mutation StartSubmission($articleType: String!) {
@@ -54,6 +84,23 @@ export const startSubmission = async (apollo: ApolloClient<unknown>, articleType
         mutation: startSubmission,
         variables: {
             articleType,
+        },
+    });
+};
+
+export const submit = async (apollo: ApolloClient<unknown>, id: string): Promise<FetchResult> => {
+    const submit = gql`
+        mutation submit($id: ID!) {
+            submit(id: $id) {
+                id
+            }
+        }
+    `;
+
+    return apollo.mutate({
+        mutation: submit,
+        variables: {
+            id,
         },
     });
 };

@@ -1,37 +1,8 @@
 import axios, { AxiosResponse } from 'axios';
-import { jwtToken, startSubmissionAlt } from './test.utils';
+import { jwtToken, startSubmissionAlt, uploadManuscript } from './test.utils';
 import { sign } from 'jsonwebtoken';
 import config from '../src/config';
 import * as FormData from 'form-data';
-
-export const uploadManuscript = async (submissionId: string): Promise<AxiosResponse> => {
-    const body = new FormData();
-    const query = `mutation UploadManuscript($id: ID!, $file: Upload!, $fileSize: Int!) {
-        uploadManuscript(id: $id, file: $file, fileSize: $fileSize) {
-            id,
-            manuscriptFile {
-                id
-            }
-        }
-    }`;
-
-    const operations = {
-        query: query,
-        variables: {
-            id: submissionId,
-            file: null,
-            fileSize: 2,
-        },
-    };
-
-    body.append('operations', JSON.stringify(operations));
-    body.append('map', '{ "1": ["variables.file"] }');
-    body.append('1', 'a', { filename: 'a.txt' });
-
-    return await axios.post('http://localhost:3000/graphql', body, {
-        headers: { Authorization: `Bearer ${jwtToken}`, ...body.getHeaders() },
-    });
-};
 
 export const uploadSupportingFile = async (submissionId: string): Promise<AxiosResponse> => {
     const body = new FormData();

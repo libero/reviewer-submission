@@ -23,6 +23,8 @@ test: get_deps
 	yarn test
 
 test_integration:
+	docker pull liberoadmin/reviewer-mocks:latest
+	docker pull liberoadmin/reviewer-xpub-postgres:latest
 	${DOCKER_COMPOSE_TEST} down
 	${DOCKER_COMPOSE_TEST} up -d postgres s3 reviewer-mocks
 	./.scripts/docker/wait-healthy.sh test_postgres 20
