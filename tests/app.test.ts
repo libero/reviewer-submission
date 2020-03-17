@@ -503,9 +503,10 @@ describe('Application Integration Tests', () => {
         expect(uploadManuscriptResponse.data.errors).toBeUndefined();
     });
 
-    it.only('should give back progress on manuscript upload', async done => {
+    it('should give back progress on manuscript upload', async done => {
         const startResponse = await startSubmissionAlt('researchArticle');
         const submissionId = startResponse.data.data.startSubmission.id;
+        let percentage: string;
 
         const client = new WebSocket('ws://localhost:3000/graphql', 'graphql-ws', {
             headers: { Authorization: `Bearer ${jwtToken}` },
@@ -514,6 +515,7 @@ describe('Application Integration Tests', () => {
             console.log('open');
             client.send(
                 JSON.stringify({
+                    id: 1,
                     type: 'connection_init',
                     payload: {
                         Authorization: `Bearer ${jwtToken}`,
@@ -523,13 +525,13 @@ describe('Application Integration Tests', () => {
         });
         client.on('message', (message: string) => {
             const result = JSON.parse(message);
-            console.log(result);
             if (result.type === 'connection_ack') {
-                console.log('start');
                 client.send(
                     JSON.stringify({
+                        id: 1,
                         type: 'start',
                         payload: {
+                            operationName: 'ManuscriptUploadProgress',
                             query: `
                                 subscription ManuscriptUploadProgress($filename: String!) {
                                     manuscriptUploadProgress(filename: $filename) {
@@ -544,12 +546,18 @@ describe('Application Integration Tests', () => {
                     }),
                 );
             }
+            if (result.type === 'data') {
+                percentage = result.payload.data.manuscriptUploadProgress.percentage;
+            }
         });
-        client.on('error', error => console.log(error));
         client.on('close', () => console.log('close'));
 
         await uploadManuscript(submissionId);
 
-        setTimeout(done, 6000);
+        setTimeout(() => {
+            expect(percentage).toBeDefined();
+            expect(percentage).toBe('100');
+            done();
+        }, 2000);
     });
 });
