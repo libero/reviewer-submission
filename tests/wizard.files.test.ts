@@ -278,6 +278,7 @@ describe('Wizard->Files Integration Tests', () => {
             }
             if (result.type === 'data') {
                 percentage = result.payload.data.manuscriptUploadProgress.percentage;
+                client.close();
             }
         });
         client.on('close', () => console.log('close'));
@@ -288,6 +289,6 @@ describe('Wizard->Files Integration Tests', () => {
             expect(percentage).toBeDefined();
             expect(percentage).toBe('100');
             done();
-        }, 2000);
+        }, 500);
     });
 });
