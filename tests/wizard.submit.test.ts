@@ -1,5 +1,5 @@
 import ApolloClient from 'apollo-client';
-import { createApolloClient, startSubmission, submit, uploadManuscript } from './test.utils';
+import { createApolloClient, startSubmission, submit } from './test.utils';
 
 describe('Submit Integration Tests', () => {
     let apollo: ApolloClient<unknown>;
