@@ -1,5 +1,5 @@
 import ApolloClient from 'apollo-client';
-import { createApolloClient, startSubmission, submit } from './test.utils';
+import { createApolloClient, startSubmission, submit, uploadManuscript } from './test.utils';
 
 describe('Submit Integration Tests', () => {
     let apollo: ApolloClient<unknown>;
@@ -8,7 +8,7 @@ describe('Submit Integration Tests', () => {
         apollo = createApolloClient();
     });
 
-    it('submits a valid submission', async () => {
+    it('cannot submit an invalid submission', async () => {
         const response = await startSubmission(apollo, 'researchArticle');
         const data = response.data ? response.data : null;
 
@@ -16,8 +16,6 @@ describe('Submit Integration Tests', () => {
         const id = data && data.startSubmission ? data.startSubmission.id : '';
         expect(id).toHaveLength(36);
 
-        const submitData = await submit(apollo, id);
-        const submitId = submitData && submitData.data ? submitData.data.id : '';
-        expect(id).toHaveLength(submitId);
+        expect(submit(apollo, id)).resolves.toThrow('child "title" fails because ["title" is not allowed to be empty]');
     });
 });

@@ -2,8 +2,7 @@ import { sign } from 'jsonwebtoken';
 import config from '../src/config';
 import axios from 'axios';
 import ApolloClient from 'apollo-client';
-import { createApolloClient, startSubmission, jwtToken, startSubmissionAlt } from './test.utils';
-import { uploadManuscript } from './wizard.files.test';
+import { createApolloClient, startSubmission, jwtToken, startSubmissionAlt, uploadManuscript } from './test.utils';
 
 describe('Dashboard Integration Tests', () => {
     let apollo: ApolloClient<unknown>;

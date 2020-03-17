@@ -2,7 +2,7 @@ import { SubmissionId } from '../../types';
 import File from '../../../file/services/models/file';
 import { FileId } from 'src/domain/file/types';
 import * as Joi from 'joi';
-import { submissionSchema } from './submissionSchema';
+import { submissionSchema } from './submission-schema';
 import logger from '../../../../logger';
 
 export enum ArticleType {
