@@ -192,6 +192,7 @@ export class WizardService {
     /**
      * Return a full submission
      *
+     * @todo add teams as well
      * @param submissionId
      */
     private async getFullSubmission(submissionId: SubmissionId): Promise<Submission> {
