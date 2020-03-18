@@ -14,9 +14,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-        with:
-          submodules: true
       - uses: actions/setup-node@v1
         with:
           node-version: '12.15'
@@ -34,9 +31,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-        with:
-          submodules: true
       - uses: actions/setup-node@v1
         with:
           node-version: '12.15'
