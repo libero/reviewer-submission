@@ -11,10 +11,10 @@ const toPdf = async (html: string): Promise<Buffer> => {
             }
         });
     });
-}
+};
 
 export const makeCoverLetter = async (coverLetter: string): Promise<Buffer> => {
     const template = await fs.readFile(`${__dirname}/templates/coverLetter.html`, 'utf8');
     const htmlContents = template.replace('{coverLetter}', coverLetter);
     return toPdf(htmlContents);
-}
+};

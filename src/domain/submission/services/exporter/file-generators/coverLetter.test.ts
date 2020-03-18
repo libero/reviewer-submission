@@ -3,11 +3,11 @@ import { makeCoverLetter } from './coverLetter';
 
 export interface ThingWithR {
     R: ThingWithT[];
-};
+}
 
 export interface ThingWithT {
     T: string;
-};
+}
 
 const coverLetter = "<h1>Pick Me!</h1><p>I'm simply the best</p>";
 
