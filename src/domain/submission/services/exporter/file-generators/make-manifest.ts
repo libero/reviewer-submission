@@ -27,7 +27,7 @@ const supplementaryXml = (files: FileData[]): string => {
 
     fileList.forEach((file, index) => {
         const vars = [
-            { key: 'id', value: (file.id as unknown) as string},
+            { key: 'id', value: (file.id as unknown) as string },
             { key: 'filename', value: removeUnicode(file.filename, index) },
             { key: 'mimeType', value: file.mimeType },
         ];
