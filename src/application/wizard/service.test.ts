@@ -105,14 +105,17 @@ describe('saveAuthorPage', () => {
         } as unknown) as TeamService;
 
         const permissionService = new PermissionService();
-        const fileServiceMock = (jest.fn() as unknown) as FileService;
         const semanticExtractionServiceMock = (jest.fn() as unknown) as SemanticExtractionService;
 
+        const fileService = ({
+            findManuscriptFile: jest.fn(),
+            getSupportingFiles: jest.fn().mockReturnValue([]),
+        } as unknown) as FileService;
         const wizardService = new WizardService(
             permissionService,
             submissionServiceMock,
             teamServiceMock,
-            fileServiceMock,
+            fileService,
             semanticExtractionServiceMock,
         );
         await wizardService.saveAuthorPage(user, SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'), {
@@ -157,15 +160,18 @@ describe('saveAuthorPage', () => {
         } as unknown) as TeamService;
 
         const permissionService = new PermissionService();
-        const fileServiceMock = (jest.fn() as unknown) as FileService;
         const semanticExtractionServiceMock = (jest.fn() as unknown) as SemanticExtractionService;
         const subId = SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a');
 
+        const fileService = ({
+            findManuscriptFile: jest.fn(),
+            getSupportingFiles: jest.fn().mockReturnValue([]),
+        } as unknown) as FileService;
         const wizardService = new WizardService(
             permissionService,
             submissionServiceMock,
             teamServiceMock,
-            fileServiceMock,
+            fileService,
             semanticExtractionServiceMock,
         );
 
