@@ -12,6 +12,7 @@ export default class File {
     mimeType: string;
     size: number;
     status: string;
+    downloadLink?: string;
 
     constructor({
         id,
@@ -40,13 +41,13 @@ export default class File {
         this.updated = updated;
         this.type = type;
         this.filename = filename;
-        this.url = this.getFileS3Key(type, submissionId, id);
+        this.url = this.generateS3Key(type, submissionId, id);
         this.mimeType = mimeType;
         this.size = size;
         this.status = status;
     }
 
-    private getFileS3Key(fileType: FileType, submissionId: SubmissionId, fileId: FileId): string {
+    private generateS3Key(fileType: FileType, submissionId: SubmissionId, fileId: FileId): string {
         switch (fileType) {
             case FileType.MANUSCRIPT_SOURCE:
                 return `manuscripts/${submissionId}/${fileId}`;

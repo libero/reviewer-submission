@@ -98,6 +98,8 @@ export class FileService {
             return null;
         }
 
+        this.addDownloadLink(file);
+
         return file;
     }
 
@@ -107,7 +109,15 @@ export class FileService {
     }
 
     async getSupportingFiles(submissionId: SubmissionId): Promise<Array<File>> {
-        return await this.fileRepository.getSupportingFilesBySubmissionId(submissionId);
+        const supportingFiles = await this.fileRepository.getSupportingFilesBySubmissionId(submissionId);
+
+        return supportingFiles.map(
+            (file): File => {
+                this.addDownloadLink(file);
+
+                return file;
+            },
+        );
     }
 
     async uploadManuscript(
@@ -166,5 +176,14 @@ export class FileService {
         });
 
         return fileUploadManager.promise();
+    }
+
+    private addDownloadLink(file: File): void {
+        const downloadLink = this.s3.getSignedUrl('getObject', {
+            Bucket: this.bucket,
+            Key: file.url,
+        });
+
+        file.downloadLink = downloadLink;
     }
 }

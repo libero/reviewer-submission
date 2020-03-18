@@ -81,6 +81,33 @@ describe('File Service', () => {
         });
     });
 
+    describe('getSupportingFiles', () => {
+        it('should set download link', async () => {
+            XpubFileRepository.prototype.getSupportingFilesBySubmissionId = jest
+                .fn()
+                .mockReturnValue([{ ...files[0] }]);
+            const downloadLink = 'http://s3/download/link';
+            S3.prototype.getSignedUrl = jest.fn().mockReturnValue(downloadLink);
+            const service = new FileService((null as unknown) as Knex, ({} as unknown) as S3Config);
+            const result = await service.getSupportingFiles(SubmissionId.fromUuid(submissionId));
+
+            expect(result[0].downloadLink === downloadLink);
+        });
+    });
+
+    describe('findManuscriptFile', () => {
+        it('should set download link', async () => {
+            XpubFileRepository.prototype.findManuscriptBySubmissionId = jest.fn().mockReturnValue({ ...files[0] });
+            const downloadLink = 'http://s3/download/link';
+            S3.prototype.getSignedUrl = jest.fn().mockReturnValue(downloadLink);
+            const service = new FileService((null as unknown) as Knex, ({} as unknown) as S3Config);
+            const result = await service.findManuscriptFile(SubmissionId.fromUuid(submissionId));
+
+            expect(result).toBeTruthy();
+            expect(result?.downloadLink).toEqual(downloadLink);
+        });
+    });
+
     describe('deleteManuscript', () => {
         it('should delete manuscript', async () => {
             const fileId = v4();

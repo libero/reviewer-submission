@@ -25,6 +25,7 @@ type File {
     lastChangeDate: DateTime!
     lastChangeUser: User!
     status: String!
+    downloadLink: String!
 }
 
 type AuthorDetails {
