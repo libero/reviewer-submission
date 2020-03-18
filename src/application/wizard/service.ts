@@ -120,7 +120,7 @@ export class WizardService {
             manuscriptFile.setStatusToCancelled();
         }
 
-        this.fileService.update(manuscriptFile);
+        await this.fileService.update(manuscriptFile);
 
         return this.getFullSubmission(submissionId);
     }
