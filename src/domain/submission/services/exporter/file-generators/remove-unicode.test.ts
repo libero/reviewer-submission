@@ -16,5 +16,3 @@ describe('remove unicode', () => {
         expect(removeUnicode(test, 9)).toBe('9_');
     });
 });
-
-

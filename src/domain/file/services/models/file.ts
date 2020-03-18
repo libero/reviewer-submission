@@ -1,7 +1,20 @@
 import { FileId, FileType, FileStatus } from '../../types';
 import { SubmissionId } from '../../../submission/types';
 
-export default class File {
+export interface FileData {
+    id: FileId;
+    submissionId: SubmissionId;
+    created?: Date;
+    updated?: Date;
+    type: FileType;
+    filename: string;
+    url: string;
+    mimeType: string;
+    size: number;
+    status: string;
+}
+
+export default class File implements FileData {
     id: FileId;
     submissionId: SubmissionId;
     created?: Date;
