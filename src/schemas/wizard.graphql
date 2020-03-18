@@ -7,3 +7,14 @@ type Mutation {
     saveFilesPage(id: ID!, coverLetter: String!): Submission!
     submit(id: ID!): Submission!
 }
+
+type UploadProgress {
+    userId: ID!
+    filename: String!
+    fileId: ID!
+    percentage: String!
+}
+
+type Subscription {
+    manuscriptUploadProgress(filename: String!): UploadProgress
+}

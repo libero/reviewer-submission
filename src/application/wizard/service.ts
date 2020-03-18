@@ -9,6 +9,7 @@ import { AuthorTeamMember } from '../../domain/teams/repositories/types';
 import { PermissionService, SubmissionOperation } from '../permission/service';
 import { User } from 'src/domain/user/user';
 import { FileType, FileId } from '../../domain/file/types';
+import { PubSub } from 'apollo-server-express';
 
 export class WizardService {
     constructor(
@@ -75,6 +76,7 @@ export class WizardService {
         submissionId: SubmissionId,
         file: FileUpload,
         fileSize: number,
+        pubsub: PubSub,
     ): Promise<Submission> {
         const submission = await this.submissionService.get(submissionId);
         const allowed = this.permissionService.userCanWithSubmission(user, SubmissionOperation.UPDATE, submission);
@@ -99,7 +101,7 @@ export class WizardService {
             stream.on('end', () => resolve(Buffer.concat(chunks)));
         });
 
-        const uploadPromise = this.fileService.upload(fileContents, manuscriptFile);
+        const uploadPromise = this.fileService.uploadManuscript(fileContents, manuscriptFile, user.id, pubsub);
 
         manuscriptFile.setStatusToStored();
 
@@ -128,6 +130,7 @@ export class WizardService {
         submissionId: SubmissionId,
         file: FileUpload,
         fileSize: number,
+        pubsub: PubSub,
     ): Promise<Submission> {
         const submission = await this.submissionService.get(submissionId);
         const allowed = this.permissionService.userCanWithSubmission(user, SubmissionOperation.UPDATE, submission);
@@ -153,7 +156,7 @@ export class WizardService {
         });
 
         try {
-            await this.fileService.upload(fileContents, supportingFile);
+            await this.fileService.uploadSupportingFile(fileContents, supportingFile, user.id, pubsub);
             supportingFile.setStatusToStored();
         } catch (e) {
             // @todo should this not be setStatusToDeleted ?

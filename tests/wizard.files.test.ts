@@ -3,6 +3,7 @@ import { jwtToken, startSubmissionAlt, uploadManuscript } from './test.utils';
 import { sign } from 'jsonwebtoken';
 import config from '../src/config';
 import * as FormData from 'form-data';
+import * as WebSocket from 'ws';
 
 export const uploadSupportingFile = async (submissionId: string): Promise<AxiosResponse> => {
     const body = new FormData();
@@ -202,5 +203,63 @@ describe('Wizard->Files Integration Tests', () => {
 
         expect(deleteResponse.status).toBe(200);
         expect(uploadManuscriptResponse.data.errors).toBeUndefined();
+    });
+
+    it('should give back progress on manuscript upload', async done => {
+        const startResponse = await startSubmissionAlt('researchArticle');
+        const submissionId = startResponse.data.data.startSubmission.id;
+        let percentage: string;
+
+        const client = new WebSocket('ws://localhost:3000/graphql', 'graphql-ws', {
+            headers: { Authorization: `Bearer ${jwtToken}` },
+        });
+        client.on('open', () => {
+            client.send(
+                JSON.stringify({
+                    id: 1,
+                    type: 'connection_init',
+                    payload: {
+                        Authorization: `Bearer ${jwtToken}`,
+                    },
+                }),
+            );
+        });
+        client.on('message', (message: string) => {
+            const result = JSON.parse(message);
+            if (result.type === 'connection_ack') {
+                client.send(
+                    JSON.stringify({
+                        id: 1,
+                        type: 'start',
+                        payload: {
+                            operationName: 'ManuscriptUploadProgress',
+                            query: `
+                                subscription ManuscriptUploadProgress($filename: String!) {
+                                    manuscriptUploadProgress(filename: $filename) {
+                                        percentage
+                                    }
+                                }
+                            `,
+                            variables: {
+                                filename: 'a.txt',
+                            },
+                        },
+                    }),
+                );
+            }
+            if (result.type === 'data') {
+                percentage = result.payload.data.manuscriptUploadProgress.percentage;
+                client.close();
+            }
+        });
+        client.on('close', () => console.log('close'));
+
+        await uploadManuscript(submissionId);
+
+        setTimeout(() => {
+            expect(percentage).toBeDefined();
+            expect(percentage).toBe('100');
+            done();
+        }, 500);
     });
 });
