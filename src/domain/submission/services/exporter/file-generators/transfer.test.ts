@@ -1,4 +1,4 @@
-import { makeTransferFile } from './make-transfer';
+import { makeTransferFile } from './transfer';
 
 describe('Transfer XML generator', () => {
     it('interpolates auth code', async () => {

@@ -1,6 +1,6 @@
 import * as xml2json from 'xml2json';
 import { sampleManuscript } from './article.test.data';
-import { makeManifestFile } from './make-manifest';
+import { makeManifestFile } from './manifest';
 
 describe('Manifest XML generator', () => {
     it('returns required items', () => {
