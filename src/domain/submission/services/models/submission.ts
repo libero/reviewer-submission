@@ -80,7 +80,11 @@ export default class Submission {
     }
 
     public setManuscriptFile(fileId: FileId, filename: string, mimeType: string, fileSize: number): void {
-        if (this.files && this.files.manuscriptFile) {
+        if (!this.files) {
+            throw new Error('Object invalid! No files member.');
+        }
+
+        if (this.files.manuscriptFile) {
             throw new Error('Manuscript file already present');
         }
 
