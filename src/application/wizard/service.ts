@@ -201,6 +201,7 @@ export class WizardService {
         const supportingFiles = (await this.fileService.getSupportingFiles(submissionId)).filter(
             file => !file.isCancelled() && !file.isDeleted(),
         );
+        const suggestionTitle = await this.semanticExtractionService.getSubmissionTitle(submissionId);
 
         return { ...submission, manuscriptFile, supportingFiles } as Submission;
     }
