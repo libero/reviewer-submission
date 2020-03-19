@@ -4,6 +4,7 @@ import { KnexTableAdapter } from '../../knex-table-adapter';
 import { SubmissionId } from '../../submission/types';
 import { SemanticExtractionId } from '../types';
 import SemanticExtraction from '../services/models/semantic-extraction';
+import { Suggestion } from '../services/models/sugestion';
 
 type DatabaseEntry = {
     id: SemanticExtractionId;
@@ -19,14 +20,14 @@ export default class XpubSemanticExtractionRepository implements SemanticExtract
 
     public constructor(private readonly _query: KnexTableAdapter) {}
 
-    public async getTitleBySubmissionId(submissionId: SubmissionId): Promise<string | null> {
+    public async getSuggestionBySubmissionId(submissionId: SubmissionId): Promise<Suggestion | null> {
         const query = this._query
             .builder()
-            .select('value')
+            .select('value', 'field_name')
             .from(this.TABLE_NAME)
             .where({ manuscript_id: submissionId });
         const results = await this._query.executor<DatabaseEntry[]>(query);
-        return results.length > 0 ? results[0].value : null;
+        return results.length > 0 ? { value: results[0].value, fieldName: results[0].field_name } : null;
     }
 
     public async create(semanticExtraction: SemanticExtraction): Promise<SemanticExtraction> {

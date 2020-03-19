@@ -1,9 +1,10 @@
 import { SubmissionId } from '../../types';
 import File from '../../../file/services/models/file';
-import { FileId } from 'src/domain/file/types';
+import { FileId } from '../../../file/types';
 import * as Joi from 'joi';
 import { submissionSchema } from './submission-schema';
 import logger from '../../../../logger';
+import { Suggestion } from '../../../semantic-extraction/services/models/sugestion';
 
 export enum ArticleType {
     RESEARCH_ARTICLE = 'researchArticle',
@@ -19,11 +20,6 @@ export enum SubmissionStatus {
     MECA_IMPORT_FAILED = 'MECA_IMPORT_FAILED',
     MECA_IMPORT_SUCCEEDED = 'MECA_IMPORT_SUCCEEDED',
 }
-
-type Suggestion = {
-    value: string;
-    fieldName: string;
-};
 
 export default class Submission {
     id: SubmissionId;

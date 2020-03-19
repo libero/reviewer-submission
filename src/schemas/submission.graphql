@@ -10,7 +10,12 @@ type Submission {
     manuscriptDetails: ManuscriptDetails
     supportingFiles: [File]
     coverLetter: String
-    suggestions: [String]!
+    suggestions: [Suggestion]
+}
+
+type Suggestion {
+    fieldName: String!;
+    value: String!;
 }
 
 type File {

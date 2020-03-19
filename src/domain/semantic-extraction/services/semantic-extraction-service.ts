@@ -9,6 +9,7 @@ import { SemanticExtractionId } from '../types';
 import { InfraLogger as logger } from '../../../logger';
 import { SubmissionId } from '../../submission/types';
 import { ScienceBeamConfig } from '../../../config';
+import { Suggestion } from './models/sugestion';
 
 export class SemanticExtractionService {
     semanticExtractionRepository: XpubSemanticExtractionRepository;
@@ -20,8 +21,8 @@ export class SemanticExtractionService {
         this.scienceBeamConfig = scienceBeamConfig;
     }
 
-    async getSubmissionTitle(submissionId: SubmissionId): Promise<string | null> {
-        return await this.semanticExtractionRepository.getTitleBySubmissionId(submissionId);
+    async getSuggestion(submissionId: SubmissionId): Promise<Suggestion | null> {
+        return await this.semanticExtractionRepository.getSuggestionBySubmissionId(submissionId);
     }
 
     async extractTitle(
