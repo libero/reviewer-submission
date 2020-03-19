@@ -3,7 +3,7 @@ import { SubmissionService } from '../../domain/submission';
 import { TeamService } from '../../domain/teams/services/team-service';
 import { FileService } from '../../domain/file/services/file-service';
 import { SemanticExtractionService } from '../../domain/semantic-extraction/services/semantic-extraction-service';
-import { AuthorDetails, SubmissionId, FileDetails } from '../../domain/submission/types';
+import { AuthorDetails, SubmissionId } from '../../domain/submission/types';
 import Submission from '../../domain/submission/services/models/submission';
 import { AuthorTeamMember } from '../../domain/teams/repositories/types';
 import { PermissionService, SubmissionOperation } from '../permission/service';
@@ -60,6 +60,8 @@ export class WizardService {
         if (!allowed) {
             throw new Error('User not allowed to submit');
         }
+
+        this.submissionService.submit(submissionId);
 
         return this.getFullSubmission(submissionId);
     }
@@ -197,14 +199,12 @@ export class WizardService {
      */
     private async getFullSubmission(submissionId: SubmissionId): Promise<Submission> {
         const submission = await this.submissionService.get(submissionId);
-        const manuscriptFile = await this.fileService.findManuscriptFile(submissionId);
-        const supportingFiles = (await this.fileService.getSupportingFiles(submissionId)).filter(
-            file => !file.isCancelled() && !file.isDeleted(),
-        );
-        const files: FileDetails = {
-            manuscriptFile,
-            supportingFiles,
-        };
-        return { ...submission, files } as Submission;
+        if (submission) {
+            submission.files.manuscriptFile = await this.fileService.findManuscriptFile(submissionId);
+            submission.files.supportingFiles = (await this.fileService.getSupportingFiles(submissionId)).filter(
+                file => !file.isCancelled() && !file.isDeleted(),
+            );
+        }
+        return submission;
     }
 }

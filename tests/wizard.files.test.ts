@@ -10,11 +10,13 @@ export const uploadSupportingFile = async (submissionId: string): Promise<AxiosR
     const query = `mutation UploadSupportingFile($id: ID!, $file: Upload!, $fileSize: Int!) {
         uploadSupportingFile(id: $id, file: $file, fileSize: $fileSize) {
             id,
-            manuscriptFile {
-                id
-            },
-            supportingFiles {
-                id
+            files {
+                manuscriptFile {
+                    id
+                },
+                supportingFiles {
+                    id
+                }
             }
         }
     }`;
@@ -50,7 +52,9 @@ describe('Wizard->Files Integration Tests', () => {
                     mutation SaveFilesPage($id: ID!, $coverLetter: String!) {
                         saveFilesPage(id: $id, coverLetter: $coverLetter) {
                             id,
-                            coverLetter
+                            files {
+                                coverLetter
+                            }
                         }
                     }
                 `,
@@ -66,7 +70,7 @@ describe('Wizard->Files Integration Tests', () => {
 
         expect(updateCoverLetterResponse.status).toBe(200);
         expect(updateCoverLetterResponse.data.errors).toBeUndefined();
-        expect(updateCoverLetterResponse.data.data.saveFilesPage.coverLetter).toBe(coverLetter);
+        expect(updateCoverLetterResponse.data.data.saveFilesPage.files.coverLetter).toBe(coverLetter);
     });
 
     // see https://github.com/libero/reviewer-submission/issues/109
@@ -97,7 +101,7 @@ describe('Wizard->Files Integration Tests', () => {
                     }
                 `,
                 variables: {
-                    fileId: uploadResponse.data.data.uploadManuscript.manuscriptFile.id,
+                    fileId: uploadResponse.data.data.uploadManuscript.files.manuscriptFile.id,
                     submissionId,
                 },
             },
@@ -121,10 +125,10 @@ describe('Wizard->Files Integration Tests', () => {
         const uploadResponse = await uploadSupportingFile(submissionId);
         expect(uploadResponse.status).toBe(200);
         expect(uploadResponse.data.errors).toBeUndefined();
-        expect(uploadResponse.data.data.uploadSupportingFile.manuscriptFile.id).toBe(
-            uploadManuscriptResponse.data.data.uploadManuscript.manuscriptFile.id,
+        expect(uploadResponse.data.data.uploadSupportingFile.files.manuscriptFile.id).toBe(
+            uploadManuscriptResponse.data.data.uploadManuscript.files.manuscriptFile.id,
         );
-        expect(uploadResponse.data.data.uploadSupportingFile.supportingFiles).toHaveLength(1);
+        expect(uploadResponse.data.data.uploadSupportingFile.files.supportingFiles).toHaveLength(1);
     });
 
     it('it should throw if a user tries to delete a supporting file unrelated to their submission', async () => {
@@ -138,10 +142,10 @@ describe('Wizard->Files Integration Tests', () => {
         const uploadResponse = await uploadSupportingFile(submissionId);
         expect(uploadResponse.status).toBe(200);
         expect(uploadResponse.data.errors).toBeUndefined();
-        expect(uploadResponse.data.data.uploadSupportingFile.manuscriptFile.id).toBe(
-            uploadManuscriptResponse.data.data.uploadManuscript.manuscriptFile.id,
+        expect(uploadResponse.data.data.uploadSupportingFile.files.manuscriptFile.id).toBe(
+            uploadManuscriptResponse.data.data.uploadManuscript.files.manuscriptFile.id,
         );
-        expect(uploadResponse.data.data.uploadSupportingFile.supportingFiles).toHaveLength(1);
+        expect(uploadResponse.data.data.uploadSupportingFile.files.supportingFiles).toHaveLength(1);
         const imposterToken = sign({ sub: 'c0e74a86-2feb-435d-a50f-01f920334bc4' }, config.authentication_jwt_secret);
 
         const deleteResponse = await axios.post(
@@ -153,7 +157,7 @@ describe('Wizard->Files Integration Tests', () => {
                     }
                 `,
                 variables: {
-                    fileId: uploadResponse.data.data.uploadSupportingFile.supportingFiles[0].id,
+                    fileId: uploadResponse.data.data.uploadSupportingFile.files.supportingFiles[0].id,
                     submissionId,
                 },
             },
@@ -178,10 +182,10 @@ describe('Wizard->Files Integration Tests', () => {
         const uploadResponse = await uploadSupportingFile(submissionId);
         expect(uploadResponse.status).toBe(200);
         expect(uploadResponse.data.errors).toBeUndefined();
-        expect(uploadResponse.data.data.uploadSupportingFile.manuscriptFile.id).toBe(
-            uploadManuscriptResponse.data.data.uploadManuscript.manuscriptFile.id,
+        expect(uploadResponse.data.data.uploadSupportingFile.files.manuscriptFile.id).toBe(
+            uploadManuscriptResponse.data.data.uploadManuscript.files.manuscriptFile.id,
         );
-        expect(uploadResponse.data.data.uploadSupportingFile.supportingFiles).toHaveLength(1);
+        expect(uploadResponse.data.data.uploadSupportingFile.files.supportingFiles).toHaveLength(1);
 
         const deleteResponse = await axios.post(
             'http://localhost:3000/graphql',
@@ -192,7 +196,7 @@ describe('Wizard->Files Integration Tests', () => {
                     }
                 `,
                 variables: {
-                    fileId: uploadResponse.data.data.uploadSupportingFile.supportingFiles[0].id,
+                    fileId: uploadResponse.data.data.uploadSupportingFile.files.supportingFiles[0].id,
                     submissionId,
                 },
             },

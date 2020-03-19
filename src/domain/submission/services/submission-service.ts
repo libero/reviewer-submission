@@ -55,6 +55,7 @@ export class SubmissionService {
         if (!submission) {
             throw new Error('Unable to find submission with id: ' + id);
         }
+
         if (!submission.isSubmittable()) {
             throw new Error(`The submission ${id} cannot be submitted.`);
         }

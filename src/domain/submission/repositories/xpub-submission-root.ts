@@ -127,6 +127,8 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
             status: record.status,
             createdBy: record.created_by,
         });
+        result.files.coverLetter = record.cover_letter;
+        result.manuscriptDetails.title = record.meta.title;
         return result;
     }
 }

@@ -69,8 +69,12 @@ describe('Knex Submission Repository', () => {
                 created: new Date('2020-02-18T15:14:53.155Z'),
                 disclosure: {},
                 editors: {},
-                files: {},
-                manuscriptDetails: {},
+                files: {
+                    coverLetter: 'test cover',
+                },
+                manuscriptDetails: {
+                    title: 'The title',
+                },
             });
             expect({ ...result[1] }).toStrictEqual({
                 id: entryId2,
@@ -81,8 +85,12 @@ describe('Knex Submission Repository', () => {
                 created: new Date('2020-02-18T15:14:53.155Z'),
                 disclosure: {},
                 editors: {},
-                files: {},
-                manuscriptDetails: {},
+                files: {
+                    coverLetter: 'test cover',
+                },
+                manuscriptDetails: {
+                    title: 'Another title',
+                },
             });
         });
         it('calls the knex instance methods with the correct parameters', async (): Promise<void> => {
@@ -115,8 +123,12 @@ describe('Knex Submission Repository', () => {
                 created: new Date('2020-02-18T15:14:53.155Z'),
                 disclosure: {},
                 editors: {},
-                files: {},
-                manuscriptDetails: {},
+                files: {
+                    coverLetter: 'test cover',
+                },
+                manuscriptDetails: {
+                    title: 'The title',
+                },
             });
         });
         it('returns the first entry if multiple entries are found by query', async (): Promise<void> => {

@@ -6,10 +6,11 @@ type Submission {
     updated: String!
     articleType: String!
     author: AuthorDetails!
-    manuscriptFile: File
-    supportingFiles: [File]
-    coverLetter: String
     suggestions: [String]!
+    manuscriptDetails: ManuscriptDetails
+    files: FileDetails
+    editors: EditorDetails
+    disclosure: DisclosureDetails
 }
 
 type File {
@@ -41,3 +42,29 @@ input AuthorDetailsInput {
     email: String!
     institution: String!
 }
+
+type ManuscriptDetails {
+    title: String
+    subjects: [String]
+    previouslyDiscussed: String
+    previouslySubmitted: [String!]
+    cosubmission: [String!]
+}
+
+type FileDetails {
+    manuscriptFile: File
+    supportingFiles: [File]
+    coverLetter: String
+}
+
+type EditorDetails {
+    opposedSeniorEditorsReason: String
+    opposedReviewingEditorsReason: String
+    opposedReviewersReason: String
+}
+
+type DisclosureDetails {
+    submitterSignature: String
+    disclosureConsent: Boolean
+}
+
