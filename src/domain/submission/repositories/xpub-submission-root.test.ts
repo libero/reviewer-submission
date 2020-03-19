@@ -18,7 +18,8 @@ const testDatabaseEntry = {
     cover_letter: 'test cover',
     status: SubmissionStatus.INITIAL,
     created_by: '123',
-    updated: new Date('2020-02-18T15:14:53.155Z'),
+    updated: new Date('2020-02-18T15:14:53.255Z'),
+    created: new Date('2020-02-18T15:14:53.155Z'),
 };
 
 const testDatabaseEntry2 = {
@@ -30,7 +31,8 @@ const testDatabaseEntry2 = {
     cover_letter: 'test cover',
     status: SubmissionStatus.INITIAL,
     created_by: '124',
-    updated: new Date('2020-02-18T15:14:53.155Z'),
+    updated: new Date('2020-02-18T15:14:53.255Z'),
+    created: new Date('2020-02-18T15:14:53.155Z'),
 };
 
 const databaseEntries = [testDatabaseEntry, testDatabaseEntry2];
@@ -60,32 +62,42 @@ describe('Knex Submission Repository', () => {
             expect(mock.from).toBeCalled();
             expect({ ...result[0] }).toStrictEqual({
                 id: entryId,
-                title: 'The title',
                 status: SubmissionStatus.INITIAL,
                 createdBy: '123',
-                coverLetter: 'test cover',
                 articleType: ArticleType.FEATURE_ARTICLE,
-                updated: new Date('2020-02-18T15:14:53.155Z'),
-                manuscriptFile: undefined,
-                supportingFiles: undefined,
+                updated: new Date('2020-02-18T15:14:53.255Z'),
+                created: new Date('2020-02-18T15:14:53.155Z'),
+                disclosure: {},
+                editors: {},
+                files: {},
+                manuscriptDetails: {},
             });
             expect({ ...result[1] }).toStrictEqual({
                 id: entryId2,
-                title: 'Another title',
                 status: SubmissionStatus.INITIAL,
                 createdBy: '124',
-                coverLetter: 'test cover',
                 articleType: ArticleType.RESEARCH_ADVANCE,
-                updated: new Date('2020-02-18T15:14:53.155Z'),
-                manuscriptFile: undefined,
-                supportingFiles: undefined,
+                updated: new Date('2020-02-18T15:14:53.255Z'),
+                created: new Date('2020-02-18T15:14:53.155Z'),
+                disclosure: {},
+                editors: {},
+                files: {},
+                manuscriptDetails: {},
             });
         });
         it('calls the knex instance methods with the correct parameters', async (): Promise<void> => {
             adapter.executor = jest.fn().mockReturnValue(databaseEntries);
             const repo = new XpubSubmissionRootRepository(adapter);
             await repo.findAll();
-            expect(mock.select).toBeCalledWith('id', 'updated', 'created_by', 'status', 'meta', 'cover_letter');
+            expect(mock.select).toBeCalledWith(
+                'id',
+                'created',
+                'updated',
+                'created_by',
+                'status',
+                'meta',
+                'cover_letter',
+            );
             expect(mock.from).toBeCalledWith('manuscript');
         });
     });
@@ -96,14 +108,15 @@ describe('Knex Submission Repository', () => {
             const submission = await repo.findById(entryId);
             expect({ ...submission }).toStrictEqual({
                 id: entryId,
-                title: 'The title',
                 status: SubmissionStatus.INITIAL,
                 createdBy: '123',
-                coverLetter: 'test cover',
                 articleType: ArticleType.FEATURE_ARTICLE,
-                updated: new Date('2020-02-18T15:14:53.155Z'),
-                manuscriptFile: undefined,
-                supportingFiles: undefined,
+                updated: new Date('2020-02-18T15:14:53.255Z'),
+                created: new Date('2020-02-18T15:14:53.155Z'),
+                disclosure: {},
+                editors: {},
+                files: {},
+                manuscriptDetails: {},
             });
         });
         it('returns the first entry if multiple entries are found by query', async (): Promise<void> => {
@@ -122,7 +135,15 @@ describe('Knex Submission Repository', () => {
             adapter.executor = jest.fn().mockReturnValue([]);
             const repo = new XpubSubmissionRootRepository(adapter);
             await repo.findById(entryId);
-            expect(mock.select).toBeCalledWith('id', 'updated', 'created_by', 'status', 'meta', 'cover_letter');
+            expect(mock.select).toBeCalledWith(
+                'id',
+                'created',
+                'updated',
+                'created_by',
+                'status',
+                'meta',
+                'cover_letter',
+            );
             expect(mock.from).toBeCalledWith('manuscript');
             expect(mock.where).toBeCalledWith({ id: entryId });
         });
@@ -132,7 +153,6 @@ describe('Knex Submission Repository', () => {
         it('calls update on knex if the entry exists', async (): Promise<void> => {
             const submission = new Submission({
                 id: entryId,
-                title: 'The title',
                 status: SubmissionStatus.INITIAL,
                 createdBy: '123',
                 articleType: ArticleType.FEATURE_ARTICLE,
@@ -148,7 +168,6 @@ describe('Knex Submission Repository', () => {
         it('updates the updated time of the entry', async (): Promise<void> => {
             const submission = new Submission({
                 id: entryId,
-                title: 'The title',
                 status: SubmissionStatus.INITIAL,
                 createdBy: '123',
                 articleType: ArticleType.FEATURE_ARTICLE,
@@ -168,7 +187,6 @@ describe('Knex Submission Repository', () => {
         it('calls insert on knex', async (): Promise<void> => {
             const submission = new Submission({
                 id: entryId,
-                title: 'The title',
                 status: SubmissionStatus.INITIAL,
                 createdBy: '123',
                 articleType: ArticleType.FEATURE_ARTICLE,
@@ -185,7 +203,6 @@ describe('Knex Submission Repository', () => {
         it('returns a Submission when passed a Submission to create', async (): Promise<void> => {
             const submission = new Submission({
                 id: entryId,
-                title: 'A Different Title',
                 status: SubmissionStatus.INITIAL,
                 createdBy: '123',
                 articleType: ArticleType.FEATURE_ARTICLE,
@@ -195,7 +212,6 @@ describe('Knex Submission Repository', () => {
             const result = await repo.create(submission);
             expect(result).toMatchObject({
                 id: entryId,
-                title: 'A Different Title',
                 status: SubmissionStatus.INITIAL,
                 createdBy: '123',
                 articleType: ArticleType.FEATURE_ARTICLE,

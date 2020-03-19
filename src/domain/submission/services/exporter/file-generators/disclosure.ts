@@ -1,5 +1,5 @@
 import * as PDFDocument from 'pdfkit';
-import { Author, SubmissionId } from '../../../types';
+import { AuthorDetails, SubmissionId } from '../../../types';
 
 const privacyPolicy =
     'Our privacy policy explains that we share your personal information with various third parties to enable us to review ' +
@@ -15,7 +15,7 @@ const privacyPolicy =
 export const makeDisclosurePdf = (
     id: SubmissionId,
     title: string,
-    author: Author,
+    author: AuthorDetails,
     submitterSignature: string,
     clientIp: string,
 ): Promise<Buffer> => {

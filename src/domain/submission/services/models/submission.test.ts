@@ -12,7 +12,6 @@ describe('Submission Entity', () => {
         id = SubmissionId.fromUuid(uuid());
         submission = new Submission({
             id: id,
-            title: '',
             status: SubmissionStatus.INITIAL,
             createdBy: '123',
             updated: new Date(),
@@ -23,7 +22,6 @@ describe('Submission Entity', () => {
     describe('constructor', () => {
         it('creates a new entity and correctly sets properties from constructor params', () => {
             expect(submission).toBeInstanceOf(Submission);
-            expect(submission.title).toBe('');
             expect(submission.id).toBe(id);
             expect(submission.status).toBe('INITIAL');
             expect(submission.articleType).toBe('researchArticle');
@@ -35,7 +33,6 @@ describe('Submission Entity', () => {
             expect(() => {
                 new Submission({
                     id,
-                    title: '',
                     status: SubmissionStatus.INITIAL,
                     createdBy: '123',
                     updated: new Date(),
@@ -47,13 +44,13 @@ describe('Submission Entity', () => {
 
     it('new submission is not submittable', () => {
         expect(() => submission.isSubmittable()).toThrow(
-            'child "title" fails because ["title" is not allowed to be empty]',
+            'child "manuscriptDetails" fails because [child "title" fails because ["title" is required]]',
         );
     });
 
     it('new submission is submittable when fields set', () => {
-        submission.title = 'Test';
-        submission.coverLetter = 'Accept please!';
+        submission.manuscriptDetails.title = 'Test';
+        submission.files.coverLetter = 'Accept please!';
         const file = new File({
             id: FileId.fromUuid(uuid()),
             submissionId: id,
@@ -65,7 +62,7 @@ describe('Submission Entity', () => {
             size: 100,
             status: 'ok',
         });
-        submission.manuscriptFile = file;
+        submission.files.manuscriptFile = file;
 
         expect(submission.isSubmittable()).toBe(true);
     });
