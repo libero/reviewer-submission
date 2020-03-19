@@ -68,6 +68,7 @@ describe('Knex Submission Repository', () => {
                 updated: new Date('2020-02-18T15:14:53.155Z'),
                 manuscriptFile: undefined,
                 supportingFiles: undefined,
+                suggestions: undefined,
             });
             expect({ ...result[1] }).toStrictEqual({
                 id: entryId2,
@@ -79,6 +80,7 @@ describe('Knex Submission Repository', () => {
                 updated: new Date('2020-02-18T15:14:53.155Z'),
                 manuscriptFile: undefined,
                 supportingFiles: undefined,
+                suggestions: undefined,
             });
         });
         it('calls the knex instance methods with the correct parameters', async (): Promise<void> => {
@@ -104,6 +106,7 @@ describe('Knex Submission Repository', () => {
                 updated: new Date('2020-02-18T15:14:53.155Z'),
                 manuscriptFile: undefined,
                 supportingFiles: undefined,
+                suggestions: undefined,
             });
         });
         it('returns the first entry if multiple entries are found by query', async (): Promise<void> => {
