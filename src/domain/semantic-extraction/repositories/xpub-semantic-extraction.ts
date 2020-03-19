@@ -19,6 +19,16 @@ export default class XpubSemanticExtractionRepository implements SemanticExtract
 
     public constructor(private readonly _query: KnexTableAdapter) {}
 
+    public async getTitleBySubmissionId(submissionId: SubmissionId) {
+        const query = this._query
+            .builder()
+            .select('value')
+            .from(this.TABLE_NAME)
+            .where({ manuscript_id: submissionId });
+        const results = await this._query.executor<DatabaseEntry[]>(query);
+        return results.length > 0 ? results[0].value : null;
+    }
+
     public async create(semanticExtraction: SemanticExtraction): Promise<SemanticExtraction> {
         const entryToSave = this.modelToEntry({ ...semanticExtraction, updated: new Date() });
         const query = this._query

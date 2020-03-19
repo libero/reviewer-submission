@@ -20,6 +20,10 @@ export class SemanticExtractionService {
         this.scienceBeamConfig = scienceBeamConfig;
     }
 
+    async getSubmissionTitle(submissionId: SubmissionId): Promise<string | null> {
+        return await this.semanticExtractionRepository.getTitleBySubmissionId(submissionId);
+    }
+
     async extractTitle(
         fileContents: Buffer,
         mimeType: string,
