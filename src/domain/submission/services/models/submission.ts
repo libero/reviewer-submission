@@ -20,6 +20,11 @@ export enum SubmissionStatus {
     MECA_IMPORT_SUCCEEDED = 'MECA_IMPORT_SUCCEEDED',
 }
 
+type Suggestion = {
+    value: string;
+    fieldName: string;
+};
+
 export default class Submission {
     id: SubmissionId;
     title: string;
@@ -30,6 +35,7 @@ export default class Submission {
     manuscriptFile?: File | null;
     supportingFiles?: Array<File>;
     coverLetter?: string;
+    suggestions?: Array<Suggestion>;
 
     // This is wired up so that you can create an entity from the DTO described by ISubmission
     constructor({
