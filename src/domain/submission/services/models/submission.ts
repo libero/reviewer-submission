@@ -44,6 +44,7 @@ export default class Submission {
         manuscriptFile,
         supportingFiles,
         coverLetter,
+        suggestions,
     }: {
         id: SubmissionId;
         title: string;
@@ -54,6 +55,7 @@ export default class Submission {
         manuscriptFile?: File | null;
         supportingFiles?: Array<File>;
         coverLetter?: string;
+        suggestions?: Array<Suggestion>;
     }) {
         this.id = id;
         this.title = title;
@@ -64,6 +66,7 @@ export default class Submission {
         this.manuscriptFile = manuscriptFile;
         this.supportingFiles = supportingFiles;
         this.coverLetter = coverLetter;
+        this.suggestions = suggestions;
     }
 
     private articleTypeFromString(type: string): ArticleType {
