@@ -14,8 +14,8 @@ type Submission {
 }
 
 type Suggestion {
-    fieldName: String!;
-    value: String!;
+    fieldName: String!
+    value: String!
 }
 
 type File {
