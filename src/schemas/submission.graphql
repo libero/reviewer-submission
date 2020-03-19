@@ -7,6 +7,7 @@ type Submission {
     articleType: String!
     author: AuthorDetails!
     manuscriptFile: File
+    manuscriptDetails: ManuscriptDetails
     supportingFiles: [File]
     coverLetter: String
     suggestions: [String]!
@@ -40,4 +41,12 @@ input AuthorDetailsInput {
     lastName: String!
     email: String!
     institution: String!
+}
+
+type ManuscriptDetails {
+    title: String
+    subjects: [String]
+    previouslyDiscussed: String
+    previouslySubmitted: [String!]
+    cosubmission: [String!]
 }
