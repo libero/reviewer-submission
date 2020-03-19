@@ -22,7 +22,7 @@ export interface Config {
     max_ql_complexity: number;
     max_ql_depth: number;
     s3: S3Config;
-    scienceBeam: ScienceBeamConfig;
+    science_beam: ScienceBeamConfig;
 }
 
 const configPath = process.env.CONFIG_PATH ? process.env.CONFIG_PATH : '/etc/reviewer/config.json';

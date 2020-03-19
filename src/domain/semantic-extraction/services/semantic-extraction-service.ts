@@ -1,8 +1,7 @@
 import * as Knex from 'knex';
 import { v4 as uuid } from 'uuid';
 import axios from 'axios';
-import xml2js from 'xml2js';
-import { promisify } from 'util';
+import * as xml2js from 'xml2js';
 import { createKnexAdapter } from '../../knex-table-adapter';
 import XpubSemanticExtractionRepository from '../repositories/xpub-semantic-extraction';
 import { SemanticExtractionId } from '../types';
@@ -46,9 +45,8 @@ export class SemanticExtractionService {
                 timeout: this.scienceBeamConfig.timeout,
             });
 
-            const parseString = promisify(xml2js.parseString);
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const xmlData: any = await parseString(xmlBuffer.toString());
+            const xmlData: any = await xml2js.parseStringPromise(xmlBuffer.data.toString());
 
             if (xmlData.article) {
                 const firstArticle = xmlData.article.front[0];
@@ -67,6 +65,7 @@ export class SemanticExtractionService {
                 value: title,
             });
         } catch (e) {
+            logger.info(e);
             logger.error('issue with semantic extraction');
         }
 
