@@ -22,6 +22,11 @@ const fileSchema = Joi.object({
     status: Joi.string().required(),
 });
 
+const suggestionSchema = Joi.object({
+    value: Joi.string().required(),
+    fieldName: Joi.string().required(),
+});
+
 // todo: change this schema to reflect the actual one in use
 export const submissionSchema = Joi.object({
     id: Joi.string().required(),
@@ -32,6 +37,7 @@ export const submissionSchema = Joi.object({
     articleType: Joi.string().required(),
     manuscriptFile: fileSchema.required(),
     supportingFiles: Joi.array().items(fileSchema),
+    suggestions: Joi.array().items(suggestionSchema),
     /*
     subjects: Joi.alternatives().when('articleType', {
         is: 'feature',

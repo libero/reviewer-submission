@@ -1,9 +1,10 @@
 import { SubmissionId } from '../../types';
 import File from '../../../file/services/models/file';
-import { FileId } from 'src/domain/file/types';
+import { FileId } from '../../../file/types';
 import * as Joi from 'joi';
 import { submissionSchema } from './submission-schema';
 import logger from '../../../../logger';
+import { Suggestion } from '../../../semantic-extraction/services/models/sugestion';
 
 export enum ArticleType {
     RESEARCH_ARTICLE = 'researchArticle',
@@ -30,6 +31,7 @@ export default class Submission {
     manuscriptFile?: File | null;
     supportingFiles?: Array<File>;
     coverLetter?: string;
+    suggestions?: Array<Suggestion>;
 
     // This is wired up so that you can create an entity from the DTO described by ISubmission
     constructor({
@@ -42,6 +44,7 @@ export default class Submission {
         manuscriptFile,
         supportingFiles,
         coverLetter,
+        suggestions,
     }: {
         id: SubmissionId;
         title: string;
@@ -52,6 +55,7 @@ export default class Submission {
         manuscriptFile?: File | null;
         supportingFiles?: Array<File>;
         coverLetter?: string;
+        suggestions?: Array<Suggestion>;
     }) {
         this.id = id;
         this.title = title;
@@ -62,6 +66,7 @@ export default class Submission {
         this.manuscriptFile = manuscriptFile;
         this.supportingFiles = supportingFiles;
         this.coverLetter = coverLetter;
+        this.suggestions = suggestions;
     }
 
     private articleTypeFromString(type: string): ArticleType {
