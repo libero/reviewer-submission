@@ -2,7 +2,7 @@ import { FileId, FileType } from '../../../../file/types';
 import { SubmissionId } from '../../../types';
 
 export const sampleManuscript = {
-    id: '604e06ca-882d-4b5b-a147-e016893e60e9',
+    id: SubmissionId.fromUuid('604e06ca-882d-4b5b-a147-e016893e60e9'),
     journalId: null,
     created: '2018-09-07T12:25:53.196Z',
     updated: null,
@@ -11,15 +11,9 @@ export const sampleManuscript = {
     status: 'INITIAL',
     lastStepVisited: null,
     decision: null,
-    meta: {
-        title: 'Test Manuscript',
-        articleType: 'research-article',
-        articleIds: null,
-        abstract: null,
-        subjects: ['biochemistry-chemical-biology', 'chromosomes-gene-expression'],
-        publicationDates: null,
-        notes: null,
-    },
+    title: 'Test Manuscript',
+    articleType: 'research-article',
+    subjects: ['biochemistry-chemical-biology', 'chromosomes-gene-expression'],
     coverLetter: '',
     previouslyDiscussed: 'Talked to bob about it',
     previouslySubmitted: ['Original Test Title'],

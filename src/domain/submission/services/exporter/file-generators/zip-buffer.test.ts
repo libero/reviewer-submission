@@ -1,5 +1,5 @@
 import * as JsZip from 'jszip';
-import { makeZipBuffer } from './make-zip-buffer';
+import { makeZipBuffer } from './zip-buffer';
 
 describe('Generate ZIP archive', () => {
     it('returns a zip buffer', async () => {
