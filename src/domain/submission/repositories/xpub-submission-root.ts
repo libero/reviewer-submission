@@ -6,27 +6,39 @@ import Submission from '../services/models/submission';
 
 type EntryMeta = {
     articleType: string;
-    title: string;
+    title?: string;
 };
+
 // this is the xpub schema type
 type DatabaseEntry = {
     id: SubmissionId;
+    created: Date;
     updated: Date;
     created_by: string;
     status: string;
+    last_step_visited?: string;
     meta: EntryMeta;
     cover_letter?: string;
+    previously_discussed?: string;
+    previously_submitted?: string[];
+    cosubmission?: string[];
+    opposed_senior_editors_reason?: string;
+    opposed_reviewing_editors_reason?: string;
+    submitter_signature?: string;
+    disclosure_consent?: boolean;
+    opposed_reviewers_reason?: string;
 };
 
 export default class XpubSubmissionRootRepository implements SubmissionRepository {
     private readonly TABLE_NAME = 'manuscript';
+    private readonly COLUMNS = ['id', 'created', 'updated', 'created_by', 'status', 'meta', 'cover_letter'];
 
     public constructor(private readonly _query: KnexTableAdapter) {}
 
     public async findAll(): Promise<Submission[]> {
         const query = this._query
             .builder()
-            .select('id', 'updated', 'created_by', 'status', 'meta', 'cover_letter')
+            .select(...this.COLUMNS)
             .from(this.TABLE_NAME);
         const result = await this._query.executor<DatabaseEntry[]>(query);
         return result.map(this.entryToModel);
@@ -35,7 +47,7 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
     public async findByUserId(userId: string): Promise<Submission[]> {
         const query = this._query
             .builder()
-            .select('id', 'updated', 'created_by', 'status', 'meta', 'cover_letter')
+            .select(...this.COLUMNS)
             .from(this.TABLE_NAME)
             .where({ created_by: userId });
 
@@ -46,7 +58,7 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
     public async findById(id: SubmissionId): Promise<Submission | null> {
         const query = this._query
             .builder()
-            .select('id', 'updated', 'created_by', 'status', 'meta', 'cover_letter')
+            .select(...this.COLUMNS)
             .from(this.TABLE_NAME)
             .where({ id });
         const result = await this._query.executor<DatabaseEntry[]>(query);
@@ -94,31 +106,29 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
     private modelToEntry(submission: Submission): DatabaseEntry {
         return {
             id: submission.id,
+            created: submission.created as Date,
             updated: submission.updated as Date,
             created_by: submission.createdBy,
             status: submission.status,
-            cover_letter: submission.coverLetter,
+            cover_letter: submission.files.coverLetter,
             meta: {
                 articleType: submission.articleType,
-                title: submission.title,
+                title: submission.manuscriptDetails.title,
             },
         };
     }
 
     private entryToModel(record: DatabaseEntry): Submission {
-        const {
-            created_by: createdBy,
-            cover_letter: coverLetter,
-            meta: { title, articleType },
-            ...rest
-        } = record;
-
-        return new Submission({
-            ...rest,
-            coverLetter,
-            createdBy,
-            title,
-            articleType,
+        const result = new Submission({
+            id: record.id,
+            created: record.created,
+            updated: record.updated,
+            articleType: record.meta.articleType,
+            status: record.status,
+            createdBy: record.created_by,
         });
+        result.files.coverLetter = record.cover_letter;
+        result.manuscriptDetails.title = record.meta.title;
+        return result;
     }
 }

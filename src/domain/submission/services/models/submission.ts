@@ -1,4 +1,11 @@
-import { SubmissionId } from '../../types';
+import {
+    SubmissionId,
+    ManuscriptDetails,
+    AuthorDetails,
+    DisclosureDetails,
+    EditorsDetails,
+    FileDetails,
+} from '../../types';
 import File from '../../../file/services/models/file';
 import { FileId } from '../../../file/types';
 import * as Joi from 'joi';
@@ -23,50 +30,42 @@ export enum SubmissionStatus {
 
 export default class Submission {
     id: SubmissionId;
-    title: string;
+    created: Date;
     updated: Date;
     articleType: ArticleType;
     status: string;
     createdBy: string;
-    manuscriptFile?: File | null;
-    supportingFiles?: Array<File>;
-    coverLetter?: string;
-    suggestions?: Array<Suggestion>;
+    lastStepVisited?: string;
+
+    author?: AuthorDetails; // responsibility of the Teams Service
+    manuscriptDetails: ManuscriptDetails = {};
+    files: FileDetails = {}; // responsibility of the Files Service
+    editors: EditorsDetails = {};
+    disclosure: DisclosureDetails = {};
+    suggestions?: Array<Suggestion> = [];
 
     // This is wired up so that you can create an entity from the DTO described by ISubmission
     constructor({
         id,
-        title,
+        created,
         updated,
         articleType,
         status,
         createdBy,
-        manuscriptFile,
-        supportingFiles,
-        coverLetter,
-        suggestions,
     }: {
         id: SubmissionId;
-        title: string;
+        created?: Date;
         updated?: Date;
         articleType: string;
         status: string;
         createdBy: string;
-        manuscriptFile?: File | null;
-        supportingFiles?: Array<File>;
-        coverLetter?: string;
-        suggestions?: Array<Suggestion>;
     }) {
         this.id = id;
-        this.title = title;
+        this.created = created || new Date();
         this.updated = updated || new Date();
         this.articleType = this.articleTypeFromString(articleType);
         this.status = status;
         this.createdBy = createdBy;
-        this.manuscriptFile = manuscriptFile;
-        this.supportingFiles = supportingFiles;
-        this.coverLetter = coverLetter;
-        this.suggestions = suggestions;
     }
 
     private articleTypeFromString(type: string): ArticleType {
@@ -83,30 +82,34 @@ export default class Submission {
     }
 
     public setManuscriptFile(fileId: FileId, filename: string, mimeType: string, fileSize: number): void {
-        if (!this.manuscriptFile) {
+        if (!this.files) {
+            throw new Error('Object invalid! No files member.');
+        }
+
+        if (this.files.manuscriptFile) {
             throw new Error('Manuscript file already present');
         }
 
-        this.manuscriptFile = File.makeManuscriptFile(fileId, this.id, filename, mimeType, fileSize);
+        this.files.manuscriptFile = File.makeManuscriptFile(fileId, this.id, filename, mimeType, fileSize);
     }
 
     public getManuscriptFile(): File | null {
-        if (!this.manuscriptFile) {
+        if (!this.files.manuscriptFile) {
             return null;
         }
 
-        return this.manuscriptFile;
+        return this.files.manuscriptFile;
     }
 
     public setManuscriptFileStatusToStored(): void {
-        if (this.manuscriptFile) {
-            this.manuscriptFile.setStatusToStored();
+        if (this.files.manuscriptFile) {
+            this.files.manuscriptFile.setStatusToStored();
         }
     }
 
     public setManuscriptFileStatusToCancelled(): void {
-        if (this.manuscriptFile) {
-            this.manuscriptFile.setStatusToCancelled();
+        if (this.files.manuscriptFile) {
+            this.files.manuscriptFile.setStatusToCancelled();
         }
     }
 

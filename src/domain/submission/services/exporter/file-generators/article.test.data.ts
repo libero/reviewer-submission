@@ -3,14 +3,11 @@ import { SubmissionId } from '../../../types';
 
 export const sampleManuscript = {
     id: SubmissionId.fromUuid('604e06ca-882d-4b5b-a147-e016893e60e9'),
-    journalId: null,
     created: '2018-09-07T12:25:53.196Z',
     updated: null,
     createdBy: '6d8cd1ce-15b6-46c1-b901-bc91598c8f2d',
-    previousVersion: null,
     status: 'INITIAL',
     lastStepVisited: null,
-    decision: null,
     title: 'Test Manuscript',
     articleType: 'research-article',
     subjects: ['biochemistry-chemical-biology', 'chromosomes-gene-expression'],
@@ -21,10 +18,8 @@ export const sampleManuscript = {
     opposedSeniorEditorsReason: 'From another galaxy',
     opposedReviewingEditorsReason: 'Not any more',
     opposedReviewersReason: 'Wandering days are over',
-    relatedManuscripts: null,
     submitterSignature: 'A.Scientist',
     disclosureConsent: false,
-    qcIssues: null,
     teams: [
         {
             id: '0b4725a5-50a9-4214-9a31-4c200fbdff1e',

@@ -78,7 +78,7 @@ describe('Dashboard Integration Tests', () => {
                     }
                 `,
                 variables: {
-                    fileId: uploadResponse.data.data.uploadManuscript.manuscriptFile.id,
+                    fileId: uploadResponse.data.data.uploadManuscript.files.manuscriptFile.id,
                     submissionId,
                 },
             },
@@ -192,7 +192,7 @@ describe('Dashboard Integration Tests', () => {
 
         expect(deleteResponse.status).toBe(200);
         expect(deleteResponse.data.errors).toBeDefined();
-        // It's read rather than delete because of the permission service
+        // It's read rather than delete because you need to be able to read it first before deleting.
         expect(deleteResponse.data.errors[0].message).toBe('User not allowed to read submission');
     });
 });

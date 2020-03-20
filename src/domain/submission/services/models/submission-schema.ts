@@ -30,13 +30,22 @@ const suggestionSchema = Joi.object({
 // todo: change this schema to reflect the actual one in use
 export const submissionSchema = Joi.object({
     id: Joi.string().required(),
+    created: Joi.date().required(),
     updated: Joi.date().required(),
-    title: Joi.string().required(),
     status: Joi.string().required(),
     createdBy: Joi.string().required(),
     articleType: Joi.string().required(),
-    manuscriptFile: fileSchema.required(),
-    supportingFiles: Joi.array().items(fileSchema),
+    manuscriptDetails: {
+        title: Joi.string().required(),
+    },
+    files: {
+        coverLetter: Joi.string().required(),
+        manuscriptFile: fileSchema.required(),
+        supportingFiles: Joi.array().items(fileSchema),
+    },
+    editors: {},
+    disclosure: {},
+
     suggestions: Joi.array().items(suggestionSchema),
     /*
     subjects: Joi.alternatives().when('articleType', {
@@ -47,9 +56,6 @@ export const submissionSchema = Joi.object({
             .max(2)
             .required(),
     }),
-    */
-    coverLetter: Joi.string().required(),
-    /*
     author: Joi.object()
         .keys({
             firstName: Joi.string().required(),
