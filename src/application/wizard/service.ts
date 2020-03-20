@@ -102,12 +102,15 @@ export class WizardService {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const chunks: Array<any> = [];
                 stream.on('data', async chunk => {
+                    const bytesRead = stream.bytesRead;
                     await this.fileService.handleMultipartChunk(
+                        user.id,
                         manuscriptFile,
                         chunk,
                         partNumber,
                         uploadPromise,
                         pubsub,
+                        bytesRead,
                     );
                     chunks.push(chunk);
                     partNumber++;

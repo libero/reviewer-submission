@@ -43,11 +43,13 @@ export class FileService {
     }
 
     async handleMultipartChunk(
+        userId: string,
         file: File,
         chunk: any,
         partNumber: number,
         s3Stuff: PromiseResult<S3.CreateMultipartUploadOutput, AWSError>,
         pubsub: PubSub,
+        bytesRead: number,
     ) {
         if (!s3Stuff.UploadId) {
             throw new Error('no upload id');
@@ -67,7 +69,7 @@ export class FileService {
                 userId,
                 filename: file.filename,
                 fileId: file.id,
-                percentage: Math.floor((loaded / total) * 100),
+                percentage: Math.floor((bytesRead / file.size) * 100),
             },
         });
     }
