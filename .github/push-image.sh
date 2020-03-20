@@ -38,7 +38,7 @@ if [[ "$GITHUB_REF" == "refs/heads"* ]]; then
         docker push "${NAME}:latest"
     fi
 
-elif [[ "$GITHUB_REF" == "refs/tags/v"* ]]; then
+elif [[ "$GITHUB_REF" =~ refs/tags/v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*) ]]; then
     # push `semver` tagged image
     SEMVER="${GITHUB_REF/refs\/tags\/v/}"
     MAJOR="$(echo ${SEMVER} | cut -d'.' -f1)"
