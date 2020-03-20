@@ -205,7 +205,9 @@ export class WizardService {
                 file => !file.isCancelled() && !file.isDeleted(),
             );
             const suggestion = await this.semanticExtractionService.getSuggestion(submissionId);
-            submission.suggestions = [suggestion];
+            if (suggestion) {
+                submission.suggestions = [suggestion];
+            }
         }
         return submission;
     }
