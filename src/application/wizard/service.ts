@@ -204,6 +204,7 @@ export class WizardService {
             submission.files.supportingFiles = (await this.fileService.getSupportingFiles(submissionId)).filter(
                 file => !file.isCancelled() && !file.isDeleted(),
             );
+            const suggestion = await this.semanticExtractionService.getSuggestion(submissionId);
         }
         return submission;
     }

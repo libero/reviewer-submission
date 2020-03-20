@@ -18,6 +18,9 @@ export const uploadSupportingFile = async (submissionId: string): Promise<AxiosR
                     id
                 }
             }
+            supportingFiles {
+                id
+            },
         }
     }`;
 
@@ -83,6 +86,10 @@ describe('Wizard->Files Integration Tests', () => {
 
         expect(uploadResponse.status).toBe(200);
         expect(uploadResponse.data.data.uploadManuscript.id).toBe(submissionId);
+        expect(uploadResponse.data.data.uploadManuscript.suggestions[0]).toEqual({
+            value: 'Impact of Coronavirus on Velociraptors',
+            fieldName: 'title',
+        });
     });
 
     it('deletes a manuscript file', async () => {

@@ -51,6 +51,10 @@ export const uploadManuscript = async (submissionId: string): Promise<AxiosRespo
                 manuscriptFile {
                     id
                 }
+            },
+            suggestions {
+                value
+                fieldName
             }
         }
     }`;

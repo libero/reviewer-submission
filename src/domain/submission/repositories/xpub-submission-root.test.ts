@@ -75,6 +75,7 @@ describe('Knex Submission Repository', () => {
                 manuscriptDetails: {
                     title: 'The title',
                 },
+                suggestions: [],
             });
             expect({ ...result[1] }).toStrictEqual({
                 id: entryId2,
@@ -91,6 +92,7 @@ describe('Knex Submission Repository', () => {
                 manuscriptDetails: {
                     title: 'Another title',
                 },
+                suggestions: [],
             });
         });
         it('calls the knex instance methods with the correct parameters', async (): Promise<void> => {
@@ -129,6 +131,7 @@ describe('Knex Submission Repository', () => {
                 manuscriptDetails: {
                     title: 'The title',
                 },
+                suggestions: [],
             });
         });
         it('returns the first entry if multiple entries are found by query', async (): Promise<void> => {
