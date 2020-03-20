@@ -95,26 +95,38 @@ export class WizardService {
             FileType.MANUSCRIPT_SOURCE,
         );
 
-        const fileContents: Buffer = await new Promise((resolve, reject) => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const chunks: Array<any> = [];
-            stream.on('data', chunk => chunks.push(chunk));
-            stream.on('error', reject);
-            stream.on('end', () => resolve(Buffer.concat(chunks)));
-        });
-
-        const uploadPromise = this.fileService.uploadManuscript(fileContents, manuscriptFile, user.id, pubsub);
-
-        manuscriptFile.setStatusToStored();
-
-        const semanticExtractionPromise = this.semanticExtractionService.extractTitle(
-            fileContents,
-            mimeType,
-            filename,
-            submissionId,
-        );
-
         try {
+            const uploadPromise = await this.fileService.uploadManuscript(manuscriptFile);
+            let partNumber = 0;
+            const fileContents: Buffer = await new Promise((resolve, reject) => {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const chunks: Array<any> = [];
+                stream.on('data', async chunk => {
+                    await this.fileService.handleMultipartChunk(
+                        manuscriptFile,
+                        chunk,
+                        partNumber,
+                        uploadPromise,
+                        pubsub,
+                    );
+                    chunks.push(chunk);
+                    partNumber++;
+                });
+                stream.on('error', reject);
+                stream.on('end', () => {
+                    // call end of upload.
+                    resolve(Buffer.concat(chunks));
+                });
+            });
+
+            manuscriptFile.setStatusToStored();
+
+            const semanticExtractionPromise = this.semanticExtractionService.extractTitle(
+                fileContents,
+                mimeType,
+                filename,
+                submissionId,
+            );
             await Promise.all([uploadPromise, semanticExtractionPromise]);
         } catch (e) {
             manuscriptFile.setStatusToCancelled();

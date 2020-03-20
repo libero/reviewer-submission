@@ -8,6 +8,8 @@ import File from './models/file';
 import { SubmissionId } from '../../../domain/submission/types';
 import { S3Config } from '../../../config';
 import { PubSub } from 'apollo-server-express';
+import { PromiseResult } from 'aws-sdk/lib/request';
+import { AWSError } from 'aws-sdk/lib/error';
 
 export class FileService {
     fileRepository: XpubFileRepository;
@@ -38,6 +40,36 @@ export class FileService {
             default:
                 throw new Error('Invalid FileType');
         }
+    }
+
+    async handleMultipartChunk(
+        file: File,
+        chunk: any,
+        partNumber: number,
+        s3Stuff: PromiseResult<S3.CreateMultipartUploadOutput, AWSError>,
+        pubsub: PubSub,
+    ) {
+        if (!s3Stuff.UploadId) {
+            throw new Error('no upload id');
+        }
+        const partParams = {
+            Body: chunk,
+            Bucket: s3Stuff.Bucket || this.bucket,
+            Key: s3Stuff.Key || file.url,
+            PartNumber: partNumber,
+            UploadId: s3Stuff.UploadId,
+        };
+        // s3Stuff.
+        await this.s3.uploadPart(partParams).promise();
+
+        await pubsub.publish('UPLOAD_STATUS', {
+            manuscriptUploadProgress: {
+                userId,
+                filename: file.filename,
+                fileId: file.id,
+                percentage: Math.floor((loaded / total) * 100),
+            },
+        });
     }
 
     async deleteManuscript(fileId: FileId, submissionId: SubmissionId): Promise<boolean> {
@@ -121,30 +153,30 @@ export class FileService {
     }
 
     async uploadManuscript(
-        fileContents: Buffer,
+        // fileContents: Buffer,
         file: File,
-        userId: string,
-        pubsub: PubSub,
-    ): Promise<S3.ManagedUpload.SendData> {
+        // userId: string,
+        // pubsub: PubSub,
+    ): Promise<PromiseResult<S3.CreateMultipartUploadOutput, AWSError>> {
         const { url, id, mimeType } = file;
-        const fileUploadManager = this.s3.upload({
+        const fileUploadManager = this.s3.createMultipartUpload({
             Bucket: this.bucket,
             Key: `${url}/${id}`,
-            Body: fileContents.toString(),
+            // Body: fileContents.toString(),
             ContentType: mimeType,
             ACL: 'private',
         });
 
-        fileUploadManager.on('httpUploadProgress', async ({ loaded, total }) => {
-            await pubsub.publish('UPLOAD_STATUS', {
-                manuscriptUploadProgress: {
-                    userId,
-                    filename: file.filename,
-                    fileId: file.id,
-                    percentage: Math.floor((loaded / total) * 100),
-                },
-            });
-        });
+        // fileUploadManager.on('httpUploadProgress', async ({ loaded, total }) => {
+        //     await pubsub.publish('UPLOAD_STATUS', {
+        //         manuscriptUploadProgress: {
+        //             userId,
+        //             filename: file.filename,
+        //             fileId: file.id,
+        //             percentage: Math.floor((loaded / total) * 100),
+        //         },
+        //     });
+        // });
 
         return fileUploadManager.promise();
     }
@@ -154,26 +186,26 @@ export class FileService {
         file: File,
         userId: string,
         pubsub: PubSub,
-    ): Promise<S3.ManagedUpload.SendData> {
+    ): Promise<S3.CreateMultipartUploadOutput> {
         const { url, id, mimeType } = file;
-        const fileUploadManager = this.s3.upload({
+        const fileUploadManager = this.s3.createMultipartUpload({
             Bucket: this.bucket,
             Key: `${url}/${id}`,
-            Body: fileContents.toString(),
+            // Body: fileContents.toString(),
             ContentType: mimeType,
             ACL: 'private',
         });
 
-        fileUploadManager.on('httpUploadProgress', async ({ loaded, total }) => {
-            await pubsub.publish('UPLOAD_STATUS', {
-                supportingUploadProgress: {
-                    userId,
-                    filename: file.filename,
-                    fileId: file.id,
-                    percentage: Math.floor((loaded / total) * 100),
-                },
-            });
-        });
+        // fileUploadManager.on('httpUploadProgress', async ({ loaded, total }) => {
+        //     await pubsub.publish('UPLOAD_STATUS', {
+        //         supportingUploadProgress: {
+        //             userId,
+        //             filename: file.filename,
+        //             fileId: file.id,
+        //             percentage: Math.floor((loaded / total) * 100),
+        //         },
+        //     });
+        // });
 
         return fileUploadManager.promise();
     }
