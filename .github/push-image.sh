@@ -4,17 +4,17 @@ set -e
 if [ "$#" -ne 1 ]; then
     echo "Pushes a container image to Docker Hub with tags"
     echo 
-    echo "Usage: $0 PROJECT"
+    echo "Usage: $0 project"
     echo "Example: $0 dummy-api"
     echo "Relies on the following environment variables:"
     echo "- GITHUB_REF, GITHUB_SHA (GH Action default)"
     echo "- DOCKER_USERNAME, DOCKER_PASSWORD"
-    echo "Uses PROJECT:latest as input image."
+    echo "Uses project:latest as input image."
     echo "Override this behaviour with IMAGE_TAG environment variable."
     exit 1
 fi
 
-PROJECT="$1"
+project="$1"
 IMAGE_TAG="${IMAGE_TAG:-latest}"
 
 
@@ -23,34 +23,33 @@ DOCKER_REGISTRY="${DOCKER_REGISTRY:-}"
 echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin "${DOCKER_REGISTRY}"
 
 # tag temporarily as liberoadmin due to lack of `libero/` availability
-NAME="${DOCKER_REGISTRY}liberoadmin/${PROJECT}"
-INPUT_IMAGE="libero/${PROJECT}:${IMAGE_TAG}"
+name="${DOCKER_REGISTRY}liberoadmin/${project}"
+input_image="libero/${project}:${IMAGE_TAG}"
 
 if [[ "$GITHUB_REF" == "refs/heads"* ]]; then
     # push `branch-sha` tagged image
-    BRANCH="${GITHUB_REF/refs\/heads\//}"
-    docker tag $INPUT_IMAGE "${NAME}:${BRANCH}-${GITHUB_SHA}"
-    docker push "${NAME}:${BRANCH}-${GITHUB_SHA}"
+    branch="${GITHUB_REF/refs\/heads\//}"
+    docker tag "$input_image" "${name}:${branch}-${GITHUB_SHA}"
+    docker push "${name}:${branch}-${GITHUB_SHA}"
 
-    if [[ "$BRANCH" = "master" ]]; then
+    if [[ "$branch" = "master" ]]; then
         # push `latest` tag
-        docker tag $INPUT_IMAGE "${NAME}:latest"
-        docker push "${NAME}:latest"
+        docker tag "$input_image" "${name}:latest"
+        docker push "${name}:latest"
     fi
 
 elif [[ "$GITHUB_REF" =~ refs/tags/v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*) ]]; then
     # push `semver` tagged image
-    SEMVER="${GITHUB_REF/refs\/tags\/v/}"
-    MAJOR="$(echo ${SEMVER} | cut -d'.' -f1)"
-    MINOR="$(echo ${SEMVER} | cut -d'.' -f2)"
-    PATCH="$(echo ${SEMVER} | cut -d'.' -f3)"
+    semver="${GITHUB_REF/refs\/tags\/v/}"
+    major="$(echo "${semver}" | cut -d'.' -f1)"
+    minor="$(echo "${semver}" | cut -d'.' -f2)"
 
-    docker tag $INPUT_IMAGE "${NAME}:${SEMVER}"
-    docker tag $INPUT_IMAGE "${NAME}:${MAJOR}"
-    docker tag $INPUT_IMAGE "${NAME}:${MAJOR}.${MINOR}"
-    docker push "${NAME}:${SEMVER}"
-    docker push "${NAME}:${MAJOR}"
-    docker push "${NAME}:${MAJOR}.${MINOR}"
+    docker tag "$input_image" "${name}:${semver}"
+    docker tag "$input_image" "${name}:${major}"
+    docker tag "$input_image" "${name}:${major}.${minor}"
+    docker push "${name}:${semver}"
+    docker push "${name}:${major}"
+    docker push "${name}:${major}.${minor}"
 else
     echo "${GITHUB_REF} is neither branch head nor valid semver tag"
     echo "No image tagging or pushing was performed because of this."
