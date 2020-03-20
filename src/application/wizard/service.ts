@@ -117,13 +117,11 @@ export class WizardService {
                 parts.push({ ETag, PartNumber: partNumber });
                 chunks.push(chunk);
                 partNumber++;
-                stream.resume();
             }
             const fileContents = Buffer.concat(chunks);
 
             console.log(uploadPromise.UploadId);
             await this.fileService.completeMultipartUpload(manuscriptFile.url, uploadPromise.UploadId, parts);
-            // console.log('blach');
             await this.semanticExtractionService.extractTitle(fileContents, mimeType, filename, submissionId);
 
             manuscriptFile.setStatusToStored();
