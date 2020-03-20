@@ -99,6 +99,7 @@ export class WizardService {
         try {
             const uploadPromise = await this.fileService.uploadManuscript(manuscriptFile);
             let partNumber = 1;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const chunks: Array<any> = [];
             const parts: { ETag: string | undefined; PartNumber: number }[] = [];
 
@@ -118,23 +119,17 @@ export class WizardService {
                 partNumber++;
                 stream.resume();
             }
-
-            console.log('parts', parts);
-
-            await this.fileService.completeMultipartUpload(manuscriptFile.url, uploadPromise.UploadId, parts);
-
             const fileContents = Buffer.concat(chunks);
 
-            manuscriptFile.setStatusToStored();
+            console.log(uploadPromise.UploadId);
+            await this.fileService.completeMultipartUpload(manuscriptFile.url, uploadPromise.UploadId, parts);
+            // console.log('blach');
+            await this.semanticExtractionService.extractTitle(fileContents, mimeType, filename, submissionId);
 
-            const semanticExtractionPromise = this.semanticExtractionService.extractTitle(
-                fileContents,
-                mimeType,
-                filename,
-                submissionId,
-            );
-            await Promise.all([uploadPromise, semanticExtractionPromise]);
+            manuscriptFile.setStatusToStored();
+            // await Promise.all([uploadPromise, semanticExtractionPromise]);
         } catch (e) {
+            console.log(e, 'cancelled');
             manuscriptFile.setStatusToCancelled();
         }
 

@@ -59,6 +59,8 @@ export class FileService {
         if (!s3Stuff.UploadId) {
             throw new Error('no upload id');
         }
+
+        console.log(s3Stuff.UploadId);
         const partParams = {
             Body: chunk,
             Bucket: s3Stuff.Bucket || this.bucket,
