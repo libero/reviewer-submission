@@ -98,14 +98,15 @@ export class WizardService {
 
         try {
             const uploadPromise = await this.fileService.uploadManuscript(manuscriptFile);
-            let partNumber = 0;
+            let partNumber = 1;
             const fileContents: Buffer = await new Promise((resolve, reject) => {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const chunks: Array<any> = [];
+                const parts: { ETag: string | undefined; PartNumber: number }[] = [];
                 stream.on('data', async chunk => {
                     stream.pause();
                     const bytesRead = stream.bytesRead;
-                    await this.fileService.handleMultipartChunk(
+                    const { ETag } = await this.fileService.handleMultipartChunk(
                         user.id,
                         manuscriptFile,
                         chunk,
@@ -114,13 +115,18 @@ export class WizardService {
                         pubsub,
                         bytesRead,
                     );
+                    parts.push({ ETag, PartNumber: partNumber });
                     chunks.push(chunk);
                     partNumber++;
                     stream.resume();
                 });
                 stream.on('error', reject);
                 stream.on('end', async () => {
-                    await this.fileService.completeMultipartUpload(manuscriptFile.url, uploadPromise.UploadId || '');
+                    await this.fileService.completeMultipartUpload(
+                        manuscriptFile.url,
+                        uploadPromise.UploadId || '',
+                        parts,
+                    );
                     // call end of upload.
                     resolve(Buffer.concat(chunks));
                 });
@@ -149,7 +155,6 @@ export class WizardService {
         submissionId: SubmissionId,
         file: FileUpload,
         fileSize: number,
-        pubsub: PubSub,
     ): Promise<Submission> {
         const submission = await this.submissionService.get(submissionId);
         const allowed = this.permissionService.userCanWithSubmission(user, SubmissionOperation.UPDATE, submission);
@@ -166,7 +171,7 @@ export class WizardService {
             FileType.SUPPORTING_FILE,
         );
 
-        const fileContents: Buffer = await new Promise((resolve, reject) => {
+        await new Promise((resolve, reject) => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const chunks: Array<any> = [];
             stream.on('data', chunk => chunks.push(chunk));
@@ -175,7 +180,7 @@ export class WizardService {
         });
 
         try {
-            await this.fileService.uploadSupportingFile(fileContents, supportingFile, user.id, pubsub);
+            await this.fileService.uploadSupportingFile(supportingFile);
             supportingFile.setStatusToStored();
         } catch (e) {
             // @todo should this not be setStatusToDeleted ?

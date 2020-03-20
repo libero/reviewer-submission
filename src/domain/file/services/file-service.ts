@@ -52,7 +52,7 @@ export class FileService {
         pubsub: PubSub,
         bytesRead: number,
         numAttempts = 0,
-    ): Promise<void> {
+    ): Promise<PromiseResult<S3.UploadPartOutput, AWSError>> {
         if (numAttempts >= 3) {
             throw new Error(`Error uploading chunk no: ${partNumber}`);
         }
@@ -65,15 +65,23 @@ export class FileService {
             Key: s3Stuff.Key || file.url,
             PartNumber: partNumber,
             UploadId: s3Stuff.UploadId,
-            ContentLength: chunk.length,
         };
 
         try {
-            await this.s3.uploadPart(partParams).promise();
+            const params = await this.s3.uploadPart(partParams).promise();
+            await pubsub.publish('UPLOAD_STATUS', {
+                manuscriptUploadProgress: {
+                    userId,
+                    filename: file.filename,
+                    fileId: file.id,
+                    percentage: Math.floor((bytesRead / file.size) * 100),
+                },
+            });
+            return params;
         } catch (e) {
             console.log('+++++++++');
 
-            await this.handleMultipartChunk(
+            return await this.handleMultipartChunk(
                 userId,
                 file,
                 chunk,
@@ -84,26 +92,21 @@ export class FileService {
                 numAttempts + 1,
             );
         }
-
-        await pubsub.publish('UPLOAD_STATUS', {
-            manuscriptUploadProgress: {
-                userId,
-                filename: file.filename,
-                fileId: file.id,
-                percentage: Math.floor((bytesRead / file.size) * 100),
-            },
-        });
     }
 
     async completeMultipartUpload(
         key: string,
         uploadId: string,
+        parts: { ETag: string | undefined; PartNumber: number }[],
     ): Promise<PromiseResult<S3.Types.CompleteMultipartUploadOutput, AWSError>> {
         return this.s3
             .completeMultipartUpload({
                 Bucket: this.bucket,
                 Key: key,
                 UploadId: uploadId,
+                MultipartUpload: {
+                    Parts: parts,
+                },
             })
             .promise();
     }
@@ -188,12 +191,7 @@ export class FileService {
         );
     }
 
-    async uploadManuscript(
-        // fileContents: Buffer,
-        file: File,
-        // userId: string,
-        // pubsub: PubSub,
-    ): Promise<PromiseResult<S3.CreateMultipartUploadOutput, AWSError>> {
+    async uploadManuscript(file: File): Promise<PromiseResult<S3.CreateMultipartUploadOutput, AWSError>> {
         const { url, id, mimeType } = file;
         const fileUploadManager = this.s3.createMultipartUpload({
             Bucket: this.bucket,
@@ -216,31 +214,14 @@ export class FileService {
         return fileUploadManager.promise();
     }
 
-    async uploadSupportingFile(
-        fileContents: Buffer,
-        file: File,
-        userId: string,
-        pubsub: PubSub,
-    ): Promise<S3.CreateMultipartUploadOutput> {
+    async uploadSupportingFile(file: File): Promise<S3.CreateMultipartUploadOutput> {
         const { url, id, mimeType } = file;
         const fileUploadManager = this.s3.createMultipartUpload({
             Bucket: this.bucket,
             Key: `${url}/${id}`,
-            // Body: fileContents.toString(),
             ContentType: mimeType,
             ACL: 'private',
         });
-
-        // fileUploadManager.on('httpUploadProgress', async ({ loaded, total }) => {
-        //     await pubsub.publish('UPLOAD_STATUS', {
-        //         supportingUploadProgress: {
-        //             userId,
-        //             filename: file.filename,
-        //             fileId: file.id,
-        //             percentage: Math.floor((loaded / total) * 100),
-        //         },
-        //     });
-        // });
 
         return fileUploadManager.promise();
     }
