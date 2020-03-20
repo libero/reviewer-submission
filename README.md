@@ -42,8 +42,7 @@ time you make a change.
 
 Start the services
 ```sh
-docker-compose -f docker-compose.test.yml up -d postgres s3 reviewer-mocks
-docker-compose -f docker-compose.test.yml up -d s3_create-bucket
+make setup_integration
 yarn run start:dev
 ```
 
