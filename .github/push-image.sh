@@ -36,6 +36,7 @@ if [[ "$GITHUB_REF" == "refs/heads"* ]]; then
         # push `latest` tag
         docker tag $INPUT_IMAGE "${NAME}:latest"
         docker push "${NAME}:latest"
+    fi
 
 elif [[ "$GITHUB_REF" == "refs/tags/v"* ]]; then
     # push `semver` tagged image
