@@ -50,7 +50,7 @@ export class FileService {
         s3Stuff: PromiseResult<S3.CreateMultipartUploadOutput, AWSError>,
         pubsub: PubSub,
         bytesRead: number,
-    ) {
+    ): Promise<void> {
         if (!s3Stuff.UploadId) {
             throw new Error('no upload id');
         }
@@ -61,7 +61,6 @@ export class FileService {
             PartNumber: partNumber,
             UploadId: s3Stuff.UploadId,
         };
-        // s3Stuff.
         await this.s3.uploadPart(partParams).promise();
 
         await pubsub.publish('UPLOAD_STATUS', {
