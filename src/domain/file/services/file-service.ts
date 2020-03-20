@@ -79,8 +79,6 @@ export class FileService {
             });
             return params;
         } catch (e) {
-            console.log('+++++++++');
-
             return await this.handleMultipartChunk(
                 userId,
                 file,
@@ -96,7 +94,7 @@ export class FileService {
 
     async completeMultipartUpload(
         key: string,
-        uploadId: string,
+        uploadId = '',
         parts: { ETag: string | undefined; PartNumber: number }[],
     ): Promise<PromiseResult<S3.Types.CompleteMultipartUploadOutput, AWSError>> {
         return this.s3

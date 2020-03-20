@@ -99,38 +99,31 @@ export class WizardService {
         try {
             const uploadPromise = await this.fileService.uploadManuscript(manuscriptFile);
             let partNumber = 1;
-            const fileContents: Buffer = await new Promise((resolve, reject) => {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const chunks: Array<any> = [];
-                const parts: { ETag: string | undefined; PartNumber: number }[] = [];
-                stream.on('data', async chunk => {
-                    stream.pause();
-                    const bytesRead = stream.bytesRead;
-                    const { ETag } = await this.fileService.handleMultipartChunk(
-                        user.id,
-                        manuscriptFile,
-                        chunk,
-                        partNumber,
-                        uploadPromise,
-                        pubsub,
-                        bytesRead,
-                    );
-                    parts.push({ ETag, PartNumber: partNumber });
-                    chunks.push(chunk);
-                    partNumber++;
-                    stream.resume();
-                });
-                stream.on('error', reject);
-                stream.on('end', async () => {
-                    await this.fileService.completeMultipartUpload(
-                        manuscriptFile.url,
-                        uploadPromise.UploadId || '',
-                        parts,
-                    );
-                    // call end of upload.
-                    resolve(Buffer.concat(chunks));
-                });
-            });
+            const chunks: Array<any> = [];
+            const parts: { ETag: string | undefined; PartNumber: number }[] = [];
+
+            for await (const chunk of stream) {
+                const bytesRead = stream.bytesRead;
+                const { ETag } = await this.fileService.handleMultipartChunk(
+                    user.id,
+                    manuscriptFile,
+                    chunk,
+                    partNumber,
+                    uploadPromise,
+                    pubsub,
+                    bytesRead,
+                );
+                parts.push({ ETag, PartNumber: partNumber });
+                chunks.push(chunk);
+                partNumber++;
+                stream.resume();
+            }
+
+            console.log('parts', parts);
+
+            await this.fileService.completeMultipartUpload(manuscriptFile.url, uploadPromise.UploadId, parts);
+
+            const fileContents = Buffer.concat(chunks);
 
             manuscriptFile.setStatusToStored();
 
