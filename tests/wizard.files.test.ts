@@ -18,9 +18,6 @@ export const uploadSupportingFile = async (submissionId: string): Promise<AxiosR
                     id
                 }
             }
-            supportingFiles {
-                id
-            },
         }
     }`;
 
