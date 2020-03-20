@@ -65,6 +65,7 @@ export class FileService {
             Key: s3Stuff.Key || file.url,
             PartNumber: partNumber,
             UploadId: s3Stuff.UploadId,
+            ContentLength: chunk.length,
         };
 
         try {
