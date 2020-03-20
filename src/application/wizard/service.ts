@@ -10,6 +10,7 @@ import { PermissionService, SubmissionOperation } from '../permission/service';
 import { User } from 'src/domain/user/user';
 import { FileType, FileId } from '../../domain/file/types';
 import { PubSub } from 'apollo-server-express';
+import { CompletedPart } from 'aws-sdk/clients/s3';
 
 export class WizardService {
     constructor(
@@ -102,6 +103,7 @@ export class WizardService {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const chunks: Array<any> = [];
                 stream.on('data', async chunk => {
+                    stream.pause();
                     const bytesRead = stream.bytesRead;
                     await this.fileService.handleMultipartChunk(
                         user.id,
@@ -114,9 +116,11 @@ export class WizardService {
                     );
                     chunks.push(chunk);
                     partNumber++;
+                    stream.resume();
                 });
                 stream.on('error', reject);
-                stream.on('end', () => {
+                stream.on('end', async () => {
+                    await this.fileService.completeMultipartUpload(manuscriptFile.url, uploadPromise.UploadId || '');
                     // call end of upload.
                     resolve(Buffer.concat(chunks));
                 });

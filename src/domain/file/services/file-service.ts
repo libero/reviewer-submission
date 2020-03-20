@@ -10,6 +10,7 @@ import { S3Config } from '../../../config';
 import { PubSub } from 'apollo-server-express';
 import { PromiseResult } from 'aws-sdk/lib/request';
 import { AWSError } from 'aws-sdk/lib/error';
+import { response } from 'express';
 
 export class FileService {
     fileRepository: XpubFileRepository;
@@ -50,7 +51,11 @@ export class FileService {
         s3Stuff: PromiseResult<S3.CreateMultipartUploadOutput, AWSError>,
         pubsub: PubSub,
         bytesRead: number,
+        numAttempts = 0,
     ): Promise<void> {
+        if (numAttempts >= 3) {
+            throw new Error(`Error uploading chunk no: ${partNumber}`);
+        }
         if (!s3Stuff.UploadId) {
             throw new Error('no upload id');
         }
@@ -61,7 +66,23 @@ export class FileService {
             PartNumber: partNumber,
             UploadId: s3Stuff.UploadId,
         };
-        await this.s3.uploadPart(partParams).promise();
+
+        try {
+            await this.s3.uploadPart(partParams).promise();
+        } catch (e) {
+            console.log('+++++++++');
+
+            await this.handleMultipartChunk(
+                userId,
+                file,
+                chunk,
+                partNumber,
+                s3Stuff,
+                pubsub,
+                bytesRead,
+                numAttempts + 1,
+            );
+        }
 
         await pubsub.publish('UPLOAD_STATUS', {
             manuscriptUploadProgress: {
@@ -71,6 +92,19 @@ export class FileService {
                 percentage: Math.floor((bytesRead / file.size) * 100),
             },
         });
+    }
+
+    async completeMultipartUpload(
+        key: string,
+        uploadId: string,
+    ): Promise<PromiseResult<S3.Types.CompleteMultipartUploadOutput, AWSError>> {
+        return this.s3
+            .completeMultipartUpload({
+                Bucket: this.bucket,
+                Key: key,
+                UploadId: uploadId,
+            })
+            .promise();
     }
 
     async deleteManuscript(fileId: FileId, submissionId: SubmissionId): Promise<boolean> {
@@ -163,7 +197,6 @@ export class FileService {
         const fileUploadManager = this.s3.createMultipartUpload({
             Bucket: this.bucket,
             Key: `${url}/${id}`,
-            // Body: fileContents.toString(),
             ContentType: mimeType,
             ACL: 'private',
         });
