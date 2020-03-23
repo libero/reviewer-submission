@@ -73,12 +73,18 @@ export default class Submission {
 
     private articleTypeFromString(type: string): ArticleType {
         switch (type) {
-            case 'researchArticle':
+            case 'research-article':
                 return ArticleType.RESEARCH_ARTICLE;
-            case 'featureArticle':
+            case 'feature':
                 return ArticleType.FEATURE_ARTICLE;
-            case 'researchAdvance':
+            case 'research-advance':
                 return ArticleType.RESEARCH_ADVANCE;
+            case 'scientific-correspondence':
+                return ArticleType.SCIENTIFIC_CORRESPONDENCE;
+            case 'tools-resources':
+                return ArticleType.TOOLS_RESOURCES;
+            case 'short-report':
+                return ArticleType.SHORT_REPORT;
             default:
                 throw new Error('Invalid article type');
         }

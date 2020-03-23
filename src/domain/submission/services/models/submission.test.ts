@@ -15,7 +15,7 @@ describe('Submission Entity', () => {
             status: SubmissionStatus.INITIAL,
             createdBy: '123',
             updated: new Date(),
-            articleType: 'researchArticle',
+            articleType: 'research-article',
         });
     });
 
@@ -24,7 +24,7 @@ describe('Submission Entity', () => {
             expect(submission).toBeInstanceOf(Submission);
             expect(submission.id).toBe(id);
             expect(submission.status).toBe('INITIAL');
-            expect(submission.articleType).toBe('researchArticle');
+            expect(submission.articleType).toBe('research-article');
             expect(submission.createdBy).toBe('123');
             expect(submission.updated).toBeDefined();
         });

@@ -41,7 +41,7 @@ export const uploadSupportingFile = async (submissionId: string): Promise<AxiosR
 
 describe('Wizard->Files Integration Tests', () => {
     it('it should allow a user to set a a cover letter for their submission', async () => {
-        const startSubmissionResponse = await startSubmissionAlt('researchArticle');
+        const startSubmissionResponse = await startSubmissionAlt('research-article');
         const submissionId = startSubmissionResponse.data.data.startSubmission.id;
         const coverLetter = 'I am a cover';
 
@@ -75,7 +75,7 @@ describe('Wizard->Files Integration Tests', () => {
 
     // see https://github.com/libero/reviewer-submission/issues/109
     it('uploads a manuscript file', async () => {
-        const startSubmissionResponse = await startSubmissionAlt('researchArticle');
+        const startSubmissionResponse = await startSubmissionAlt('research-article');
         const submissionId = startSubmissionResponse.data.data.startSubmission.id;
 
         const uploadResponse = await uploadManuscript(submissionId);
@@ -90,7 +90,7 @@ describe('Wizard->Files Integration Tests', () => {
     });
 
     it('deletes a manuscript file', async () => {
-        const startSubmissionResponse = await startSubmissionAlt('researchArticle');
+        const startSubmissionResponse = await startSubmissionAlt('research-article');
         const submissionId = startSubmissionResponse.data.data.startSubmission.id;
 
         const uploadResponse = await uploadManuscript(submissionId);
@@ -119,7 +119,7 @@ describe('Wizard->Files Integration Tests', () => {
     });
 
     it('should upload a supporting file', async () => {
-        const startResponse = await startSubmissionAlt('researchArticle');
+        const startResponse = await startSubmissionAlt('research-article');
         const submissionId = startResponse.data.data.startSubmission.id;
 
         const uploadManuscriptResponse = await uploadManuscript(submissionId);
@@ -136,7 +136,7 @@ describe('Wizard->Files Integration Tests', () => {
     });
 
     it('it should throw if a user tries to delete a supporting file unrelated to their submission', async () => {
-        const startResponse = await startSubmissionAlt('researchArticle');
+        const startResponse = await startSubmissionAlt('research-article');
         const submissionId = startResponse.data.data.startSubmission.id;
 
         const uploadManuscriptResponse = await uploadManuscript(submissionId);
@@ -176,7 +176,7 @@ describe('Wizard->Files Integration Tests', () => {
     });
 
     it('it should allow a user to delete a supporting file ', async () => {
-        const startResponse = await startSubmissionAlt('researchArticle');
+        const startResponse = await startSubmissionAlt('research-article');
         const submissionId = startResponse.data.data.startSubmission.id;
 
         const uploadManuscriptResponse = await uploadManuscript(submissionId);
@@ -214,7 +214,7 @@ describe('Wizard->Files Integration Tests', () => {
     });
 
     it('should give back progress on manuscript upload', async done => {
-        const startResponse = await startSubmissionAlt('researchArticle');
+        const startResponse = await startSubmissionAlt('research-article');
         const submissionId = startResponse.data.data.startSubmission.id;
         let percentage: string;
 
