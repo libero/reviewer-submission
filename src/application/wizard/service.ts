@@ -126,6 +126,7 @@ export class WizardService {
         submissionId: SubmissionId,
         file: FileUpload,
         fileSize: number,
+        pubsub: PubSub,
     ): Promise<Submission> {
         const submission = await this.submissionService.get(submissionId);
         const allowed = this.permissionService.userCanWithSubmission(user, SubmissionOperation.UPDATE, submission);
@@ -142,16 +143,8 @@ export class WizardService {
             FileType.SUPPORTING_FILE,
         );
 
-        await new Promise((resolve, reject) => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const chunks: Array<any> = [];
-            stream.on('data', chunk => chunks.push(chunk));
-            stream.on('error', reject);
-            stream.on('end', () => resolve(Buffer.concat(chunks)));
-        });
-
         try {
-            await this.fileService.uploadSupportingFile(supportingFile);
+            await this.fileService.uploadSupportingFile(stream, supportingFile, user.id, pubsub);
             supportingFile.setStatusToStored();
         } catch (e) {
             // @todo should this not be setStatusToDeleted ?

@@ -8,9 +8,6 @@ import File from './models/file';
 import { SubmissionId } from '../../../domain/submission/types';
 import { S3Config } from '../../../config';
 import { PubSub } from 'apollo-server-express';
-import { PromiseResult } from 'aws-sdk/lib/request';
-import { AWSError } from 'aws-sdk/lib/error';
-import { response } from 'express';
 import { ReadStream } from 'fs';
 
 export class FileService {
@@ -153,13 +150,30 @@ export class FileService {
         return fileUploadManager.promise();
     }
 
-    async uploadSupportingFile(file: File): Promise<S3.CreateMultipartUploadOutput> {
+    async uploadSupportingFile(
+        stream: ReadStream,
+        file: File,
+        userId: string,
+        pubsub: PubSub,
+    ): Promise<S3.CreateMultipartUploadOutput> {
         const { url, id, mimeType } = file;
-        const fileUploadManager = this.s3.createMultipartUpload({
+        const fileUploadManager = this.s3.upload({
             Bucket: this.bucket,
             Key: `${url}/${id}`,
+            Body: stream,
             ContentType: mimeType,
             ACL: 'private',
+        });
+
+        fileUploadManager.on('httpUploadProgress', async ({ loaded, total }) => {
+            await pubsub.publish('UPLOAD_STATUS', {
+                supportingUploadProgress: {
+                    userId,
+                    filename: file.filename,
+                    fileId: file.id,
+                    percentage: Math.floor((loaded / total) * 100),
+                },
+            });
         });
 
         return fileUploadManager.promise();
