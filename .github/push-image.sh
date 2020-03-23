@@ -1,21 +1,19 @@
 #!/bin/bash
 set -e
 
-if [ "$#" -ne 1 ]; then
-    echo "Pushes a container image to Docker Hub with tags"
+if [ "$#" -ne 2 ]; then
+    echo "Pushes a libero container image to Docker Hub with tags"
     echo 
-    echo "Usage: $0 project"
-    echo "Example: $0 dummy-api"
+    echo "Usage: $0 project input_tag"
+    echo "Example: $0 dummy-api 6cd9d7ebad4f16ef7273a7a831d79d5d5caf4164"
     echo "Relies on the following environment variables:"
     echo "- GITHUB_REF, GITHUB_SHA (GH Action default)"
     echo "- DOCKER_USERNAME, DOCKER_PASSWORD"
-    echo "Uses project:latest as input image."
-    echo "Override this behaviour with IMAGE_TAG environment variable."
     exit 1
 fi
 
 project="$1"
-IMAGE_TAG="${IMAGE_TAG:-latest}"
+image_tag="$2"
 
 
 # login
@@ -24,7 +22,7 @@ echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --passw
 
 # tag temporarily as liberoadmin due to lack of `libero/` availability
 name="${DOCKER_REGISTRY}liberoadmin/${project}"
-input_image="libero/${project}:${IMAGE_TAG}"
+input_image="libero/${project}:${image_tag}"
 
 if [[ "$GITHUB_REF" == "refs/heads"* ]]; then
     # push `branch-sha` tagged image
