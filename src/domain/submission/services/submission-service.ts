@@ -30,7 +30,6 @@ export class SubmissionService {
         const id = SubmissionId.fromUuid(uuid());
         const submission = new Submission({
             id,
-            title: '',
             updated: new Date(),
             articleType,
             status: 'INITIAL',
@@ -56,6 +55,7 @@ export class SubmissionService {
         if (!submission) {
             throw new Error('Unable to find submission with id: ' + id);
         }
+
         if (!submission.isSubmittable()) {
             throw new Error(`The submission ${id} cannot be submitted.`);
         }
@@ -78,7 +78,7 @@ export class SubmissionService {
         if (!submission) {
             throw new Error('Unable to find submission with id: ' + id);
         }
-        submission.coverLetter = coverLetter;
+        submission.files.coverLetter = coverLetter;
         return await this.submissionRepository.update(submission);
     }
 }

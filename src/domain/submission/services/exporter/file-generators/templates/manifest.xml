@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE manifest SYSTEM "manifest.dtd">
+<manifest version="1" xmlns="">
+
+    <item id="xpub-121" type="article-metadata" submission-item-id="custom001" version="0">
+        <description>Contains the submission metadata</description>
+        <file-order>1</file-order>
+        <instance media-type="application/xml" href="article.xml"/>
+    </item>
+
+    <item id="xpub-122" type="transfer-metadata" submission-item-id="custom002" version="0">
+        <description>Contains information about the source and destination of the transfer</description>
+        <file-order>1</file-order>
+        <instance media-type="application/xml" href="transfer.xml"/>
+    </item>
+
+    <item id="xpub-123" type="manuscript" submission-item-id="custom003" version="0">
+        <title>Article File</title>
+        <description>Article File</description>
+        <filename>{manuscript.filename}</filename>
+        <file-order>1</file-order>
+        <instance media-type="{manuscript.mimeType}" href="{manuscript.filename}"/>
+    </item>
+
+    <item id="xpub-124" type="disclosure" submission-item-id="custom004" version="0">
+        <title>Disclosure</title>
+        <description>The auto-generated disclosure from xPub.</description>
+        <filename>disclosure.pdf</filename>
+        <file-order>1</file-order>
+        <instance media-type="application/pdf" href="disclosure.pdf"/>
+    </item>
+
+    <item id="xpub-125" type="coverletter" submission-item-id="custom005" version="0">
+        <title>Cover Letter</title>
+        <description>The cover letter supplied by the submitter.</description>
+        <filename>cover_letter.pdf</filename>
+        <file-order>1</file-order>
+        <instance media-type="application/pdf" href="cover_letter.pdf"/>
+    </item>
+
+    {supplementaryFiles}
+</manifest>

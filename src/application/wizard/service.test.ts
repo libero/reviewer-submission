@@ -6,6 +6,7 @@ import { TeamId } from '../../domain/teams/types';
 import { PermissionService } from '../permission/service';
 import { FileService } from '../../domain/file/services/file-service';
 import { SemanticExtractionService } from '../../domain/semantic-extraction/services/semantic-extraction-service';
+import { Suggestion } from '../../domain/semantic-extraction/services/models/sugestion';
 
 describe('saveAuthorPage', () => {
     it('should throw if submission not found', async () => {
@@ -103,16 +104,21 @@ describe('saveAuthorPage', () => {
             update: jest.fn(),
             create: jest.fn(),
         } as unknown) as TeamService;
-
         const permissionService = new PermissionService();
-        const fileServiceMock = (jest.fn() as unknown) as FileService;
-        const semanticExtractionServiceMock = (jest.fn() as unknown) as SemanticExtractionService;
+        const suggestion: Suggestion = { fieldName: 'title', value: 'title' };
+        const semanticExtractionServiceMock = ({
+            getSuggestion: jest.fn().mockReturnValue([suggestion]),
+        } as unknown) as SemanticExtractionService;
 
+        const fileService = ({
+            findManuscriptFile: jest.fn(),
+            getSupportingFiles: jest.fn().mockReturnValue([]),
+        } as unknown) as FileService;
         const wizardService = new WizardService(
             permissionService,
             submissionServiceMock,
             teamServiceMock,
-            fileServiceMock,
+            fileService,
             semanticExtractionServiceMock,
         );
         await wizardService.saveAuthorPage(user, SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'), {
@@ -157,15 +163,21 @@ describe('saveAuthorPage', () => {
         } as unknown) as TeamService;
 
         const permissionService = new PermissionService();
-        const fileServiceMock = (jest.fn() as unknown) as FileService;
-        const semanticExtractionServiceMock = (jest.fn() as unknown) as SemanticExtractionService;
+        const suggestion: Suggestion = { fieldName: 'title', value: 'title' };
+        const semanticExtractionServiceMock = ({
+            getSuggestion: jest.fn().mockReturnValue([suggestion]),
+        } as unknown) as SemanticExtractionService;
         const subId = SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a');
 
+        const fileService = ({
+            findManuscriptFile: jest.fn(),
+            getSupportingFiles: jest.fn().mockReturnValue([]),
+        } as unknown) as FileService;
         const wizardService = new WizardService(
             permissionService,
             submissionServiceMock,
             teamServiceMock,
-            fileServiceMock,
+            fileService,
             semanticExtractionServiceMock,
         );
 

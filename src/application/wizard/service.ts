@@ -3,7 +3,7 @@ import { SubmissionService } from '../../domain/submission';
 import { TeamService } from '../../domain/teams/services/team-service';
 import { FileService } from '../../domain/file/services/file-service';
 import { SemanticExtractionService } from '../../domain/semantic-extraction/services/semantic-extraction-service';
-import { Author, SubmissionId } from '../../domain/submission/types';
+import { AuthorDetails, SubmissionId } from '../../domain/submission/types';
 import Submission from '../../domain/submission/services/models/submission';
 import { AuthorTeamMember } from '../../domain/teams/repositories/types';
 import { PermissionService, SubmissionOperation } from '../permission/service';
@@ -20,7 +20,7 @@ export class WizardService {
         private readonly semanticExtractionService: SemanticExtractionService,
     ) {}
 
-    async saveAuthorPage(user: User, submissionId: SubmissionId, details: Author): Promise<Submission | null> {
+    async saveAuthorPage(user: User, submissionId: SubmissionId, details: AuthorDetails): Promise<Submission | null> {
         const submission = await this.submissionService.get(submissionId);
         if (submission === null) {
             throw new Error('No submission found');
@@ -50,7 +50,8 @@ export class WizardService {
                 objectType: 'manuscript',
             });
         }
-        return submission;
+
+        return this.getFullSubmission(submissionId);
     }
 
     async submit(user: User, submissionId: SubmissionId): Promise<Submission> {
@@ -59,7 +60,10 @@ export class WizardService {
         if (!allowed) {
             throw new Error('User not allowed to submit');
         }
-        return await this.submissionService.submit(submissionId);
+
+        this.submissionService.submit(submissionId);
+
+        return this.getFullSubmission(submissionId);
     }
 
     async deleteManuscriptFile(fileId: FileId, submissionId: SubmissionId, user: User): Promise<boolean> {
@@ -118,11 +122,9 @@ export class WizardService {
             manuscriptFile.setStatusToCancelled();
         }
 
-        this.fileService.update(manuscriptFile);
+        await this.fileService.update(manuscriptFile);
 
-        // this is not elegant but its the best we can do given the fact that files are now a concept
-        // outside of Submission, so we patch it in ¯\_(ツ)_/¯
-        return new Submission({ ...submission, manuscriptFile });
+        return this.getFullSubmission(submissionId);
     }
 
     async saveSupportingFile(
@@ -165,16 +167,7 @@ export class WizardService {
 
         this.fileService.update(supportingFile);
 
-        // Again because we are not following a DDD approach for the submission, i.e. we are not loading
-        // the files when fetching a Submission, we need to load them separately and patch them in ¯\_(ツ)_/¯
-        // this is bad because a developer needs to remember to do this every time a submission is manipulated
-        // Submission is an anemic data model as all our logic pretty much now resides in services.
-        const manuscriptFile = await this.fileService.findManuscriptFile(submissionId);
-        const supportingFiles = (await this.fileService.getSupportingFiles(submissionId)).filter(
-            file => !file.isCancelled() && !file.isDeleted(),
-        );
-
-        return new Submission({ ...submission, manuscriptFile, supportingFiles });
+        return this.getFullSubmission(submissionId);
     }
 
     async deleteSupportingFile(fileId: FileId, submissionId: SubmissionId, user: User): Promise<boolean> {
@@ -192,6 +185,30 @@ export class WizardService {
         if (!allowed) {
             throw new Error('User not allowed to update submission');
         }
-        return await this.submissionService.changeCoverLetter(submissionId, coverLetter);
+
+        await this.submissionService.changeCoverLetter(submissionId, coverLetter);
+
+        return this.getFullSubmission(submissionId);
+    }
+
+    /**
+     * Return a full submission
+     *
+     * @todo add teams as well
+     * @param submissionId
+     */
+    private async getFullSubmission(submissionId: SubmissionId): Promise<Submission> {
+        const submission = await this.submissionService.get(submissionId);
+        if (submission) {
+            submission.files.manuscriptFile = await this.fileService.findManuscriptFile(submissionId);
+            submission.files.supportingFiles = (await this.fileService.getSupportingFiles(submissionId)).filter(
+                file => !file.isCancelled() && !file.isDeleted(),
+            );
+            const suggestion = await this.semanticExtractionService.getSuggestion(submissionId);
+            if (suggestion) {
+                submission.suggestions = [suggestion];
+            }
+        }
+        return submission;
     }
 }

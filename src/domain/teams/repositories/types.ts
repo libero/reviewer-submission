@@ -1,4 +1,4 @@
-import { Author } from '../../submission/types';
+import { AuthorDetails } from '../../submission/types';
 import Team from '../services/models/team';
 
 export interface TeamRepository {
@@ -8,6 +8,6 @@ export interface TeamRepository {
 }
 
 export type AuthorTeamMember = {
-    alias: Author;
+    alias: AuthorDetails;
     meta: { corresponding: true };
 };

@@ -60,7 +60,7 @@ const init = async (): Promise<void> => {
     const srvUser = new UserService(config.user_adapter_url);
     const srvTeam = new TeamService(knexConnection);
     const srvFile = new FileService(knexConnection, config.s3);
-    const srvExtractionService = new SemanticExtractionService(knexConnection, config.scienceBeam);
+    const srvExtractionService = new SemanticExtractionService(knexConnection, config.science_beam);
 
     // init application services
     const srvPermission = new PermissionService();

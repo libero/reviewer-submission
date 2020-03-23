@@ -1,7 +1,7 @@
 import { FileId, FileType, FileStatus } from '../../types';
 import { SubmissionId } from '../../../submission/types';
 
-export default class File {
+export interface FileData {
     id: FileId;
     submissionId: SubmissionId;
     created?: Date;
@@ -12,6 +12,20 @@ export default class File {
     mimeType: string;
     size: number;
     status: string;
+}
+
+export default class File implements FileData {
+    id: FileId;
+    submissionId: SubmissionId;
+    created?: Date;
+    updated?: Date;
+    type: FileType;
+    filename: string;
+    url: string;
+    mimeType: string;
+    size: number;
+    status: string;
+    downloadLink?: string;
 
     constructor({
         id,
@@ -40,13 +54,13 @@ export default class File {
         this.updated = updated;
         this.type = type;
         this.filename = filename;
-        this.url = this.getFileS3Key(type, submissionId, id);
+        this.url = this.generateS3Key(type, submissionId, id);
         this.mimeType = mimeType;
         this.size = size;
         this.status = status;
     }
 
-    private getFileS3Key(fileType: FileType, submissionId: SubmissionId, fileId: FileId): string {
+    private generateS3Key(fileType: FileType, submissionId: SubmissionId, fileId: FileId): string {
         switch (fileType) {
             case FileType.MANUSCRIPT_SOURCE:
                 return `manuscripts/${submissionId}/${fileId}`;

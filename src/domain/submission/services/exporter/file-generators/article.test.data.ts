@@ -1,0 +1,198 @@
+import { FileId, FileType } from '../../../../file/types';
+import { SubmissionId } from '../../../types';
+
+export const sampleManuscript = {
+    id: SubmissionId.fromUuid('604e06ca-882d-4b5b-a147-e016893e60e9'),
+    created: '2018-09-07T12:25:53.196Z',
+    updated: null,
+    createdBy: '6d8cd1ce-15b6-46c1-b901-bc91598c8f2d',
+    status: 'INITIAL',
+    lastStepVisited: null,
+    title: 'Test Manuscript',
+    articleType: 'research-article',
+    subjects: ['biochemistry-chemical-biology', 'chromosomes-gene-expression'],
+    coverLetter: '',
+    previouslyDiscussed: 'Talked to bob about it',
+    previouslySubmitted: ['Original Test Title'],
+    cosubmission: ['asdassss', 'Another'],
+    opposedSeniorEditorsReason: 'From another galaxy',
+    opposedReviewingEditorsReason: 'Not any more',
+    opposedReviewersReason: 'Wandering days are over',
+    submitterSignature: 'A.Scientist',
+    disclosureConsent: false,
+    teams: [
+        {
+            id: '0b4725a5-50a9-4214-9a31-4c200fbdff1e',
+            role: 'opposedReviewingEditor',
+            created: '2018-09-07T13:25:57.285176+01:00',
+            updated: null,
+            objectId: '604e06ca-882d-4b5b-a147-e016893e60e9',
+            objectType: 'manuscript',
+            teamMembers: [
+                {
+                    meta: {
+                        elifePersonId: '87f34696',
+                    },
+                },
+            ],
+        },
+        {
+            id: '324a91da-0172-4429-aaff-1b534f7b38e2',
+            role: 'suggestedSeniorEditor',
+            created: '2018-09-07T13:25:57.284586+01:00',
+            updated: null,
+            objectId: '604e06ca-882d-4b5b-a147-e016893e60e9',
+            objectType: 'manuscript',
+            teamMembers: [
+                {
+                    meta: {
+                        elifePersonId: '1e9e661f',
+                    },
+                },
+                {
+                    meta: {
+                        elifePersonId: '3edb2ed8',
+                    },
+                },
+            ],
+        },
+        {
+            id: 'a3ee30fa-ccd2-4231-8c13-4be02b0fe5a7',
+            role: 'opposedSeniorEditor',
+            created: '2018-09-07T13:25:57.283611+01:00',
+            updated: null,
+            objectId: '604e06ca-882d-4b5b-a147-e016893e60e9',
+            objectType: 'manuscript',
+            teamMembers: [
+                {
+                    meta: {
+                        elifePersonId: '232d9893',
+                    },
+                },
+            ],
+        },
+        {
+            id: 'ab035109-6feb-4c11-a2eb-17fdf4eb7df0',
+            role: 'author',
+            created: '2018-09-07T13:25:57.28537+01:00',
+            updated: null,
+            objectId: '604e06ca-882d-4b5b-a147-e016893e60e9',
+            objectType: 'manuscript',
+            teamMembers: [
+                {
+                    alias: {
+                        firstName: 'Test',
+                        lastName: 'User',
+                        email: 'elife@mailinator.com',
+                        aff: 'University of eLife',
+                    },
+                    meta: {
+                        corresponding: true,
+                    },
+                },
+            ],
+        },
+        {
+            id: 'edffefdc-6043-4df7-b186-7fed9da831eb',
+            role: 'suggestedReviewer',
+            created: '2018-09-07T13:25:53.199808+01:00',
+            updated: null,
+            objectId: '604e06ca-882d-4b5b-a147-e016893e60e9',
+            objectType: 'manuscript',
+            teamMembers: [
+                {
+                    meta: {
+                        name: 'J. Edward Reviewer',
+                        email: 'edward@example.com',
+                    },
+                },
+                {
+                    meta: {
+                        name: 'Frances de Reviewer',
+                        email: 'frances@example.org',
+                    },
+                },
+                {
+                    meta: {
+                        name: 'Gertrude Reviewer',
+                        email: 'gertrude@example.net',
+                    },
+                },
+            ],
+        },
+        {
+            id: 'f923c402-a34e-49cd-b565-f1e4725428e2',
+            role: 'suggestedReviewingEditor',
+            created: '2018-09-07T13:25:57.284051+01:00',
+            updated: null,
+            objectId: '604e06ca-882d-4b5b-a147-e016893e60e9',
+            objectType: 'manuscript',
+            teamMembers: [
+                {
+                    meta: {
+                        elifePersonId: '6fabd619',
+                    },
+                },
+                {
+                    meta: {
+                        elifePersonId: 'fd8295ba',
+                    },
+                },
+            ],
+        },
+        {
+            id: 'fa56d242-6d81-44ca-9978-6ea7c8513594',
+            role: 'opposedReviewer',
+            created: '2018-09-07T13:25:57.284254+01:00',
+            updated: null,
+            objectId: '604e06ca-882d-4b5b-a147-e016893e60e9',
+            objectType: 'manuscript',
+            teamMembers: [
+                {
+                    meta: {
+                        name: 'Hoo',
+                        email: 'laughing@example.com',
+                    },
+                },
+                {
+                    meta: {
+                        name: 'Who',
+                        email: 'singing@example.com',
+                    },
+                },
+            ],
+        },
+    ],
+    files: [
+        {
+            status: 'CREATED',
+            id: FileId.fromUuid('00000000-6c48-4747-851c-ef806e8486b2'),
+            url: 'uploads/604e06ca-882d-4b5b-a147-e016893e60e9/f357bfb6b9b0886c2afc1ea1ddcabc61.pdf',
+            size: 0,
+            type: FileType.MANUSCRIPT_SOURCE,
+            filename: '00000000-6c48-4747-851c-ef806e8486b2.pdf',
+            mimeType: 'application/pdf',
+            submissionId: SubmissionId.fromUuid('604e06ca-882d-4b5b-a147-e016893e60e9'),
+        },
+        {
+            status: 'CREATED',
+            id: FileId.fromUuid('00000001-6c48-4747-851c-ef806e8486b2'),
+            url: 'uploads/604e06ca-882d-4b5b-a147-e016893e60e9/f357bfb6b9b0886c2afc1ea1ddcabc61.pdf',
+            size: 0,
+            type: FileType.SUPPORTING_FILE,
+            filename: '👉👉👉00000001&1.docx',
+            mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            submissionId: SubmissionId.fromUuid('604e06ca-882d-4b5b-a147-e016893e60e9'),
+        },
+        {
+            id: FileId.fromUuid('00000002-6c48-4747-851c-ef806e8486b2'),
+            submissionId: SubmissionId.fromUuid('604e06ca-882d-4b5b-a147-e016893e60e9'),
+            type: FileType.SUPPORTING_FILE,
+            filename: '👍👍👍000000002©.pdf',
+            url: 'uploads/604e06ca-882d-4b5b-a147-e016893e60e9/f357bfb6b9b0886c2afc1ea1ddcabc61.pdf',
+            mimeType: 'application/pdf',
+            size: 0,
+            status: 'CREATED',
+        },
+    ],
+};

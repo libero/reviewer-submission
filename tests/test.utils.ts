@@ -47,8 +47,14 @@ export const uploadManuscript = async (submissionId: string): Promise<AxiosRespo
     const query = `mutation UploadManuscript($id: ID!, $file: Upload!, $fileSize: Int!) {
         uploadManuscript(id: $id, file: $file, fileSize: $fileSize) {
             id,
-            manuscriptFile {
-                id
+            files {
+                manuscriptFile {
+                    id
+                }
+            },
+            suggestions {
+                value
+                fieldName
             }
         }
     }`;

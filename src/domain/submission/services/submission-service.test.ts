@@ -8,7 +8,6 @@ import Submission, { SubmissionStatus, ArticleType } from './models/submission';
 const submissionModels: Submission[] = [
     new Submission({
         id: SubmissionId.fromUuid(v4()),
-        title: 'The title',
         status: SubmissionStatus.INITIAL,
         createdBy: '123',
         articleType: ArticleType.FEATURE_ARTICLE,
@@ -16,7 +15,6 @@ const submissionModels: Submission[] = [
     }),
     new Submission({
         id: SubmissionId.fromUuid(v4()),
-        title: 'Another title',
         status: SubmissionStatus.INITIAL,
         createdBy: '124',
         articleType: ArticleType.RESEARCH_ADVANCE,
