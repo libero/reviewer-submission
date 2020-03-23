@@ -87,8 +87,8 @@ jobs:
           make setup
           make test_integration
 
-      - name: Push Images if master or v-tag
-        if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')
+      - name: Push Images if on master
+        if: github.ref == 'refs/heads/master'
         run: |
           .github/push-image.sh reviewer-submission ${IMAGE_TAG}
           .github/push-image.sh reviewer-xpub-postgres ${IMAGE_TAG}
