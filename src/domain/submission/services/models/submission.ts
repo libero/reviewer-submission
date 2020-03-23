@@ -14,9 +14,12 @@ import logger from '../../../../logger';
 import { Suggestion } from '../../../semantic-extraction/services/models/sugestion';
 
 export enum ArticleType {
-    RESEARCH_ARTICLE = 'researchArticle',
-    FEATURE_ARTICLE = 'featureArticle',
-    RESEARCH_ADVANCE = 'researchAdvance',
+    RESEARCH_ARTICLE = 'research-article',
+    FEATURE_ARTICLE = 'feature',
+    RESEARCH_ADVANCE = 'research-advance',
+    SCIENTIFIC_CORRESPONDENCE = 'scientific-correspondence',
+    TOOLS_RESOURCES = 'tools-resources',
+    SHORT_REPORT = 'short-report',
 }
 
 export enum SubmissionStatus {
