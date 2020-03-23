@@ -10,7 +10,8 @@ import { PermissionService, SubmissionOperation } from '../permission/service';
 import { User } from 'src/domain/user/user';
 import { FileType, FileId } from '../../domain/file/types';
 import { PubSub } from 'apollo-server-express';
-import { CompletedPart } from 'aws-sdk/clients/s3';
+import { ReadStream } from 'fs';
+// import { CompletedPart } from 'aws-sdk/clients/s3';
 
 export class WizardService {
     constructor(
@@ -74,6 +75,15 @@ export class WizardService {
         return await this.fileService.deleteManuscript(fileId, submissionId);
     }
 
+    private async extractContentFromStream(stream: ReadStream): Promise<Buffer> {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const chunks: Array<any> = [];
+        for await (const chunk of stream) {
+            chunks.push(chunk);
+        }
+        return Buffer.concat(chunks);
+    }
+
     async saveManuscriptFile(
         user: User,
         submissionId: SubmissionId,
@@ -97,42 +107,17 @@ export class WizardService {
         );
 
         try {
-            const uploadPromise = await this.fileService.uploadManuscript(manuscriptFile);
-            let partNumber = 1;
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const chunks: Array<any> = [];
-            const parts: { ETag: string | undefined; PartNumber: number }[] = [];
-
-            for await (const chunk of stream) {
-                const bytesRead = stream.bytesRead;
-                const { ETag } = await this.fileService.handleMultipartChunk(
-                    user.id,
-                    manuscriptFile,
-                    chunk,
-                    partNumber,
-                    uploadPromise,
-                    pubsub,
-                    bytesRead,
-                );
-                parts.push({ ETag, PartNumber: partNumber });
-                chunks.push(chunk);
-                partNumber++;
-            }
-            const fileContents = Buffer.concat(chunks);
-
-            console.log(uploadPromise.UploadId);
-            await this.fileService.completeMultipartUpload(manuscriptFile.url, uploadPromise.UploadId, parts);
+            const [_, fileContents] = await Promise.all([
+                await this.fileService.uploadManuscript(stream, manuscriptFile, user.id, pubsub),
+                await this.extractContentFromStream(stream),
+            ]);
             await this.semanticExtractionService.extractTitle(fileContents, mimeType, filename, submissionId);
-
             manuscriptFile.setStatusToStored();
-            // await Promise.all([uploadPromise, semanticExtractionPromise]);
         } catch (e) {
             console.log(e, 'cancelled');
             manuscriptFile.setStatusToCancelled();
         }
-
         await this.fileService.update(manuscriptFile);
-
         return this.getFullSubmission(submissionId);
     }
 
