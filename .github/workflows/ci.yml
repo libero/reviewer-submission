@@ -107,8 +107,8 @@ jobs:
           docker load -i docker-image/reviewer-xpub-postgres.tar
       - name: Push image
         run: |
-          .github/push-image.sh reviewer-submission
-          .github/push-image.sh reviewer-xpub-postgres
+          .github/push-image.sh reviewer-submission ${IMAGE_TAG}
+          .github/push-image.sh reviewer-xpub-postgres ${IMAGE_TAG}
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
