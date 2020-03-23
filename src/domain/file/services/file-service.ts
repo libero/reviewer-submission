@@ -191,24 +191,13 @@ export class FileService {
     }
 
     async uploadManuscript(file: File): Promise<PromiseResult<S3.CreateMultipartUploadOutput, AWSError>> {
-        const { url, id, mimeType } = file;
+        const { url, mimeType } = file;
         const fileUploadManager = this.s3.createMultipartUpload({
             Bucket: this.bucket,
-            Key: `${url}/${id}`,
+            Key: url,
             ContentType: mimeType,
             ACL: 'private',
         });
-
-        // fileUploadManager.on('httpUploadProgress', async ({ loaded, total }) => {
-        //     await pubsub.publish('UPLOAD_STATUS', {
-        //         manuscriptUploadProgress: {
-        //             userId,
-        //             filename: file.filename,
-        //             fileId: file.id,
-        //             percentage: Math.floor((loaded / total) * 100),
-        //         },
-        //     });
-        // });
 
         return fileUploadManager.promise();
     }
