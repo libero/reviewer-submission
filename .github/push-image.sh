@@ -49,7 +49,7 @@ elif [[ "$GITHUB_REF" =~ refs/tags/v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*) ]];
     docker push "${name}:${major}"
     docker push "${name}:${major}.${minor}"
 else
-    echo "${GITHUB_REF} is neither branch head nor valid semver tag"
+    echo "${GITHUB_REF} is neither a branch head or valid semver tag"
     echo "No image tagging or pushing was performed because of this."
     exit 1
 fi
