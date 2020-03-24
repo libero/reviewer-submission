@@ -62,7 +62,7 @@ export const uploadManuscript = async (submissionId: string): Promise<AxiosRespo
         variables: {
             id: submissionId,
             file: null,
-            fileSize: 2,
+            fileSize: 115,
         },
     };
 

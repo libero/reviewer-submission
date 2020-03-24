@@ -120,7 +120,6 @@ export class WizardService {
             }
             const fileContents = Buffer.concat(chunks);
 
-            console.log(uploadPromise.UploadId);
             await this.fileService.completeMultipartUpload(manuscriptFile.url, uploadPromise.UploadId, parts);
             await this.semanticExtractionService.extractTitle(fileContents, mimeType, filename, submissionId);
 
