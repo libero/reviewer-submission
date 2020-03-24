@@ -46,6 +46,7 @@ export class FileService {
     async handleMultipartChunk(
         userId: string,
         file: File,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         chunk: any,
         partNumber: number,
         s3Stuff: PromiseResult<S3.CreateMultipartUploadOutput, AWSError>,
@@ -226,11 +227,11 @@ export class FileService {
     }
 
     async uploadSupportingFile(file: File, stream: ReadStream, userId: string, pubsub: PubSub): Promise<void> {
-        const { url, id, mimeType } = file;
+        const { url, mimeType } = file;
         const fileUploadManager = await this.s3
             .createMultipartUpload({
                 Bucket: this.bucket,
-                Key: `${url}/${id}`,
+                Key: url,
                 ContentType: mimeType,
                 ACL: 'private',
             })

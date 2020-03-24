@@ -10,7 +10,6 @@ import { PermissionService, SubmissionOperation } from '../permission/service';
 import { User } from 'src/domain/user/user';
 import { FileType, FileId } from '../../domain/file/types';
 import { PubSub } from 'apollo-server-express';
-import { CompletedPart } from 'aws-sdk/clients/s3';
 
 export class WizardService {
     constructor(
@@ -135,13 +134,14 @@ export class WizardService {
             await this.fileService.uploadSupportingFile(supportingFile, stream, user.id, pubsub);
             supportingFile.setStatusToStored();
         } catch (e) {
+            console.log('error', e);
             // @todo should this not be setStatusToDeleted ?
             supportingFile.setStatusToCancelled();
         }
 
-        this.fileService.update(supportingFile);
+        await this.fileService.update(supportingFile);
 
-        return this.getFullSubmission(submissionId);
+        return await this.getFullSubmission(submissionId);
     }
 
     async deleteSupportingFile(fileId: FileId, submissionId: SubmissionId, user: User): Promise<boolean> {
@@ -178,6 +178,7 @@ export class WizardService {
             file => !file.isCancelled() && !file.isDeleted(),
         );
         const suggestion = await this.semanticExtractionService.getSuggestion(submissionId);
+        console.log('supportingFiles', supportingFiles);
 
         return { ...submission, manuscriptFile, supportingFiles, suggestions: [suggestion] } as Submission;
     }
