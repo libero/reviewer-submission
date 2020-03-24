@@ -74,7 +74,7 @@ describe('Wizard->Files Integration Tests', () => {
     });
 
     // see https://github.com/libero/reviewer-submission/issues/109
-    it.only('uploads a manuscript file', async () => {
+    it('uploads a manuscript file', async () => {
         const startSubmissionResponse = await startSubmissionAlt('research-article');
         const submissionId = startSubmissionResponse.data.data.startSubmission.id;
 
