@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { SubmissionId } from '../types';
+import { SubmissionId, ManuscriptDetails } from '../types';
 import { SubmissionRepository } from './types';
 import { KnexTableAdapter } from '../../knex-table-adapter';
 import Submission from '../services/models/submission';
@@ -7,6 +7,7 @@ import Submission from '../services/models/submission';
 type EntryMeta = {
     articleType: string;
     title?: string;
+    subjects?: string[];
 };
 
 // this is the xpub schema type
@@ -111,9 +112,13 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
             created_by: submission.createdBy,
             status: submission.status,
             cover_letter: submission.files.coverLetter,
+            previously_discussed: submission.manuscriptDetails.previouslyDiscussed,
+            previously_submitted: submission.manuscriptDetails.previouslySubmitted,
+            cosubmission: submission.manuscriptDetails.cosubmission,
             meta: {
                 articleType: submission.articleType,
                 title: submission.manuscriptDetails.title,
+                subjects: submission.manuscriptDetails.subjects,
             },
         };
     }
@@ -127,8 +132,16 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
             status: record.status,
             createdBy: record.created_by,
         });
+        const meta = record.meta;
+        const details: ManuscriptDetails = {
+            title: meta.title,
+            subjects: meta.subjects,
+            previouslyDiscussed: record.previously_discussed,
+            previouslySubmitted: record.previously_submitted,
+            cosubmission: record.cosubmission,
+        };
         result.files.coverLetter = record.cover_letter;
-        result.manuscriptDetails.title = record.meta.title;
+        result.manuscriptDetails = details;
         return result;
     }
 }
