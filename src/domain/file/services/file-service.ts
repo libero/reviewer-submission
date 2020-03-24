@@ -49,7 +49,7 @@ export class FileService {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         chunk: any,
         partNumber: number,
-        s3Stuff: PromiseResult<S3.CreateMultipartUploadOutput, AWSError>,
+        s3MultiPart: PromiseResult<S3.CreateMultipartUploadOutput, AWSError>,
         pubsub: PubSub,
         bytesRead: number,
         numAttempts = 0,
@@ -57,15 +57,15 @@ export class FileService {
         if (numAttempts >= 3) {
             throw new Error(`Error uploading chunk no: ${partNumber}`);
         }
-        if (!s3Stuff.UploadId) {
+        if (!s3MultiPart.UploadId) {
             throw new Error('no upload id');
         }
         const partParams = {
             Body: chunk,
-            Bucket: s3Stuff.Bucket || this.bucket,
-            Key: s3Stuff.Key || file.url,
+            Bucket: s3MultiPart.Bucket || this.bucket,
+            Key: s3MultiPart.Key || file.url,
             PartNumber: partNumber,
-            UploadId: s3Stuff.UploadId,
+            UploadId: s3MultiPart.UploadId,
         };
 
         try {
@@ -85,7 +85,7 @@ export class FileService {
                 file,
                 chunk,
                 partNumber,
-                s3Stuff,
+                s3MultiPart,
                 pubsub,
                 bytesRead,
                 numAttempts + 1,
