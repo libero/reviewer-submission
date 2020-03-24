@@ -50,8 +50,8 @@ export class FileService {
         chunk: any,
         partNumber: number,
         s3MultiPart: PromiseResult<S3.CreateMultipartUploadOutput, AWSError>,
-        pubsub: PubSub,
         bytesRead: number,
+        statusFunction: Function,
         numAttempts = 0,
     ): Promise<PromiseResult<S3.UploadPartOutput, AWSError>> {
         if (numAttempts >= 3) {
@@ -70,14 +70,7 @@ export class FileService {
 
         try {
             const params = await this.s3.uploadPart(partParams).promise();
-            await pubsub.publish('UPLOAD_STATUS', {
-                manuscriptUploadProgress: {
-                    userId,
-                    filename: file.filename,
-                    fileId: file.id,
-                    percentage: Math.floor((bytesRead / file.size) * 100),
-                },
-            });
+            await statusFunction(userId, file.filename, file.id, Math.floor((bytesRead / file.size) * 100));
             return params;
         } catch (e) {
             return await this.handleMultipartChunk(
@@ -86,8 +79,8 @@ export class FileService {
                 chunk,
                 partNumber,
                 s3MultiPart,
-                pubsub,
                 bytesRead,
+                statusFunction,
                 numAttempts + 1,
             );
         }
@@ -205,6 +198,21 @@ export class FileService {
         const chunks: Array<any> = [];
         const parts: { ETag: string | undefined; PartNumber: number }[] = [];
 
+        const uploadStatusFunction = async (
+            userId: string,
+            filename: string,
+            fileId: string,
+            percentage: number,
+        ): Promise<void> =>
+            await pubsub.publish('UPLOAD_STATUS', {
+                manuscriptUploadProgress: {
+                    userId,
+                    filename,
+                    fileId,
+                    percentage,
+                },
+            });
+
         for await (const chunk of stream) {
             const bytesRead = stream.bytesRead;
             const { ETag } = await this.handleMultipartChunk(
@@ -213,8 +221,8 @@ export class FileService {
                 chunk,
                 partNumber,
                 fileUploadManager,
-                pubsub,
                 bytesRead,
+                uploadStatusFunction,
             );
             parts.push({ ETag, PartNumber: partNumber });
             chunks.push(chunk);
@@ -222,7 +230,6 @@ export class FileService {
         }
 
         await this.completeMultipartUpload(file.url, fileUploadManager.UploadId, parts);
-
         return Buffer.concat(chunks);
     }
 
@@ -240,6 +247,21 @@ export class FileService {
         let partNumber = 1;
         const parts: { ETag: string | undefined; PartNumber: number }[] = [];
 
+        const uploadStatusFunction = async (
+            userId: string,
+            filename: string,
+            fileId: string,
+            percentage: number,
+        ): Promise<void> =>
+            await pubsub.publish('UPLOAD_STATUS', {
+                supportingUploadProgress: {
+                    userId,
+                    filename,
+                    fileId,
+                    percentage,
+                },
+            });
+
         for await (const chunk of stream) {
             const bytesRead = stream.bytesRead;
             const { ETag } = await this.handleMultipartChunk(
@@ -248,8 +270,8 @@ export class FileService {
                 chunk,
                 partNumber,
                 fileUploadManager,
-                pubsub,
                 bytesRead,
+                uploadStatusFunction,
             );
             parts.push({ ETag, PartNumber: partNumber });
             partNumber++;
