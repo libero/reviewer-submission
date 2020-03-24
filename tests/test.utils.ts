@@ -64,7 +64,7 @@ export const uploadManuscript = async (submissionId: string): Promise<AxiosRespo
         variables: {
             id: submissionId,
             file: null,
-            fileSize: 115,
+            fileSize: 122,
         },
     };
 
@@ -72,7 +72,7 @@ export const uploadManuscript = async (submissionId: string): Promise<AxiosRespo
     body.append('map', '{ "1": ["variables.file"] }');
     body.append(
         '1',
-        'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
         { filename: 'a.txt' },
     );
 
