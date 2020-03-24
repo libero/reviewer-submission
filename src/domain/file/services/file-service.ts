@@ -10,7 +10,7 @@ import { S3Config } from '../../../config';
 import { PubSub } from 'apollo-server-express';
 import { PromiseResult } from 'aws-sdk/lib/request';
 import { AWSError } from 'aws-sdk/lib/error';
-import { response } from 'express';
+import { ReadStream } from 'fs';
 
 export class FileService {
     fileRepository: XpubFileRepository;
@@ -59,7 +59,6 @@ export class FileService {
         if (!s3Stuff.UploadId) {
             throw new Error('no upload id');
         }
-        console.log(s3Stuff.UploadId);
         const partParams = {
             Body: chunk,
             Bucket: s3Stuff.Bucket || this.bucket,
@@ -190,16 +189,40 @@ export class FileService {
         );
     }
 
-    async uploadManuscript(file: File): Promise<PromiseResult<S3.CreateMultipartUploadOutput, AWSError>> {
+    async uploadManuscript(file: File, stream: ReadStream, userId: string, pubsub: PubSub): Promise<Buffer> {
         const { url, mimeType } = file;
-        const fileUploadManager = this.s3.createMultipartUpload({
-            Bucket: this.bucket,
-            Key: url,
-            ContentType: mimeType,
-            ACL: 'private',
-        });
+        const fileUploadManager = await this.s3
+            .createMultipartUpload({
+                Bucket: this.bucket,
+                Key: url,
+                ContentType: mimeType,
+                ACL: 'private',
+            })
+            .promise();
+        let partNumber = 1;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const chunks: Array<any> = [];
+        const parts: { ETag: string | undefined; PartNumber: number }[] = [];
 
-        return fileUploadManager.promise();
+        for await (const chunk of stream) {
+            const bytesRead = stream.bytesRead;
+            const { ETag } = await this.handleMultipartChunk(
+                userId,
+                file,
+                chunk,
+                partNumber,
+                fileUploadManager,
+                pubsub,
+                bytesRead,
+            );
+            parts.push({ ETag, PartNumber: partNumber });
+            chunks.push(chunk);
+            partNumber++;
+        }
+
+        await this.completeMultipartUpload(file.url, fileUploadManager.UploadId, parts);
+
+        return Buffer.concat(chunks);
     }
 
     async uploadSupportingFile(file: File): Promise<S3.CreateMultipartUploadOutput> {
