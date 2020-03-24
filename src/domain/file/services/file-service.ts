@@ -238,8 +238,6 @@ export class FileService {
             .promise();
 
         let partNumber = 1;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const chunks: Array<any> = [];
         const parts: { ETag: string | undefined; PartNumber: number }[] = [];
 
         for await (const chunk of stream) {
@@ -254,7 +252,6 @@ export class FileService {
                 bytesRead,
             );
             parts.push({ ETag, PartNumber: partNumber });
-            chunks.push(chunk);
             partNumber++;
         }
 
