@@ -97,27 +97,10 @@ export class WizardService {
             FileType.MANUSCRIPT_SOURCE,
         );
 
-        const fileContents: Buffer = await new Promise((resolve, reject) => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const chunks: Array<any> = [];
-            stream.on('data', chunk => chunks.push(chunk));
-            stream.on('error', reject);
-            stream.on('end', () => resolve(Buffer.concat(chunks)));
-        });
-
-        const uploadPromise = this.fileService.uploadManuscript(fileContents, manuscriptFile, user.id, pubsub);
-
-        manuscriptFile.setStatusToStored();
-
-        const semanticExtractionPromise = this.semanticExtractionService.extractTitle(
-            fileContents,
-            mimeType,
-            filename,
-            submissionId,
-        );
-
         try {
-            await Promise.all([uploadPromise, semanticExtractionPromise]);
+            const fileContents = await this.fileService.uploadManuscript(manuscriptFile, stream, user.id, pubsub);
+            await this.semanticExtractionService.extractTitle(fileContents, mimeType, filename, submissionId);
+            manuscriptFile.setStatusToStored();
         } catch (e) {
             manuscriptFile.setStatusToCancelled();
         }
@@ -149,25 +132,18 @@ export class WizardService {
             FileType.SUPPORTING_FILE,
         );
 
-        const fileContents: Buffer = await new Promise((resolve, reject) => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const chunks: Array<any> = [];
-            stream.on('data', chunk => chunks.push(chunk));
-            stream.on('error', reject);
-            stream.on('end', () => resolve(Buffer.concat(chunks)));
-        });
-
         try {
-            await this.fileService.uploadSupportingFile(fileContents, supportingFile, user.id, pubsub);
+            await this.fileService.uploadSupportingFile(supportingFile, stream, user.id, pubsub);
             supportingFile.setStatusToStored();
         } catch (e) {
+            console.log('error', e);
             // @todo should this not be setStatusToDeleted ?
             supportingFile.setStatusToCancelled();
         }
 
-        this.fileService.update(supportingFile);
+        await this.fileService.update(supportingFile);
 
-        return this.getFullSubmission(submissionId);
+        return await this.getFullSubmission(submissionId);
     }
 
     async deleteSupportingFile(fileId: FileId, submissionId: SubmissionId, user: User): Promise<boolean> {

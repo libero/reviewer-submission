@@ -64,13 +64,17 @@ export const uploadManuscript = async (submissionId: string): Promise<AxiosRespo
         variables: {
             id: submissionId,
             file: null,
-            fileSize: 2,
+            fileSize: 122,
         },
     };
 
     body.append('operations', JSON.stringify(operations));
     body.append('map', '{ "1": ["variables.file"] }');
-    body.append('1', 'a', { filename: 'a.txt' });
+    body.append(
+        '1',
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
+        { filename: 'a.txt' },
+    );
 
     return await axios.post('http://localhost:3000/graphql', body, {
         headers: { Authorization: `Bearer ${jwtToken}`, ...body.getHeaders() },
