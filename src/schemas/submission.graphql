@@ -2,14 +2,13 @@ scalar Upload
 
 type Submission {
     id: ID!
-    title: String!
     updated: String!
     articleType: String!
     author: AuthorDetails!
-    manuscriptFile: File
     manuscriptDetails: ManuscriptDetails
-    supportingFiles: [File]
-    coverLetter: String
+    files: FileDetails
+    editors: EditorDetails
+    disclosure: DisclosureDetails
     suggestions: [Suggestion]
 }
 
@@ -55,3 +54,21 @@ type ManuscriptDetails {
     previouslySubmitted: [String!]
     cosubmission: [String!]
 }
+
+type FileDetails {
+    manuscriptFile: File
+    supportingFiles: [File]
+    coverLetter: String
+}
+
+type EditorDetails {
+    opposedSeniorEditorsReason: String
+    opposedReviewingEditorsReason: String
+    opposedReviewersReason: String
+}
+
+type DisclosureDetails {
+    submitterSignature: String
+    disclosureConsent: Boolean
+}
+

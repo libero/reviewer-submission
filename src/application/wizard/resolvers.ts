@@ -1,7 +1,7 @@
 import { IResolvers, withFilter, PubSub } from 'apollo-server-express';
 import { FileUpload } from 'graphql-upload';
 import Submission from '../../domain/submission/services/models/submission';
-import { SubmissionId, Author } from '../../domain/submission/types';
+import { SubmissionId, AuthorDetails } from '../../domain/submission/types';
 import { UserService } from 'src/domain/user';
 import { WizardService } from './service';
 import { FileId } from '../../domain/file/types';
@@ -17,7 +17,7 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
         },
         async saveAuthorPage(
             _,
-            { id: submissionId, details }: { id: SubmissionId; details: Author },
+            { id: submissionId, details }: { id: SubmissionId; details: AuthorDetails },
             context,
         ): Promise<Submission | null> {
             const user = await userService.getCurrentUser(context.authorizationHeader);

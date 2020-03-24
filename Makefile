@@ -22,7 +22,7 @@ lint: get_deps
 test: get_deps
 	yarn test
 
-test_integration:
+setup_integration:
 	docker pull liberoadmin/reviewer-mocks:latest
 	docker pull liberoadmin/reviewer-xpub-postgres:latest
 	${DOCKER_COMPOSE_TEST} down
@@ -31,6 +31,8 @@ test_integration:
 	./.scripts/docker/wait-healthy.sh test_s3 30
 	./.scripts/docker/wait-healthy.sh test_reviewer_mocks 30
 	${DOCKER_COMPOSE_TEST} up -d s3_create-bucket
+
+test_integration: setup_integration
 	${DOCKER_COMPOSE_TEST} up -d application
 	./.scripts/docker/wait-healthy.sh test_reviewer-submission 20
 	CONFIG_PATH=./config/config.json yarn run test:integration

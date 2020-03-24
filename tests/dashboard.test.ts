@@ -12,7 +12,7 @@ describe('Dashboard Integration Tests', () => {
     });
 
     it('returns no errors on valid research article', async () => {
-        const response = await startSubmission(apollo, 'researchArticle');
+        const response = await startSubmission(apollo, 'research-article');
         const data = response.data ? response.data : null;
 
         expect(data).toBeTruthy();
@@ -61,7 +61,7 @@ describe('Dashboard Integration Tests', () => {
     });
 
     it('it should throw a user tries to delete a file unrelated to their submission', async () => {
-        const startSubmissionResponse = await startSubmissionAlt('researchArticle');
+        const startSubmissionResponse = await startSubmissionAlt('research-article');
         const submissionId = startSubmissionResponse.data.data.startSubmission.id;
 
         const uploadResponse = await uploadManuscript(submissionId);
@@ -78,7 +78,7 @@ describe('Dashboard Integration Tests', () => {
                     }
                 `,
                 variables: {
-                    fileId: uploadResponse.data.data.uploadManuscript.manuscriptFile.id,
+                    fileId: uploadResponse.data.data.uploadManuscript.files.manuscriptFile.id,
                     submissionId,
                 },
             },
@@ -93,7 +93,7 @@ describe('Dashboard Integration Tests', () => {
     });
 
     it('it should allow a user to delete their submission', async () => {
-        const startSubmissionResponse = await startSubmissionAlt('researchArticle');
+        const startSubmissionResponse = await startSubmissionAlt('research-article');
         const submissionId = startSubmissionResponse.data.data.startSubmission.id;
 
         const deleteResponse = await axios.post(
@@ -118,7 +118,7 @@ describe('Dashboard Integration Tests', () => {
     });
 
     it('it should allow a user to get their submission', async () => {
-        const startSubmissionResponse = await startSubmissionAlt('researchArticle');
+        const startSubmissionResponse = await startSubmissionAlt('research-article');
         const submissionId = startSubmissionResponse.data.data.startSubmission.id;
 
         const getResponse = await axios.post(
@@ -142,11 +142,11 @@ describe('Dashboard Integration Tests', () => {
         );
         expect(getResponse.status).toBe(200);
         expect(getResponse.data.data.getSubmission.id).toBe(submissionId);
-        expect(getResponse.data.data.getSubmission.articleType).toBe('researchArticle');
+        expect(getResponse.data.data.getSubmission.articleType).toBe('research-article');
     });
 
     it('it should allow a user to get their submissions', async () => {
-        await startSubmissionAlt('researchArticle');
+        await startSubmissionAlt('research-article');
         const getResponse = await axios.post(
             'http://localhost:3000/graphql',
             {
@@ -169,7 +169,7 @@ describe('Dashboard Integration Tests', () => {
     });
 
     it('it should throw if the user tries to delete a submission that is not their own', async () => {
-        const startSubmissionResponse = await startSubmissionAlt('researchArticle');
+        const startSubmissionResponse = await startSubmissionAlt('research-article');
         const submissionId = startSubmissionResponse.data.data.startSubmission.id;
         const imposterToken = sign({ sub: 'c0e74a86-2feb-435d-a50f-01f920334bc4' }, config.authentication_jwt_secret);
 
@@ -192,7 +192,7 @@ describe('Dashboard Integration Tests', () => {
 
         expect(deleteResponse.status).toBe(200);
         expect(deleteResponse.data.errors).toBeDefined();
-        // It's read rather than delete because of the permission service
+        // It's read rather than delete because you need to be able to read it first before deleting.
         expect(deleteResponse.data.errors[0].message).toBe('User not allowed to read submission');
     });
 });

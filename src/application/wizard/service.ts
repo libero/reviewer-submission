@@ -3,7 +3,7 @@ import { SubmissionService } from '../../domain/submission';
 import { TeamService } from '../../domain/teams/services/team-service';
 import { FileService } from '../../domain/file/services/file-service';
 import { SemanticExtractionService } from '../../domain/semantic-extraction/services/semantic-extraction-service';
-import { Author, SubmissionId } from '../../domain/submission/types';
+import { AuthorDetails, SubmissionId } from '../../domain/submission/types';
 import Submission from '../../domain/submission/services/models/submission';
 import { AuthorTeamMember } from '../../domain/teams/repositories/types';
 import { PermissionService, SubmissionOperation } from '../permission/service';
@@ -20,7 +20,7 @@ export class WizardService {
         private readonly semanticExtractionService: SemanticExtractionService,
     ) {}
 
-    async saveAuthorPage(user: User, submissionId: SubmissionId, details: Author): Promise<Submission | null> {
+    async saveAuthorPage(user: User, submissionId: SubmissionId, details: AuthorDetails): Promise<Submission | null> {
         const submission = await this.submissionService.get(submissionId);
         if (submission === null) {
             throw new Error('No submission found');
@@ -60,6 +60,8 @@ export class WizardService {
         if (!allowed) {
             throw new Error('User not allowed to submit');
         }
+
+        this.submissionService.submit(submissionId);
 
         return this.getFullSubmission(submissionId);
     }
@@ -173,13 +175,16 @@ export class WizardService {
      */
     private async getFullSubmission(submissionId: SubmissionId): Promise<Submission> {
         const submission = await this.submissionService.get(submissionId);
-        const manuscriptFile = await this.fileService.findManuscriptFile(submissionId);
-        const supportingFiles = (await this.fileService.getSupportingFiles(submissionId)).filter(
-            file => !file.isCancelled() && !file.isDeleted(),
-        );
-        const suggestion = await this.semanticExtractionService.getSuggestion(submissionId);
-        console.log('supportingFiles', supportingFiles);
-
-        return { ...submission, manuscriptFile, supportingFiles, suggestions: [suggestion] } as Submission;
+        if (submission) {
+            submission.files.manuscriptFile = await this.fileService.findManuscriptFile(submissionId);
+            submission.files.supportingFiles = (await this.fileService.getSupportingFiles(submissionId)).filter(
+                file => !file.isCancelled() && !file.isDeleted(),
+            );
+            const suggestion = await this.semanticExtractionService.getSuggestion(submissionId);
+            if (suggestion) {
+                submission.suggestions = [suggestion];
+            }
+        }
+        return submission;
     }
 }
