@@ -51,7 +51,7 @@ type ManuscriptDetails {
     title: String
     subjects: [String]
     previouslyDiscussed: String
-    previouslySubmitted: [String!]
+    previouslySubmitted: String!
     cosubmission: [String!]
 }
 
@@ -59,7 +59,7 @@ input ManuscriptDetailsInput {
     title: String
     subjects: [String]
     previouslyDiscussed: String
-    previouslySubmitted: [String!]
+    previouslySubmitted: String!
     cosubmission: [String!]
 }
 

@@ -21,7 +21,7 @@ export type ManuscriptDetails = {
     title?: string;
     subjects?: string[];
     previouslyDiscussed?: string;
-    previouslySubmitted?: string[];
+    previouslySubmitted?: string;
     cosubmission?: string[];
 };
 

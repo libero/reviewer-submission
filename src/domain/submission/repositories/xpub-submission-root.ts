@@ -105,6 +105,7 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
 
     // These mapping functions are here because xpub schema isn't what we want the dto to look like but we need to convert data sent to something compatible with knex.insert
     private modelToEntry(submission: Submission): DatabaseEntry {
+        const previouslySubmitted = submission.manuscriptDetails.previouslySubmitted;
         return {
             id: submission.id,
             created: submission.created as Date,
@@ -113,7 +114,7 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
             status: submission.status,
             cover_letter: submission.files.coverLetter,
             previously_discussed: submission.manuscriptDetails.previouslyDiscussed,
-            previously_submitted: submission.manuscriptDetails.previouslySubmitted,
+            previously_submitted: previouslySubmitted ? [previouslySubmitted] : undefined,
             cosubmission: submission.manuscriptDetails.cosubmission,
             meta: {
                 articleType: submission.articleType,
@@ -137,7 +138,7 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
             title: meta.title,
             subjects: meta.subjects,
             previouslyDiscussed: record.previously_discussed,
-            previouslySubmitted: record.previously_submitted,
+            previouslySubmitted: record.previously_submitted ? record.previously_submitted[0] : undefined,
             cosubmission: record.cosubmission,
         };
         result.files.coverLetter = record.cover_letter;

@@ -11,7 +11,7 @@ describe('Wizard->Pages Integration Tests', () => {
             title: 'title',
             subjects: ['subjects'],
             previouslyDiscussed: 'previous',
-            previouslySubmitted: ['p1', 'p2'],
+            previouslySubmitted: 'p1',
             cosubmission: 'co',
         };
 
@@ -52,7 +52,7 @@ describe('Wizard->Pages Integration Tests', () => {
             title: 'title',
             subjects: ['subjects'],
             previouslyDiscussed: 'previous',
-            previouslySubmitted: ['p1', 'p2'],
+            previouslySubmitted: 'p1',
             cosubmission: 'co',
         };
 
