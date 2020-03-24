@@ -55,6 +55,14 @@ type ManuscriptDetails {
     cosubmission: [String!]
 }
 
+input ManuscriptDetailsInput {
+    title: String
+    subjects: [String]
+    previouslyDiscussed: String
+    previouslySubmitted: [String!]
+    cosubmission: [String!]
+}
+
 type FileDetails {
     manuscriptFile: File
     supportingFiles: [File]
@@ -71,4 +79,3 @@ type DisclosureDetails {
     submitterSignature: String
     disclosureConsent: Boolean
 }
-
