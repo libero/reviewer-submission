@@ -20,6 +20,7 @@ lint: get_deps
 	yarn lint
 
 test: get_deps
+	npx jest src/domain/submission/services/exporter/file-generators/coverLetter.test.ts
 	yarn test
 
 setup_integration:
