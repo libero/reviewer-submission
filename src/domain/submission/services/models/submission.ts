@@ -14,9 +14,12 @@ import logger from '../../../../logger';
 import { Suggestion } from '../../../semantic-extraction/services/models/sugestion';
 
 export enum ArticleType {
-    RESEARCH_ARTICLE = 'researchArticle',
-    FEATURE_ARTICLE = 'featureArticle',
-    RESEARCH_ADVANCE = 'researchAdvance',
+    RESEARCH_ARTICLE = 'research-article',
+    FEATURE_ARTICLE = 'feature',
+    RESEARCH_ADVANCE = 'research-advance',
+    SCIENTIFIC_CORRESPONDENCE = 'scientific-correspondence',
+    TOOLS_RESOURCES = 'tools-resources',
+    SHORT_REPORT = 'short-report',
 }
 
 export enum SubmissionStatus {
@@ -70,12 +73,18 @@ export default class Submission {
 
     private articleTypeFromString(type: string): ArticleType {
         switch (type) {
-            case 'researchArticle':
+            case 'research-article':
                 return ArticleType.RESEARCH_ARTICLE;
-            case 'featureArticle':
+            case 'feature':
                 return ArticleType.FEATURE_ARTICLE;
-            case 'researchAdvance':
+            case 'research-advance':
                 return ArticleType.RESEARCH_ADVANCE;
+            case 'scientific-correspondence':
+                return ArticleType.SCIENTIFIC_CORRESPONDENCE;
+            case 'tools-resources':
+                return ArticleType.TOOLS_RESOURCES;
+            case 'short-report':
+                return ArticleType.SHORT_REPORT;
             default:
                 throw new Error('Invalid article type');
         }

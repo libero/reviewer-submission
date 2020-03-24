@@ -71,15 +71,15 @@ describe('Submission Service', () => {
         it('returns a created Submission when correct values are sent', async (): Promise<void> => {
             XpubSubmissionRootRepository.prototype.create = jest.fn(async (submission: Submission) => submission);
             const service = new SubmissionService((null as unknown) as Knex);
-            const submission = await service.create('researchArticle', 'userId');
+            const submission = await service.create('research-article', 'userId');
             expect(submission).toBeInstanceOf(Submission);
         });
         it('returns a created Submission with correctly set initial properties', async (): Promise<void> => {
             XpubSubmissionRootRepository.prototype.create = jest.fn(async (submission: Submission) => submission);
             const service = new SubmissionService((null as unknown) as Knex);
-            const submission = await service.create('researchArticle', 'userId');
+            const submission = await service.create('research-article', 'userId');
             expect(submission.status).toBe('INITIAL');
-            expect(submission.articleType).toBe('researchArticle');
+            expect(submission.articleType).toBe('research-article');
             expect(submission.createdBy).toBe('userId');
             expect(submission.id).toBeDefined();
             expect(submission.updated).toBeDefined();

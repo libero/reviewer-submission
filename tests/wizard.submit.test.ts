@@ -9,7 +9,7 @@ describe('Submit Integration Tests', () => {
     });
 
     it('cannot submit an invalid submission', async () => {
-        const response = await startSubmission(apollo, 'researchArticle');
+        const response = await startSubmission(apollo, 'research-article');
         const data = response.data ? response.data : null;
 
         expect(data).toBeTruthy();
