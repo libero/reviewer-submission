@@ -20,9 +20,13 @@ image_tag="$2"
 DOCKER_REGISTRY="${DOCKER_REGISTRY:-}"
 echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin "${DOCKER_REGISTRY}"
 
-# tag temporarily as liberoadmin due to lack of `libero/` availability
+# `libero/` currently not available, replace with `liberoadmin` for now
 name="${DOCKER_REGISTRY}liberoadmin/${project}"
 input_image="libero/${project}:${image_tag}"
+if ! (docker image inspect "$input_image" > /dev/null ) ; then
+    echo "Replacing libero/ with liberoadmin/"
+    input_image="liberoadmin/${project}:${image_tag}"
+fi
 
 if [[ "$GITHUB_REF" == "refs/heads"* ]]; then
     # push `branch-sha` tagged image
