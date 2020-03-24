@@ -50,7 +50,7 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
         ): Promise<Submission> {
             const { file, id: submissionId, fileSize } = variables;
             const user = await userService.getCurrentUser(context.authorizationHeader);
-            const submission = await wizard.saveSupportingFile(user, submissionId, file, fileSize);
+            const submission = await wizard.saveSupportingFile(user, submissionId, file, fileSize, pubsub);
 
             return submission;
         },

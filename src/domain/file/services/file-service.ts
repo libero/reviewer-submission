@@ -225,16 +225,39 @@ export class FileService {
         return Buffer.concat(chunks);
     }
 
-    async uploadSupportingFile(file: File): Promise<S3.CreateMultipartUploadOutput> {
+    async uploadSupportingFile(file: File, stream: ReadStream, userId: string, pubsub: PubSub): Promise<void> {
         const { url, id, mimeType } = file;
-        const fileUploadManager = this.s3.createMultipartUpload({
-            Bucket: this.bucket,
-            Key: `${url}/${id}`,
-            ContentType: mimeType,
-            ACL: 'private',
-        });
+        const fileUploadManager = await this.s3
+            .createMultipartUpload({
+                Bucket: this.bucket,
+                Key: `${url}/${id}`,
+                ContentType: mimeType,
+                ACL: 'private',
+            })
+            .promise();
 
-        return fileUploadManager.promise();
+        let partNumber = 1;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const chunks: Array<any> = [];
+        const parts: { ETag: string | undefined; PartNumber: number }[] = [];
+
+        for await (const chunk of stream) {
+            const bytesRead = stream.bytesRead;
+            const { ETag } = await this.handleMultipartChunk(
+                userId,
+                file,
+                chunk,
+                partNumber,
+                fileUploadManager,
+                pubsub,
+                bytesRead,
+            );
+            parts.push({ ETag, PartNumber: partNumber });
+            chunks.push(chunk);
+            partNumber++;
+        }
+
+        await this.completeMultipartUpload(file.url, fileUploadManager.UploadId, parts);
     }
 
     private addDownloadLink(file: File): void {
