@@ -94,7 +94,7 @@ describe('Knex Submission Repository', () => {
                     coverLetter: 'test cover',
                 },
                 manuscriptDetails: {
-                    title: 'The title',
+                    title: 'Another title',
                     cosubmission: undefined,
                     previouslyDiscussed: undefined,
                     previouslySubmitted: undefined,
