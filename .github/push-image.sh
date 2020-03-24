@@ -41,13 +41,14 @@ elif [[ "$GITHUB_REF" =~ refs/tags/v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*) ]];
     semver="${GITHUB_REF/refs\/tags\/v/}"
     major="$(echo "${semver}" | cut -d'.' -f1)"
     minor="$(echo "${semver}" | cut -d'.' -f2)"
+    patch="$(echo "${semver}" | cut -d'.' -f3)"
 
-    docker tag "$input_image" "${name}:${semver}"
-    docker tag "$input_image" "${name}:${major}"
+    docker tag "$input_image" "${name}:${major}.${minor}.${patch}"
     docker tag "$input_image" "${name}:${major}.${minor}"
-    docker push "${name}:${semver}"
-    docker push "${name}:${major}"
+    docker tag "$input_image" "${name}:${major}"
+    docker push "${name}:${major}.${minor}.${patch}"
     docker push "${name}:${major}.${minor}"
+    docker push "${name}:${major}"
 else
     echo "${GITHUB_REF} is neither a branch head or valid semver tag"
     echo "No image tagging or pushing was performed because of this."
