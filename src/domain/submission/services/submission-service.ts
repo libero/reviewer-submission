@@ -1,5 +1,5 @@
 import * as Knex from 'knex';
-import { SubmissionId } from '../types';
+import { SubmissionId, ManuscriptDetails } from '../types';
 import XpubSubmissionRootRepository from '../repositories/xpub-submission-root';
 import { v4 as uuid } from 'uuid';
 import Submission from './models/submission';
@@ -79,6 +79,15 @@ export class SubmissionService {
             throw new Error('Unable to find submission with id: ' + id);
         }
         submission.files.coverLetter = coverLetter;
+        return await this.submissionRepository.update(submission);
+    }
+
+    async saveDetailsPage(id: SubmissionId, details: ManuscriptDetails): Promise<Submission> {
+        const submission = await this.submissionRepository.findById(id);
+        if (!submission) {
+            throw new Error('Unable to find submission with id: ' + id);
+        }
+        submission.manuscriptDetails = details;
         return await this.submissionRepository.update(submission);
     }
 }

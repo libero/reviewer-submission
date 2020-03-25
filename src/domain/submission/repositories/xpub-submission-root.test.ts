@@ -74,6 +74,10 @@ describe('Knex Submission Repository', () => {
                 },
                 manuscriptDetails: {
                     title: 'The title',
+                    cosubmission: undefined,
+                    previouslyDiscussed: undefined,
+                    previouslySubmitted: undefined,
+                    subjects: undefined,
                 },
                 suggestions: [],
             });
@@ -91,6 +95,10 @@ describe('Knex Submission Repository', () => {
                 },
                 manuscriptDetails: {
                     title: 'Another title',
+                    cosubmission: undefined,
+                    previouslyDiscussed: undefined,
+                    previouslySubmitted: undefined,
+                    subjects: undefined,
                 },
                 suggestions: [],
             });
@@ -130,6 +138,10 @@ describe('Knex Submission Repository', () => {
                 },
                 manuscriptDetails: {
                     title: 'The title',
+                    cosubmission: undefined,
+                    previouslyDiscussed: undefined,
+                    previouslySubmitted: undefined,
+                    subjects: undefined,
                 },
                 suggestions: [],
             });
