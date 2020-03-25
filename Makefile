@@ -20,6 +20,8 @@ lint: get_deps
 	yarn lint
 
 test: get_deps
+	npx jest --showConfig | grep cacheDir
+	npx jest --showConfig | grep cacheDir | cut -d ':' -f2 | tr -d '",' | xargs ls
 	npx jest src/domain/submission/services/exporter/file-generators/coverLetter.test.ts
 	yarn test
 
