@@ -11,7 +11,6 @@
         "start:dev": "NEW_RELIC_HOME=config/ CONFIG_PATH=config/config.local.json nodemon --watch 'src/**/*.ts' --ignore 'src/**/*.spec.ts' --exec 'ts-node' src/main.ts | pino-pretty",
         "start:debug": "nodemon --config nodemon-debug.json",
         "prestart:prod": "rimraf dist && npm run build",
-        "start:cache": "node -c \"import * as PDFParser from 'pdf2json'\"",
         "start:prod": "node dist/main.js",
         "lint": "eslint --ext .js,.ts src/",
         "prettier": "prettier --write './src/**/*.ts'",
