@@ -23,10 +23,7 @@ test: get_deps
 	echo "***** Timing load of pdf2json"
 	time npx ts-node --files -e "import * as p from 'pdf2json'"
 	echo "***** Timing load of html-pdf"
-	time npx ts-node --files -e "import * as pdf from 'html-pdf'"
-	echo "***** Looking at Jest cache..."
-	npx jest --showConfig | grep cacheDir
-	-npx jest --showConfig | grep cacheDir | cut -d ':' -f2 | tr -d '",' | xargs ls
+	time npx ts-node --files -e "import * as pdf from 'html-pdf'; pdf.create('<html>X</html>');"
 	echo "***** Running cover letter test for the first time..."
 	npx jest src/domain/submission/services/exporter/file-generators/coverLetter.test.ts
 	echo "***** Running cover letter test for the second time..."
