@@ -84,7 +84,7 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
             context,
         ): Promise<Submission> {
             const user = await userService.getCurrentUser(context.authorizationHeader);
-            return await wizard.saveDetailsPage(user, submissionId, details);
+            return wizard.saveDetailsPage(user, submissionId, details);
         },
     },
     Subscription: {
