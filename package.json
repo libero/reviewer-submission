@@ -14,7 +14,7 @@
         "start:prod": "node dist/main.js",
         "lint": "eslint --ext .js,.ts src/",
         "prettier": "prettier --write './src/**/*.ts'",
-        "test": "NEW_RELIC_NO_CONFIG_FILE=true jest ./src",
+        "test": "NEW_RELIC_NO_CONFIG_FILE=true jest --verbose ./src",
         "test:watch": "NEW_RELIC_NO_CONFIG_FILE=true jest ./src --watch",
         "test:cov": "NEW_RELIC_NO_CONFIG_FILE=true jest ./src --coverage",
         "test:debug": "NEW_RELIC_NO_CONFIG_FILE=true node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest .src/ --runInBand",
