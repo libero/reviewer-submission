@@ -20,9 +20,16 @@ lint: get_deps
 	yarn lint
 
 test: get_deps
+	echo "***** Timing load of pdf2json"
+	time npx ts-node --files -e "import * as p from 'pdf2json'"
+	echo "***** Looking at Jest cache..."
 	npx jest --showConfig | grep cacheDir
 	-npx jest --showConfig | grep cacheDir | cut -d ':' -f2 | tr -d '",' | xargs ls
+	echo "***** Running cover letter test for the first time..."
 	npx jest src/domain/submission/services/exporter/file-generators/coverLetter.test.ts
+	echo "***** Running cover letter test for the second time..."
+	npx jest src/domain/submission/services/exporter/file-generators/coverLetter.test.ts
+	echo "***** Running normal test suite..."
 	yarn test
 
 setup_integration:
