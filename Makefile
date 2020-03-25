@@ -20,10 +20,8 @@ lint: get_deps
 	yarn lint
 
 test: get_deps
-	echo "***** Running cover letter test for the first time..."
+	echo "***** Running cover letter test with large timeout to prepopulate cache."
 	npx jest --testTimeout 50000 src/domain/submission/services/exporter/file-generators/coverLetter.test.ts
-	echo "***** Running cover letter test for the second time..."
-	npx jest src/domain/submission/services/exporter/file-generators/coverLetter.test.ts
 	echo "***** Running normal test suite..."
 	yarn test
 
