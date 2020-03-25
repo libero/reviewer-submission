@@ -18,4 +18,5 @@ type UploadProgress {
 
 type Subscription {
     manuscriptUploadProgress(filename: String!): UploadProgress
+    supportingUploadProgress(filename: String!): UploadProgress
 }

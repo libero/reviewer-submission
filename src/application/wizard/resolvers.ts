@@ -99,6 +99,17 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
                 },
             ),
         },
+        supportingUploadProgress: {
+            subscribe: withFilter(
+                () => pubsub.asyncIterator('UPLOAD_STATUS'),
+                (payload, variables, context) => {
+                    return (
+                        payload.supportingUploadProgress.filename === variables.filename &&
+                        payload.supportingUploadProgress.userId === context.userId
+                    );
+                },
+            ),
+        },
     },
 });
 
