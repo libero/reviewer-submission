@@ -88,7 +88,7 @@ const init = async (): Promise<void> => {
     const apolloServer = new ApolloServer({
         schema,
         uploads: {
-            maxFileSize: config.max_file_Size_in_bytes,
+            maxFileSize: config.max_file_size_in_bytes,
         },
         plugins: [
             {
