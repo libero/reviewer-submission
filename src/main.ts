@@ -87,6 +87,9 @@ const init = async (): Promise<void> => {
     const schema = makeExecutableSchema({ typeDefs, resolvers });
     const apolloServer = new ApolloServer({
         schema,
+        uploads: {
+            maxFileSize: config.max_file_size_in_bytes,
+        },
         plugins: [
             {
                 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type

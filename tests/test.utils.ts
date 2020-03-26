@@ -81,6 +81,52 @@ export const uploadManuscript = async (submissionId: string): Promise<AxiosRespo
     });
 };
 
+export const uploadLargeManuscript = async (submissionId: string): Promise<AxiosResponse> => {
+    const body = new FormData();
+    const query = `mutation UploadManuscript($id: ID!, $file: Upload!, $fileSize: Int!) {
+        uploadManuscript(id: $id, file: $file, fileSize: $fileSize) {
+            id,
+            files {
+                manuscriptFile {
+                    id
+                }
+            },
+            suggestions {
+                value
+                fieldName
+            }
+        }
+    }`;
+
+    const operations = {
+        query: query,
+        variables: {
+            id: submissionId,
+            file: null,
+            fileSize: 200,
+        },
+    };
+
+    body.append('operations', JSON.stringify(operations));
+    body.append('map', '{ "1": ["variables.file"] }');
+    body.append(
+        '1',
+        `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.`,
+        { filename: 'a.txt' },
+    );
+
+    return await axios.post('http://localhost:3000/graphql', body, {
+        headers: { Authorization: `Bearer ${jwtToken}`, ...body.getHeaders() },
+    });
+};
+
 export const startSubmission = async (apollo: ApolloClient<unknown>, articleType: string): Promise<FetchResult> => {
     const startSubmission = gql`
         mutation StartSubmission($articleType: String!) {
