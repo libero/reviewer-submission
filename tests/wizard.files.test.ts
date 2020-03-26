@@ -89,7 +89,7 @@ describe('Wizard->Files Integration Tests', () => {
         });
     });
 
-    // File Size limit for test sshould be 200 butes.
+    // File Size limit for test should be 150 bytes.
     it('uploads throw is the file exceed the size limit', async () => {
         const startSubmissionResponse = await startSubmissionAlt('research-article');
         const submissionId = startSubmissionResponse.data.data.startSubmission.id;
