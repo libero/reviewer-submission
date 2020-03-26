@@ -19,7 +19,7 @@
         "fileBucket": "test",
         "awsEndPoint": "http://s3:9000"
     },
-    "max_file_size_in_bytes": 150,
+    "max_file_size_in_bytes": 100000000,
     "authentication_jwt_secret": "super_secret_jam",
     "user_adapter_url": "http://test_reviewer_mocks:3003/current-user",
     "science_beam": {
