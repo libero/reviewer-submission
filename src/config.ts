@@ -23,6 +23,7 @@ export interface Config {
     max_ql_depth: number;
     s3: S3Config;
     science_beam: ScienceBeamConfig;
+    max_file_Size_in_bytes: number;
 }
 
 const configPath = process.env.CONFIG_PATH ? process.env.CONFIG_PATH : '/etc/reviewer/config.json';
