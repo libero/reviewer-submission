@@ -88,24 +88,13 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
         },
     },
     Subscription: {
-        manuscriptUploadProgress: {
+        fileUploadProgress: {
             subscribe: withFilter(
                 () => pubsub.asyncIterator('UPLOAD_STATUS'),
                 (payload, variables, context) => {
                     return (
-                        payload.manuscriptUploadProgress.filename === variables.filename &&
-                        payload.manuscriptUploadProgress.userId === context.userId
-                    );
-                },
-            ),
-        },
-        supportingUploadProgress: {
-            subscribe: withFilter(
-                () => pubsub.asyncIterator('UPLOAD_STATUS'),
-                (payload, variables, context) => {
-                    return (
-                        payload.supportingUploadProgress.filename === variables.filename &&
-                        payload.supportingUploadProgress.userId === context.userId
+                        payload.fileUploadProgress.userId === context.userId &&
+                        payload.fileUploadProgress.submissionId === variables.submissionId
                     );
                 },
             ),

@@ -98,7 +98,13 @@ export class WizardService {
         );
 
         try {
-            const fileContents = await this.fileService.uploadManuscript(manuscriptFile, stream, user.id, pubsub);
+            const fileContents = await this.fileService.uploadManuscript(
+                manuscriptFile,
+                stream,
+                user.id,
+                pubsub,
+                submissionId,
+            );
             await this.semanticExtractionService.extractTitle(fileContents, mimeType, filename, submissionId);
             manuscriptFile.setStatusToStored();
         } catch (e) {
@@ -133,7 +139,7 @@ export class WizardService {
         );
 
         try {
-            await this.fileService.uploadSupportingFile(supportingFile, stream, user.id, pubsub);
+            await this.fileService.uploadSupportingFile(supportingFile, stream, user.id, pubsub, submissionId);
             supportingFile.setStatusToStored();
         } catch (e) {
             console.log('error', e);
