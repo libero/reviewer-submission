@@ -1,5 +1,5 @@
 ## This is only a single container right now but in future this should bring up supporting services needed for development ie: postgres, audit service ect.
-version: '3'
+version: "3"
 services:
   application:
     image: libero/reviewer-submission:${IMAGE_TAG:-local}
@@ -10,8 +10,10 @@ services:
       # NEW_RELIC_LOG_ENABLED: "false"
       NEW_RELIC_NO_CONFIG_FILE: "true"
       CONFIG_PATH: /etc/reviewer/config.json
+      CLIENT_CONFIG_PATH: /etc/reviewer/config.client.json
     volumes:
       - ./tests/config/reviewer-submission.json:/etc/reviewer/config.json
+      - ./tests/config/reviewer-submission-client.json:/etc/reviewer/config.client.json
     healthcheck:
       test: 'echo -e "GET /health\n\n" | nc localhost ${SERVER_PORT:-3000}'
       interval: 3s
