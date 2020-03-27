@@ -250,23 +250,23 @@ describe('Wizard->Files Integration Tests', () => {
                         id: 1,
                         type: 'start',
                         payload: {
-                            operationName: 'ManuscriptUploadProgress',
+                            operationName: 'FileUploadProgress',
                             query: `
-                                subscription ManuscriptUploadProgress($filename: String!) {
-                                    manuscriptUploadProgress(filename: $filename) {
+                                subscription FileUploadProgress($submissionId: ID!) {
+                                    fileUploadProgress(submissionId: $submissionId) {
                                         percentage
                                     }
                                 }
                             `,
                             variables: {
-                                filename: 'a.txt',
+                                submissionId,
                             },
                         },
                     }),
                 );
             }
             if (result.type === 'data') {
-                percentage = result.payload.data.manuscriptUploadProgress.percentage;
+                percentage = result.payload.data.fileUploadProgress.percentage;
                 client.close();
             }
         });

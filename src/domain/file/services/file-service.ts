@@ -183,7 +183,13 @@ export class FileService {
         );
     }
 
-    async uploadManuscript(file: File, stream: ReadStream, userId: string, pubsub: PubSub): Promise<Buffer> {
+    async uploadManuscript(
+        file: File,
+        stream: ReadStream,
+        userId: string,
+        pubsub: PubSub,
+        submissionId: SubmissionId,
+    ): Promise<Buffer> {
         const { url, mimeType } = file;
         const fileUploadManager = await this.s3
             .createMultipartUpload({
@@ -205,11 +211,13 @@ export class FileService {
             percentage: number,
         ): Promise<void> =>
             await pubsub.publish('UPLOAD_STATUS', {
-                manuscriptUploadProgress: {
+                fileUploadProgress: {
                     userId,
                     filename,
                     fileId,
                     percentage,
+                    type: FileType.MANUSCRIPT_SOURCE,
+                    submissionId,
                 },
             });
 
@@ -233,7 +241,13 @@ export class FileService {
         return Buffer.concat(chunks);
     }
 
-    async uploadSupportingFile(file: File, stream: ReadStream, userId: string, pubsub: PubSub): Promise<void> {
+    async uploadSupportingFile(
+        file: File,
+        stream: ReadStream,
+        userId: string,
+        pubsub: PubSub,
+        submissionId: SubmissionId,
+    ): Promise<void> {
         const { url, mimeType } = file;
         const fileUploadManager = await this.s3
             .createMultipartUpload({
@@ -254,11 +268,13 @@ export class FileService {
             percentage: number,
         ): Promise<void> =>
             await pubsub.publish('UPLOAD_STATUS', {
-                supportingUploadProgress: {
+                fileUploadProgress: {
                     userId,
                     filename,
                     fileId,
                     percentage,
+                    type: FileType.SUPPORTING_FILE,
+                    submissionId,
                 },
             });
 
