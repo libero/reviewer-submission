@@ -39,7 +39,7 @@ setup_integration:
 test_integration: setup_integration
 	${DOCKER_COMPOSE_TEST} up -d application
 	./.scripts/docker/wait-healthy.sh test_reviewer-submission 20
-	CONFIG_PATH=./config/config.json yarn run test:integration
+	CONFIG_PATH=./config/config.json CLIENT_CONFIG_PATH=config/config.client.json yarn run test:integration
 	${DOCKER_COMPOSE_TEST} down
 
 load_schema:
