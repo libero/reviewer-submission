@@ -21,12 +21,6 @@
             "structural-biology-molecular-biophysics": "Structural Biology and Molecular Biophysics"
         }
     },
-    "login": {
-        "url": "/mock-token-exchange/ewwboc7m",
-        "enableMock": true,
-        "signupUrl": "https://orcid.org/register",
-        "legacySubmissionUrl": "https://submit.elifesciences.org"
-    },
     "fileUpload": {
         "maxSizeMB": 100
     },
