@@ -5,13 +5,6 @@ export interface ClientPublicConfig {
         majorSubjectAreas: { [key: string]: string };
     };
 
-    login: {
-        url: string;
-        enableMock: boolean;
-        signupUrl: string;
-        legacySubmissionUrl: string;
-    };
-
     fileUpload: {
         maxSizeMB: number;
     };
