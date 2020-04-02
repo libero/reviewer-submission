@@ -90,8 +90,8 @@ jobs:
       - name: Push Images if on master
         if: github.ref == 'refs/heads/master'
         run: |
-          ./scripts/github/retag-and-push.sh reviewer-submission ${IMAGE_TAG}
-          ./scripts/github/retag-and-push.sh reviewer-xpub-postgres ${IMAGE_TAG}
+          .scripts/github/retag-and-push.sh reviewer-submission ${IMAGE_TAG}
+          .scripts/github/retag-and-push.sh reviewer-xpub-postgres ${IMAGE_TAG}
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
