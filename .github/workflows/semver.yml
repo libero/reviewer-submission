@@ -15,8 +15,8 @@ jobs:
       - run: |
           docker pull liberoadmin/reviewer-submission:master-${{ github.sha }}
           docker pull liberoadmin/reviewer-xpub-postgres:master-${{ github.sha }}
-          .github/push-image.sh reviewer-submission master-${{ github.sha }}
-          .github/push-image.sh reviewer-xpub-postgres master-${{ github.sha }}
+          ./scripts/github/retag-and-push.sh reviewer-submission master-${{ github.sha }}
+          ./scripts/github/retag-and-push.sh reviewer-xpub-postgres master-${{ github.sha }}
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
