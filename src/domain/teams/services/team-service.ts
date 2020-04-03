@@ -2,7 +2,7 @@ import * as Knex from 'knex';
 import { createKnexAdapter } from '../../knex-table-adapter';
 import XpubTeamRepository from '../repositories/xpub-team';
 import Team from './models/team';
-import uuid from 'uuid';
+import { v4 as uuid } from 'uuid';
 import { TeamId } from '../types';
 import { AuthorTeamMember } from '../repositories/types';
 

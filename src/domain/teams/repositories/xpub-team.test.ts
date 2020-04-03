@@ -54,7 +54,7 @@ describe('Knex Submission Repository', () => {
             adapter.executor = jest.fn().mockReturnValue(databaseEntries);
             const repo = new XpubTeamRepository(adapter);
             await repo.findByObjectIdAndRole('someObjectId', 'role');
-            expect(mock.select).toBeCalledWith('id', 'updated', 'alias');
+            expect(mock.select).toBeCalledWith('id', 'updated', 'team_members');
             expect(mock.from).toBeCalledWith('team');
             // eslint-disable-next-line @typescript-eslint/camelcase
             expect(mock.where).toBeCalledWith({ object_id: 'someObjectId', role: 'role' });

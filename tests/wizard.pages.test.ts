@@ -86,4 +86,42 @@ describe('Wizard->Pages Integration Tests', () => {
         expect(failedSaveDetailsResponse.data.errors).toBeDefined();
         expect(failedSaveDetailsResponse.data.errors[0].message).toBe('User not allowed to update submission');
     });
+
+    it('it should set author details', async () => {
+        const startSubmissionResponse = await startSubmissionAlt('research-article');
+        const submissionId = startSubmissionResponse.data.data.startSubmission.id;
+        const details = {
+            firstName: 'jimmy',
+            lastName: 'doe',
+            email: 'jimmy@doe.com',
+            institution: 'institution',
+        };
+
+        const saveAuthorPageResponse = await axios.post(
+            'http://localhost:3000/graphql',
+            {
+                query: `
+                    mutation saveAuthorPage($id: ID!, $details: AuthorDetailsInput!) {
+                        saveAuthorPage(id: $id, details: $details) {
+                            id,
+                            author {
+                                firstName
+                            }
+                        }
+                    }
+                `,
+                variables: {
+                    id: submissionId,
+                    details,
+                },
+            },
+            {
+                headers: { Authorization: `Bearer ${jwtToken}` },
+            },
+        );
+
+        expect(saveAuthorPageResponse.status).toBe(200);
+        expect(saveAuthorPageResponse.data.errors).toBeUndefined();
+        expect(saveAuthorPageResponse.data.data.saveAuthorPage.author.firstName).toBe('jimmy');
+    });
 });
