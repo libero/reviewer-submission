@@ -4,7 +4,7 @@ type Mutation {
     deleteManuscript(fileId: ID!, submissionId: ID!): Boolean!
     uploadSupportingFile(id: ID!, file: Upload!, fileSize: Int!): Submission!
     deleteSupportingFile(fileId: ID!, submissionId: ID!): Boolean!
-    saveFilesPage(id: ID!, coverLetter: String!): Submission!
+    saveFilesPage(id: ID!, coverLetter: String): Submission!
     saveDetailsPage(id: ID!, details: ManuscriptDetailsInput!): Submission!
     submit(id: ID!): Submission!
 }

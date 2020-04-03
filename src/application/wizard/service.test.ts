@@ -191,7 +191,7 @@ describe('saveAuthorPage', () => {
         expect(teamServiceMock.create).toHaveBeenCalledTimes(1);
         expect(teamServiceMock.create).toHaveBeenCalledWith({
             role: 'author',
-            objectId: subId.value,
+            objectId: subId.toString(),
             objectType: 'manuscript',
             teamMembers: [
                 {
