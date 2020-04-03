@@ -105,7 +105,8 @@ describe('Wizard->Pages Integration Tests', () => {
                         saveAuthorPage(id: $id, details: $details) {
                             id,
                             author {
-                                firstName
+                                firstName,
+                                institution
                             }
                         }
                     }
@@ -123,5 +124,6 @@ describe('Wizard->Pages Integration Tests', () => {
         expect(saveAuthorPageResponse.status).toBe(200);
         expect(saveAuthorPageResponse.data.errors).toBeUndefined();
         expect(saveAuthorPageResponse.data.data.saveAuthorPage.author.firstName).toBe('jimmy');
+        expect(saveAuthorPageResponse.data.data.saveAuthorPage.author.institution).toBe('institution');
     });
 });
