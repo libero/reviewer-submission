@@ -30,7 +30,7 @@ export class WizardService {
             throw new Error('User not allowed to save submission');
         }
 
-        const team = await this.teamService.find(submissionId.value, 'author');
+        const team = await this.teamService.find(submissionId.toString(), 'author');
         const teamMembers: Array<AuthorTeamMember> = [
             {
                 alias: details,
@@ -46,7 +46,7 @@ export class WizardService {
             this.teamService.create({
                 role: 'author',
                 teamMembers,
-                objectId: submissionId.value,
+                objectId: submissionId.toString(),
                 objectType: 'manuscript',
             });
         }
