@@ -40,6 +40,39 @@ export const uploadSupportingFile = async (submissionId: string): Promise<AxiosR
 };
 
 describe('Wizard->Files Integration Tests', () => {
+    it('it should allow a user to set a blank cover letter for their submission', async () => {
+        const startSubmissionResponse = await startSubmissionAlt('research-article');
+        const submissionId = startSubmissionResponse.data.data.startSubmission.id;
+        const coverLetter = null;
+
+        const updateCoverLetterResponse = await axios.post(
+            'http://localhost:3000/graphql',
+            {
+                query: `
+                    mutation SaveFilesPage($id: ID!, $coverLetter: String) {
+                        saveFilesPage(id: $id, coverLetter: $coverLetter) {
+                            id,
+                            files {
+                                coverLetter
+                            }
+                        }
+                    }
+                `,
+                variables: {
+                    id: submissionId,
+                    coverLetter,
+                },
+            },
+            {
+                headers: { Authorization: `Bearer ${jwtToken}` },
+            },
+        );
+
+        expect(updateCoverLetterResponse.status).toBe(200);
+        expect(updateCoverLetterResponse.data.errors).toBeUndefined();
+        expect(updateCoverLetterResponse.data.data.saveFilesPage.files.coverLetter).toBe(coverLetter);
+    });
+
     it('it should allow a user to set a a cover letter for their submission', async () => {
         const startSubmissionResponse = await startSubmissionAlt('research-article');
         const submissionId = startSubmissionResponse.data.data.startSubmission.id;
