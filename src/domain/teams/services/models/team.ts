@@ -4,7 +4,7 @@ import { TeamId } from '../../types';
 export default class Team {
     id: TeamId;
     created: Date;
-    updated?: Date;
+    updated: Date;
     teamMembers: Array<AuthorTeamMember>;
     role: string;
     objectId: string;
@@ -13,6 +13,7 @@ export default class Team {
     public constructor(
         id: TeamId,
         created: Date,
+        updated: Date,
         teamMembers: Array<AuthorTeamMember>,
         role: string,
         objectId: string,
@@ -20,6 +21,7 @@ export default class Team {
     ) {
         this.id = id;
         this.created = created;
+        this.updated = updated;
         this.teamMembers = teamMembers;
         this.role = role;
         this.objectId = objectId;

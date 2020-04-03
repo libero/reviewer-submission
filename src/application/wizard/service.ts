@@ -38,12 +38,12 @@ export class WizardService {
             },
         ];
         if (team) {
-            this.teamService.update({
+            await this.teamService.update({
                 ...team,
                 teamMembers,
             });
         } else {
-            this.teamService.create({
+            await this.teamService.create({
                 role: 'author',
                 teamMembers,
                 objectId: submissionId.toString(),
@@ -201,6 +201,10 @@ export class WizardService {
             const suggestion = await this.semanticExtractionService.getSuggestion(submissionId);
             if (suggestion) {
                 submission.suggestions = [suggestion];
+            }
+            const authorDetails = await this.teamService.find(submissionId.toString(), 'author');
+            if (authorDetails) {
+                submission.author;
             }
         }
         return submission;

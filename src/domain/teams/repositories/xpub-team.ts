@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { TeamRepository } from './types';
+import { TeamRepository, AuthorTeamMember } from './types';
 import { TeamId } from '../types';
 import { KnexTableAdapter } from '../../knex-table-adapter';
 import Team from '../services/models/team';
@@ -7,6 +7,11 @@ import Team from '../services/models/team';
 type DatabaseEntry = {
     id: TeamId;
     updated: Date;
+    created: Date;
+    team_members: Array<AuthorTeamMember>;
+    role: string;
+    object_id: string;
+    object_type: string;
 };
 
 export default class XpubTeamRepository implements TeamRepository {
@@ -17,10 +22,11 @@ export default class XpubTeamRepository implements TeamRepository {
     public async findByObjectIdAndRole(object_id: string, role: string): Promise<Team[]> {
         const query = this._query
             .builder()
-            .select<DatabaseEntry[]>('id', 'updated')
+            .select<DatabaseEntry[]>('id', 'updated', 'alias')
             .from(this.TABLE_NAME)
             .where({ object_id, role });
-        return await this._query.executor<Team[]>(query);
+        const results = await this._query.executor<Team[]>(query);
+        // results.map(_ => new );
     }
 
     public async findTeamById(id: TeamId): Promise<Team | null> {
@@ -68,5 +74,27 @@ export default class XpubTeamRepository implements TeamRepository {
         }
 
         return team;
+    }
+
+    private toDatabaseEntry(team: Team): DatabaseEntry {
+        const {
+            teamMembers: team_members,
+            objectId: object_id,
+            objectType: object_type,
+            id,
+            updated,
+            created,
+            role,
+        } = team;
+        const databaseEntry: DatabaseEntry = {
+            team_members,
+            object_id,
+            object_type,
+            id,
+            updated,
+            created,
+            role,
+        };
+        return databaseEntry;
     }
 }
