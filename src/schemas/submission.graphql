@@ -1,10 +1,11 @@
 scalar Upload
 
+# TODO : Missing created, status, lastStepVisted
 type Submission {
     id: ID!
     updated: String!
     articleType: String!
-    author: AuthorDetails!
+    author: AuthorDetails
     manuscriptDetails: ManuscriptDetails
     files: FileDetails
     editors: EditorDetails
