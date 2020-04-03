@@ -2,6 +2,9 @@ import * as Knex from 'knex';
 import { createKnexAdapter } from '../../knex-table-adapter';
 import XpubTeamRepository from '../repositories/xpub-team';
 import Team from './models/team';
+import uuid from 'uuid';
+import { TeamId } from '../types';
+import { AuthorTeamMember } from '../repositories/types';
 
 export class TeamService {
     teamRepository: XpubTeamRepository;
@@ -20,7 +23,14 @@ export class TeamService {
         return await this.teamRepository.update(team);
     }
 
-    async create(team: Omit<Team, 'id' | 'created' | 'updated'>): Promise<Team> {
+    async createAuthor(
+        role: string,
+        teamMembers: Array<AuthorTeamMember>,
+        objectId: string,
+        objectType: string,
+    ): Promise<Team> {
+        const id = TeamId.fromUuid(uuid());
+        const team = new Team(id, new Date(), new Date(), teamMembers, role, objectId, objectType);
         return await this.teamRepository.create(team);
     }
 }

@@ -159,7 +159,7 @@ describe('saveAuthorPage', () => {
         const teamServiceMock = ({
             find: jest.fn().mockImplementationOnce(() => existingTeam),
             update: jest.fn(),
-            create: jest.fn(),
+            createAuthor: jest.fn(),
         } as unknown) as TeamService;
 
         const permissionService = new PermissionService();
@@ -188,12 +188,10 @@ describe('saveAuthorPage', () => {
             aff: 'aff',
         });
 
-        expect(teamServiceMock.create).toHaveBeenCalledTimes(1);
-        expect(teamServiceMock.create).toHaveBeenCalledWith({
-            role: 'author',
-            objectId: subId.toString(),
-            objectType: 'manuscript',
-            teamMembers: [
+        expect(teamServiceMock.createAuthor).toHaveBeenCalledTimes(1);
+        expect(teamServiceMock.createAuthor).toHaveBeenCalledWith(
+            'author',
+            [
                 {
                     alias: {
                         firstName: 'John',
@@ -204,7 +202,9 @@ describe('saveAuthorPage', () => {
                     meta: { corresponding: true },
                 },
             ],
-        });
+            subId.toString(),
+            'manuscript',
+        );
     });
 
     it('should throw when userId is not owner', async () => {

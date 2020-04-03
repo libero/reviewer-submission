@@ -43,12 +43,7 @@ export class WizardService {
                 teamMembers,
             });
         } else {
-            await this.teamService.create({
-                role: 'author',
-                teamMembers,
-                objectId: submissionId.toString(),
-                objectType: 'manuscript',
-            });
+            await this.teamService.createAuthor('author', teamMembers, submissionId.toString(), 'manuscript');
         }
 
         return this.getFullSubmission(submissionId);
@@ -202,9 +197,9 @@ export class WizardService {
             if (suggestion) {
                 submission.suggestions = [suggestion];
             }
-            const authorDetails = await this.teamService.find(submissionId.toString(), 'author');
-            if (authorDetails) {
-                submission.author;
+            const authorTeamMember = await this.teamService.find(submissionId.toString(), 'author');
+            if (authorTeamMember) {
+                submission.author = authorTeamMember.teamMembers[0].alias;
             }
         }
         return submission;
