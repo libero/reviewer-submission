@@ -41,11 +41,11 @@ describe('Knex Submission Repository', () => {
             adapter.executor = jest.fn().mockReturnValue(databaseEntries);
             const repo = new XpubTeamRepository(adapter);
             const result = await repo.findByObjectIdAndRole('someObjectId', 'role');
-            expect(result[0]).toStrictEqual({
+            expect(result[0]).toMatchObject({
                 id: entryId1,
                 updated: new Date('2020-02-18T15:14:53.155Z'),
             });
-            expect(result[1]).toStrictEqual({
+            expect(result[1]).toMatchObject({
                 id: entryId2,
                 updated: new Date('2020-02-18T15:14:53.155Z'),
             });
@@ -54,7 +54,7 @@ describe('Knex Submission Repository', () => {
             adapter.executor = jest.fn().mockReturnValue(databaseEntries);
             const repo = new XpubTeamRepository(adapter);
             await repo.findByObjectIdAndRole('someObjectId', 'role');
-            expect(mock.select).toBeCalledWith('id', 'updated');
+            expect(mock.select).toBeCalledWith('id', 'updated', 'team_members');
             expect(mock.from).toBeCalledWith('team');
             // eslint-disable-next-line @typescript-eslint/camelcase
             expect(mock.where).toBeCalledWith({ object_id: 'someObjectId', role: 'role' });
@@ -76,6 +76,8 @@ describe('Knex Submission Repository', () => {
                 role: 'role',
                 objectId: '1234',
                 objectType: 'type',
+                created: new Date(),
+                updated: new Date(),
                 teamMembers: [
                     {
                         alias: {

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { TeamRepository } from './types';
+import { TeamRepository, AuthorTeamMember } from './types';
 import { TeamId } from '../types';
 import { KnexTableAdapter } from '../../knex-table-adapter';
 import Team from '../services/models/team';
@@ -7,6 +7,11 @@ import Team from '../services/models/team';
 type DatabaseEntry = {
     id: TeamId;
     updated: Date;
+    created: Date;
+    team_members: Array<AuthorTeamMember>;
+    role: string;
+    object_id: string;
+    object_type: string;
 };
 
 export default class XpubTeamRepository implements TeamRepository {
@@ -17,20 +22,21 @@ export default class XpubTeamRepository implements TeamRepository {
     public async findByObjectIdAndRole(object_id: string, role: string): Promise<Team[]> {
         const query = this._query
             .builder()
-            .select<DatabaseEntry[]>('id', 'updated')
+            .select<DatabaseEntry[]>('id', 'updated', 'team_members')
             .from(this.TABLE_NAME)
             .where({ object_id, role });
-        return await this._query.executor<Team[]>(query);
+        const results = await this._query.executor<DatabaseEntry[]>(query);
+        return results.map(r => this.toModel(r));
     }
 
     public async findTeamById(id: TeamId): Promise<Team | null> {
         const query = this._query
             .builder()
-            .select<DatabaseEntry[]>('id', 'updated')
+            .select<DatabaseEntry[]>('id', 'updated', 'team_members')
             .from(this.TABLE_NAME)
             .where({ id });
-        const [team = null] = await this._query.executor<Team[]>(query);
-        return team;
+        const [team = null] = await this._query.executor<DatabaseEntry[]>(query);
+        return team ? this.toModel(team) : null;
     }
 
     public async update(dtoTeam: Team): Promise<Team> {
@@ -42,31 +48,55 @@ export default class XpubTeamRepository implements TeamRepository {
         const query = this._query
             .builder()
             .table(this.TABLE_NAME)
-            .update(entryToSave)
+            .update(this.toDatabaseEntry(entryToSave))
             .where({ id: dtoTeam.id });
         await this._query.executor(query);
         return entryToSave;
     }
 
-    public async create(dtoTeam: Omit<Team, 'id' | 'created' | 'updated'>): Promise<Team> {
-        const entryToSave = { ...dtoTeam, updated: new Date() };
+    public async create(inputTeam: Team): Promise<Team> {
+        const entryToSave = { ...inputTeam, updated: new Date() };
         const query = this._query
             .builder()
-            .insert(entryToSave)
-            .into(this.TABLE_NAME)
-            .returning('id');
-        const id = await this._query.executor<TeamId>(query);
+            .insert(this.toDatabaseEntry(entryToSave))
+            .into(this.TABLE_NAME);
+        await this._query.executor<TeamId>(query);
+        return inputTeam;
+    }
 
-        if (id === null) {
-            throw new Error('Unable to create team');
-        }
+    private toDatabaseEntry(team: Team): DatabaseEntry {
+        const {
+            teamMembers: team_members,
+            objectId: object_id,
+            objectType: object_type,
+            id,
+            updated,
+            created,
+            role,
+        } = team;
+        const databaseEntry: DatabaseEntry = {
+            team_members,
+            object_id,
+            object_type,
+            id,
+            updated,
+            created,
+            role,
+        };
+        return databaseEntry;
+    }
 
-        const team = await this.findTeamById(id);
+    private toModel(databaseEntry: DatabaseEntry): Team {
+        const {
+            team_members: teamMembers,
+            object_id: objectId,
+            object_type: objectType,
+            id,
+            updated,
+            created,
+            role,
+        } = databaseEntry;
 
-        if (team === null) {
-            throw new Error(`Unable to find entry with id: ${id}`);
-        }
-
-        return team;
+        return new Team(id, created, updated, teamMembers, role, objectId, objectType);
     }
 }
