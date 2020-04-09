@@ -9,6 +9,10 @@ type Mutation {
     submit(id: ID!): Submission!
 }
 
+type Query {
+    getSubmission(id: ID!): Submission
+}
+
 type UploadProgress {
     userId: ID!
     filename: String!

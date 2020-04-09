@@ -1,6 +1,5 @@
 type Query {
     getSubmissions: [Submission!]!
-    getSubmission(id: ID!): Submission
 }
 
 type Mutation {
