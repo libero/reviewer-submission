@@ -9,11 +9,7 @@ const resolvers = (dashboard: DashboardService, userService: UserService): IReso
         async getSubmissions(_, {}: {}, context): Promise<Submission[] | null> {
             const user = await userService.getCurrentUser(context.authorizationHeader);
             return await dashboard.findMySubmissions(user);
-        },
-        async getSubmission(_, { id }: { id: SubmissionId }, context): Promise<Submission | null> {
-            const user = await userService.getCurrentUser(context.authorizationHeader);
-            return await dashboard.getSubmission(user, id);
-        },
+        }
     },
     Mutation: {
         async startSubmission(_, args: { articleType: string }, context): Promise<Submission | null> {

@@ -11,6 +11,10 @@ const pubsub = new PubSub();
 const resolvers = (wizard: WizardService, userService: UserService): IResolvers => ({
     Query: {},
     Mutation: {
+        async getSubmission(_, { id }: { id: SubmissionId }, context): Promise<Submission | null> {
+            const user = await userService.getCurrentUser(context.authorizationHeader);
+            return await wizard.getSubmission(user, id);
+        },
         async submit(_, { id: submissionId }: { id: SubmissionId }, context): Promise<Submission | null> {
             const user = await userService.getCurrentUser(context.authorizationHeader);
             return wizard.submit(user, submissionId);

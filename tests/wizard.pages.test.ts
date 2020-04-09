@@ -4,6 +4,57 @@ import { sign } from 'jsonwebtoken';
 import config from '../src/config';
 
 describe('Wizard->Pages Integration Tests', () => {
+    it('it should allow a user to get their submission', async () => {
+        const startSubmissionResponse = await startSubmissionAlt('research-article');
+        const submissionId = startSubmissionResponse.data.data.startSubmission.id;
+
+        const getResponse = await axios.post(
+            'http://localhost:3000/graphql',
+            {
+                query: `
+                    query GetSubmission($id: ID!) {
+                        getSubmission(id: $id) {
+                            id,
+                            articleType
+                        }
+                    }
+                `,
+                variables: {
+                    id: submissionId,
+                },
+            },
+            {
+                headers: { Authorization: `Bearer ${jwtToken}` },
+            },
+        );
+        expect(getResponse.status).toBe(200);
+        expect(getResponse.data.data.getSubmission.id).toBe(submissionId);
+        expect(getResponse.data.data.getSubmission.articleType).toBe('research-article');
+    });
+
+    it('it should allow a user to get their submissions', async () => {
+        await startSubmissionAlt('research-article');
+        const getResponse = await axios.post(
+            'http://localhost:3000/graphql',
+            {
+                query: `
+                    query getSubmissions {
+                        getSubmissions {
+                            id,
+                            articleType
+                        }
+                    }
+                `,
+            },
+            {
+                headers: { Authorization: `Bearer ${jwtToken}` },
+            },
+        );
+        expect(getResponse.status).toBe(200);
+        expect(Array.isArray(getResponse.data.data.getSubmissions)).toBe(true);
+        expect(getResponse.data.data.getSubmissions.length).toBeGreaterThan(1);
+    });
+    
     it('it should allow a user to set details', async () => {
         const startSubmissionResponse = await startSubmissionAlt('research-article');
         const submissionId = startSubmissionResponse.data.data.startSubmission.id;

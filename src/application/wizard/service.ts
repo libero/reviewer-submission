@@ -20,6 +20,18 @@ export class WizardService {
         private readonly semanticExtractionService: SemanticExtractionService,
     ) {}
 
+    async getSubmission(user: User, submissionId: SubmissionId): Promise<Submission | null> {
+        const submission = await this.submissionService.get(submissionId);
+        if (submission === null) {
+            throw new Error('No submission found');
+        }
+        const allowed = this.permissionService.userCanWithSubmission(user, SubmissionOperation.UPDATE, submission);
+        if (!allowed) {
+            throw new Error('User not allowed to save submission');
+        }
+        return this.getFullSubmission(submissionId);
+    }
+
     async saveAuthorPage(user: User, submissionId: SubmissionId, details: AuthorDetails): Promise<Submission | null> {
         const submission = await this.submissionService.get(submissionId);
         if (submission === null) {
