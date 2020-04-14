@@ -18,6 +18,8 @@ type UploadProgress {
     filename: String!
     fileId: ID!
     percentage: String!
+    type: String!
+    submissionId: ID!
 }
 
 type Subscription {
