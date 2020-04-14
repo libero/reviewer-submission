@@ -223,20 +223,27 @@ export class FileService {
                 },
             });
 
+        let currentBytes = 0;
+        let chunksToSend = [];
         for await (const chunk of stream) {
             const bytesRead = stream.bytesRead;
-            const { ETag } = await this.handleMultipartChunk(
-                userId,
-                file,
-                chunk,
-                partNumber,
-                fileUploadManager,
-                bytesRead,
-                uploadStatusFunction,
-            );
-            parts.push({ ETag, PartNumber: partNumber });
+            currentBytes = currentBytes + chunk.size;
+            chunksToSend.push(chunk)
+            if (currentBytes >= maxChunk || bytesRead === stream.bytesRead) {
+                const { ETag } = await this.handleMultipartChunk(
+                    userId,
+                    file,
+                    chunksToSend,
+                    partNumber,
+                    fileUploadManager,
+                    bytesRead,
+                    uploadStatusFunction,
+                );
+                parts.push({ ETag, PartNumber: partNumber });
+                partNumber++;
+                chunksToSend = [];
+            }
             chunks.push(chunk);
-            partNumber++;
         }
 
         await this.completeMultipartUpload(file.url, fileUploadManager.UploadId, parts);
