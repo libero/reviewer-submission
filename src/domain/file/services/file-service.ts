@@ -12,6 +12,8 @@ import { PromiseResult } from 'aws-sdk/lib/request';
 import { AWSError } from 'aws-sdk/lib/error';
 import { ReadStream } from 'fs';
 
+const maxChunk = 1024 * 5;
+
 export class FileService {
     fileRepository: XpubFileRepository;
     s3: S3;
