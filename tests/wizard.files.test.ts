@@ -1,11 +1,9 @@
 import axios, { AxiosResponse } from 'axios';
-import { jwtToken, startSubmissionAlt, uploadManuscript, uploadLargeManuscript } from './test.utils';
+import { jwtToken, startSubmissionAlt, uploadManuscript, uploadLargeManuscript, uploadTooLargeManuscript } from './test.utils';
 import { sign } from 'jsonwebtoken';
 import config from '../src/config';
 import * as FormData from 'form-data';
 import * as WebSocket from 'ws';
-import * as fs from 'fs';
-import * as path from 'path';
 
 export const uploadSupportingFile = async (submissionId: string): Promise<AxiosResponse> => {
     const body = new FormData();
@@ -28,7 +26,7 @@ export const uploadSupportingFile = async (submissionId: string): Promise<AxiosR
         variables: {
             id: submissionId,
             file: null,
-            fileSize: 2,
+            fileSize: 1,
         },
     };
 
@@ -125,46 +123,11 @@ describe('Wizard->Files Integration Tests', () => {
     });
 
 
-    it.only('uploads a large manuscript file', async () => {
+    it('uploads a large manuscript file', async () => {
         const startSubmissionResponse = await startSubmissionAlt('research-article');
         const submissionId = startSubmissionResponse.data.data.startSubmission.id;
 
-        const body = new FormData();
-        const query = `mutation UploadManuscript($id: ID!, $file: Upload!, $fileSize: Int!) {
-            uploadManuscript(id: $id, file: $file, fileSize: $fileSize) {
-                id,
-                files {
-                    manuscriptFile {
-                        id
-                    }
-                },
-                suggestions {
-                    value
-                    fieldName
-                }
-            }
-        }`;
-    
-        const operations = {
-            query: query,
-            variables: {
-                id: submissionId,
-                file: null,
-                fileSize: 122,
-            },
-        };
-    
-        body.append('operations', JSON.stringify(operations));
-        body.append('map', '{ "1": ["variables.file"] }');
-        body.append(
-            '1',
-            fs.createReadStream(path.join(__dirname, './files/test-v2.pdf')),
-            { filename: 'test-v2.pdf' },
-        );
-    
-        const uploadResponse = await axios.post('http://localhost:3000/graphql', body, {
-            headers: { Authorization: `Bearer ${jwtToken}`, ...body.getHeaders() },
-        });
+        const uploadResponse = await uploadLargeManuscript(submissionId);
 
         expect(uploadResponse.status).toBe(200);
 
@@ -177,9 +140,9 @@ describe('Wizard->Files Integration Tests', () => {
         const startSubmissionResponse = await startSubmissionAlt('research-article');
         const submissionId = startSubmissionResponse.data.data.startSubmission.id;
 
-        const uploadResponse = await uploadLargeManuscript(submissionId);
+        const uploadResponse = await uploadTooLargeManuscript(submissionId);
         expect(uploadResponse.status).toBe(200);
-        expect(uploadResponse.data.errors[0].message).toBe('File truncated as it exceeds the 150 byte size limit.');
+        expect(uploadResponse.data.errors[0].message).toBe('File truncated as it exceeds the 1000000 byte size limit.');
     });
 
     it('deletes a manuscript file', async () => {

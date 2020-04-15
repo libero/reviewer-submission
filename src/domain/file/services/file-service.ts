@@ -12,7 +12,7 @@ import { PromiseResult } from 'aws-sdk/lib/request';
 import { AWSError } from 'aws-sdk/lib/error';
 import { ReadStream } from 'fs';
 
-const s3MinChunkSize = 1024 * 5;
+const s3MinChunkSize = 5000000;
 
 export class FileService {
     fileRepository: XpubFileRepository;
@@ -30,7 +30,6 @@ export class FileService {
             s3ForcePathStyle: s3config.s3ForcePathStyle,
         };
         const s3Options = s3config.awsEndPoint ? { ...defaultOptions, endpoint: s3config.awsEndPoint } : defaultOptions;
-        console.log('s3Options',s3Options );
         this.bucket = s3config.fileBucket;
         this.s3 = new S3(s3Options);
     }
@@ -47,6 +46,8 @@ export class FileService {
     }
 
     async handleMultipartChunk(
+        pubsub: PubSub,
+        submissionId: SubmissionId,
         userId: string,
         file: File,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -54,7 +55,7 @@ export class FileService {
         partNumber: number,
         s3MultiPart: PromiseResult<S3.CreateMultipartUploadOutput, AWSError>,
         bytesRead: number,
-        statusFunction: Function,
+        type: FileType,
         numAttempts = 0,
     ): Promise<PromiseResult<S3.UploadPartOutput, AWSError>> {
         if (numAttempts >= 3) {
@@ -73,65 +74,76 @@ export class FileService {
 
         try {
             const params = await this.s3.uploadPart(partParams).promise();
-            await statusFunction(userId, file.filename, file.id, Math.floor((bytesRead / file.size) * 100));
-            return params;
-        } catch (e) {
-            return await this.handleMultipartChunk(
-                userId,
-                file,
-                chunk,
-                partNumber,
-                s3MultiPart,
-                bytesRead,
-                statusFunction,
-                numAttempts + 1,
-            );
+            await pubsub.publish('UPLOAD_STATUS', {
+                fileUploadProgress: {
+                    userId,
+                    filename: file.filename,
+                    fileId: file.id,
+                    percentage: Math.floor((bytesRead / file.size) * 100),
+                    type: FileType.MANUSCRIPT_SOURCE,
+                    submissionId,
+                },
+                    });
+                return params;
+            } catch (e) {
+                return await this.handleMultipartChunk(
+                    pubsub,
+                    submissionId,
+                    userId,
+                    file,
+                    chunk,
+                    partNumber,
+                    s3MultiPart,
+                    bytesRead,
+                    type,
+                    numAttempts + 1,
+                );
+            }
         }
-    }
 
     async completeMultipartUpload(
-        key: string,
-        uploadId = '',
-        parts: { ETag: string | undefined; PartNumber: number }[],
-    ): Promise<PromiseResult<S3.Types.CompleteMultipartUploadOutput, AWSError>> {
-        return this.s3
-            .completeMultipartUpload({
+            key: string,
+            uploadId = '',
+            parts: { ETag: string | undefined; PartNumber: number }[],
+        ): Promise < PromiseResult < S3.Types.CompleteMultipartUploadOutput, AWSError >> {
+            return this.s3
+                .completeMultipartUpload({
+                    Bucket: this.bucket,
+                    Key: key,
+                    UploadId: uploadId,
+                    MultipartUpload: {
+                        Parts: parts,
+                    },
+                })
+                .promise();
+        }
+
+        async deleteManuscript(fileId: FileId, submissionId: SubmissionId): Promise < boolean > {
+            await this.fileRepository.deleteByIdAndSubmissionId(fileId, submissionId);
+            await this.s3.deleteObject({
                 Bucket: this.bucket,
-                Key: key,
-                UploadId: uploadId,
-                MultipartUpload: {
-                    Parts: parts,
-                },
-            })
-            .promise();
-    }
+                Key: this.getFileS3Key(FileType.MANUSCRIPT_SOURCE, submissionId, fileId),
+            });
+            return true;
+        }
 
-    async deleteManuscript(fileId: FileId, submissionId: SubmissionId): Promise<boolean> {
-        await this.fileRepository.deleteByIdAndSubmissionId(fileId, submissionId);
-        await this.s3.deleteObject({
-            Bucket: this.bucket,
-            Key: this.getFileS3Key(FileType.MANUSCRIPT_SOURCE, submissionId, fileId),
-        });
-        return true;
-    }
+        async deleteSupportingFile(fileId: FileId, submissionId: SubmissionId): Promise < boolean > {
+            await this.fileRepository.deleteByIdAndSubmissionId(fileId, submissionId);
+            await this.s3.deleteObject({
+                Bucket: this.bucket,
+                Key: this.getFileS3Key(FileType.SUPPORTING_FILE, submissionId, fileId),
+            });
+            return true;
+        }
 
-    async deleteSupportingFile(fileId: FileId, submissionId: SubmissionId): Promise<boolean> {
-        await this.fileRepository.deleteByIdAndSubmissionId(fileId, submissionId);
-        await this.s3.deleteObject({
-            Bucket: this.bucket,
-            Key: this.getFileS3Key(FileType.SUPPORTING_FILE, submissionId, fileId),
-        });
-        return true;
-    }
-
-    async create(
-        submissionId: SubmissionId,
-        filename: string,
-        mimeType: string,
-        size: number,
-        type: FileType,
-    ): Promise<File> {
-        if (type === FileType.MANUSCRIPT_SOURCE) {
+        async create(
+            submissionId: SubmissionId,
+            filename: string,
+            mimeType: string,
+            size: number,
+            type: FileType,
+        ): Promise < File > {
+            if(type === FileType.MANUSCRIPT_SOURCE) {
             const hasFile = await this.hasManuscriptFile(submissionId);
             if (hasFile === true) {
                 throw new Error('Submission already has manuscript');
@@ -194,7 +206,6 @@ export class FileService {
         submissionId: SubmissionId,
     ): Promise<Buffer> {
         const { url, mimeType } = file;
-        console.log('this.bucket', this.bucket);
         const fileUploadManager = await this.s3
             .createMultipartUpload({
                 Bucket: this.bucket,
@@ -203,50 +214,31 @@ export class FileService {
                 ACL: 'private',
             })
             .promise();
+
         let partNumber = 1;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const chunks: Array<any> = [];
         const parts: { ETag: string | undefined; PartNumber: number }[] = [];
-
-        const uploadStatusFunction = async (
-            userId: string,
-            filename: string,
-            fileId: string,
-            percentage: number,
-        ): Promise<void> =>
-            await pubsub.publish('UPLOAD_STATUS', {
-                fileUploadProgress: {
-                    userId,
-                    filename,
-                    fileId,
-                    percentage,
-                    type: FileType.MANUSCRIPT_SOURCE,
-                    submissionId,
-                },
-            });
 
         // tracks bytes until 5mb or last chunk, and send up.  
         let currentBytes = 0;
         let chunksToSend = [];
         for await (const chunk of stream) {
             const bytesRead = stream.bytesRead;
-            currentBytes = currentBytes + chunk.size;
+            currentBytes = currentBytes + chunk.length;
             chunksToSend.push(chunk);
             chunks.push(chunk);
-            console.log('loop');
-            if (currentBytes >= s3MinChunkSize || bytesRead === stream.bytesRead) {
-                console.log('currentBytes', currentBytes);
-                console.log('s3MinChunkSize', s3MinChunkSize);
-                console.log('bytesRead', bytesRead);
-                console.log('stream.bytesRead', stream.bytesRead);
+            if (currentBytes >= s3MinChunkSize || bytesRead === file.size) {
                 const { ETag } = await this.handleMultipartChunk(
+                    pubsub,
+                    submissionId,
                     userId,
                     file,
-                    chunksToSend,
+                    Buffer.concat(chunksToSend),
                     partNumber,
                     fileUploadManager,
                     bytesRead,
-                    uploadStatusFunction,
+                    FileType.MANUSCRIPT_SOURCE,
                 );
                 parts.push({ ETag, PartNumber: partNumber });
                 partNumber++;
@@ -280,36 +272,31 @@ export class FileService {
         let partNumber = 1;
         const parts: { ETag: string | undefined; PartNumber: number }[] = [];
 
-        const uploadStatusFunction = async (
-            userId: string,
-            filename: string,
-            fileId: string,
-            percentage: number,
-        ): Promise<void> =>
-            await pubsub.publish('UPLOAD_STATUS', {
-                fileUploadProgress: {
-                    userId,
-                    filename,
-                    fileId,
-                    percentage,
-                    type: FileType.SUPPORTING_FILE,
-                    submissionId,
-                },
-            });
-
+        // tracks bytes until 5mb or last chunk, and send up.  
+        let currentBytes = 0;
+        let chunksToSend = [];
         for await (const chunk of stream) {
             const bytesRead = stream.bytesRead;
-            const { ETag } = await this.handleMultipartChunk(
-                userId,
-                file,
-                chunk,
-                partNumber,
-                fileUploadManager,
-                bytesRead,
-                uploadStatusFunction,
-            );
-            parts.push({ ETag, PartNumber: partNumber });
-            partNumber++;
+            currentBytes = currentBytes + chunk.length;
+            chunksToSend.push(chunk);
+            if (currentBytes >= s3MinChunkSize || bytesRead === file.size) {
+                const { ETag } = await this.handleMultipartChunk(
+                    pubsub,
+                    submissionId,
+                    userId,
+                    file,
+                    Buffer.concat(chunksToSend),
+                    partNumber,
+                    fileUploadManager,
+                    bytesRead,
+                    FileType.SUPPORTING_FILE,
+                );
+                parts.push({ ETag, PartNumber: partNumber });
+                partNumber++;
+                // reset state tracking.
+                chunksToSend = [];
+                currentBytes = 0;
+            }
         }
 
         await this.completeMultipartUpload(file.url, fileUploadManager.UploadId, parts);

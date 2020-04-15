@@ -10,6 +10,7 @@ import { PermissionService, SubmissionOperation } from '../permission/service';
 import { User } from 'src/domain/user/user';
 import { FileType, FileId } from '../../domain/file/types';
 import { PubSub } from 'apollo-server-express';
+import { InfraLogger as logger } from '../../logger';
 
 export class WizardService {
     constructor(
@@ -115,7 +116,7 @@ export class WizardService {
             await this.semanticExtractionService.extractTitle(fileContents, mimeType, filename, submissionId);
             manuscriptFile.setStatusToStored();
         } catch (e) {
-            console.log('UPLOAD ERROR', e);
+            logger.error('UPLOAD ERROR', e);
             manuscriptFile.setStatusToCancelled();
         }
 
