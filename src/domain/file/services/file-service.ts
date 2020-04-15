@@ -83,67 +83,67 @@ export class FileService {
                     type: FileType.MANUSCRIPT_SOURCE,
                     submissionId,
                 },
-                    });
-                return params;
-            } catch (e) {
-                return await this.handleMultipartChunk(
-                    pubsub,
-                    submissionId,
-                    userId,
-                    file,
-                    chunk,
-                    partNumber,
-                    s3MultiPart,
-                    bytesRead,
-                    type,
-                    numAttempts + 1,
-                );
-            }
+            });
+            return params;
+        } catch (e) {
+            return await this.handleMultipartChunk(
+                pubsub,
+                submissionId,
+                userId,
+                file,
+                chunk,
+                partNumber,
+                s3MultiPart,
+                bytesRead,
+                type,
+                numAttempts + 1,
+            );
         }
+    }
 
     async completeMultipartUpload(
-            key: string,
-            uploadId = '',
-            parts: { ETag: string | undefined; PartNumber: number }[],
-        ): Promise < PromiseResult < S3.Types.CompleteMultipartUploadOutput, AWSError >> {
-            return this.s3
-                .completeMultipartUpload({
-                    Bucket: this.bucket,
-                    Key: key,
-                    UploadId: uploadId,
-                    MultipartUpload: {
-                        Parts: parts,
-                    },
-                })
-                .promise();
-        }
-
-        async deleteManuscript(fileId: FileId, submissionId: SubmissionId): Promise < boolean > {
-            await this.fileRepository.deleteByIdAndSubmissionId(fileId, submissionId);
-            await this.s3.deleteObject({
+        key: string,
+        uploadId = '',
+        parts: { ETag: string | undefined; PartNumber: number }[],
+    ): Promise<PromiseResult<S3.Types.CompleteMultipartUploadOutput, AWSError>> {
+        return this.s3
+            .completeMultipartUpload({
                 Bucket: this.bucket,
-                Key: this.getFileS3Key(FileType.MANUSCRIPT_SOURCE, submissionId, fileId),
-            });
-            return true;
-        }
+                Key: key,
+                UploadId: uploadId,
+                MultipartUpload: {
+                    Parts: parts,
+                },
+            })
+            .promise();
+    }
 
-        async deleteSupportingFile(fileId: FileId, submissionId: SubmissionId): Promise < boolean > {
-            await this.fileRepository.deleteByIdAndSubmissionId(fileId, submissionId);
-            await this.s3.deleteObject({
-                Bucket: this.bucket,
-                Key: this.getFileS3Key(FileType.SUPPORTING_FILE, submissionId, fileId),
-            });
-            return true;
-        }
+    async deleteManuscript(fileId: FileId, submissionId: SubmissionId): Promise<boolean> {
+        await this.fileRepository.deleteByIdAndSubmissionId(fileId, submissionId);
+        await this.s3.deleteObject({
+            Bucket: this.bucket,
+            Key: this.getFileS3Key(FileType.MANUSCRIPT_SOURCE, submissionId, fileId),
+        });
+        return true;
+    }
 
-        async create(
-            submissionId: SubmissionId,
-            filename: string,
-            mimeType: string,
-            size: number,
-            type: FileType,
-        ): Promise < File > {
-            if(type === FileType.MANUSCRIPT_SOURCE) {
+    async deleteSupportingFile(fileId: FileId, submissionId: SubmissionId): Promise<boolean> {
+        await this.fileRepository.deleteByIdAndSubmissionId(fileId, submissionId);
+        await this.s3.deleteObject({
+            Bucket: this.bucket,
+            Key: this.getFileS3Key(FileType.SUPPORTING_FILE, submissionId, fileId),
+        });
+        return true;
+    }
+
+    async create(
+        submissionId: SubmissionId,
+        filename: string,
+        mimeType: string,
+        size: number,
+        type: FileType,
+    ): Promise<File> {
+        if (type === FileType.MANUSCRIPT_SOURCE) {
             const hasFile = await this.hasManuscriptFile(submissionId);
             if (hasFile === true) {
                 throw new Error('Submission already has manuscript');
@@ -198,13 +198,14 @@ export class FileService {
         );
     }
 
-    async uploadManuscript(
-        file: File,
-        stream: ReadStream,
-        userId: string,
+    async handleFileUpload(
         pubsub: PubSub,
         submissionId: SubmissionId,
-    ): Promise<Buffer> {
+        userId: string,
+        file: File,
+        stream: ReadStream,
+        type: FileType,
+    ): Promise<Array<{}>> {
         const { url, mimeType } = file;
         const fileUploadManager = await this.s3
             .createMultipartUpload({
@@ -220,7 +221,7 @@ export class FileService {
         const chunks: Array<any> = [];
         const parts: { ETag: string | undefined; PartNumber: number }[] = [];
 
-        // tracks bytes until 5mb or last chunk, and send up.  
+        // tracks bytes until 5mb or last chunk, and send up.
         let currentBytes = 0;
         let chunksToSend = [];
         for await (const chunk of stream) {
@@ -238,7 +239,7 @@ export class FileService {
                     partNumber,
                     fileUploadManager,
                     bytesRead,
-                    FileType.MANUSCRIPT_SOURCE,
+                    type,
                 );
                 parts.push({ ETag, PartNumber: partNumber });
                 partNumber++;
@@ -249,6 +250,24 @@ export class FileService {
         }
 
         await this.completeMultipartUpload(file.url, fileUploadManager.UploadId, parts);
+        return chunks;
+    }
+
+    async uploadManuscript(
+        file: File,
+        stream: ReadStream,
+        userId: string,
+        pubsub: PubSub,
+        submissionId: SubmissionId,
+    ): Promise<Buffer> {
+        const chunks = await this.handleFileUpload(
+            pubsub,
+            submissionId,
+            userId,
+            file,
+            stream,
+            FileType.MANUSCRIPT_SOURCE,
+        );
         return Buffer.concat(chunks);
     }
 
@@ -259,47 +278,7 @@ export class FileService {
         pubsub: PubSub,
         submissionId: SubmissionId,
     ): Promise<void> {
-        const { url, mimeType } = file;
-        const fileUploadManager = await this.s3
-            .createMultipartUpload({
-                Bucket: this.bucket,
-                Key: url,
-                ContentType: mimeType,
-                ACL: 'private',
-            })
-            .promise();
-
-        let partNumber = 1;
-        const parts: { ETag: string | undefined; PartNumber: number }[] = [];
-
-        // tracks bytes until 5mb or last chunk, and send up.  
-        let currentBytes = 0;
-        let chunksToSend = [];
-        for await (const chunk of stream) {
-            const bytesRead = stream.bytesRead;
-            currentBytes = currentBytes + chunk.length;
-            chunksToSend.push(chunk);
-            if (currentBytes >= s3MinChunkSize || bytesRead === file.size) {
-                const { ETag } = await this.handleMultipartChunk(
-                    pubsub,
-                    submissionId,
-                    userId,
-                    file,
-                    Buffer.concat(chunksToSend),
-                    partNumber,
-                    fileUploadManager,
-                    bytesRead,
-                    FileType.SUPPORTING_FILE,
-                );
-                parts.push({ ETag, PartNumber: partNumber });
-                partNumber++;
-                // reset state tracking.
-                chunksToSend = [];
-                currentBytes = 0;
-            }
-        }
-
-        await this.completeMultipartUpload(file.url, fileUploadManager.UploadId, parts);
+        await this.handleFileUpload(pubsub, submissionId, userId, file, stream, FileType.SUPPORTING_FILE);
     }
 
     private addDownloadLink(file: File): void {
