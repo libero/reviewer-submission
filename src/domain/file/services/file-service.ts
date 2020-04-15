@@ -30,6 +30,7 @@ export class FileService {
             s3ForcePathStyle: s3config.s3ForcePathStyle,
         };
         const s3Options = s3config.awsEndPoint ? { ...defaultOptions, endpoint: s3config.awsEndPoint } : defaultOptions;
+        console.log('s3Options',s3Options );
         this.bucket = s3config.fileBucket;
         this.s3 = new S3(s3Options);
     }
@@ -193,6 +194,7 @@ export class FileService {
         submissionId: SubmissionId,
     ): Promise<Buffer> {
         const { url, mimeType } = file;
+        console.log('this.bucket', this.bucket);
         const fileUploadManager = await this.s3
             .createMultipartUpload({
                 Bucket: this.bucket,
@@ -223,7 +225,7 @@ export class FileService {
                 },
             });
 
-        // chunks have to be at least 5mb.  
+        // tracks bytes until 5mb or last chunk, and send up.  
         let currentBytes = 0;
         let chunksToSend = [];
         for await (const chunk of stream) {
@@ -231,7 +233,12 @@ export class FileService {
             currentBytes = currentBytes + chunk.size;
             chunksToSend.push(chunk);
             chunks.push(chunk);
+            console.log('loop');
             if (currentBytes >= s3MinChunkSize || bytesRead === stream.bytesRead) {
+                console.log('currentBytes', currentBytes);
+                console.log('s3MinChunkSize', s3MinChunkSize);
+                console.log('bytesRead', bytesRead);
+                console.log('stream.bytesRead', stream.bytesRead);
                 const { ETag } = await this.handleMultipartChunk(
                     userId,
                     file,

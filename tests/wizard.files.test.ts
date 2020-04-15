@@ -4,6 +4,8 @@ import { sign } from 'jsonwebtoken';
 import config from '../src/config';
 import * as FormData from 'form-data';
 import * as WebSocket from 'ws';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export const uploadSupportingFile = async (submissionId: string): Promise<AxiosResponse> => {
     const body = new FormData();
@@ -120,6 +122,54 @@ describe('Wizard->Files Integration Tests', () => {
             value: 'Impact of Coronavirus on Velociraptors',
             fieldName: 'title',
         });
+    });
+
+
+    it.only('uploads a large manuscript file', async () => {
+        const startSubmissionResponse = await startSubmissionAlt('research-article');
+        const submissionId = startSubmissionResponse.data.data.startSubmission.id;
+
+        const body = new FormData();
+        const query = `mutation UploadManuscript($id: ID!, $file: Upload!, $fileSize: Int!) {
+            uploadManuscript(id: $id, file: $file, fileSize: $fileSize) {
+                id,
+                files {
+                    manuscriptFile {
+                        id
+                    }
+                },
+                suggestions {
+                    value
+                    fieldName
+                }
+            }
+        }`;
+    
+        const operations = {
+            query: query,
+            variables: {
+                id: submissionId,
+                file: null,
+                fileSize: 122,
+            },
+        };
+    
+        body.append('operations', JSON.stringify(operations));
+        body.append('map', '{ "1": ["variables.file"] }');
+        body.append(
+            '1',
+            fs.createReadStream(path.join(__dirname, './files/test-v2.pdf')),
+            { filename: 'test-v2.pdf' },
+        );
+    
+        const uploadResponse = await axios.post('http://localhost:3000/graphql', body, {
+            headers: { Authorization: `Bearer ${jwtToken}`, ...body.getHeaders() },
+        });
+
+        expect(uploadResponse.status).toBe(200);
+
+        expect(uploadResponse.status).toBe(200);
+        expect(uploadResponse.data.data.uploadManuscript.id).toBe(submissionId);
     });
 
     // File Size limit for test should be 150 bytes.

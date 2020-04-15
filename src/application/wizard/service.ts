@@ -115,6 +115,7 @@ export class WizardService {
             await this.semanticExtractionService.extractTitle(fileContents, mimeType, filename, submissionId);
             manuscriptFile.setStatusToStored();
         } catch (e) {
+            console.log('UPLOAD ERROR', e);
             manuscriptFile.setStatusToCancelled();
         }
 
