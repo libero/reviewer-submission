@@ -80,7 +80,7 @@ export class FileService {
                     filename: file.filename,
                     fileId: file.id,
                     percentage: Math.floor((bytesRead / file.size) * 100),
-                    type: FileType.MANUSCRIPT_SOURCE,
+                    type,
                     submissionId,
                 },
             });
