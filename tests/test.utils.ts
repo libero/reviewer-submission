@@ -144,7 +144,7 @@ export const uploadTooLargeManuscript = async (submissionId: string): Promise<Ax
         variables: {
             id: submissionId,
             file: null,
-            fileSize: 1523729,
+            fileSize: 1523768,
         },
     };
 
