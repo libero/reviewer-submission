@@ -142,7 +142,7 @@ describe('Wizard->Files Integration Tests', () => {
 
         const uploadResponse = await uploadTooLargeManuscript(submissionId);
         expect(uploadResponse.status).toBe(200);
-        expect(uploadResponse.data.errors[0].message).toBe('File truncated as it exceeds the 100000 byte size limit.');
+        expect(uploadResponse.data.errors[0].message).toBe('File truncated as it exceeds the 1000000 byte size limit.');
     });
 
     it('deletes a manuscript file', async () => {
