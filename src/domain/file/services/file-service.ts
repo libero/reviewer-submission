@@ -12,7 +12,7 @@ import { PromiseResult } from 'aws-sdk/lib/request';
 import { AWSError } from 'aws-sdk/lib/error';
 import { ReadStream } from 'fs';
 
-const maxChunk = 1024 * 5;
+const s3MinChunkSize = 1024 * 5;
 
 export class FileService {
     fileRepository: XpubFileRepository;
@@ -223,13 +223,15 @@ export class FileService {
                 },
             });
 
+        // chunks have to be at least 5mb.  
         let currentBytes = 0;
         let chunksToSend = [];
         for await (const chunk of stream) {
             const bytesRead = stream.bytesRead;
             currentBytes = currentBytes + chunk.size;
-            chunksToSend.push(chunk)
-            if (currentBytes >= maxChunk || bytesRead === stream.bytesRead) {
+            chunksToSend.push(chunk);
+            chunks.push(chunk);
+            if (currentBytes >= s3MinChunkSize || bytesRead === stream.bytesRead) {
                 const { ETag } = await this.handleMultipartChunk(
                     userId,
                     file,
@@ -241,9 +243,10 @@ export class FileService {
                 );
                 parts.push({ ETag, PartNumber: partNumber });
                 partNumber++;
+                // reset state tracking.
                 chunksToSend = [];
+                currentBytes = 0;
             }
-            chunks.push(chunk);
         }
 
         await this.completeMultipartUpload(file.url, fileUploadManager.UploadId, parts);
