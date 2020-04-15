@@ -10,6 +10,8 @@ import { PermissionService, SubmissionOperation } from '../permission/service';
 import { User } from 'src/domain/user/user';
 import { FileType, FileId } from '../../domain/file/types';
 import { PubSub } from 'apollo-server-express';
+import config from '../../config';
+import { InfraLogger as logger } from '../../logger';
 
 export class WizardService {
     constructor(
@@ -94,6 +96,9 @@ export class WizardService {
         if (!allowed) {
             throw new Error('User not allowed to save submission');
         }
+        if (fileSize > config.max_file_size_in_bytes) {
+            throw new Error(`File truncated as it exceeds the ${config.max_file_size_in_bytes} byte size limit.`);
+        }
         const { filename, mimetype: mimeType, createReadStream } = await file;
         const stream = createReadStream();
         const manuscriptFile = await this.fileService.create(
@@ -115,6 +120,7 @@ export class WizardService {
             await this.semanticExtractionService.extractTitle(fileContents, mimeType, filename, submissionId);
             manuscriptFile.setStatusToStored();
         } catch (e) {
+            logger.error('UPLOAD ERROR', e);
             manuscriptFile.setStatusToCancelled();
         }
 
@@ -134,6 +140,9 @@ export class WizardService {
         const allowed = this.permissionService.userCanWithSubmission(user, SubmissionOperation.UPDATE, submission);
         if (!allowed) {
             throw new Error('User not allowed to save submission');
+        }
+        if (fileSize > config.max_file_size_in_bytes) {
+            throw new Error(`File truncated as it exceeds the ${config.max_file_size_in_bytes} byte size limit.`);
         }
         const { filename, mimetype: mimeType, createReadStream } = await file;
         const stream = createReadStream();

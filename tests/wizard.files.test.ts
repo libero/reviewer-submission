@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
-import { jwtToken, startSubmissionAlt, uploadManuscript, uploadLargeManuscript } from './test.utils';
+import { jwtToken, startSubmissionAlt, uploadManuscript, uploadLargeManuscript, uploadTooLargeManuscript } from './test.utils';
 import { sign } from 'jsonwebtoken';
 import config from '../src/config';
 import * as FormData from 'form-data';
@@ -26,7 +26,7 @@ export const uploadSupportingFile = async (submissionId: string): Promise<AxiosR
         variables: {
             id: submissionId,
             file: null,
-            fileSize: 2,
+            fileSize: 1,
         },
     };
 
@@ -122,14 +122,27 @@ describe('Wizard->Files Integration Tests', () => {
         });
     });
 
+
+    it('uploads a large manuscript file', async () => {
+        const startSubmissionResponse = await startSubmissionAlt('research-article');
+        const submissionId = startSubmissionResponse.data.data.startSubmission.id;
+
+        const uploadResponse = await uploadLargeManuscript(submissionId);
+
+        expect(uploadResponse.status).toBe(200);
+
+        expect(uploadResponse.status).toBe(200);
+        expect(uploadResponse.data.data.uploadManuscript.id).toBe(submissionId);
+    });
+
     // File Size limit for test should be 150 bytes.
     it('uploads throw is the file exceed the size limit', async () => {
         const startSubmissionResponse = await startSubmissionAlt('research-article');
         const submissionId = startSubmissionResponse.data.data.startSubmission.id;
 
-        const uploadResponse = await uploadLargeManuscript(submissionId);
+        const uploadResponse = await uploadTooLargeManuscript(submissionId);
         expect(uploadResponse.status).toBe(200);
-        expect(uploadResponse.data.errors[0].message).toBe('File truncated as it exceeds the 150 byte size limit.');
+        expect(uploadResponse.data.errors[0].message).toBe('File truncated as it exceeds the 1000000 byte size limit.');
     });
 
     it('deletes a manuscript file', async () => {

@@ -8,6 +8,10 @@ import { FileService } from '../../domain/file/services/file-service';
 import { SemanticExtractionService } from '../../domain/semantic-extraction/services/semantic-extraction-service';
 import { Suggestion } from '../../domain/semantic-extraction/services/models/sugestion';
 
+jest.mock('fs', () => ({
+    readFileSync: jest.fn().mockReturnValue('{}'),
+}));
+
 describe('saveAuthorPage', () => {
     it('should throw if submission not found', async () => {
         const submissionServiceMock = ({

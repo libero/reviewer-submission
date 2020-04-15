@@ -7,8 +7,10 @@ import { HttpLink } from 'apollo-link-http';
 import { setContext } from 'apollo-link-context';
 import gql from 'graphql-tag';
 import { sign } from 'jsonwebtoken';
-import config from '../src/config';
+import * as fs from 'fs';
+import * as path from 'path';
 import * as FormData from 'form-data';
+import config from '../src/config';
 
 export const jwtToken = sign({ sub: 'c0e64a86-2feb-435d-a40f-01f920334bc4' }, config.authentication_jwt_secret);
 
@@ -103,7 +105,7 @@ export const uploadLargeManuscript = async (submissionId: string): Promise<Axios
         variables: {
             id: submissionId,
             file: null,
-            fileSize: 200,
+            fileSize: 761864,
         },
     };
 
@@ -111,15 +113,47 @@ export const uploadLargeManuscript = async (submissionId: string): Promise<Axios
     body.append('map', '{ "1": ["variables.file"] }');
     body.append(
         '1',
-        `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.`,
-        { filename: 'a.txt' },
+        fs.createReadStream(path.join(__dirname, './mock-data/allowed.txt'), { highWaterMark: 1024 }),
+        { filename: 'allowed.txt' },
+    );
+
+    return await axios.post('http://localhost:3000/graphql', body, {
+        headers: { Authorization: `Bearer ${jwtToken}`, ...body.getHeaders() },
+    });
+};
+
+export const uploadTooLargeManuscript = async (submissionId: string): Promise<AxiosResponse> => {
+    const body = new FormData();
+    const query = `mutation UploadManuscript($id: ID!, $file: Upload!, $fileSize: Int!) {
+        uploadManuscript(id: $id, file: $file, fileSize: $fileSize) {
+            id,
+            files {
+                manuscriptFile {
+                    id
+                }
+            },
+            suggestions {
+                value
+                fieldName
+            }
+        }
+    }`;
+
+    const operations = {
+        query: query,
+        variables: {
+            id: submissionId,
+            file: null,
+            fileSize: 1523768,
+        },
+    };
+
+    body.append('operations', JSON.stringify(operations));
+    body.append('map', '{ "1": ["variables.file"] }');
+    body.append(
+        '1',
+        fs.createReadStream(path.join(__dirname, './mock-data/disallowed.txt')),
+        { filename: 'disallowed.txt' },
     );
 
     return await axios.post('http://localhost:3000/graphql', body, {
