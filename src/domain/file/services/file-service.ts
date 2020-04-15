@@ -205,7 +205,8 @@ export class FileService {
         file: File,
         stream: ReadStream,
         type: FileType,
-    ): Promise<Array<{}>> {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ): Promise<Array<any>> {
         const { url, mimeType } = file;
         const fileUploadManager = await this.s3
             .createMultipartUpload({
