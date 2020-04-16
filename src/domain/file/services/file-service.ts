@@ -12,7 +12,7 @@ import { PromiseResult } from 'aws-sdk/lib/request';
 import { AWSError } from 'aws-sdk/lib/error';
 import { ReadStream } from 'fs';
 
-const s3MinChunkSize = 5000000;
+const s3MinChunkSize = 5 * 1024 * 1024; // at least 5MB (non rounded)
 
 export class FileService {
     fileRepository: XpubFileRepository;
@@ -218,9 +218,13 @@ export class FileService {
         for await (const chunk of stream) {
             const bytesRead = stream.bytesRead;
             currentBytes = currentBytes + chunk.length;
+            // console.log('currentBytes OUT ', currentBytes);
+            // console.log('OUT bytesRead ', bytesRead);
+            // console.log('OUT file.size', file.size);
             chunksToSend.push(chunk);
             chunks.push(chunk);
             if (currentBytes >= s3MinChunkSize || bytesRead === file.size) {
+                console.log('currentBytes IN ', currentBytes);
                 // this will obviously cause some progress update delays as each chunk must be 5MB
                 const { ETag } = await this.handleMultipartChunk(
                     pubsub,
@@ -233,11 +237,11 @@ export class FileService {
                     bytesRead,
                     type,
                 );
-                parts.push({ ETag, PartNumber: partNumber });
-                partNumber++;
                 // reset state tracking.
                 chunksToSend = [];
                 currentBytes = 0;
+                parts.push({ ETag, PartNumber: partNumber });
+                partNumber++;
             }
             // this will keep reporting despite AWS' min chunk size 5MB
             await pubsub.publish('UPLOAD_STATUS', {
