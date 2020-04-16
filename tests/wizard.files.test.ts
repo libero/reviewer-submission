@@ -133,6 +133,7 @@ describe('Wizard->Files Integration Tests', () => {
 
         expect(uploadResponse.status).toBe(200);
         expect(uploadResponse.data.data.uploadManuscript.id).toBe(submissionId);
+        expect(uploadResponse.data.data.uploadManuscript.files.manuscriptFile).not.toBeNull();
     });
 
     // File Size limit for test should be 150 bytes.

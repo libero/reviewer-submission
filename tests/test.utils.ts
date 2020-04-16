@@ -105,7 +105,7 @@ export const uploadLargeManuscript = async (submissionId: string): Promise<Axios
         variables: {
             id: submissionId,
             file: null,
-            fileSize: 761864,
+            fileSize: 761903,
         },
     };
 
@@ -113,7 +113,7 @@ export const uploadLargeManuscript = async (submissionId: string): Promise<Axios
     body.append('map', '{ "1": ["variables.file"] }');
     body.append(
         '1',
-        fs.createReadStream(path.join(__dirname, './mock-data/allowed.txt'), { highWaterMark: 1024 }),
+        fs.createReadStream(path.join(__dirname, './mock-data/allowed.txt')),
         { filename: 'allowed.txt' },
     );
 

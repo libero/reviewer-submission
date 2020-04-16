@@ -12,7 +12,7 @@ import { PromiseResult } from 'aws-sdk/lib/request';
 import { AWSError } from 'aws-sdk/lib/error';
 import { ReadStream } from 'fs';
 
-const s3MinChunkSize = 5000000;
+const s3MinChunkSize = 5 * 1024 * 1024; // at least 5MB (non rounded)
 
 export class FileService {
     fileRepository: XpubFileRepository;
@@ -233,11 +233,11 @@ export class FileService {
                     bytesRead,
                     type,
                 );
-                parts.push({ ETag, PartNumber: partNumber });
-                partNumber++;
                 // reset state tracking.
                 chunksToSend = [];
                 currentBytes = 0;
+                parts.push({ ETag, PartNumber: partNumber });
+                partNumber++;
             }
             // this will keep reporting despite AWS' min chunk size 5MB
             await pubsub.publish('UPLOAD_STATUS', {
