@@ -65,8 +65,7 @@ export class SemanticExtractionService {
                 value: title,
             });
         } catch (e) {
-            logger.info(e);
-            logger.error('issue with semantic extraction');
+            logger.error(`issue with semantic extraction - file id - ${filename} - submission id - ${submissionId}`);
         }
 
         return title;
