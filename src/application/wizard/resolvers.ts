@@ -34,7 +34,6 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
             context,
         ): Promise<Submission> {
             const { file, id: submissionId, fileSize } = variables;
-            console.log('in resolver wizard', Date.now());
             const user = await userService.getCurrentUser(context.authorizationHeader);
             const submission = await wizard.saveManuscriptFile(user, submissionId, file, fileSize, pubsub);
 
