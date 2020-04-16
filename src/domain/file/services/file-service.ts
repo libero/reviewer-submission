@@ -221,7 +221,7 @@ export class FileService {
             chunksToSend.push(chunk);
             chunks.push(chunk);
             if (currentBytes >= s3MinChunkSize || bytesRead === file.size) {
-                // this will obviously cause some progress update delays as each chunk msy be 5MB
+                // this will obviously cause some progress update delays as each chunk must be 5MB
                 const { ETag } = await this.handleMultipartChunk(
                     pubsub,
                     submissionId,
