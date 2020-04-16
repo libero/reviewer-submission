@@ -218,13 +218,9 @@ export class FileService {
         for await (const chunk of stream) {
             const bytesRead = stream.bytesRead;
             currentBytes = currentBytes + chunk.length;
-            // console.log('currentBytes OUT ', currentBytes);
-            // console.log('OUT bytesRead ', bytesRead);
-            // console.log('OUT file.size', file.size);
             chunksToSend.push(chunk);
             chunks.push(chunk);
             if (currentBytes >= s3MinChunkSize || bytesRead === file.size) {
-                console.log('currentBytes IN ', currentBytes);
                 // this will obviously cause some progress update delays as each chunk must be 5MB
                 const { ETag } = await this.handleMultipartChunk(
                     pubsub,
