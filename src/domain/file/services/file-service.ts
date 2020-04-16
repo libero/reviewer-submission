@@ -74,16 +74,6 @@ export class FileService {
 
         try {
             const params = await this.s3.uploadPart(partParams).promise();
-            await pubsub.publish('UPLOAD_STATUS', {
-                fileUploadProgress: {
-                    userId,
-                    filename: file.filename,
-                    fileId: file.id,
-                    percentage: Math.floor((bytesRead / file.size) * 100),
-                    type,
-                    submissionId,
-                },
-            });
             return params;
         } catch (e) {
             return await this.handleMultipartChunk(
@@ -231,6 +221,7 @@ export class FileService {
             chunksToSend.push(chunk);
             chunks.push(chunk);
             if (currentBytes >= s3MinChunkSize || bytesRead === file.size) {
+                // this will obviously cause some progress update delays as each chunk must be 5MB
                 const { ETag } = await this.handleMultipartChunk(
                     pubsub,
                     submissionId,
@@ -248,6 +239,17 @@ export class FileService {
                 chunksToSend = [];
                 currentBytes = 0;
             }
+            // this will keep reporting despite AWS' min chunk size 5MB
+            await pubsub.publish('UPLOAD_STATUS', {
+                fileUploadProgress: {
+                    userId,
+                    filename: file.filename,
+                    fileId: file.id,
+                    percentage: Math.floor((bytesRead / file.size) * 100),
+                    type,
+                    submissionId,
+                },
+            });
         }
 
         await this.completeMultipartUpload(file.url, fileUploadManager.UploadId, parts);
