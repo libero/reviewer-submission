@@ -1,9 +1,14 @@
 ARG image_tag=latest
 
-FROM node:12.15 as source
+FROM node:12-slim@sha256:13feae32c9b554584a6df818bde1546edee7a8e497b54c57680c621235a48606 as source
 MAINTAINER eLife Reviewer Product Team <reviewer-product@elifesciences.org>
 
 WORKDIR /app
+
+RUN apt-get update && apt-get install --no-install-recommends -y \
+    build-essential \
+    python3 \
+    bzip2
 
 COPY  tsconfig.build.json \
       tsconfig.json \
@@ -18,7 +23,7 @@ COPY src/ ./src/
 RUN yarn &&\
     yarn build
 
-FROM node:12.15-alpine
+FROM node:12-alpine@sha256:5646d1e5bc470500414feb3540186c02845db0e0e1788621c271fbf3a0c1830d
 MAINTAINER eLife Reviewer Product Team <reviewer-product@elifesciences.org>
 
 WORKDIR /app
