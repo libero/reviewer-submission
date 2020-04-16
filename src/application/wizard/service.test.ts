@@ -1,5 +1,6 @@
 import { FileUpload } from 'graphql-upload';
 import { PubSub } from 'apollo-server-express';
+import { Config } from '../../config';
 import { WizardService } from './service';
 import { SubmissionService } from '../../domain/submission';
 import { TeamService } from '../../domain/teams/services/team-service';
@@ -15,6 +16,7 @@ jest.mock('fs', () => ({
 }));
 
 describe('saveAuthorPage', () => {
+    const mockConfig = ({} as unknown) as Config;
     it('should throw if submission not found', async () => {
         const submissionServiceMock = ({
             get: jest.fn().mockImplementationOnce(() => null),
@@ -36,6 +38,7 @@ describe('saveAuthorPage', () => {
             teamServiceMock,
             fileServiceMock,
             semanticExtractionServiceMock,
+            mockConfig,
         );
         const user = {
             id: '89e0aec8-b9fc-4413-8a37-5cc77567',
@@ -74,6 +77,7 @@ describe('saveAuthorPage', () => {
             teamServiceMock,
             fileServiceMock,
             semanticExtractionServiceMock,
+            mockConfig,
         );
         const user = {
             id: '89e0aec8-b9fc-4413-8a37-5cc77567',
@@ -126,6 +130,7 @@ describe('saveAuthorPage', () => {
             teamServiceMock,
             fileService,
             semanticExtractionServiceMock,
+            mockConfig,
         );
         await wizardService.saveAuthorPage(user, SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'), {
             firstName: 'John',
@@ -185,6 +190,7 @@ describe('saveAuthorPage', () => {
             teamServiceMock,
             fileService,
             semanticExtractionServiceMock,
+            mockConfig,
         );
 
         await wizardService.saveAuthorPage(user, subId, {
@@ -243,6 +249,7 @@ describe('saveAuthorPage', () => {
             teamServiceMock,
             fileServiceMock,
             semanticExtractionServiceMock,
+            mockConfig,
         );
 
         await expect(
@@ -262,6 +269,11 @@ describe('saveManuscript', () => {
         name: 'Bob',
         role: 'user',
     };
+    const mockConfig = ({
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        max_file_size_in_bytes: 100,
+    } as unknown) as Config;
+
     it('should throw if user is not allowed to update submission', async (): Promise<void> => {
         const permissionService = ({
             userCanWithSubmission: jest.fn(() => false),
@@ -273,6 +285,7 @@ describe('saveManuscript', () => {
             (jest.fn() as unknown) as TeamService,
             (jest.fn() as unknown) as FileService,
             (jest.fn() as unknown) as SemanticExtractionService,
+            mockConfig,
         );
         await expect(
             wizardService.saveManuscriptFile(
@@ -284,6 +297,31 @@ describe('saveManuscript', () => {
             ),
         ).rejects.toThrow('User not allowed to save submission');
     });
+
+    it('should throw if the file size is greater than the max in config', async (): Promise<void> => {
+        const mockFileSize = mockConfig.max_file_size_in_bytes + 1;
+        const permissionService = ({
+            userCanWithSubmission: jest.fn(() => true),
+        } as unknown) as PermissionService;
+
+        const wizardService = new WizardService(
+            permissionService,
+            ({ get: jest.fn(() => Promise.resolve()) } as unknown) as SubmissionService,
+            (jest.fn() as unknown) as TeamService,
+            (jest.fn() as unknown) as FileService,
+            (jest.fn() as unknown) as SemanticExtractionService,
+            mockConfig,
+        );
+        await expect(
+            wizardService.saveManuscriptFile(
+                mockUser,
+                SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'),
+                (jest.fn() as unknown) as FileUpload,
+                mockFileSize,
+                (jest.fn() as unknown) as PubSub,
+            ),
+        ).rejects.toThrow('File truncated as it exceeds the 100 byte size limit.');
+    });
 });
 
 describe('saveSupporting', () => {
@@ -292,6 +330,11 @@ describe('saveSupporting', () => {
         name: 'Bob',
         role: 'user',
     };
+    const mockConfig = ({
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        max_file_size_in_bytes: 100,
+    } as unknown) as Config;
+
     it('should throw if user is not allowed to update submission', async (): Promise<void> => {
         const permissionService = ({
             userCanWithSubmission: jest.fn(() => false),
@@ -303,6 +346,7 @@ describe('saveSupporting', () => {
             (jest.fn() as unknown) as TeamService,
             (jest.fn() as unknown) as FileService,
             (jest.fn() as unknown) as SemanticExtractionService,
+            mockConfig,
         );
         await expect(
             wizardService.saveSupportingFile(
@@ -313,5 +357,29 @@ describe('saveSupporting', () => {
                 (jest.fn() as unknown) as PubSub,
             ),
         ).rejects.toThrow('User not allowed to save submission');
+    });
+    it('should throw if the file size is greater than the max in config', async (): Promise<void> => {
+        const mockFileSize = mockConfig.max_file_size_in_bytes + 1;
+        const permissionService = ({
+            userCanWithSubmission: jest.fn(() => true),
+        } as unknown) as PermissionService;
+
+        const wizardService = new WizardService(
+            permissionService,
+            ({ get: jest.fn(() => Promise.resolve()) } as unknown) as SubmissionService,
+            (jest.fn() as unknown) as TeamService,
+            (jest.fn() as unknown) as FileService,
+            (jest.fn() as unknown) as SemanticExtractionService,
+            mockConfig,
+        );
+        await expect(
+            wizardService.saveSupportingFile(
+                mockUser,
+                SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'),
+                (jest.fn() as unknown) as FileUpload,
+                mockFileSize,
+                (jest.fn() as unknown) as PubSub,
+            ),
+        ).rejects.toThrow('File truncated as it exceeds the 100 byte size limit.');
     });
 });

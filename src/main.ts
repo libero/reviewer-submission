@@ -66,7 +66,7 @@ const init = async (): Promise<void> => {
     // init application services
     const srvPermission = new PermissionService();
     const srvDashboard = new DashboardService(srvPermission, srvSubmission);
-    const srvWizard = new WizardService(srvPermission, srvSubmission, srvTeam, srvFile, srvExtractionService);
+    const srvWizard = new WizardService(srvPermission, srvSubmission, srvTeam, srvFile, srvExtractionService, config);
 
     // init resolvers
     const resolvers = [

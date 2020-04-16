@@ -10,7 +10,7 @@ import { PermissionService, SubmissionOperation } from '../permission/service';
 import { User } from 'src/domain/user/user';
 import { FileType, FileId } from '../../domain/file/types';
 import { PubSub } from 'apollo-server-express';
-import config from '../../config';
+import { Config } from '../../config';
 import { InfraLogger as logger } from '../../logger';
 
 export class WizardService {
@@ -20,6 +20,7 @@ export class WizardService {
         private readonly teamService: TeamService,
         private readonly fileService: FileService,
         private readonly semanticExtractionService: SemanticExtractionService,
+        private readonly config: Config,
     ) {}
 
     async getSubmission(user: User, submissionId: SubmissionId): Promise<Submission | null> {
@@ -96,8 +97,9 @@ export class WizardService {
         if (!allowed) {
             throw new Error('User not allowed to save submission');
         }
-        if (fileSize > config.max_file_size_in_bytes) {
-            throw new Error(`File truncated as it exceeds the ${config.max_file_size_in_bytes} byte size limit.`);
+        console.log(fileSize, this.config.max_file_size_in_bytes);
+        if (fileSize > this.config.max_file_size_in_bytes) {
+            throw new Error(`File truncated as it exceeds the ${this.config.max_file_size_in_bytes} byte size limit.`);
         }
         const { filename, mimetype: mimeType, createReadStream } = await file;
         const stream = createReadStream();
@@ -143,8 +145,8 @@ export class WizardService {
         if (!allowed) {
             throw new Error('User not allowed to save submission');
         }
-        if (fileSize > config.max_file_size_in_bytes) {
-            throw new Error(`File truncated as it exceeds the ${config.max_file_size_in_bytes} byte size limit.`);
+        if (fileSize > this.config.max_file_size_in_bytes) {
+            throw new Error(`File truncated as it exceeds the ${this.config.max_file_size_in_bytes} byte size limit.`);
         }
         const { filename, mimetype: mimeType, createReadStream } = await file;
         const stream = createReadStream();
