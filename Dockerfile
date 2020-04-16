@@ -1,6 +1,6 @@
 ARG image_tag=latest
 
-FROM node:lts-slim@sha256:13feae32c9b554584a6df818bde1546edee7a8e497b54c57680c621235a48606 as source
+FROM node:12-alpine@sha256:5646d1e5bc470500414feb3540186c02845db0e0e1788621c271fbf3a0c1830d
 MAINTAINER eLife Reviewer Product Team <reviewer-product@elifesciences.org>
 
 WORKDIR /app
@@ -18,7 +18,7 @@ COPY src/ ./src/
 RUN yarn &&\
     yarn build
 
-FROM node:lts-slim@sha256:13feae32c9b554584a6df818bde1546edee7a8e497b54c57680c621235a48606
+FROM node:12-alpine@sha256:5646d1e5bc470500414feb3540186c02845db0e0e1788621c271fbf3a0c1830d
 MAINTAINER eLife Reviewer Product Team <reviewer-product@elifesciences.org>
 
 WORKDIR /app
