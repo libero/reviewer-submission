@@ -2,7 +2,7 @@
 version: '3'
 services:
   application:
-    image: node:10
+    image: node:12-alpine@sha256:5646d1e5bc470500414feb3540186c02845db0e0e1788621c271fbf3a0c1830d
     ports:
       - "${SERVER_PORT:-3000}:3000"
     working_dir: "/src"
