@@ -123,7 +123,7 @@ describe('Wizard->Files Integration Tests', () => {
     });
 
 
-    it.only('uploads a large manuscript file', async () => {
+    it('uploads a large manuscript file', async () => {
         const startSubmissionResponse = await startSubmissionAlt('research-article');
         const submissionId = startSubmissionResponse.data.data.startSubmission.id;
 
