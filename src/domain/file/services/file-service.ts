@@ -215,9 +215,7 @@ export class FileService {
         // tracks bytes until 5mb or last chunk, and send up.
         let currentBytes = 0;
         let chunksToSend = [];
-        console.log('pre loops', Date.now());
         for await (const chunk of stream) {
-            console.log('post loops', Date.now());
             const bytesRead = stream.bytesRead;
             currentBytes = currentBytes + chunk.length;
             chunksToSend.push(chunk);
