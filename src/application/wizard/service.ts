@@ -118,12 +118,14 @@ export class WizardService {
                 submissionId,
             );
             await this.semanticExtractionService.extractTitle(fileContents, mimeType, filename, submissionId);
-            manuscriptFile.setStatusToStored();
         } catch (e) {
-            logger.error('UPLOAD ERROR', e);
+            logger.error(submissionId, 'MANUSCRIPT UPLOAD ERROR', e);
             manuscriptFile.setStatusToCancelled();
+            await this.fileService.update(manuscriptFile);
+            throw new Error('Manuscript upload failed to store file.');
         }
 
+        manuscriptFile.setStatusToStored();
         await this.fileService.update(manuscriptFile);
 
         return this.getFullSubmission(submissionId);
@@ -156,13 +158,14 @@ export class WizardService {
 
         try {
             await this.fileService.uploadSupportingFile(supportingFile, stream, user.id, pubsub, submissionId);
-            supportingFile.setStatusToStored();
         } catch (e) {
-            console.log('error', e);
-            // @todo should this not be setStatusToDeleted ?
+            logger.error(submissionId, 'SUPPORTING UPLOAD ERROR', e);
             supportingFile.setStatusToCancelled();
+            await this.fileService.update(supportingFile);
+            throw new Error('Supporting upload failed to store file.');
         }
 
+        supportingFile.setStatusToStored();
         await this.fileService.update(supportingFile);
 
         return await this.getFullSubmission(submissionId);

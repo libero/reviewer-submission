@@ -1,3 +1,5 @@
+import { FileUpload } from 'graphql-upload';
+import { PubSub } from 'apollo-server-express';
 import { WizardService } from './service';
 import { SubmissionService } from '../../domain/submission';
 import { TeamService } from '../../domain/teams/services/team-service';
@@ -251,5 +253,65 @@ describe('saveAuthorPage', () => {
                 aff: 'aff',
             }),
         ).rejects.toThrow();
+    });
+});
+
+describe('saveManuscript', () => {
+    const mockUser = {
+        id: '89e0aec8-b9fc-4413-8a37-cccccccc',
+        name: 'Bob',
+        role: 'user',
+    };
+    it('should throw if user is not allowed to update submission', async (): Promise<void> => {
+        const permissionService = ({
+            userCanWithSubmission: jest.fn(() => false),
+        } as unknown) as PermissionService;
+
+        const wizardService = new WizardService(
+            permissionService,
+            ({ get: jest.fn(() => Promise.resolve()) } as unknown) as SubmissionService,
+            (jest.fn() as unknown) as TeamService,
+            (jest.fn() as unknown) as FileService,
+            (jest.fn() as unknown) as SemanticExtractionService,
+        );
+        await expect(
+            wizardService.saveManuscriptFile(
+                mockUser,
+                SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'),
+                (jest.fn() as unknown) as FileUpload,
+                0,
+                (jest.fn() as unknown) as PubSub,
+            ),
+        ).rejects.toThrow('User not allowed to save submission');
+    });
+});
+
+describe('saveSupporting', () => {
+    const mockUser = {
+        id: '89e0aec8-b9fc-4413-8a37-cccccccc',
+        name: 'Bob',
+        role: 'user',
+    };
+    it('should throw if user is not allowed to update submission', async (): Promise<void> => {
+        const permissionService = ({
+            userCanWithSubmission: jest.fn(() => false),
+        } as unknown) as PermissionService;
+
+        const wizardService = new WizardService(
+            permissionService,
+            ({ get: jest.fn(() => Promise.resolve()) } as unknown) as SubmissionService,
+            (jest.fn() as unknown) as TeamService,
+            (jest.fn() as unknown) as FileService,
+            (jest.fn() as unknown) as SemanticExtractionService,
+        );
+        await expect(
+            wizardService.saveSupportingFile(
+                mockUser,
+                SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'),
+                (jest.fn() as unknown) as FileUpload,
+                0,
+                (jest.fn() as unknown) as PubSub,
+            ),
+        ).rejects.toThrow('User not allowed to save submission');
     });
 });
