@@ -97,7 +97,6 @@ export class WizardService {
         if (!allowed) {
             throw new Error('User not allowed to save submission');
         }
-        console.log(fileSize, this.config.max_file_size_in_bytes);
         if (fileSize > this.config.max_file_size_in_bytes) {
             throw new Error(`File truncated as it exceeds the ${this.config.max_file_size_in_bytes} byte size limit.`);
         }

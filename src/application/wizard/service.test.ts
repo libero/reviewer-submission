@@ -14,6 +14,7 @@ import { Suggestion } from '../../domain/semantic-extraction/services/models/sug
 jest.mock('fs', () => ({
     readFileSync: jest.fn().mockReturnValue('{}'),
 }));
+jest.mock('../../logger');
 
 describe('saveAuthorPage', () => {
     const mockConfig = ({} as unknown) as Config;
@@ -321,6 +322,39 @@ describe('saveManuscript', () => {
                 (jest.fn() as unknown) as PubSub,
             ),
         ).rejects.toThrow('File truncated as it exceeds the 100 byte size limit.');
+    });
+
+    it('throws if the upload process fails', async (): Promise<void> => {
+        const permissionService = ({
+            userCanWithSubmission: jest.fn(() => true),
+        } as unknown) as PermissionService;
+
+        const mockManuscriptFile = { setStatusToCancelled: jest.fn() };
+        const mockUpdate = jest.fn();
+        const wizardService = new WizardService(
+            permissionService,
+            ({ get: jest.fn(() => Promise.resolve()) } as unknown) as SubmissionService,
+            (jest.fn() as unknown) as TeamService,
+            ({
+                create: jest.fn(() => mockManuscriptFile),
+                update: mockUpdate,
+                uploadManuscript: jest.fn(() => Promise.reject('test error')),
+            } as unknown) as FileService,
+            (jest.fn() as unknown) as SemanticExtractionService,
+            mockConfig,
+        );
+
+        await expect(
+            wizardService.saveManuscriptFile(
+                mockUser,
+                SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'),
+                (new Promise(resolve => resolve({ createReadStream: jest.fn() })) as unknown) as FileUpload,
+                0,
+                (jest.fn() as unknown) as PubSub,
+            ),
+        ).rejects.toThrow('Manuscript upload failed to store file.');
+        expect(mockManuscriptFile.setStatusToCancelled).toBeCalled();
+        expect(mockUpdate).toBeCalled();
     });
 });
 
