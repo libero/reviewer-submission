@@ -10,7 +10,7 @@ import { PermissionService, SubmissionOperation } from '../permission/service';
 import { User } from 'src/domain/user/user';
 import { FileType, FileId } from '../../domain/file/types';
 import { PubSub } from 'apollo-server-express';
-import config from '../../config';
+import { Config } from '../../config';
 import { InfraLogger as logger } from '../../logger';
 
 export class WizardService {
@@ -20,6 +20,7 @@ export class WizardService {
         private readonly teamService: TeamService,
         private readonly fileService: FileService,
         private readonly semanticExtractionService: SemanticExtractionService,
+        private readonly config: Config,
     ) {}
 
     async getSubmission(user: User, submissionId: SubmissionId): Promise<Submission | null> {
@@ -96,8 +97,8 @@ export class WizardService {
         if (!allowed) {
             throw new Error('User not allowed to save submission');
         }
-        if (fileSize > config.max_file_size_in_bytes) {
-            throw new Error(`File truncated as it exceeds the ${config.max_file_size_in_bytes} byte size limit.`);
+        if (fileSize > this.config.max_file_size_in_bytes) {
+            throw new Error(`File truncated as it exceeds the ${this.config.max_file_size_in_bytes} byte size limit.`);
         }
         const { filename, mimetype: mimeType, createReadStream } = await file;
         const stream = createReadStream();
@@ -118,12 +119,14 @@ export class WizardService {
                 submissionId,
             );
             await this.semanticExtractionService.extractTitle(fileContents, mimeType, filename, submissionId);
-            manuscriptFile.setStatusToStored();
         } catch (e) {
-            logger.error('UPLOAD ERROR', e);
+            logger.error(submissionId, 'MANUSCRIPT UPLOAD ERROR', e);
             manuscriptFile.setStatusToCancelled();
+            await this.fileService.update(manuscriptFile);
+            throw new Error('Manuscript upload failed to store file.');
         }
 
+        manuscriptFile.setStatusToStored();
         await this.fileService.update(manuscriptFile);
 
         return this.getFullSubmission(submissionId);
@@ -141,8 +144,8 @@ export class WizardService {
         if (!allowed) {
             throw new Error('User not allowed to save submission');
         }
-        if (fileSize > config.max_file_size_in_bytes) {
-            throw new Error(`File truncated as it exceeds the ${config.max_file_size_in_bytes} byte size limit.`);
+        if (fileSize > this.config.max_file_size_in_bytes) {
+            throw new Error(`File truncated as it exceeds the ${this.config.max_file_size_in_bytes} byte size limit.`);
         }
         const { filename, mimetype: mimeType, createReadStream } = await file;
         const stream = createReadStream();
@@ -156,13 +159,14 @@ export class WizardService {
 
         try {
             await this.fileService.uploadSupportingFile(supportingFile, stream, user.id, pubsub, submissionId);
-            supportingFile.setStatusToStored();
         } catch (e) {
-            console.log('error', e);
-            // @todo should this not be setStatusToDeleted ?
+            logger.error(submissionId, 'SUPPORTING UPLOAD ERROR', e);
             supportingFile.setStatusToCancelled();
+            await this.fileService.update(supportingFile);
+            throw new Error('Supporting upload failed to store file.');
         }
 
+        supportingFile.setStatusToStored();
         await this.fileService.update(supportingFile);
 
         return await this.getFullSubmission(submissionId);
