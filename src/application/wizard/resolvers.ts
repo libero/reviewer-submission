@@ -5,6 +5,7 @@ import { SubmissionId, AuthorDetails, ManuscriptDetails } from '../../domain/sub
 import { UserService } from 'src/domain/user';
 import { WizardService } from './service';
 import { FileId } from '../../domain/file/types';
+import File from '../../domain/file/services/models/file';
 
 const pubsub = new PubSub();
 
@@ -52,18 +53,18 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
             _,
             variables: { file: FileUpload; fileSize: number; id: SubmissionId },
             context,
-        ): Promise<Submission> {
+        ): Promise<File> {
             const { file, id: submissionId, fileSize } = variables;
             const user = await userService.getCurrentUser(context.authorizationHeader);
-            const submission = await wizard.saveSupportingFile(user, submissionId, file, fileSize, pubsub);
+            const supportingFile = await wizard.saveSupportingFile(user, submissionId, file, fileSize, pubsub);
 
-            return submission;
+            return supportingFile;
         },
         async deleteSupportingFile(
             _,
             variables: { fileId: FileId; submissionId: SubmissionId },
             context,
-        ): Promise<boolean> {
+        ): Promise<string> {
             const { fileId, submissionId } = variables;
             const user = await userService.getCurrentUser(context.authorizationHeader);
             return await wizard.deleteSupportingFile(fileId, submissionId, user);

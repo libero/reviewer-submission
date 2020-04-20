@@ -10,6 +10,8 @@ import { PermissionService } from '../permission/service';
 import { FileService } from '../../domain/file/services/file-service';
 import { SemanticExtractionService } from '../../domain/semantic-extraction/services/semantic-extraction-service';
 import { Suggestion } from '../../domain/semantic-extraction/services/models/sugestion';
+import File from '../../domain/file/services/models/file';
+import { FileId, FileType } from '../../domain/file/types';
 
 jest.mock('fs', () => ({
     readFileSync: jest.fn().mockReturnValue('{}'),
@@ -447,5 +449,44 @@ describe('saveSupporting', () => {
         ).rejects.toThrow('Supporting upload failed to store file.');
         expect(mockManuscriptFile.setStatusToCancelled).toBeCalled();
         expect(mockUpdate).toBeCalled();
+    });
+    it('should return the file that has been added on upload', async (): Promise<void> => {
+        const permissionService = ({
+            userCanWithSubmission: jest.fn(() => true),
+        } as unknown) as PermissionService;
+
+        const mockUpdate = jest.fn();
+        const submissionId = new SubmissionId();
+        const fileId = new FileId();
+        const testFile: File = new File({
+            mimeType: '',
+            size: 0,
+            status: '',
+            submissionId: submissionId,
+            type: FileType.SUPPORTING_FILE,
+            filename: 'bob',
+            id: fileId,
+        });
+        const wizardService = new WizardService(
+            permissionService,
+            ({ get: jest.fn(() => Promise.resolve()) } as unknown) as SubmissionService,
+            (jest.fn() as unknown) as TeamService,
+            ({
+                create: jest.fn(() => testFile),
+                update: mockUpdate,
+                uploadSupportingFile: jest.fn(() => Promise.resolve(testFile)),
+            } as unknown) as FileService,
+            (jest.fn() as unknown) as SemanticExtractionService,
+            mockConfig,
+        );
+
+        const supportingFile = await wizardService.saveSupportingFile(
+            mockUser,
+            SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'),
+            (new Promise(resolve => resolve({ createReadStream: jest.fn() })) as unknown) as FileUpload,
+            0,
+            (jest.fn() as unknown) as PubSub,
+        );
+        expect(supportingFile.id).toBe(fileId);
     });
 });
