@@ -117,13 +117,13 @@ export class FileService {
         return true;
     }
 
-    async deleteSupportingFile(fileId: FileId, submissionId: SubmissionId): Promise<string> {
+    async deleteSupportingFile(fileId: FileId, submissionId: SubmissionId): Promise<FileId> {
         await this.fileRepository.deleteByIdAndSubmissionId(fileId, submissionId);
         await this.s3.deleteObject({
             Bucket: this.bucket,
             Key: this.getFileS3Key(FileType.SUPPORTING_FILE, submissionId, fileId),
         });
-        return fileId.value;
+        return fileId;
     }
 
     async create(

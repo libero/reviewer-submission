@@ -173,7 +173,7 @@ export class WizardService {
         return supportingFile;
     }
 
-    async deleteSupportingFile(fileId: FileId, submissionId: SubmissionId, user: User): Promise<string> {
+    async deleteSupportingFile(fileId: FileId, submissionId: SubmissionId, user: User): Promise<FileId> {
         const submission = await this.submissionService.get(submissionId);
         const allowed = this.permissionService.userCanWithSubmission(user, SubmissionOperation.DELETE, submission);
         if (!allowed) {
