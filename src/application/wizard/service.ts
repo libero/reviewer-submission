@@ -12,6 +12,7 @@ import { FileType, FileId } from '../../domain/file/types';
 import { PubSub } from 'apollo-server-express';
 import { Config } from '../../config';
 import { InfraLogger as logger } from '../../logger';
+import File from '../../domain/file/services/models/file';
 
 export class WizardService {
     constructor(
@@ -138,7 +139,7 @@ export class WizardService {
         file: FileUpload,
         fileSize: number,
         pubsub: PubSub,
-    ): Promise<Submission> {
+    ): Promise<File> {
         const submission = await this.submissionService.get(submissionId);
         const allowed = this.permissionService.userCanWithSubmission(user, SubmissionOperation.UPDATE, submission);
         if (!allowed) {
@@ -169,10 +170,10 @@ export class WizardService {
         supportingFile.setStatusToStored();
         await this.fileService.update(supportingFile);
 
-        return await this.getFullSubmission(submissionId);
+        return supportingFile;
     }
 
-    async deleteSupportingFile(fileId: FileId, submissionId: SubmissionId, user: User): Promise<boolean> {
+    async deleteSupportingFile(fileId: FileId, submissionId: SubmissionId, user: User): Promise<FileId> {
         const submission = await this.submissionService.get(submissionId);
         const allowed = this.permissionService.userCanWithSubmission(user, SubmissionOperation.DELETE, submission);
         if (!allowed) {
