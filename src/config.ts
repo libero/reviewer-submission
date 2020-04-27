@@ -65,7 +65,7 @@ const appConfig: Config = {
     user_adapter_url: process.env.USER_ADAPTER_URL || '',
     science_beam: {
         api_url: process.env.SCIENCE_BEAM_URL || '',
-        timeout: process.env.SCIENCE_BEAM_TIMEROUT || ''
+        timeout: process.env.SCIENCE_BEAM_TIMEROUT || '',
     },
 };
 
