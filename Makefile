@@ -25,7 +25,7 @@ install:
 lint: install
 	yarn lint
 
-test: get_deps
+test: install
 	echo "***** Running cover letter test with large timeout to prepopulate cache."
 	npx jest --testTimeout 50000 src/domain/submission/services/exporter/file-generators/coverLetter.test.ts
 	echo "***** Running normal test suite..."
