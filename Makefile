@@ -9,7 +9,8 @@ GET_SCHEMA_TABLES = psql -q -t -U postgres postgres -c "select count(*) from inf
 LOAD_SCHEMA = psql -U postgres -f xpub-schema.sql
 
 setup:
-	git submodule update --init --recursive
+	-@ git submodule update --init --recursive
+	-@ docker network create reviewer > /dev/null 2>&1 || true
 
 start:
 	${DOCKER_COMPOSE} up -d s3 postgres
