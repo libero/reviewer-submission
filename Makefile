@@ -1,6 +1,7 @@
 
 IMAGE_TAG ?= "local"
-DOCKER_COMPOSE = IMAGE_TAG=${IMAGE_TAG} docker-compose -f docker-compose.build.yml
+DOCKER_COMPOSE = IMAGE_TAG=${IMAGE_TAG} docker-compose
+DOCKER_COMPOSE_BUILD = IMAGE_TAG=${IMAGE_TAG} docker-compose -f docker-compose.build.yml
 DOCKER_COMPOSE_TEST = IMAGE_TAG=${IMAGE_TAG} docker-compose -f docker-compose.test.yml
 DOCKER_COMPOSE_XPUB_POSTGRES = IMAGE_TAG=${IMAGE_TAG} docker-compose -f docker-compose.xpub-postgres.yml
 PUSH_COMMAND = IMAGE_TAG=${IMAGE_TAG} .scripts/travis/push-image.sh
@@ -8,16 +9,19 @@ GET_SCHEMA_TABLES = psql -q -t -U postgres postgres -c "select count(*) from inf
 LOAD_SCHEMA = psql -U postgres -f xpub-schema.sql
 
 setup:
-	if [ ! -e ./config/config.json ] ; then cp config/config.example.json config/config.json ; fi
-	if [ ! -e ./config/config.local.json ] ; then cp config/config.local.example.json config/config.local.json ; fi
-	if [ ! -e ./config/config.client.json ] ; then cp config/config.client.example.json config/config.client.json ; fi
 	git submodule update --init --recursive
-	$(MAKE) get_deps
 
-get_deps:
+start:
+	${DOCKER_COMPOSE} up -d s3 postgres
+	${DOCKER_COMPOSE} up reviewer-submission
+
+stop:
+	${DOCKER_COMPOSE} down
+
+install:
 	yarn
 
-lint: get_deps
+lint: install
 	yarn lint
 
 test: get_deps
@@ -37,22 +41,21 @@ setup_integration:
 	${DOCKER_COMPOSE_TEST} up -d s3_create-bucket
 
 test_integration: setup_integration
-	${DOCKER_COMPOSE_TEST} up -d application
+	${DOCKER_COMPOSE_TEST} up -d reviewer-submission
 	./.scripts/docker/wait-healthy.sh test_reviewer-submission 20
 	CONFIG_PATH=./config/config.json CLIENT_CONFIG_PATH=config/config.client.json yarn run test:integration
 	${DOCKER_COMPOSE_TEST} down
 
 load_schema:
-ifeq ($(shell $(GET_SCHEMA_TABLES)),14)
-	@echo "Schema already loaded"
-else
-	@echo "Schema not loaded"
-	$(LOAD_SCHEMA)
-endif
-
+	ifeq ($(shell $(GET_SCHEMA_TABLES)),14)
+		@echo "Schema already loaded"
+	else
+		@echo "Schema not loaded"
+		$(LOAD_SCHEMA)
+	endif
 
 build:
-	${DOCKER_COMPOSE} build submission
+	${DOCKER_COMPOSE_BUILD} build submission
 
 push:
 	${PUSH_COMMAND} reviewer-submission

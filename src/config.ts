@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import { readFileSync } from 'fs';
 import { Config as KnexConfig } from 'knex';
 
@@ -6,7 +7,7 @@ export interface S3Config {
     secretAccessKey: string;
     s3ForcePathStyle: boolean;
     fileBucket: string;
-    awsEndPoint: string;
+    awsEndPoint?: string;
 }
 
 export interface ScienceBeamConfig {
@@ -33,15 +34,43 @@ export interface ClientPublicConfig {
     };
 }
 
-const configPath = process.env.CONFIG_PATH ? process.env.CONFIG_PATH : '/etc/reviewer/config.json';
+// const configPath = process.env.CONFIG_PATH ? process.env.CONFIG_PATH : '/etc/reviewer/config.json';
 const clientConfigPath = process.env.CLIENT_CONFIG_PATH
     ? process.env.CLIENT_CONFIG_PATH
     : '/etc/reviewer/config.client.json';
 
-const thisConfig: Config = JSON.parse(readFileSync(configPath, 'utf8'));
+const appConfig: Config = {
+    port: 3000,
+    knex: {
+        client: 'pg',
+        connection: {
+            host: process.env.DATABASE_HOST,
+            database: process.env.DATABASE_NAME,
+            password: process.env.DATABASE_PASSWORD,
+            user: process.env.DATABASE_USER,
+            port: Number(process.env.DATABASE_PORT),
+        },
+    },
+    s3: {
+        accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
+        secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
+        s3ForcePathStyle: Boolean(process.env.S3_FORCE_PATH_STYLE) || true,
+        fileBucket: process.env.S3_FILE_BUCKET || '',
+        awsEndPoint: process.env.S3_AWS_ENDPOINT,
+    },
+    max_ql_depth: Number(process.env.MAX_QL_DEPTH),
+    max_ql_complexity: Number(process.env.MAX_QL_COMPLEXITY),
+    max_file_size_in_bytes: Number(process.env.MAX_FILE_SIZE_IN_BYTES),
+    authentication_jwt_secret: process.env.AUTHENTICATION_JWT_SECRET || '',
+    user_adapter_url: process.env.USER_ADAPTER_URL || '',
+    science_beam: {
+        api_url: process.env.SCIENCE_BEAM_URL || '',
+        timeout: process.env.SCIENCE_BEAM_TIMEROUT || ''
+    },
+};
 
 const clientConfig: ClientPublicConfig = JSON.parse(readFileSync(clientConfigPath, 'utf8'));
 
-export default thisConfig;
+export default appConfig;
 
 export { clientConfig };

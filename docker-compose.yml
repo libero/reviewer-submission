@@ -1,40 +1,58 @@
 ## This is only a single container right now but in future this should bring up supporting services needed for development ie: postgres, audit service ect.
 version: '3'
 services:
-  application:
+  reviewer-submission:
     image: node:12-alpine@sha256:5646d1e5bc470500414feb3540186c02845db0e0e1788621c271fbf3a0c1830d
     ports:
-      - "${SERVER_PORT:-3000}:3000"
+      - "3000:3000"
     working_dir: "/src"
     healthcheck:
       test: "curl localhost:3000/health"
       interval: 1m
       timeout: 10s
       retries: 3
-    command: ["bash", "-c", "yarn && yarn run start:dev"]
+    command: ["sh", "-c", "yarn && yarn run start:dev"]
     environment:
-      NEW_RELIC_HOME: ${NEW_RELIC_HOME:-/etc/reviewer/}
+      DATABASE_NAME: postgres
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: postgres
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      S3_AWS_ENDPOINT: http://s3:9000
+      S3_ACCESS_KEY_ID: minio
+      S3_SECRET_ACCESS_KEY: minio123
+      S3_FORCE_PATH_STYLE: 'true'
+      S3_FILE_BUCKET: test
+      NEW_RELIC_HOME: /etc/reviewer/
+      MAX_QL_COMPLEXITY: 100
+      MAX_QL_DEPTH: 5
+      MAX_FILE_SIZE_IN_BYTES: 100000000
+      AUTHENTICATION_JWT_SECRET: super_secret_jam
+      USER_ADAPTER_URL: http://reviewer-mocks:3003/current-user
+      SCIENCE_BEAM_URL: http://reviewer-mocks:3003/science-beam/convert"
+      SCIENCE_BEAM_TIMEOUT: 20000
     volumes:
+      - ./config:/etc/reviewer
       - ./:/src/:z
-      - ./config/:/etc/reviewer/:z
     networks:
-      - "infra_api"
+      - "reviewer"
 
   postgres:
     image: liberoadmin/reviewer-xpub-postgres:latest
     container_name: test_postgres
-    ports:
-      - "5432:5432"
     environment:
       POSTGRES_DB: postgres
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+      POSTGRES_PORT: 5432
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 2s
       timeout: 30s
       retries: 10
-
+    networks:
+      - "reviewer"
+      
   s3:
     image: minio/minio:latest
     ports:
@@ -50,6 +68,6 @@ services:
       retries: 3
 
 networks:
-  infra_api:
+  reviewer:
     external:
-      name: "infra_api"
+      name: "reviewer"
