@@ -1,7 +1,7 @@
 ## This is only a single container right now but in future this should bring up supporting services needed for development ie: postgres, audit service ect.
 version: "3"
 services:
-  application:
+  reviewer-submission:
     image: libero/reviewer-submission:${IMAGE_TAG:-local}
     container_name: test_reviewer-submission
     ports:
