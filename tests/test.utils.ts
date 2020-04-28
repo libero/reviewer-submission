@@ -10,9 +10,10 @@ import { sign } from 'jsonwebtoken';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as FormData from 'form-data';
-import config from '../src/config';
 
-export const jwtToken = sign({ sub: 'c0e64a86-2feb-435d-a40f-01f920334bc4' }, config.authentication_jwt_secret);
+const AUTHENTICATION_JWT_SECRET = 'super_secret_jam';
+
+export const jwtToken = sign({ sub: 'c0e64a86-2feb-435d-a40f-01f920334bc4' }, AUTHENTICATION_JWT_SECRET);
 
 const authLink = setContext((_, { headers }) => {
     return {

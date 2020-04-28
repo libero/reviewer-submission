@@ -10,7 +10,24 @@ services:
       # NEW_RELIC_LOG_ENABLED: "false"
       NEW_RELIC_NO_CONFIG_FILE: "true"
       CONFIG_PATH: /etc/reviewer/config.json
-      CLIENT_CONFIG_PATH: /etc/reviewer/config.client.json
+      DATABASE_NAME: postgres
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: postgres
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      S3_AWS_ENDPOINT: http://s3:9000
+      S3_ACCESS_KEY_ID: minio
+      S3_SECRET_ACCESS_KEY: minio123
+      S3_FORCE_PATH_STYLE: 'true'
+      S3_FILE_BUCKET: test
+      NEW_RELIC_HOME: /etc/reviewer/
+      MAX_QL_COMPLEXITY: 100
+      MAX_QL_DEPTH: 5
+      MAX_FILE_SIZE_IN_BYTES: 100000000
+      AUTHENTICATION_JWT_SECRET: super_secret_jam
+      USER_ADAPTER_URL: http://reviewer-mocks:3003/current-user
+      SCIENCE_BEAM_URL: http://reviewer-mocks:3003/science-beam/convert"
+      SCIENCE_BEAM_TIMEOUT: 20000
     volumes:
       - ./tests/config/reviewer-submission.json:/etc/reviewer/config.json
       - ./tests/config/reviewer-submission-client.json:/etc/reviewer/config.client.json

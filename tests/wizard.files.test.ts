@@ -5,6 +5,8 @@ import config from '../src/config';
 import * as FormData from 'form-data';
 import * as WebSocket from 'ws';
 
+const AUTHENTICATION_JWT_SECRET = 'super_secret_jame';
+
 export const uploadSupportingFile = async (submissionId: string): Promise<AxiosResponse> => {
     const body = new FormData();
     const query = `mutation UploadSupportingFile($id: ID!, $file: Upload!, $fileSize: Int!) {
@@ -207,7 +209,7 @@ describe('Wizard->Files Integration Tests', () => {
             uploadManuscriptResponse.data.data.uploadManuscript.files.manuscriptFile.id,
         );
         expect(uploadResponse.data.data.uploadSupportingFile.files.supportingFiles).toHaveLength(1);
-        const imposterToken = sign({ sub: 'c0e74a86-2feb-435d-a50f-01f920334bc4' }, config.authentication_jwt_secret);
+        const imposterToken = sign({ sub: 'c0e74a86-2feb-435d-a50f-01f920334bc4' }, AUTHENTICATION_JWT_SECRET);
 
         const deleteResponse = await axios.post(
             'http://localhost:3000/graphql',
