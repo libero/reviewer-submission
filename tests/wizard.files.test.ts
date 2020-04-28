@@ -122,24 +122,23 @@ describe('Wizard->Files Integration Tests', () => {
         });
     });
 
-        it('uploads a manuscript file and replace previous', async () => {
-            const startSubmissionResponse = await startSubmissionAlt('research-article');
-            const submissionId = startSubmissionResponse.data.data.startSubmission.id;
-    
-            const uploadResponse = await uploadManuscript(submissionId);
-    
-            expect(uploadResponse.status).toBe(200);
-            expect(uploadResponse.data.data.uploadManuscript.id).toBe(submissionId);
-            expect(uploadResponse.data.data.uploadManuscript.files.manuscriptFile).not.toBeNull();
-            const manuscriptFileId = uploadResponse.data.data.uploadManuscript.files.manuscriptFile.id;
-            const uploadResponse2 = await uploadManuscript(submissionId);
-    
-            expect(uploadResponse2.status).toBe(200);
-            expect(uploadResponse2.data.data.uploadManuscript.id).toBe(submissionId);
-            expect(uploadResponse2.data.data.uploadManuscript.files.manuscriptFile).not.toBeNull();
-            expect(uploadResponse2.data.data.uploadManuscript.files.manuscriptFile.id).not.toBe(manuscriptFileId);
-        });
+    it('uploads a manuscript file and replace previous', async () => {
+        const startSubmissionResponse = await startSubmissionAlt('research-article');
+        const submissionId = startSubmissionResponse.data.data.startSubmission.id;
 
+        const uploadResponse = await uploadManuscript(submissionId);
+
+        expect(uploadResponse.status).toBe(200);
+        expect(uploadResponse.data.data.uploadManuscript.id).toBe(submissionId);
+        expect(uploadResponse.data.data.uploadManuscript.files.manuscriptFile).not.toBeNull();
+        const manuscriptFileId = uploadResponse.data.data.uploadManuscript.files.manuscriptFile.id;
+        const uploadResponse2 = await uploadManuscript(submissionId);
+
+        expect(uploadResponse2.status).toBe(200);
+        expect(uploadResponse2.data.data.uploadManuscript.id).toBe(submissionId);
+        expect(uploadResponse2.data.data.uploadManuscript.files.manuscriptFile).not.toBeNull();
+        expect(uploadResponse2.data.data.uploadManuscript.files.manuscriptFile.id).not.toBe(manuscriptFileId);
+    });
 
     it('uploads a large manuscript file', async () => {
         const startSubmissionResponse = await startSubmissionAlt('research-article');
