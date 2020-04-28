@@ -56,7 +56,7 @@ load_schema:
 	endif
 
 build:
-	${DOCKER_COMPOSE_BUILD} build submission
+	${DOCKER_COMPOSE_BUILD} build reviewer-submission
 
 push:
 	${PUSH_COMMAND} reviewer-submission
