@@ -11,9 +11,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as FormData from 'form-data';
 
-const AUTHENTICATION_JWT_SECRET = 'super_secret_jam';
+export const authenticationJwtSecret = 'super_secret_jam';
 
-export const jwtToken = sign({ sub: 'c0e64a86-2feb-435d-a40f-01f920334bc4' }, AUTHENTICATION_JWT_SECRET);
+export const jwtToken = sign({ sub: 'c0e64a86-2feb-435d-a40f-01f920334bc4' }, authenticationJwtSecret);
 
 const authLink = setContext((_, { headers }) => {
     return {

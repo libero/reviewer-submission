@@ -1,25 +1,24 @@
 import axios, { AxiosResponse } from 'axios';
-import { jwtToken, startSubmissionAlt, uploadManuscript, uploadLargeManuscript, uploadTooLargeManuscript } from './test.utils';
+import {
+    jwtToken,
+    startSubmissionAlt,
+    uploadManuscript,
+    uploadLargeManuscript,
+    uploadTooLargeManuscript,
+    authenticationJwtSecret
+} from './test.utils';
 import { sign } from 'jsonwebtoken';
 import config from '../src/config';
 import * as FormData from 'form-data';
 import * as WebSocket from 'ws';
-
-const AUTHENTICATION_JWT_SECRET = 'super_secret_jame';
 
 export const uploadSupportingFile = async (submissionId: string): Promise<AxiosResponse> => {
     const body = new FormData();
     const query = `mutation UploadSupportingFile($id: ID!, $file: Upload!, $fileSize: Int!) {
         uploadSupportingFile(id: $id, file: $file, fileSize: $fileSize) {
             id,
-            files {
-                manuscriptFile {
-                    id
-                },
-                supportingFiles {
-                    id
-                }
-            }
+            filename,
+            url
         }
     }`;
 
@@ -124,14 +123,30 @@ describe('Wizard->Files Integration Tests', () => {
         });
     });
 
+        it('uploads a manuscript file and replace previous', async () => {
+            const startSubmissionResponse = await startSubmissionAlt('research-article');
+            const submissionId = startSubmissionResponse.data.data.startSubmission.id;
+    
+            const uploadResponse = await uploadManuscript(submissionId);
+    
+            expect(uploadResponse.status).toBe(200);
+            expect(uploadResponse.data.data.uploadManuscript.id).toBe(submissionId);
+            expect(uploadResponse.data.data.uploadManuscript.files.manuscriptFile).not.toBeNull();
+            const manuscriptFileId = uploadResponse.data.data.uploadManuscript.files.manuscriptFile.id;
+            const uploadResponse2 = await uploadManuscript(submissionId);
+    
+            expect(uploadResponse2.status).toBe(200);
+            expect(uploadResponse2.data.data.uploadManuscript.id).toBe(submissionId);
+            expect(uploadResponse2.data.data.uploadManuscript.files.manuscriptFile).not.toBeNull();
+            expect(uploadResponse2.data.data.uploadManuscript.files.manuscriptFile.id).not.toBe(manuscriptFileId);
+        });
+
 
     it('uploads a large manuscript file', async () => {
         const startSubmissionResponse = await startSubmissionAlt('research-article');
         const submissionId = startSubmissionResponse.data.data.startSubmission.id;
 
         const uploadResponse = await uploadLargeManuscript(submissionId);
-
-        expect(uploadResponse.status).toBe(200);
 
         expect(uploadResponse.status).toBe(200);
         expect(uploadResponse.data.data.uploadManuscript.id).toBe(submissionId);
@@ -188,10 +203,10 @@ describe('Wizard->Files Integration Tests', () => {
         const uploadResponse = await uploadSupportingFile(submissionId);
         expect(uploadResponse.status).toBe(200);
         expect(uploadResponse.data.errors).toBeUndefined();
-        expect(uploadResponse.data.data.uploadSupportingFile.files.manuscriptFile.id).toBe(
-            uploadManuscriptResponse.data.data.uploadManuscript.files.manuscriptFile.id,
-        );
-        expect(uploadResponse.data.data.uploadSupportingFile.files.supportingFiles).toHaveLength(1);
+        expect(uploadResponse.data.data.uploadSupportingFile).not.toBeNull();
+        expect(uploadResponse.data.data.uploadSupportingFile.id).toBeDefined();
+        expect(uploadResponse.data.data.uploadSupportingFile.filename).toBeDefined();
+        expect(uploadResponse.data.data.uploadSupportingFile.url).toBeDefined();
     });
 
     it('it should throw if a user tries to delete a supporting file unrelated to their submission', async () => {
@@ -205,11 +220,9 @@ describe('Wizard->Files Integration Tests', () => {
         const uploadResponse = await uploadSupportingFile(submissionId);
         expect(uploadResponse.status).toBe(200);
         expect(uploadResponse.data.errors).toBeUndefined();
-        expect(uploadResponse.data.data.uploadSupportingFile.files.manuscriptFile.id).toBe(
-            uploadManuscriptResponse.data.data.uploadManuscript.files.manuscriptFile.id,
-        );
-        expect(uploadResponse.data.data.uploadSupportingFile.files.supportingFiles).toHaveLength(1);
-        const imposterToken = sign({ sub: 'c0e74a86-2feb-435d-a50f-01f920334bc4' }, AUTHENTICATION_JWT_SECRET);
+        expect(uploadResponse.data.data.uploadSupportingFile).not.toBeNull();
+        expect(uploadResponse.data.data.uploadSupportingFile.id).toBeDefined();
+        const imposterToken = sign({ sub: 'c0e74a86-2feb-435d-a50f-01f920334bc4' }, authenticationJwtSecret);
 
         const deleteResponse = await axios.post(
             'http://localhost:3000/graphql',
@@ -220,7 +233,7 @@ describe('Wizard->Files Integration Tests', () => {
                     }
                 `,
                 variables: {
-                    fileId: uploadResponse.data.data.uploadSupportingFile.files.supportingFiles[0].id,
+                    fileId: uploadResponse.data.data.uploadSupportingFile.id,
                     submissionId,
                 },
             },
@@ -245,10 +258,8 @@ describe('Wizard->Files Integration Tests', () => {
         const uploadResponse = await uploadSupportingFile(submissionId);
         expect(uploadResponse.status).toBe(200);
         expect(uploadResponse.data.errors).toBeUndefined();
-        expect(uploadResponse.data.data.uploadSupportingFile.files.manuscriptFile.id).toBe(
-            uploadManuscriptResponse.data.data.uploadManuscript.files.manuscriptFile.id,
-        );
-        expect(uploadResponse.data.data.uploadSupportingFile.files.supportingFiles).toHaveLength(1);
+        expect(uploadResponse.data.data.uploadSupportingFile).not.toBeNull();
+        expect(uploadResponse.data.data.uploadSupportingFile.id).toBeDefined();
 
         const deleteResponse = await axios.post(
             'http://localhost:3000/graphql',
@@ -259,7 +270,7 @@ describe('Wizard->Files Integration Tests', () => {
                     }
                 `,
                 variables: {
-                    fileId: uploadResponse.data.data.uploadSupportingFile.files.supportingFiles[0].id,
+                    fileId: uploadResponse.data.data.uploadSupportingFile.id,
                     submissionId,
                 },
             },
@@ -319,8 +330,6 @@ describe('Wizard->Files Integration Tests', () => {
                 client.close();
             }
         });
-        client.on('close', () => console.log('close'));
-
         await uploadManuscript(submissionId);
 
         setTimeout(() => {

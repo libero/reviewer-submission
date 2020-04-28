@@ -1,8 +1,6 @@
 import axios from 'axios';
-import { jwtToken, startSubmissionAlt } from './test.utils';
+import { jwtToken, startSubmissionAlt, authenticationJwtSecret } from './test.utils';
 import { sign } from 'jsonwebtoken';
-
-const AUTHENTICATION_JWT_SECRET = 'super_secret_jam';
 
 describe('Wizard->Pages Integration Tests', () => {
     it('it should allow a user to get their submission', async () => {
@@ -55,7 +53,7 @@ describe('Wizard->Pages Integration Tests', () => {
         expect(Array.isArray(getResponse.data.data.getSubmissions)).toBe(true);
         expect(getResponse.data.data.getSubmissions.length).toBeGreaterThan(1);
     });
-    
+
     it('it should allow a user to set details', async () => {
         const startSubmissionResponse = await startSubmissionAlt('research-article');
         const submissionId = startSubmissionResponse.data.data.startSubmission.id;
@@ -108,7 +106,7 @@ describe('Wizard->Pages Integration Tests', () => {
             cosubmission: 'co',
         };
 
-        const imposterToken = sign({ sub: 'c0e74a86-2feb-435d-a50f-01f920334bc4' }, AUTHENTICATION_JWT_SECRET);
+        const imposterToken = sign({ sub: 'c0e74a86-2feb-435d-a50f-01f920334bc4' }, authenticationJwtSecret);
 
         const failedSaveDetailsResponse = await axios.post(
             'http://localhost:3000/graphql',

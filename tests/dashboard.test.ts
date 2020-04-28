@@ -1,10 +1,14 @@
 import { sign } from 'jsonwebtoken';
-import config from '../src/config';
 import axios from 'axios';
 import ApolloClient from 'apollo-client';
-import { createApolloClient, startSubmission, jwtToken, startSubmissionAlt, uploadManuscript } from './test.utils';
-
-const AUTHENTICATION_JWT_SECRET = 'super_secret_jam';
+import {
+    createApolloClient,
+    startSubmission,
+    jwtToken,
+    startSubmissionAlt,
+    uploadManuscript,
+    authenticationJwtSecret,
+} from './test.utils';
 
 describe('Dashboard Integration Tests', () => {
     let apollo: ApolloClient<unknown>;
@@ -69,7 +73,7 @@ describe('Dashboard Integration Tests', () => {
         const uploadResponse = await uploadManuscript(submissionId);
         expect(uploadResponse.status).toBe(200);
 
-        const imposterToken = sign({ sub: 'c0e74a86-2feb-435d-a50f-01f920334bc4' }, AUTHENTICATION_JWT_SECRET);
+        const imposterToken = sign({ sub: 'c0e74a86-2feb-435d-a50f-01f920334bc4' }, authenticationJwtSecret);
 
         const deleteResponse = await axios.post(
             'http://localhost:3000/graphql',
@@ -122,7 +126,7 @@ describe('Dashboard Integration Tests', () => {
     it('it should throw if the user tries to delete a submission that is not their own', async () => {
         const startSubmissionResponse = await startSubmissionAlt('research-article');
         const submissionId = startSubmissionResponse.data.data.startSubmission.id;
-        const imposterToken = sign({ sub: 'c0e74a86-2feb-435d-a50f-01f920334bc4' }, AUTHENTICATION_JWT_SECRET);
+        const imposterToken = sign({ sub: 'c0e74a86-2feb-435d-a50f-01f920334bc4' }, authenticationJwtSecret);
 
         const deleteResponse = await axios.post(
             'http://localhost:3000/graphql',

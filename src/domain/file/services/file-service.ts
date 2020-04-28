@@ -117,13 +117,13 @@ export class FileService {
         return true;
     }
 
-    async deleteSupportingFile(fileId: FileId, submissionId: SubmissionId): Promise<boolean> {
+    async deleteSupportingFile(fileId: FileId, submissionId: SubmissionId): Promise<FileId> {
         await this.fileRepository.deleteByIdAndSubmissionId(fileId, submissionId);
         await this.s3.deleteObject({
             Bucket: this.bucket,
             Key: this.getFileS3Key(FileType.SUPPORTING_FILE, submissionId, fileId),
         });
-        return true;
+        return fileId;
     }
 
     async create(
@@ -134,9 +134,10 @@ export class FileService {
         type: FileType,
     ): Promise<File> {
         if (type === FileType.MANUSCRIPT_SOURCE) {
-            const hasFile = await this.hasManuscriptFile(submissionId);
-            if (hasFile === true) {
-                throw new Error('Submission already has manuscript');
+            const manuscriptFile = await this.findManuscriptFile(submissionId);
+            // we have a file so delete it
+            if (manuscriptFile !== null) {
+                await this.deleteManuscript(manuscriptFile.id, submissionId);
             }
         }
         const id = FileId.fromUuid(uuid());
