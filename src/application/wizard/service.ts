@@ -5,7 +5,7 @@ import { FileService } from '../../domain/file/services/file-service';
 import { SemanticExtractionService } from '../../domain/semantic-extraction/services/semantic-extraction-service';
 import { AuthorDetails, SubmissionId, ManuscriptDetails } from '../../domain/submission/types';
 import Submission from '../../domain/submission/services/models/submission';
-import { AuthorTeamMember } from '../../domain/teams/repositories/types';
+import { AuthorTeamMember, EditorTeamMember } from '../../domain/teams/repositories/types';
 import { PermissionService, SubmissionOperation } from '../permission/service';
 import { User } from 'src/domain/user/user';
 import { FileType, FileId } from '../../domain/file/types';
@@ -60,6 +60,42 @@ export class WizardService {
             });
         } else {
             await this.teamService.createAuthor('author', teamMembers, submissionId.toString(), 'manuscript');
+        }
+
+        return this.getFullSubmission(submissionId);
+    }
+
+    /*  For creating the following roles of teams
+        opposedReviewer
+        suggestedSeniorEditor
+        opposedSeniorEditor
+        opposedReviewingEditor
+        suggestedReviewingEditor
+        suggestedReviewer
+    */
+    async saveEditorPage(
+        user: User,
+        submissionId: SubmissionId,
+        details: { members: Array<{ meta: { elifePersonId: string } }> }, // TODO: type properly
+    ) {
+        const submission = await this.submissionService.get(submissionId);
+        if (submission === null) {
+            throw new Error('No submission found');
+        }
+        const allowed = this.permissionService.userCanWithSubmission(user, SubmissionOperation.UPDATE, submission);
+        if (!allowed) {
+            throw new Error('User not allowed to save submission');
+        }
+
+        const team = await this.teamService.find(submissionId.toString(), 'author');
+        // TODO: get elifePersonId - populate from EditorsDetails
+        const teamMembers: Array<EditorTeamMember> = details.members;
+        if (team) {
+            // TODO: update
+            await this.teamService.update({});
+        } else {
+            // TODO: create, patch role
+            await this.teamService.createTeamByRole('ROLE', teamMembers, submissionId.toString(), 'manuscript');
         }
 
         return this.getFullSubmission(submissionId);

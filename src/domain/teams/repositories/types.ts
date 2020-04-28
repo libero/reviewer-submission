@@ -11,3 +11,9 @@ export type AuthorTeamMember = {
     alias: AuthorDetails;
     meta: { corresponding: true };
 };
+
+export type EditorTeamMember = {
+    meta: {
+        elifePersonId: string;
+    };
+}

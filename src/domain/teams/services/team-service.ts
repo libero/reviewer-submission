@@ -23,6 +23,25 @@ export class TeamService {
         return await this.teamRepository.update(team);
     }
 
+    /*  For creating the following roles of teams
+        opposedReviewer
+        suggestedSeniorEditor
+        opposedSeniorEditor
+        opposedReviewingEditor
+        suggestedReviewingEditor
+        suggestedReviewer
+    */
+    async createTeamByRole(
+        role: string,
+        teamMembers: Array<AuthorTeamMember>,
+        objectId: string,
+        objectType: string,
+    ): Promise<Team> {
+        const id = TeamId.fromUuid(uuid());
+        const team = new Team(id, new Date(), new Date(), teamMembers, role, objectId, objectType);
+        return await this.teamRepository.create(team);
+    }
+
     async createAuthor(
         role: string,
         teamMembers: Array<AuthorTeamMember>,

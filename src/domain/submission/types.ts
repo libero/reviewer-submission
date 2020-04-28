@@ -17,6 +17,7 @@ export type AuthorDetails = {
     aff: string;
 };
 
+
 export type ManuscriptDetails = {
     title?: string;
     subjects?: string[];
