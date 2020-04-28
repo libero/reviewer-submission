@@ -92,7 +92,7 @@ export class WizardService {
         const teamMembers: Array<EditorTeamMember> = details.members;
         if (team) {
             // TODO: update
-            await this.teamService.update({});
+            await this.teamService.update({...team, teamMembers });
         } else {
             // TODO: create, patch role
             await this.teamService.createTeamByRole('ROLE', teamMembers, submissionId.toString(), 'manuscript');
