@@ -11,6 +11,8 @@ LOAD_SCHEMA = psql -U postgres -f xpub-schema.sql
 setup:
 	-@ git submodule update --init --recursive
 	-@ docker network create reviewer > /dev/null 2>&1 || true
+	-@ if [ ! -e ./config/config.client.json ] ; then cp config/config.client.example.json config/config.client.json ; fi
+
 
 start:
 	${DOCKER_COMPOSE} up -d s3 postgres

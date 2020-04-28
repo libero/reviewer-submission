@@ -5,10 +5,9 @@ import {
     uploadManuscript,
     uploadLargeManuscript,
     uploadTooLargeManuscript,
-    authenticationJwtSecret
+    authenticationJwtSecret,
 } from './test.utils';
 import { sign } from 'jsonwebtoken';
-import config from '../src/config';
 import * as FormData from 'form-data';
 import * as WebSocket from 'ws';
 
