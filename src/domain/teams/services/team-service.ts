@@ -4,7 +4,7 @@ import XpubTeamRepository from '../repositories/xpub-team';
 import Team from './models/team';
 import { v4 as uuid } from 'uuid';
 import { TeamId } from '../types';
-import { AuthorTeamMember, EditorTeamMember } from '../repositories/types';
+import { AuthorTeamMember, PeopleTeamMember } from '../repositories/types';
 
 export class TeamService {
     teamRepository: XpubTeamRepository;
@@ -17,6 +17,11 @@ export class TeamService {
     async find(id: string, role: string): Promise<Team | null> {
         const results = await this.teamRepository.findByObjectIdAndRole(id, role);
         return results.length > 0 ? results[0] : null;
+    }
+
+    async findPeopleTeams(id: string): Promise<Array<Team>> {
+        const results = await this.teamRepository.findByObjectId(id);
+        return results;
     }
 
     async update(team: Team): Promise<Team> {
@@ -33,7 +38,7 @@ export class TeamService {
     */
     async createTeamByRole(
         role: string,
-        teamMembers: Array<EditorTeamMember>,
+        teamMembers: Array<PeopleTeamMember>,
         objectId: string,
         objectType: string,
     ): Promise<Team> {

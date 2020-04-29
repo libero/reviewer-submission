@@ -13,7 +13,12 @@ export type AuthorTeamMember = {
 };
 
 export type PeopleTeamMember = {
-    meta: {
-        elifePersonId: string;
-    };
-}
+    meta:
+        | {
+              elifePersonId: string;
+          }
+        | {
+              name: string;
+              email: string;
+          };
+};

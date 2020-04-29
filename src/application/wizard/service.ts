@@ -87,50 +87,63 @@ export class WizardService {
             throw new Error('User not allowed to save submission');
         }
 
-        const team = await this.teamService.find(submissionId.toString(), 'author');
+        const teams = await this.teamService.findPeopleTeams(submissionId.toString());
 
-        // TODO: get elifePersonId - populate from EditorsDetails
-        /*
-            opposedReviewer
-            suggestedSeniorEditor
-            opposedSeniorEditor
-            opposedReviewingEditor
-            suggestedReviewingEditor
-            suggestedReviewer
-        */
+        const suggestedSeniorEditors: Array<PeopleTeamMember> = (details.suggestedSeniorEditors || [])?.map(
+            elifePersonId => ({
+                meta: { elifePersonId },
+            }),
+        );
 
-        // role = suggestedSeniorEditor
-        const suggestedSeniorEditors: Array<PeopleTeamMember> = (details.suggestedSeniorEditors || [])?.map(elifePersonId => ({
-            meta: { elifePersonId },
+        const opposedSeniorEditors: Array<PeopleTeamMember> = (details.opposedSeniorEditors || [])?.map(
+            elifePersonId => ({
+                meta: { elifePersonId },
+            }),
+        );
+
+        const suggestedReviewingEditors: Array<PeopleTeamMember> = (details.suggestedReviewingEditors || [])?.map(
+            elifePersonId => ({
+                meta: { elifePersonId },
+            }),
+        );
+
+        const opposedReviewingEditors: Array<PeopleTeamMember> = (details.opposedReviewingEditors || [])?.map(
+            elifePersonId => ({
+                meta: { elifePersonId },
+            }),
+        );
+        const opposedReviewers: Array<any> = (details.opposedReviewers || [])?.map(({ email, name }) => ({
+            meta: {
+                email,
+                name,
+            },
         }));
 
-        // role = opposedSeniorEditor
-        const opposedSeniorEditors: Array<PeopleTeamMember> = (details.opposedSeniorEditors || [])?.map(elifePersonId => ({
-            meta: { elifePersonId },
+        const suggestedReviewers: Array<any> = (details.suggestedReviewers || [])?.map(({ email, name }) => ({
+            meta: {
+                email,
+                name,
+            },
         }));
 
-        // role = suggestedReviewingEditor
-        const suggestedReviewingEditors: Array<PeopleTeamMember> = (details.suggestedReviewingEditors || [])?.map(elifePersonId => ({
-            meta: { elifePersonId },
-        }));
+        const teamUpdates = [
+            { role: 'suggestedSeniorEditors', teamMembers: suggestedSeniorEditors },
+            { role: 'opposedSeniorEditors', teamMembers: opposedSeniorEditors },
+            { role: 'suggestedReviewingEditor', teamMembers: suggestedReviewingEditors },
+            { role: 'opposedReviewingEditor', teamMembers: opposedReviewingEditors },
+            { role: 'opposedReviewer', teamMembers: opposedReviewers },
+            { role: 'suggestedReviewer', teamMembers: suggestedReviewers },
+        ].map(async ({ role, teamMembers }) => {
+            const team = teams.find(t => t.role === role);
 
-        // role = opposedReviewingEditor
-        const opposedReviewingEditors: Array<PeopleTeamMember> = (details.opposedReviewingEditors || [])?.map(elifePersonId => ({
-            meta: { elifePersonId },
-        }));
+            if (team) {
+                await this.teamService.update({ ...team, teamMembers });
+            } else {
+                await this.teamService.createTeamByRole(role, teamMembers, submissionId.toString(), 'manuscript');
+            }
+        });
 
-        if (team) {
-            // TODO: update
-            await this.teamService.update({ ...team, teamMembers: suggestedSeniorEditors });
-        } else {
-            // TODO: create, patch role
-            await this.teamService.createTeamByRole(
-                'ROLE',
-                suggestedSeniorEditors,
-                submissionId.toString(),
-                'manuscript',
-            );
-        }
+        await Promise.all(teamUpdates);
 
         return this.getFullSubmission(submissionId);
     }

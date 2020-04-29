@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { TeamRepository, AuthorTeamMember } from './types';
+import { TeamRepository, AuthorTeamMember, PeopleTeamMember } from './types';
 import { TeamId } from '../types';
 import { KnexTableAdapter } from '../../knex-table-adapter';
 import Team from '../services/models/team';
@@ -8,7 +8,7 @@ type DatabaseEntry = {
     id: TeamId;
     updated: Date;
     created: Date;
-    team_members: Array<AuthorTeamMember>;
+    team_members: Array<AuthorTeamMember | PeopleTeamMember>;
     role: string;
     object_id: string;
     object_type: string;
@@ -25,6 +25,17 @@ export default class XpubTeamRepository implements TeamRepository {
             .select<DatabaseEntry[]>('id', 'updated', 'team_members')
             .from(this.TABLE_NAME)
             .where({ object_id, role });
+        const results = await this._query.executor<DatabaseEntry[]>(query);
+        return results.map(r => this.toModel(r));
+    }
+
+
+    public async findByObjectId(object_id: string): Promise<Team[]> {
+        const query = this._query
+            .builder()
+            .select<DatabaseEntry[]>('id', 'updated', 'team_members', 'role')
+            .from(this.TABLE_NAME)
+            .where({ object_id });
         const results = await this._query.executor<DatabaseEntry[]>(query);
         return results.map(r => this.toModel(r));
     }
