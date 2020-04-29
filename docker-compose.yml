@@ -34,8 +34,8 @@ services:
     volumes:
       - ./config:/etc/reviewer
       - ./:/src/:z
-    # networks:
-    #   - "reviewer"
+    networks:
+      - "reviewer"
 
   postgres:
     image: liberoadmin/reviewer-xpub-postgres:latest
