@@ -74,11 +74,7 @@ dist/
 data.db
 
 # config
-config/*
-!config/config.example.json
-!config/config.client.example.json
-!config/config.local.example.json
-!config/newrelic.example.js
+config/newrelic.js
 
 lint-schemas/
 
