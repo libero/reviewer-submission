@@ -7,9 +7,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      # NEW_RELIC_LOG_ENABLED: "false"
       NEW_RELIC_NO_CONFIG_FILE: "true"
-      CONFIG_PATH: /etc/reviewer/config.json
       DATABASE_NAME: postgres
       DATABASE_USER: postgres
       DATABASE_PASSWORD: postgres
@@ -23,10 +21,10 @@ services:
       NEW_RELIC_HOME: /etc/reviewer/
       MAX_QL_COMPLEXITY: 100
       MAX_QL_DEPTH: 5
-      MAX_FILE_SIZE_IN_BYTES: 100000000
+      MAX_FILE_SIZE_IN_BYTES: 1000000
       AUTHENTICATION_JWT_SECRET: super_secret_jam
       USER_ADAPTER_URL: http://reviewer-mocks:3003/current-user
-      SCIENCE_BEAM_URL: http://reviewer-mocks:3003/science-beam/convert"
+      SCIENCE_BEAM_URL: http://reviewer-mocks:3003/science-beam/convert
       SCIENCE_BEAM_TIMEOUT: 20000
     volumes:
       - ./tests/config/reviewer-submission-client.json:/etc/reviewer/config.client.json
@@ -40,14 +38,14 @@ services:
     image: liberoadmin/reviewer-mocks:latest
     container_name: test_reviewer_mocks
     ports:
-      - "${REVIEWER_MOCKS_PORT:-3003}:3003"
+      - "3003:3003"
     environment:
       DATA_DIRECTORY_PATH: "/etc/mock-data/"
     volumes:
       - ./tests/config/reviewer-mocks.json:/etc/reviewer/config.json:z
       - ./tests/mock-data:/etc/mock-data/
     healthcheck:
-      test: 'echo -e "GET /health\n\n" | nc localhost ${REVIEWER_MOCKS_PORT:-3003}'
+      test: 'echo -e "GET /health\n\n" | nc localhost 3003'
       interval: 3s
       timeout: 10s
       retries: 3

@@ -29,13 +29,13 @@ services:
       MAX_FILE_SIZE_IN_BYTES: 100000000
       AUTHENTICATION_JWT_SECRET: super_secret_jam
       USER_ADAPTER_URL: http://reviewer-mocks:3003/current-user
-      SCIENCE_BEAM_URL: http://reviewer-mocks:3003/science-beam/convert"
+      SCIENCE_BEAM_URL: http://reviewer-mocks:3003/science-beam/convert
       SCIENCE_BEAM_TIMEOUT: 20000
     volumes:
       - ./config:/etc/reviewer
       - ./:/src/:z
-    networks:
-      - "reviewer"
+    # networks:
+    #   - "reviewer"
 
   postgres:
     image: liberoadmin/reviewer-xpub-postgres:latest

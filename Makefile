@@ -16,13 +16,13 @@ help:
 setup: ## perform setup tasks
 	-@ git submodule update --init --recursive
 	-@ docker network create reviewer > /dev/null 2>&1 || true
-	-@ if [ ! -e ./config/config.client.json ] ; then cp config/config.client.example.json config/config.client.json ; fi
 
 start: ## start s3, postgres and reviewer-submission in development mode
 	${DOCKER_COMPOSE} up -d s3 postgres
 	${DOCKER_COMPOSE} up reviewer-submission
 
 stop: ## stop all containers
+	${DOCKER_COMPOSE_TEST} down
 	${DOCKER_COMPOSE} down
 
 install: ## install dependencies
@@ -38,8 +38,7 @@ test: install ## run unit tests
 	yarn test
 
 setup_integration: ## bring up service containers for integration tests
-	docker pull liberoadmin/reviewer-mocks:latest
-	docker pull liberoadmin/reviewer-xpub-postgres:latest
+	${DOCKER_COMPOSE_TEST} pull reviewer-mocks postgres
 	${DOCKER_COMPOSE_TEST} down
 	${DOCKER_COMPOSE_TEST} up -d postgres s3 reviewer-mocks
 	./.scripts/docker/wait-healthy.sh test_postgres 20
