@@ -29,6 +29,16 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
             const user = await userService.getCurrentUser(context.authorizationHeader);
             return wizard.saveAuthorPage(user, submissionId, details);
         },
+
+        // TODO: type correctly
+        async saveEditorsPage(       _,
+            { id: submissionId, details }: { id: SubmissionId; details: any },
+            context,
+        ): Promise<Submission | null> {
+            const user = await userService.getCurrentUser(context.authorizationHeader);
+            return wizard.saveEditorsPage(user, submissionId, details);
+        },
+
         async uploadManuscript(
             _,
             variables: { file: FileUpload; fileSize: number; id: SubmissionId },

@@ -73,7 +73,7 @@ export class WizardService {
         suggestedReviewingEditor
         suggestedReviewer
     */
-    async saveEditorPage(
+    async saveEditorsPage(
         user: User,
         submissionId: SubmissionId,
         details: { members: Array<{ meta: { elifePersonId: string } }> }, // TODO: type properly

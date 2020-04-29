@@ -76,6 +76,9 @@ type EditorDetails {
     opposedReviewersReason: String
 }
 
+input EditorsDetailsInput {
+}
+
 type DisclosureDetails {
     submitterSignature: String
     disclosureConsent: Boolean
