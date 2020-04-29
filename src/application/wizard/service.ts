@@ -65,19 +65,7 @@ export class WizardService {
         return this.getFullSubmission(submissionId);
     }
 
-    /*  For creating the following roles of teams
-        opposedReviewer
-        suggestedSeniorEditor
-        opposedSeniorEditor
-        opposedReviewingEditor
-        suggestedReviewingEditor
-        suggestedReviewer
-    */
-    async savePeoplePage(
-        user: User,
-        submissionId: SubmissionId,
-        details: PeopleDetails, // TODO: type properly
-    ) {
+    async savePeoplePage(user: User, submissionId: SubmissionId, details: PeopleDetails) {
         const submission = await this.submissionService.get(submissionId);
         if (submission === null) {
             throw new Error('No submission found');
@@ -142,6 +130,13 @@ export class WizardService {
                 await this.teamService.createTeamByRole(role, teamMembers, submissionId.toString(), 'manuscript');
             }
         });
+
+        await this.submissionService.addEditorDetails(
+            submissionId,
+            details.opposedReviewersReason,
+            details.opposedReviewingEditorsReason,
+            details.opposedSeniorEditorsReason,
+        );
 
         await Promise.all(teamUpdates);
 

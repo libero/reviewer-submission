@@ -116,6 +116,9 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
             previously_discussed: submission.manuscriptDetails.previouslyDiscussed,
             previously_submitted: previouslySubmitted ? [previouslySubmitted] : undefined,
             cosubmission: submission.manuscriptDetails.cosubmission,
+            opposed_senior_editors_reason: submission.opposedSeniorEditorsReason,
+            opposed_reviewing_editors_reason: submission.opposedReviewingEditorsReason,
+            opposed_reviewers_reason: submission.opposedReviewersReason,
             meta: {
                 articleType: submission.articleType,
                 title: submission.manuscriptDetails.title,
@@ -143,6 +146,7 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
         };
         result.files.coverLetter = record.cover_letter;
         result.manuscriptDetails = details;
+        // TODO: add editor related conversion.
         return result;
     }
 }
