@@ -5,7 +5,7 @@ services:
     image: libero/reviewer-submission:${IMAGE_TAG:-local}
     container_name: test_reviewer-submission
     ports:
-      - "${SERVER_PORT:-3000}:3000"
+      - "3000:3000"
     environment:
       # NEW_RELIC_LOG_ENABLED: "false"
       NEW_RELIC_NO_CONFIG_FILE: "true"
@@ -29,10 +29,9 @@ services:
       SCIENCE_BEAM_URL: http://reviewer-mocks:3003/science-beam/convert"
       SCIENCE_BEAM_TIMEOUT: 20000
     volumes:
-      - ./tests/config/reviewer-submission.json:/etc/reviewer/config.json
       - ./tests/config/reviewer-submission-client.json:/etc/reviewer/config.client.json
     healthcheck:
-      test: 'echo -e "GET /health\n\n" | nc localhost ${SERVER_PORT:-3000}'
+      test: 'echo -e "GET /health\n\n" | nc localhost 3000'
       interval: 3s
       timeout: 10s
       retries: 3
