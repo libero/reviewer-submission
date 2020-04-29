@@ -31,12 +31,12 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
         },
 
         // TODO: type correctly
-        async saveEditorsPage(       _,
+        async savePeoplePage(       _,
             { id: submissionId, details }: { id: SubmissionId; details: any },
             context,
         ): Promise<Submission | null> {
             const user = await userService.getCurrentUser(context.authorizationHeader);
-            return wizard.saveEditorsPage(user, submissionId, details);
+            return wizard.savePeoplePage(user, submissionId, details);
         },
 
         async uploadManuscript(

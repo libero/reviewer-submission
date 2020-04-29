@@ -3,7 +3,7 @@ import { SubmissionService } from '../../domain/submission';
 import { TeamService } from '../../domain/teams/services/team-service';
 import { FileService } from '../../domain/file/services/file-service';
 import { SemanticExtractionService } from '../../domain/semantic-extraction/services/semantic-extraction-service';
-import { AuthorDetails, SubmissionId, ManuscriptDetails } from '../../domain/submission/types';
+import { AuthorDetails, SubmissionId, ManuscriptDetails, PeopleDetails } from '../../domain/submission/types';
 import Submission from '../../domain/submission/services/models/submission';
 import { AuthorTeamMember, EditorTeamMember } from '../../domain/teams/repositories/types';
 import { PermissionService, SubmissionOperation } from '../permission/service';
@@ -73,10 +73,10 @@ export class WizardService {
         suggestedReviewingEditor
         suggestedReviewer
     */
-    async saveEditorsPage(
+    async savePeoplePage(
         user: User,
         submissionId: SubmissionId,
-        details: { members: Array<{ meta: { elifePersonId: string } }> }, // TODO: type properly
+        details: PeopleDetails, // TODO: type properly
     ) {
         const submission = await this.submissionService.get(submissionId);
         if (submission === null) {
@@ -89,6 +89,14 @@ export class WizardService {
 
         const team = await this.teamService.find(submissionId.toString(), 'author');
         // TODO: get elifePersonId - populate from EditorsDetails
+        /*
+            opposedReviewer
+            suggestedSeniorEditor
+            opposedSeniorEditor
+            opposedReviewingEditor
+            suggestedReviewingEditor
+            suggestedReviewer
+        */
         const teamMembers: Array<EditorTeamMember> = details.members;
         if (team) {
             // TODO: update

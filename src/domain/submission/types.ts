@@ -31,9 +31,25 @@ export type DisclosureDetails = {
     disclosureConsent?: boolean;
 };
 
-export type EditorsDetails = {
+export type ReviewerAlias = {
+    name: string
+    email: string
+}
+
+export type OpposedReviewer = {
+    name: string
+    email: string
+}
+
+export type PeopleDetails = {
+    suggestedSeniorEditors?: Array<string>;
+    opposedSeniorEditors?: Array<string>;
     opposedSeniorEditorsReason?: string;
+    suggestedReviewingEditors?: Array<string>;
+    opposedReviewingEditors?: Array<string>;
     opposedReviewingEditorsReason?: string;
+    suggestedReviewers?: Array<ReviewerAlias>;
+    opposedReviewers?: Array<OpposedReviewer>;
     opposedReviewersReason?: string;
 };
 
