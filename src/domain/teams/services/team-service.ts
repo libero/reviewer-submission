@@ -4,7 +4,7 @@ import XpubTeamRepository from '../repositories/xpub-team';
 import Team from './models/team';
 import { v4 as uuid } from 'uuid';
 import { TeamId } from '../types';
-import { AuthorTeamMember } from '../repositories/types';
+import { AuthorTeamMember, EditorTeamMember } from '../repositories/types';
 
 export class TeamService {
     teamRepository: XpubTeamRepository;
@@ -33,7 +33,7 @@ export class TeamService {
     */
     async createTeamByRole(
         role: string,
-        teamMembers: Array<AuthorTeamMember>,
+        teamMembers: Array<EditorTeamMember>,
         objectId: string,
         objectType: string,
     ): Promise<Team> {

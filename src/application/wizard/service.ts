@@ -261,7 +261,8 @@ export class WizardService {
             }
             const authorTeamMember = await this.teamService.find(submissionId.toString(), 'author');
             if (authorTeamMember) {
-                submission.author = authorTeamMember.teamMembers[0].alias;
+                const teamMembers = authorTeamMember.teamMembers as Array<AuthorTeamMember>
+                submission.author = teamMembers[0].alias;
             }
         }
         return submission;
