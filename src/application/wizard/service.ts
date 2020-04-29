@@ -5,7 +5,7 @@ import { FileService } from '../../domain/file/services/file-service';
 import { SemanticExtractionService } from '../../domain/semantic-extraction/services/semantic-extraction-service';
 import { AuthorDetails, SubmissionId, ManuscriptDetails, PeopleDetails } from '../../domain/submission/types';
 import Submission from '../../domain/submission/services/models/submission';
-import { AuthorTeamMember, EditorTeamMember } from '../../domain/teams/repositories/types';
+import { AuthorTeamMember, PeopleTeamMember } from '../../domain/teams/repositories/types';
 import { PermissionService, SubmissionOperation } from '../permission/service';
 import { User } from 'src/domain/user/user';
 import { FileType, FileId } from '../../domain/file/types';
@@ -88,6 +88,7 @@ export class WizardService {
         }
 
         const team = await this.teamService.find(submissionId.toString(), 'author');
+
         // TODO: get elifePersonId - populate from EditorsDetails
         /*
             opposedReviewer
@@ -97,13 +98,38 @@ export class WizardService {
             suggestedReviewingEditor
             suggestedReviewer
         */
-        const teamMembers: Array<EditorTeamMember> = details.members;
+
+        // role = suggestedSeniorEditor
+        const suggestedSeniorEditors: Array<PeopleTeamMember> = (details.suggestedSeniorEditors || [])?.map(elifePersonId => ({
+            meta: { elifePersonId },
+        }));
+
+        // role = opposedSeniorEditor
+        const opposedSeniorEditors: Array<PeopleTeamMember> = (details.opposedSeniorEditors || [])?.map(elifePersonId => ({
+            meta: { elifePersonId },
+        }));
+
+        // role = suggestedReviewingEditor
+        const suggestedReviewingEditors: Array<PeopleTeamMember> = (details.suggestedReviewingEditors || [])?.map(elifePersonId => ({
+            meta: { elifePersonId },
+        }));
+
+        // role = opposedReviewingEditor
+        const opposedReviewingEditors: Array<PeopleTeamMember> = (details.opposedReviewingEditors || [])?.map(elifePersonId => ({
+            meta: { elifePersonId },
+        }));
+
         if (team) {
             // TODO: update
-            await this.teamService.update({...team, teamMembers });
+            await this.teamService.update({ ...team, teamMembers: suggestedSeniorEditors });
         } else {
             // TODO: create, patch role
-            await this.teamService.createTeamByRole('ROLE', teamMembers, submissionId.toString(), 'manuscript');
+            await this.teamService.createTeamByRole(
+                'ROLE',
+                suggestedSeniorEditors,
+                submissionId.toString(),
+                'manuscript',
+            );
         }
 
         return this.getFullSubmission(submissionId);
@@ -269,7 +295,7 @@ export class WizardService {
             }
             const authorTeamMember = await this.teamService.find(submissionId.toString(), 'author');
             if (authorTeamMember) {
-                const teamMembers = authorTeamMember.teamMembers as Array<AuthorTeamMember>
+                const teamMembers = authorTeamMember.teamMembers as Array<AuthorTeamMember>;
                 submission.author = teamMembers[0].alias;
             }
         }

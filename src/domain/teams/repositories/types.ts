@@ -12,7 +12,7 @@ export type AuthorTeamMember = {
     meta: { corresponding: true };
 };
 
-export type EditorTeamMember = {
+export type PeopleTeamMember = {
     meta: {
         elifePersonId: string;
     };
