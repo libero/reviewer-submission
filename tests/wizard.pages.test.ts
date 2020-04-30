@@ -177,4 +177,77 @@ describe('Wizard->Pages Integration Tests', () => {
         expect(saveAuthorPageResponse.data.data.saveAuthorPage.author.firstName).toBe('jimmy');
         expect(saveAuthorPageResponse.data.data.saveAuthorPage.author.institution).toBe('institution');
     });
+    
+
+    it.only('it should allow user to set editor details', async () => {
+        const startSubmissionResponse = await startSubmissionAlt('research-article');
+        const submissionId = startSubmissionResponse.data.data.startSubmission.id;
+        const details = {
+
+            suggestedSeniorEditors: ['1111'],
+            opposedSeniorEditors: ['2222'],
+            opposedSeniorEditorsReason: 'because',
+            suggestedReviewingEditors: ['3333'],
+            opposedReviewingEditors: ['4444'],
+            opposedReviewingEditorsReason: 'because 2',
+            suggestedReviewers: [{
+                email: 'jimmy@doe.com',
+                name: 'name'
+            }],
+            opposedReviewers: [{
+                email: 'jimmy@doe.com',
+                name: 'name'
+            }],
+            opposedReviewersReason: 'because 3',
+        };
+
+        const savePeoplePageResponse = await axios.post(
+            'http://localhost:3000/graphql',
+            {
+                query: `
+                    mutation savePeoplePage($id: ID!, $details: PeopleDetailsInput!) {
+                        savePeoplePage(id: $id, details: $details) {
+                            id,
+                            people {
+                                suggestedSeniorEditors,
+                                opposedSeniorEditors,
+                                opposedSeniorEditorsReason,
+                                suggestedReviewingEditors,
+                                opposedReviewingEditors,
+                                opposedReviewingEditorsReason,
+                                suggestedReviewers {
+                                    name,
+                                    email
+                                },
+                                opposedReviewers {
+                                    name,
+                                    email
+                                },
+                                opposedReviewersReason
+                            }
+                        }
+                    }
+                `,
+                variables: {
+                    id: submissionId,
+                    details,
+                },
+            },
+            {
+                headers: { Authorization: `Bearer ${jwtToken}` },
+            },
+        );
+
+        expect(savePeoplePageResponse.status).toBe(200);
+        expect(savePeoplePageResponse.data.errors).toBeUndefined();
+        expect(savePeoplePageResponse.data.data.savePeoplePage.people.suggestedSeniorEditors).toEqual(details.suggestedSeniorEditors);
+        expect(savePeoplePageResponse.data.data.savePeoplePage.people.opposedSeniorEditors).toEqual(details.opposedSeniorEditors);
+        expect(savePeoplePageResponse.data.data.savePeoplePage.people.opposedSeniorEditorsReason).toEqual(details.opposedSeniorEditorsReason);
+        expect(savePeoplePageResponse.data.data.savePeoplePage.people.suggestedReviewingEditors).toEqual(details.suggestedReviewingEditors);
+        expect(savePeoplePageResponse.data.data.savePeoplePage.people.opposedReviewingEditorsReason).toEqual(details.opposedReviewingEditorsReason);
+        expect(savePeoplePageResponse.data.data.savePeoplePage.people.suggestedReviewers).toEqual(details.suggestedReviewers);
+        expect(savePeoplePageResponse.data.data.savePeoplePage.people.opposedReviewers).toEqual(details.opposedReviewers);
+        expect(savePeoplePageResponse.data.data.savePeoplePage.people.opposedReviewersReason).toEqual(details.opposedReviewersReason);
+
+    });
 });
