@@ -90,6 +90,16 @@ export default class Submission {
         }
     }
 
+    public addEditorFeedback(
+        opposedReviewersReason?: string,
+        opposedReviewingEditorsReason?: string,
+        opposedSeniorEditorsReason?: string,
+    ): void {
+        this.editorDetails.opposedReviewersReason = opposedReviewersReason;
+        this.editorDetails.opposedReviewingEditorsReason = opposedReviewingEditorsReason;
+        this.editorDetails.opposedSeniorEditorsReason = opposedSeniorEditorsReason;
+    }
+
     public setManuscriptFile(fileId: FileId, filename: string, mimeType: string, fileSize: number): void {
         if (!this.files) {
             throw new Error('Object invalid! No files member.');

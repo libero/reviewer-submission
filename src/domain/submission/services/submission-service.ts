@@ -101,9 +101,7 @@ export class SubmissionService {
         if (!submission) {
             throw new Error('Unable to find submission with id: ' + id);
         }
-        submission.editorDetails.opposedReviewersReason = opposedReviewersReason;
-        submission.editorDetails.opposedReviewingEditorsReason = opposedReviewingEditorsReason;
-        submission.editorDetails.opposedSeniorEditorsReason = opposedSeniorEditorsReason;
+        submission.addEditorFeedback(opposedReviewersReason, opposedReviewingEditorsReason, opposedSeniorEditorsReason);
         return await this.submissionRepository.update(submission);
     }
 }
