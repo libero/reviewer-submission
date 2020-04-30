@@ -115,6 +115,9 @@ describe('Knex Submission Repository', () => {
                 'status',
                 'meta',
                 'cover_letter',
+                'opposed_senior_editors_reason',
+                'opposed_reviewing_editors_reason',
+                'opposed_reviewers_reason',
             );
             expect(mock.from).toBeCalledWith('manuscript');
         });
@@ -170,6 +173,9 @@ describe('Knex Submission Repository', () => {
                 'status',
                 'meta',
                 'cover_letter',
+                'opposed_senior_editors_reason',
+                'opposed_reviewing_editors_reason',
+                'opposed_reviewers_reason',
             );
             expect(mock.from).toBeCalledWith('manuscript');
             expect(mock.where).toBeCalledWith({ id: entryId });
