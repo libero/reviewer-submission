@@ -54,7 +54,6 @@ export default class XpubTeamRepository implements TeamRepository {
         if (team === null) {
             throw new Error(`Unable to find entry with id: ${dtoTeam.id}`);
         }
-        console.log('team UPDATE', team);
         const entryToSave = { ...team, ...dtoTeam, updated: new Date() };
         const query = this._query
             .builder()
@@ -67,7 +66,6 @@ export default class XpubTeamRepository implements TeamRepository {
 
     public async create(inputTeam: Team): Promise<Team> {
         const entryToSave = { ...inputTeam, updated: new Date() };
-        console.log('CREATE UPDATE', entryToSave);
         const query = this._query
             .builder()
             .insert(this.toDatabaseEntry(entryToSave))

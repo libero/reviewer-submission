@@ -28,6 +28,15 @@ interface TeamData {
     author?: AuthorDetails;
 }
 
+const rolesToProps: { [key: string]: string } = {
+    suggestedSeniorEditor: 'suggestedSeniorEditors',
+    opposedSeniorEditor: 'opposedSeniorEditors',
+    suggestedReviewingEditor: 'suggestedReviewingEditors',
+    opposedReviewingEditor: 'opposedReviewingEditors',
+    opposedReviewer: 'opposedReviewers',
+    suggestedReviewer: 'suggestedReviewers',
+};
+
 export class WizardService {
     constructor(
         private readonly permissionService: PermissionService,
@@ -88,9 +97,6 @@ export class WizardService {
         if (!allowed) {
             throw new Error('User not allowed to save submission');
         }
-
-        console.log('ubmissionId.toString()', submissionId.toString());
-
         await this.teamService.addOrUpdatePeopleTeams(submissionId.toString(), details);
 
         await this.submissionService.addEditorDetails(
@@ -261,6 +267,7 @@ export class WizardService {
             if (suggestion) {
                 submission.suggestions = [suggestion];
             }
+
             const teams = await this.teamService.findTeams(submissionId.toString());
             const details = teams.reduce(
                 (acc, team) => {
@@ -269,7 +276,7 @@ export class WizardService {
                         case 'opposedSeniorEditor':
                         case 'suggestedReviewingEditor':
                         case 'opposedReviewingEditor': {
-                            acc.peopleDetails[team.role + 's'] = team.teamMembers.map(
+                            acc.peopleDetails[rolesToProps[team.role]] = team.teamMembers.map(
                                 tm => (tm as PeopleTeamMember).meta.elifePersonId,
                             );
                             return acc;
@@ -277,7 +284,7 @@ export class WizardService {
 
                         case 'opposedReviewer':
                         case 'suggestedReviewer': {
-                            acc.peopleDetails[team.role + 's'] = team.teamMembers.map(
+                            acc.peopleDetails[rolesToProps[team.role]] = team.teamMembers.map(
                                 tm => (tm as PeopleReviewerTeamMember).meta,
                             );
                             return acc;
@@ -294,8 +301,6 @@ export class WizardService {
                 },
                 { peopleDetails: {} } as TeamData,
             );
-
-            console.log('details', details.peopleDetails);
 
             if (details.author) {
                 submission.author = details.author;

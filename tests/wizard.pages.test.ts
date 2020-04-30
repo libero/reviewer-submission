@@ -179,7 +179,7 @@ describe('Wizard->Pages Integration Tests', () => {
     });
     
 
-    it.only('it should allow user to set editor details', async () => {
+    it('it should allow user to set editor details', async () => {
         const startSubmissionResponse = await startSubmissionAlt('research-article');
         const submissionId = startSubmissionResponse.data.data.startSubmission.id;
         const details = {
