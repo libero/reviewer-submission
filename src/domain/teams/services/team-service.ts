@@ -33,31 +33,46 @@ export class TeamService {
         const teams = await this.findTeams(submissionId);
         const results: Array<Team> = [];
 
-        const suggestedSeniorEditors: Array<EditorTeamMember> = (details.suggestedSeniorEditors || [])?.map(
+        const suggestedSeniorEditors: Array<EditorTeamMember> = (!!details.suggestedSeniorEditors
+            ? details.suggestedSeniorEditors
+            : []
+        )?.map(
             (elifePersonId): EditorTeamMember => ({
                 meta: { elifePersonId },
             }),
         );
 
-        const opposedSeniorEditors: Array<EditorTeamMember> = (details.opposedSeniorEditors || [])?.map(
+        const opposedSeniorEditors: Array<EditorTeamMember> = (!!details.opposedSeniorEditors
+            ? details.opposedSeniorEditors
+            : []
+        )?.map(
             (elifePersonId): EditorTeamMember => ({
                 meta: { elifePersonId },
             }),
         );
 
-        const suggestedReviewingEditors: Array<EditorTeamMember> = (details.suggestedReviewingEditors || [])?.map(
+        const suggestedReviewingEditors: Array<EditorTeamMember> = (!!details.suggestedReviewingEditors
+            ? details.suggestedReviewingEditors
+            : []
+        )?.map(
             (elifePersonId): EditorTeamMember => ({
                 meta: { elifePersonId },
             }),
         );
 
-        const opposedReviewingEditors: Array<EditorTeamMember> = (details.opposedReviewingEditors || [])?.map(
+        const opposedReviewingEditors: Array<EditorTeamMember> = (!!details.opposedReviewingEditors
+            ? details.opposedReviewingEditors
+            : []
+        )?.map(
             (elifePersonId): EditorTeamMember => ({
                 meta: { elifePersonId },
             }),
         );
 
-        const opposedReviewers: Array<EditorReviewerTeamMember> = (details.opposedReviewers || [])?.map(
+        const opposedReviewers: Array<EditorReviewerTeamMember> = (!!details.opposedReviewers
+            ? details.opposedReviewers
+            : []
+        )?.map(
             ({ email, name }): EditorReviewerTeamMember => ({
                 meta: {
                     email,
@@ -66,7 +81,10 @@ export class TeamService {
             }),
         );
 
-        const suggestedReviewers: Array<EditorReviewerTeamMember> = (details.suggestedReviewers || [])?.map(
+        const suggestedReviewers: Array<EditorReviewerTeamMember> = (!!details.suggestedReviewers
+            ? details.suggestedReviewers
+            : []
+        )?.map(
             ({ email, name }): EditorReviewerTeamMember => ({
                 meta: {
                     email,
