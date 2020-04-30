@@ -14,7 +14,7 @@ export default class Team {
         id: TeamId,
         created: Date,
         updated: Date,
-        teamMembers: Array<AuthorTeamMember | PeopleTeamMember>,
+        teamMembers: Array<AuthorTeamMember | PeopleTeamMember | PeopleReviewerTeamMember>,
         role: string,
         objectId: string,
         objectType: string,

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { TeamRepository, AuthorTeamMember, PeopleTeamMember } from './types';
+import { TeamRepository, AuthorTeamMember, PeopleTeamMember, PeopleReviewerTeamMember } from './types';
 import { TeamId } from '../types';
 import { KnexTableAdapter } from '../../knex-table-adapter';
 import Team from '../services/models/team';
@@ -8,7 +8,7 @@ type DatabaseEntry = {
     id: TeamId;
     updated: Date;
     created: Date;
-    team_members: Array<AuthorTeamMember | PeopleTeamMember>;
+    team_members: Array<AuthorTeamMember | PeopleTeamMember | PeopleReviewerTeamMember>;
     role: string;
     object_id: string;
     object_type: string;

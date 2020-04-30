@@ -5,7 +5,7 @@ import { FileService } from '../../domain/file/services/file-service';
 import { SemanticExtractionService } from '../../domain/semantic-extraction/services/semantic-extraction-service';
 import { AuthorDetails, SubmissionId, ManuscriptDetails, PeopleDetails } from '../../domain/submission/types';
 import Submission from '../../domain/submission/services/models/submission';
-import { AuthorTeamMember } from '../../domain/teams/repositories/types';
+import { AuthorTeamMember, PeopleTeamMember, PeopleReviewerTeamMember } from '../../domain/teams/repositories/types';
 import { PermissionService, SubmissionOperation } from '../permission/service';
 import { User } from 'src/domain/user/user';
 import { FileType, FileId } from '../../domain/file/types';
@@ -13,6 +13,20 @@ import { PubSub } from 'apollo-server-express';
 import { Config } from '../../config';
 import { InfraLogger as logger } from '../../logger';
 import File from '../../domain/file/services/models/file';
+
+interface TeamData {
+    peopleDetails: {
+        suggestedSeniorEditors?: Array<string>;
+        opposedSeniorEditors?: Array<string>;
+        suggestedReviewingEditor?: Array<string>;
+        opposedReviewingEditor?: Array<string>;
+        opposedReviewer?: Array<{ name: string; email: string }>;
+        suggestedReviewer?: Array<{ name: string; email: string }>;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        [key: string]: any;
+    };
+    author?: AuthorDetails;
+}
 
 export class WizardService {
     constructor(
@@ -245,11 +259,43 @@ export class WizardService {
             if (suggestion) {
                 submission.suggestions = [suggestion];
             }
-            // TODO: update this.
-            const authorTeamMember = await this.teamService.find(submissionId.toString(), 'author');
-            if (authorTeamMember) {
-                const teamMembers = authorTeamMember.teamMembers as Array<AuthorTeamMember>;
-                submission.author = teamMembers[0].alias;
+            const teams = await this.teamService.findTeams(submissionId.toString());
+            const details = teams.reduce((acc, team) => {
+                switch (team.role) {
+                    case 'suggestedSeniorEditors':
+                    case 'opposedSeniorEditors':
+                    case 'suggestedSeniorEditors':
+                    case 'opposedReviewingEditor': {
+                        acc.peopleDetails[team.role] = team.teamMembers.map(
+                            tm => (tm as PeopleTeamMember).meta.elifePersonId,
+                        );
+                        return acc;
+                    }
+
+                    case 'opposedReviewer':
+                    case 'suggestedReviewer': {
+                        acc.peopleDetails[team.role] = team.teamMembers.map(
+                            tm => (tm as PeopleReviewerTeamMember).meta,
+                        );
+                        return acc;
+                    }
+
+                    case 'author': {
+                        acc.author = (team.teamMembers as Array<AuthorTeamMember>)[0].alias;
+                        return acc;
+                    }
+
+                    default:
+                        return acc;
+                }
+            }, {} as TeamData);
+
+            if (details.author) {
+                submission.author = details.author;
+            }
+
+            if (details.peopleDetails) {
+                submission.people = details.peopleDetails;
             }
         }
         return submission;

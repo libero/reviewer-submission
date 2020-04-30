@@ -78,7 +78,7 @@ type PeopleDetails {
     opposedReviewingEditors: [ID]
     opposedReviewingEditorsReason: String
     suggestedReviewers: [ReviewerAlias]
-    opposedReviewers: [OpposedReviewerInput]
+    opposedReviewers: [OpposedReviewer]
     opposedReviewersReason: String
 }
 
@@ -94,7 +94,7 @@ input PeopleDetailsInput {
     opposedReviewersReason: String
 }
 
-input ReviewerAlias {
+type ReviewerAlias {
     name: String
     email: String
 }
@@ -109,7 +109,7 @@ input OpposedReviewerInput {
     email: String
 }
 
-input OpposedReviewer {
+type OpposedReviewer {
     name: String
     email: String
 }

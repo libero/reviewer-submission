@@ -20,7 +20,7 @@ export class TeamService {
         return results.length > 0 ? results[0] : null;
     }
 
-    async findPeopleTeams(id: string): Promise<Array<Team>> {
+    async findTeams(id: string): Promise<Array<Team>> {
         const results = await this.teamRepository.findByObjectId(id);
         return results;
     }
@@ -30,7 +30,7 @@ export class TeamService {
     }
 
     async addOrUpdatePeopleTeams(submissionId: string, details: PeopleDetails): Promise<Array<Team>> {
-        const teams = await this.findPeopleTeams(submissionId);
+        const teams = await this.findTeams(submissionId);
         const results: Array<Team> = [];
 
         const suggestedSeniorEditors: Array<PeopleTeamMember> = (details.suggestedSeniorEditors || [])?.map(
@@ -101,7 +101,7 @@ export class TeamService {
 
     async createTeamByRole(
         role: string,
-        teamMembers: Array<PeopleTeamMember>,
+        teamMembers: Array<PeopleTeamMember | PeopleReviewerTeamMember>,
         objectId: string,
         objectType: string,
     ): Promise<Team> {
