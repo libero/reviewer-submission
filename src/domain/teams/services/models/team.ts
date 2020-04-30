@@ -1,11 +1,11 @@
-import { AuthorTeamMember, PeopleTeamMember } from '../../repositories/types';
+import { AuthorTeamMember, PeopleTeamMember, PeopleReviewerTeamMember } from '../../repositories/types';
 import { TeamId } from '../../types';
 
 export default class Team {
     id: TeamId;
     created: Date;
     updated: Date;
-    teamMembers: Array<AuthorTeamMember | PeopleTeamMember>;
+    teamMembers: Array<AuthorTeamMember | PeopleTeamMember | PeopleReviewerTeamMember>;
     role: string;
     objectId: string;
     objectType: string;

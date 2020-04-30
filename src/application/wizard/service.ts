@@ -5,7 +5,7 @@ import { FileService } from '../../domain/file/services/file-service';
 import { SemanticExtractionService } from '../../domain/semantic-extraction/services/semantic-extraction-service';
 import { AuthorDetails, SubmissionId, ManuscriptDetails, PeopleDetails } from '../../domain/submission/types';
 import Submission from '../../domain/submission/services/models/submission';
-import { AuthorTeamMember, PeopleTeamMember } from '../../domain/teams/repositories/types';
+import { AuthorTeamMember } from '../../domain/teams/repositories/types';
 import { PermissionService, SubmissionOperation } from '../permission/service';
 import { User } from 'src/domain/user/user';
 import { FileType, FileId } from '../../domain/file/types';
@@ -65,7 +65,7 @@ export class WizardService {
         return this.getFullSubmission(submissionId);
     }
 
-    async savePeoplePage(user: User, submissionId: SubmissionId, details: PeopleDetails) {
+    async savePeoplePage(user: User, submissionId: SubmissionId, details: PeopleDetails): Promise<Submission> {
         const submission = await this.submissionService.get(submissionId);
         if (submission === null) {
             throw new Error('No submission found');
@@ -75,61 +75,7 @@ export class WizardService {
             throw new Error('User not allowed to save submission');
         }
 
-        const teams = await this.teamService.findPeopleTeams(submissionId.toString());
-
-        const suggestedSeniorEditors: Array<PeopleTeamMember> = (details.suggestedSeniorEditors || [])?.map(
-            elifePersonId => ({
-                meta: { elifePersonId },
-            }),
-        );
-
-        const opposedSeniorEditors: Array<PeopleTeamMember> = (details.opposedSeniorEditors || [])?.map(
-            elifePersonId => ({
-                meta: { elifePersonId },
-            }),
-        );
-
-        const suggestedReviewingEditors: Array<PeopleTeamMember> = (details.suggestedReviewingEditors || [])?.map(
-            elifePersonId => ({
-                meta: { elifePersonId },
-            }),
-        );
-
-        const opposedReviewingEditors: Array<PeopleTeamMember> = (details.opposedReviewingEditors || [])?.map(
-            elifePersonId => ({
-                meta: { elifePersonId },
-            }),
-        );
-        const opposedReviewers: Array<any> = (details.opposedReviewers || [])?.map(({ email, name }) => ({
-            meta: {
-                email,
-                name,
-            },
-        }));
-
-        const suggestedReviewers: Array<any> = (details.suggestedReviewers || [])?.map(({ email, name }) => ({
-            meta: {
-                email,
-                name,
-            },
-        }));
-
-        const teamUpdates = [
-            { role: 'suggestedSeniorEditors', teamMembers: suggestedSeniorEditors },
-            { role: 'opposedSeniorEditors', teamMembers: opposedSeniorEditors },
-            { role: 'suggestedReviewingEditor', teamMembers: suggestedReviewingEditors },
-            { role: 'opposedReviewingEditor', teamMembers: opposedReviewingEditors },
-            { role: 'opposedReviewer', teamMembers: opposedReviewers },
-            { role: 'suggestedReviewer', teamMembers: suggestedReviewers },
-        ].map(async ({ role, teamMembers }) => {
-            const team = teams.find(t => t.role === role);
-
-            if (team) {
-                await this.teamService.update({ ...team, teamMembers });
-            } else {
-                await this.teamService.createTeamByRole(role, teamMembers, submissionId.toString(), 'manuscript');
-            }
-        });
+        await this.teamService.addOrUpdatePeopleTeams(submissionId.toString(), details);
 
         await this.submissionService.addEditorDetails(
             submissionId,
@@ -137,8 +83,6 @@ export class WizardService {
             details.opposedReviewingEditorsReason,
             details.opposedSeniorEditorsReason,
         );
-
-        await Promise.all(teamUpdates);
 
         return this.getFullSubmission(submissionId);
     }
@@ -301,6 +245,7 @@ export class WizardService {
             if (suggestion) {
                 submission.suggestions = [suggestion];
             }
+            // TODO: update this.
             const authorTeamMember = await this.teamService.find(submissionId.toString(), 'author');
             if (authorTeamMember) {
                 const teamMembers = authorTeamMember.teamMembers as Array<AuthorTeamMember>;

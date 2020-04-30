@@ -22,3 +22,10 @@ export type PeopleTeamMember = {
               email: string;
           };
 };
+
+export type PeopleReviewerTeamMember = {
+    meta: {
+        email: string;
+        name: string;
+    };
+};

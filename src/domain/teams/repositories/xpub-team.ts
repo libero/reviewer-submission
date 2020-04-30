@@ -29,7 +29,6 @@ export default class XpubTeamRepository implements TeamRepository {
         return results.map(r => this.toModel(r));
     }
 
-
     public async findByObjectId(object_id: string): Promise<Team[]> {
         const query = this._query
             .builder()

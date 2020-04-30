@@ -1,7 +1,7 @@
 import { IResolvers, withFilter, PubSub } from 'apollo-server-express';
 import { FileUpload } from 'graphql-upload';
 import Submission from '../../domain/submission/services/models/submission';
-import { SubmissionId, AuthorDetails, ManuscriptDetails } from '../../domain/submission/types';
+import { SubmissionId, AuthorDetails, ManuscriptDetails, PeopleDetails } from '../../domain/submission/types';
 import { UserService } from 'src/domain/user';
 import { WizardService } from './service';
 import { FileId } from '../../domain/file/types';
@@ -30,9 +30,9 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
             return wizard.saveAuthorPage(user, submissionId, details);
         },
 
-        // TODO: type correctly
-        async savePeoplePage(       _,
-            { id: submissionId, details }: { id: SubmissionId; details: any },
+        async savePeoplePage(
+            _,
+            { id: submissionId, details }: { id: SubmissionId; details: PeopleDetails },
             context,
         ): Promise<Submission | null> {
             const user = await userService.getCurrentUser(context.authorizationHeader);

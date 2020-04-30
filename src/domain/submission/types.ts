@@ -17,7 +17,6 @@ export type AuthorDetails = {
     aff: string;
 };
 
-
 export type ManuscriptDetails = {
     title?: string;
     subjects?: string[];
@@ -32,14 +31,14 @@ export type DisclosureDetails = {
 };
 
 export type ReviewerAlias = {
-    name: string
-    email: string
-}
+    name: string;
+    email: string;
+};
 
 export type OpposedReviewer = {
-    name: string
-    email: string
-}
+    name: string;
+    email: string;
+};
 
 export type PeopleDetails = {
     suggestedSeniorEditors?: Array<string>;
