@@ -40,7 +40,7 @@ export type OpposedReviewer = {
     email: string;
 };
 
-export type PeopleDetails = {
+export type EditorDetails = {
     suggestedSeniorEditors?: Array<string>;
     opposedSeniorEditors?: Array<string>;
     opposedSeniorEditorsReason?: string;

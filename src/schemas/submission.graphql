@@ -8,7 +8,7 @@ type Submission {
     author: AuthorDetails
     manuscriptDetails: ManuscriptDetails
     files: FileDetails
-    people: PeopleDetails
+    editorDetails: EditorDetails
     disclosure: DisclosureDetails
     suggestions: [Suggestion]
 }
@@ -70,7 +70,7 @@ type FileDetails {
     coverLetter: String
 }
 
-type PeopleDetails {
+type EditorDetails {
     suggestedSeniorEditors: [ID]
     opposedSeniorEditors: [ID]
     opposedSeniorEditorsReason: String
@@ -82,7 +82,7 @@ type PeopleDetails {
     opposedReviewersReason: String
 }
 
-input PeopleDetailsInput {
+input EditorDetailsInput {
     suggestedSeniorEditors: [ID]
     opposedSeniorEditors: [ID]
     opposedSeniorEditorsReason: String

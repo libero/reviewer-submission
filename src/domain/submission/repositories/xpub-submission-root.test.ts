@@ -68,7 +68,7 @@ describe('Knex Submission Repository', () => {
                 updated: new Date('2020-02-18T15:14:53.255Z'),
                 created: new Date('2020-02-18T15:14:53.155Z'),
                 disclosure: {},
-                people: {},
+                editorDetails: {},
                 files: {
                     coverLetter: 'test cover',
                 },
@@ -89,7 +89,7 @@ describe('Knex Submission Repository', () => {
                 updated: new Date('2020-02-18T15:14:53.255Z'),
                 created: new Date('2020-02-18T15:14:53.155Z'),
                 disclosure: {},
-                people: {},
+                editorDetails: {},
                 files: {
                     coverLetter: 'test cover',
                 },
@@ -135,7 +135,7 @@ describe('Knex Submission Repository', () => {
                 updated: new Date('2020-02-18T15:14:53.255Z'),
                 created: new Date('2020-02-18T15:14:53.155Z'),
                 disclosure: {},
-                people: {},
+                editorDetails: {},
                 files: {
                     coverLetter: 'test cover',
                 },

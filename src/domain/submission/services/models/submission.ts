@@ -3,7 +3,7 @@ import {
     ManuscriptDetails,
     AuthorDetails,
     DisclosureDetails,
-    PeopleDetails,
+    EditorDetails,
     FileDetails,
 } from '../../types';
 import File from '../../../file/services/models/file';
@@ -43,7 +43,7 @@ export default class Submission {
     author?: AuthorDetails; // responsibility of the Teams Service
     manuscriptDetails: ManuscriptDetails = {};
     files: FileDetails = {}; // responsibility of the Files Service
-    people: PeopleDetails = {};
+    editorDetails: EditorDetails = {};
     disclosure: DisclosureDetails = {};
     suggestions?: Array<Suggestion> = [];
 

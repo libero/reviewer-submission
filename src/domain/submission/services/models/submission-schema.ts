@@ -43,7 +43,7 @@ export const submissionSchema = Joi.object({
         manuscriptFile: fileSchema.required(),
         supportingFiles: Joi.array().items(fileSchema),
     },
-    people: {},
+    editorDetails: {},
     disclosure: {},
 
     suggestions: Joi.array().items(suggestionSchema),

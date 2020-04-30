@@ -200,14 +200,14 @@ describe('Wizard->Pages Integration Tests', () => {
             opposedReviewersReason: 'because 3',
         };
 
-        const savePeoplePageResponse = await axios.post(
+        const saveEditorPageResponse = await axios.post(
             'http://localhost:3000/graphql',
             {
                 query: `
-                    mutation savePeoplePage($id: ID!, $details: PeopleDetailsInput!) {
-                        savePeoplePage(id: $id, details: $details) {
+                    mutation saveEditorPage($id: ID!, $details: EditorDetailsInput!) {
+                        saveEditorPage(id: $id, details: $details) {
                             id,
-                            people {
+                            editorDetails {
                                 suggestedSeniorEditors,
                                 opposedSeniorEditors,
                                 opposedSeniorEditorsReason,
@@ -237,16 +237,16 @@ describe('Wizard->Pages Integration Tests', () => {
             },
         );
 
-        expect(savePeoplePageResponse.status).toBe(200);
-        expect(savePeoplePageResponse.data.errors).toBeUndefined();
-        expect(savePeoplePageResponse.data.data.savePeoplePage.people.suggestedSeniorEditors).toEqual(details.suggestedSeniorEditors);
-        expect(savePeoplePageResponse.data.data.savePeoplePage.people.opposedSeniorEditors).toEqual(details.opposedSeniorEditors);
-        expect(savePeoplePageResponse.data.data.savePeoplePage.people.opposedSeniorEditorsReason).toEqual(details.opposedSeniorEditorsReason);
-        expect(savePeoplePageResponse.data.data.savePeoplePage.people.suggestedReviewingEditors).toEqual(details.suggestedReviewingEditors);
-        expect(savePeoplePageResponse.data.data.savePeoplePage.people.opposedReviewingEditorsReason).toEqual(details.opposedReviewingEditorsReason);
-        expect(savePeoplePageResponse.data.data.savePeoplePage.people.suggestedReviewers).toEqual(details.suggestedReviewers);
-        expect(savePeoplePageResponse.data.data.savePeoplePage.people.opposedReviewers).toEqual(details.opposedReviewers);
-        expect(savePeoplePageResponse.data.data.savePeoplePage.people.opposedReviewersReason).toEqual(details.opposedReviewersReason);
+        expect(saveEditorPageResponse.status).toBe(200);
+        expect(saveEditorPageResponse.data.errors).toBeUndefined();
+        expect(saveEditorPageResponse.data.data.saveEditorPage.editorDetails.suggestedSeniorEditors).toEqual(details.suggestedSeniorEditors);
+        expect(saveEditorPageResponse.data.data.saveEditorPage.editorDetails.opposedSeniorEditors).toEqual(details.opposedSeniorEditors);
+        expect(saveEditorPageResponse.data.data.saveEditorPage.editorDetails.opposedSeniorEditorsReason).toEqual(details.opposedSeniorEditorsReason);
+        expect(saveEditorPageResponse.data.data.saveEditorPage.editorDetails.suggestedReviewingEditors).toEqual(details.suggestedReviewingEditors);
+        expect(saveEditorPageResponse.data.data.saveEditorPage.editorDetails.opposedReviewingEditorsReason).toEqual(details.opposedReviewingEditorsReason);
+        expect(saveEditorPageResponse.data.data.saveEditorPage.editorDetails.suggestedReviewers).toEqual(details.suggestedReviewers);
+        expect(saveEditorPageResponse.data.data.saveEditorPage.editorDetails.opposedReviewers).toEqual(details.opposedReviewers);
+        expect(saveEditorPageResponse.data.data.saveEditorPage.editorDetails.opposedReviewersReason).toEqual(details.opposedReviewersReason);
 
     });
 });

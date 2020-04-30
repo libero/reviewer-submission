@@ -1,5 +1,5 @@
 type Mutation {
-    savePeoplePage(id: ID!, details: PeopleDetailsInput!): Submission!
+    saveEditorPage(id: ID!, details: EditorDetailsInput!): Submission!
     saveAuthorPage(id: ID!, details: AuthorDetailsInput!): Submission!
     uploadManuscript(id: ID!, file: Upload!, fileSize: Int!): Submission!
     deleteManuscript(fileId: ID!, submissionId: ID!): Boolean!

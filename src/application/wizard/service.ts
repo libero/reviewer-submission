@@ -3,9 +3,9 @@ import { SubmissionService } from '../../domain/submission';
 import { TeamService } from '../../domain/teams/services/team-service';
 import { FileService } from '../../domain/file/services/file-service';
 import { SemanticExtractionService } from '../../domain/semantic-extraction/services/semantic-extraction-service';
-import { AuthorDetails, SubmissionId, ManuscriptDetails, PeopleDetails } from '../../domain/submission/types';
+import { AuthorDetails, SubmissionId, ManuscriptDetails, EditorDetails } from '../../domain/submission/types';
 import Submission from '../../domain/submission/services/models/submission';
-import { AuthorTeamMember, PeopleTeamMember, PeopleReviewerTeamMember } from '../../domain/teams/repositories/types';
+import { AuthorTeamMember, EditorTeamMember, EditorReviewerTeamMember } from '../../domain/teams/repositories/types';
 import { PermissionService, SubmissionOperation } from '../permission/service';
 import { User } from 'src/domain/user/user';
 import { FileType, FileId } from '../../domain/file/types';
@@ -15,7 +15,7 @@ import { InfraLogger as logger } from '../../logger';
 import File from '../../domain/file/services/models/file';
 
 interface TeamData {
-    peopleDetails: {
+    editorDetails: {
         suggestedSeniorEditors?: Array<string>;
         opposedSeniorEditors?: Array<string>;
         suggestedReviewingEditor?: Array<string>;
@@ -88,7 +88,7 @@ export class WizardService {
         return this.getFullSubmission(submissionId);
     }
 
-    async savePeoplePage(user: User, submissionId: SubmissionId, details: PeopleDetails): Promise<Submission> {
+    async saveEditorPage(user: User, submissionId: SubmissionId, details: EditorDetails): Promise<Submission> {
         const submission = await this.submissionService.get(submissionId);
         if (submission === null) {
             throw new Error('No submission found');
@@ -97,7 +97,7 @@ export class WizardService {
         if (!allowed) {
             throw new Error('User not allowed to save submission');
         }
-        await this.teamService.addOrUpdatePeopleTeams(submissionId.toString(), details);
+        await this.teamService.addOrUpdateEditorTeams(submissionId.toString(), details);
 
         await this.submissionService.addEditorDetails(
             submissionId,
@@ -276,16 +276,16 @@ export class WizardService {
                         case 'opposedSeniorEditor':
                         case 'suggestedReviewingEditor':
                         case 'opposedReviewingEditor': {
-                            acc.peopleDetails[rolesToProps[team.role]] = team.teamMembers.map(
-                                tm => (tm as PeopleTeamMember).meta.elifePersonId,
+                            acc.editorDetails[rolesToProps[team.role]] = team.teamMembers.map(
+                                tm => (tm as EditorTeamMember).meta.elifePersonId,
                             );
                             return acc;
                         }
 
                         case 'opposedReviewer':
                         case 'suggestedReviewer': {
-                            acc.peopleDetails[rolesToProps[team.role]] = team.teamMembers.map(
-                                tm => (tm as PeopleReviewerTeamMember).meta,
+                            acc.editorDetails[rolesToProps[team.role]] = team.teamMembers.map(
+                                tm => (tm as EditorReviewerTeamMember).meta,
                             );
                             return acc;
                         }
@@ -299,15 +299,15 @@ export class WizardService {
                             return acc;
                     }
                 },
-                { peopleDetails: {} } as TeamData,
+                { editorDetails: {} } as TeamData,
             );
 
             if (details.author) {
                 submission.author = details.author;
             }
 
-            if (details.peopleDetails) {
-                submission.people = { ...details.peopleDetails, ...submission.people };
+            if (details.editorDetails) {
+                submission.editorDetails = { ...details.editorDetails, ...submission.editorDetails };
             }
         }
         return submission;

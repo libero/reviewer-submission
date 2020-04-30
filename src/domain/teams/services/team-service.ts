@@ -4,8 +4,8 @@ import XpubTeamRepository from '../repositories/xpub-team';
 import Team from './models/team';
 import { v4 as uuid } from 'uuid';
 import { TeamId } from '../types';
-import { AuthorTeamMember, PeopleTeamMember, PeopleReviewerTeamMember } from '../repositories/types';
-import { PeopleDetails } from 'src/domain/submission/types';
+import { AuthorTeamMember, EditorTeamMember, EditorReviewerTeamMember } from '../repositories/types';
+import { EditorDetails } from 'src/domain/submission/types';
 
 export class TeamService {
     teamRepository: XpubTeamRepository;
@@ -29,36 +29,36 @@ export class TeamService {
         return await this.teamRepository.update(team);
     }
 
-    async addOrUpdatePeopleTeams(submissionId: string, details: PeopleDetails): Promise<Array<Team>> {
+    async addOrUpdateEditorTeams(submissionId: string, details: EditorDetails): Promise<Array<Team>> {
         const teams = await this.findTeams(submissionId);
         const results: Array<Team> = [];
 
-        const suggestedSeniorEditors: Array<PeopleTeamMember> = (details.suggestedSeniorEditors || [])?.map(
-            (elifePersonId): PeopleTeamMember => ({
+        const suggestedSeniorEditors: Array<EditorTeamMember> = (details.suggestedSeniorEditors || [])?.map(
+            (elifePersonId): EditorTeamMember => ({
                 meta: { elifePersonId },
             }),
         );
 
-        const opposedSeniorEditors: Array<PeopleTeamMember> = (details.opposedSeniorEditors || [])?.map(
-            (elifePersonId): PeopleTeamMember => ({
+        const opposedSeniorEditors: Array<EditorTeamMember> = (details.opposedSeniorEditors || [])?.map(
+            (elifePersonId): EditorTeamMember => ({
                 meta: { elifePersonId },
             }),
         );
 
-        const suggestedReviewingEditors: Array<PeopleTeamMember> = (details.suggestedReviewingEditors || [])?.map(
-            (elifePersonId): PeopleTeamMember => ({
+        const suggestedReviewingEditors: Array<EditorTeamMember> = (details.suggestedReviewingEditors || [])?.map(
+            (elifePersonId): EditorTeamMember => ({
                 meta: { elifePersonId },
             }),
         );
 
-        const opposedReviewingEditors: Array<PeopleTeamMember> = (details.opposedReviewingEditors || [])?.map(
-            (elifePersonId): PeopleTeamMember => ({
+        const opposedReviewingEditors: Array<EditorTeamMember> = (details.opposedReviewingEditors || [])?.map(
+            (elifePersonId): EditorTeamMember => ({
                 meta: { elifePersonId },
             }),
         );
 
-        const opposedReviewers: Array<PeopleReviewerTeamMember> = (details.opposedReviewers || [])?.map(
-            ({ email, name }): PeopleReviewerTeamMember => ({
+        const opposedReviewers: Array<EditorReviewerTeamMember> = (details.opposedReviewers || [])?.map(
+            ({ email, name }): EditorReviewerTeamMember => ({
                 meta: {
                     email,
                     name,
@@ -66,8 +66,8 @@ export class TeamService {
             }),
         );
 
-        const suggestedReviewers: Array<PeopleReviewerTeamMember> = (details.suggestedReviewers || [])?.map(
-            ({ email, name }): PeopleReviewerTeamMember => ({
+        const suggestedReviewers: Array<EditorReviewerTeamMember> = (details.suggestedReviewers || [])?.map(
+            ({ email, name }): EditorReviewerTeamMember => ({
                 meta: {
                     email,
                     name,
@@ -101,7 +101,7 @@ export class TeamService {
 
     async createTeamByRole(
         role: string,
-        teamMembers: Array<PeopleTeamMember | PeopleReviewerTeamMember>,
+        teamMembers: Array<EditorTeamMember | EditorReviewerTeamMember>,
         objectId: string,
         objectType: string,
     ): Promise<Team> {
