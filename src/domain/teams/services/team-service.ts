@@ -76,8 +76,8 @@ export class TeamService {
         );
 
         const teamUpdates = [
-            { role: 'suggestedSeniorEditors', teamMembers: suggestedSeniorEditors },
-            { role: 'opposedSeniorEditors', teamMembers: opposedSeniorEditors },
+            { role: 'suggestedSeniorEditor', teamMembers: suggestedSeniorEditors },
+            { role: 'opposedSeniorEditor', teamMembers: opposedSeniorEditors },
             { role: 'suggestedReviewingEditor', teamMembers: suggestedReviewingEditors },
             { role: 'opposedReviewingEditor', teamMembers: opposedReviewingEditors },
             { role: 'opposedReviewer', teamMembers: opposedReviewers },
@@ -89,7 +89,7 @@ export class TeamService {
                 const updatedTeam = await this.update({ ...team, teamMembers });
                 results.push(updatedTeam);
             } else {
-                const newTeam = await this.createTeamByRole(role, teamMembers, submissionId.toString(), 'manuscript');
+                const newTeam = await this.createTeamByRole(role, teamMembers, submissionId, 'manuscript');
                 results.push(newTeam);
             }
         });

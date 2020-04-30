@@ -183,7 +183,6 @@ describe('Wizard->Pages Integration Tests', () => {
         const startSubmissionResponse = await startSubmissionAlt('research-article');
         const submissionId = startSubmissionResponse.data.data.startSubmission.id;
         const details = {
-
             suggestedSeniorEditors: ['1111'],
             opposedSeniorEditors: ['2222'],
             opposedSeniorEditorsReason: 'because',

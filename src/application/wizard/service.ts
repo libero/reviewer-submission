@@ -19,9 +19,9 @@ interface TeamData {
         suggestedSeniorEditors?: Array<string>;
         opposedSeniorEditors?: Array<string>;
         suggestedReviewingEditor?: Array<string>;
-        opposedReviewingEditor?: Array<string>;
+        opposedReviewingEditors?: Array<string>;
         opposedReviewer?: Array<{ name: string; email: string }>;
-        suggestedReviewer?: Array<{ name: string; email: string }>;
+        suggestedReviewers?: Array<{ name: string; email: string }>;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         [key: string]: any;
     };
@@ -88,6 +88,8 @@ export class WizardService {
         if (!allowed) {
             throw new Error('User not allowed to save submission');
         }
+
+        console.log('ubmissionId.toString()', submissionId.toString());
 
         await this.teamService.addOrUpdatePeopleTeams(submissionId.toString(), details);
 
@@ -260,42 +262,47 @@ export class WizardService {
                 submission.suggestions = [suggestion];
             }
             const teams = await this.teamService.findTeams(submissionId.toString());
-            const details = teams.reduce((acc, team) => {
-                switch (team.role) {
-                    case 'suggestedSeniorEditors':
-                    case 'opposedSeniorEditors':
-                    case 'suggestedSeniorEditors':
-                    case 'opposedReviewingEditor': {
-                        acc.peopleDetails[team.role] = team.teamMembers.map(
-                            tm => (tm as PeopleTeamMember).meta.elifePersonId,
-                        );
-                        return acc;
-                    }
+            const details = teams.reduce(
+                (acc, team) => {
+                    switch (team.role) {
+                        case 'suggestedSeniorEditor':
+                        case 'opposedSeniorEditor':
+                        case 'suggestedReviewingEditor':
+                        case 'opposedReviewingEditor': {
+                            acc.peopleDetails[team.role + 's'] = team.teamMembers.map(
+                                tm => (tm as PeopleTeamMember).meta.elifePersonId,
+                            );
+                            return acc;
+                        }
 
-                    case 'opposedReviewer':
-                    case 'suggestedReviewer': {
-                        acc.peopleDetails[team.role] = team.teamMembers.map(
-                            tm => (tm as PeopleReviewerTeamMember).meta,
-                        );
-                        return acc;
-                    }
+                        case 'opposedReviewer':
+                        case 'suggestedReviewer': {
+                            acc.peopleDetails[team.role + 's'] = team.teamMembers.map(
+                                tm => (tm as PeopleReviewerTeamMember).meta,
+                            );
+                            return acc;
+                        }
 
-                    case 'author': {
-                        acc.author = (team.teamMembers as Array<AuthorTeamMember>)[0].alias;
-                        return acc;
-                    }
+                        case 'author': {
+                            acc.author = (team.teamMembers as Array<AuthorTeamMember>)[0].alias;
+                            return acc;
+                        }
 
-                    default:
-                        return acc;
-                }
-            }, {} as TeamData);
+                        default:
+                            return acc;
+                    }
+                },
+                { peopleDetails: {} } as TeamData,
+            );
+
+            console.log('details', details.peopleDetails);
 
             if (details.author) {
                 submission.author = details.author;
             }
 
             if (details.peopleDetails) {
-                submission.people = details.peopleDetails;
+                submission.people = { ...details.peopleDetails, ...submission.people };
             }
         }
         return submission;

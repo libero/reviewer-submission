@@ -46,9 +46,6 @@ export default class Submission {
     people: PeopleDetails = {};
     disclosure: DisclosureDetails = {};
     suggestions?: Array<Suggestion> = [];
-    opposedReviewersReason?: string;
-    opposedReviewingEditorsReason?: string;
-    opposedSeniorEditorsReason?: string;
 
     // This is wired up so that you can create an entity from the DTO described by ISubmission
     constructor({

@@ -22,7 +22,7 @@ export default class XpubTeamRepository implements TeamRepository {
     public async findByObjectIdAndRole(object_id: string, role: string): Promise<Team[]> {
         const query = this._query
             .builder()
-            .select<DatabaseEntry[]>('id', 'updated', 'team_members')
+            .select<DatabaseEntry[]>('id', 'updated', 'team_members', 'role')
             .from(this.TABLE_NAME)
             .where({ object_id, role });
         const results = await this._query.executor<DatabaseEntry[]>(query);
@@ -42,7 +42,7 @@ export default class XpubTeamRepository implements TeamRepository {
     public async findTeamById(id: TeamId): Promise<Team | null> {
         const query = this._query
             .builder()
-            .select<DatabaseEntry[]>('id', 'updated', 'team_members')
+            .select<DatabaseEntry[]>('id', 'updated', 'team_members', 'role')
             .from(this.TABLE_NAME)
             .where({ id });
         const [team = null] = await this._query.executor<DatabaseEntry[]>(query);
@@ -54,6 +54,7 @@ export default class XpubTeamRepository implements TeamRepository {
         if (team === null) {
             throw new Error(`Unable to find entry with id: ${dtoTeam.id}`);
         }
+        console.log('team UPDATE', team);
         const entryToSave = { ...team, ...dtoTeam, updated: new Date() };
         const query = this._query
             .builder()
@@ -66,6 +67,7 @@ export default class XpubTeamRepository implements TeamRepository {
 
     public async create(inputTeam: Team): Promise<Team> {
         const entryToSave = { ...inputTeam, updated: new Date() };
+        console.log('CREATE UPDATE', entryToSave);
         const query = this._query
             .builder()
             .insert(this.toDatabaseEntry(entryToSave))

@@ -32,7 +32,18 @@ type DatabaseEntry = {
 
 export default class XpubSubmissionRootRepository implements SubmissionRepository {
     private readonly TABLE_NAME = 'manuscript';
-    private readonly COLUMNS = ['id', 'created', 'updated', 'created_by', 'status', 'meta', 'cover_letter'];
+    private readonly COLUMNS = [
+        'id',
+        'created',
+        'updated',
+        'created_by',
+        'status',
+        'meta',
+        'cover_letter',
+        'opposed_senior_editors_reason',
+        'opposed_reviewing_editors_reason',
+        'opposed_reviewers_reason',
+    ];
 
     public constructor(private readonly _query: KnexTableAdapter) {}
 
@@ -116,9 +127,9 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
             previously_discussed: submission.manuscriptDetails.previouslyDiscussed,
             previously_submitted: previouslySubmitted ? [previouslySubmitted] : undefined,
             cosubmission: submission.manuscriptDetails.cosubmission,
-            opposed_senior_editors_reason: submission.opposedSeniorEditorsReason,
-            opposed_reviewing_editors_reason: submission.opposedReviewingEditorsReason,
-            opposed_reviewers_reason: submission.opposedReviewersReason,
+            opposed_senior_editors_reason: submission.people.opposedSeniorEditorsReason,
+            opposed_reviewing_editors_reason: submission.people.opposedReviewingEditorsReason,
+            opposed_reviewers_reason: submission.people.opposedReviewersReason,
             meta: {
                 articleType: submission.articleType,
                 title: submission.manuscriptDetails.title,
@@ -146,7 +157,15 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
         };
         result.files.coverLetter = record.cover_letter;
         result.manuscriptDetails = details;
-        // TODO: add editor related conversion.
+        if (record.opposed_reviewers_reason) {
+            result.people.opposedReviewersReason = record.opposed_reviewers_reason;
+        }
+        if (record.opposed_reviewing_editors_reason) {
+            result.people.opposedReviewingEditorsReason = record.opposed_reviewing_editors_reason;
+        }
+        if (record.opposed_senior_editors_reason) {
+            result.people.opposedSeniorEditorsReason = record.opposed_senior_editors_reason;
+        }
         return result;
     }
 }
