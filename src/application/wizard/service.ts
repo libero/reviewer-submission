@@ -15,13 +15,7 @@ import { InfraLogger as logger } from '../../logger';
 import File from '../../domain/file/services/models/file';
 
 interface TeamData {
-    editorDetails: {
-        suggestedSeniorEditors?: Array<string>;
-        opposedSeniorEditors?: Array<string>;
-        suggestedReviewingEditor?: Array<string>;
-        opposedReviewingEditors?: Array<string>;
-        opposedReviewer?: Array<{ name: string; email: string }>;
-        suggestedReviewers?: Array<{ name: string; email: string }>;
+    editorDetails: EditorDetails & {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         [key: string]: any;
     };
