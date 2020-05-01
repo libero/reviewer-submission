@@ -4,7 +4,6 @@ import * as knex from 'knex';
 import { Express, Request, Response } from 'express';
 import { ApolloServer, AuthenticationError, makeExecutableSchema, UserInputError } from 'apollo-server-express';
 import config from './config';
-import clientConfig from './client-config';
 import { InfraLogger as logger } from './logger';
 import { join } from 'path';
 import { importSchema } from 'graphql-import';
@@ -80,7 +79,6 @@ const init = async (): Promise<void> => {
     app.use(helmet());
     app.use(hpp());
     app.get('/health', (_: Request, res: Response) => res.sendStatus(200));
-    app.get('/config', (_: Request, res: Response) => res.json({ config: clientConfig }));
 
     const typeDefs = await importSchema(join(__dirname, './schemas/**/*.graphql'), {
         forceGraphQLImport: false,
