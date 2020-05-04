@@ -11,7 +11,7 @@ export interface S3Config {
 
 export interface ScienceBeamConfig {
     api_url: string;
-    timeout: string;
+    timeout: number;
 }
 
 export interface Config {
