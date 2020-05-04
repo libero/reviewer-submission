@@ -279,7 +279,9 @@ describe('Wizard->Files Integration Tests', () => {
         );
 
         expect(deleteResponse.status).toBe(200);
-        expect(uploadManuscriptResponse.data.errors).toBeUndefined();
+        expect(deleteResponse.data.errors).toBeUndefined();
+        expect(deleteResponse.data.errors).toBeUndefined();
+        expect(deleteResponse.data.data.deleteSupportingFile).toEqual(uploadResponse.data.data.uploadSupportingFile.id);
     });
 
     it('should give back progress on manuscript upload', async done => {
