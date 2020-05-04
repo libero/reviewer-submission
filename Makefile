@@ -10,7 +10,6 @@ LOAD_SCHEMA = psql -U postgres -f xpub-schema.sql
 setup:
 	if [ ! -e ./config/config.json ] ; then cp config/config.example.json config/config.json ; fi
 	if [ ! -e ./config/config.local.json ] ; then cp config/config.local.example.json config/config.local.json ; fi
-	if [ ! -e ./config/config.client.json ] ; then cp config/config.client.example.json config/config.client.json ; fi
 	git submodule update --init --recursive
 	$(MAKE) get_deps
 
@@ -39,7 +38,6 @@ setup_integration:
 test_integration: setup_integration
 	${DOCKER_COMPOSE_TEST} up -d application
 	./.scripts/docker/wait-healthy.sh test_reviewer-submission 20
-	CONFIG_PATH=./config/config.json CLIENT_CONFIG_PATH=config/config.client.json yarn run test:integration
 	${DOCKER_COMPOSE_TEST} down
 
 load_schema:
