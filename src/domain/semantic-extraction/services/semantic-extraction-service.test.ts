@@ -92,7 +92,7 @@ describe('scienceBeamApi', () => {
         expect(result).toBe(false);
     });
 
-    it('dddd', async () => {
+    it('silently fails if database on failure', async () => {
         returnedStatus = 200;
         returnedContents = mockContents;
         mockCreate.mockRejectedValue('database on fire');
