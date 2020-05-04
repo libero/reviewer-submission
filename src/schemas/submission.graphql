@@ -28,8 +28,6 @@ type File {
     url: String
     mimeType: String
     size: Int
-    lastChangeDate: DateTime!
-    lastChangeUser: User!
     status: String!
     downloadLink: String!
 }
