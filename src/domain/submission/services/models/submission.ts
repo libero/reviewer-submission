@@ -3,7 +3,7 @@ import {
     ManuscriptDetails,
     AuthorDetails,
     DisclosureDetails,
-    EditorsDetails,
+    EditorDetails,
     FileDetails,
 } from '../../types';
 import File from '../../../file/services/models/file';
@@ -43,7 +43,7 @@ export default class Submission {
     author?: AuthorDetails; // responsibility of the Teams Service
     manuscriptDetails: ManuscriptDetails = {};
     files: FileDetails = {}; // responsibility of the Files Service
-    editors: EditorsDetails = {};
+    editorDetails: EditorDetails = {};
     disclosure: DisclosureDetails = {};
     suggestions?: Array<Suggestion> = [];
 
@@ -88,6 +88,16 @@ export default class Submission {
             default:
                 throw new Error('Invalid article type');
         }
+    }
+
+    public addEditorFeedback(
+        opposedReviewersReason?: string,
+        opposedReviewingEditorsReason?: string,
+        opposedSeniorEditorsReason?: string,
+    ): void {
+        this.editorDetails.opposedReviewersReason = opposedReviewersReason;
+        this.editorDetails.opposedReviewingEditorsReason = opposedReviewingEditorsReason;
+        this.editorDetails.opposedSeniorEditorsReason = opposedSeniorEditorsReason;
     }
 
     public setManuscriptFile(fileId: FileId, filename: string, mimeType: string, fileSize: number): void {

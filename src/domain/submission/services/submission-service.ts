@@ -90,4 +90,18 @@ export class SubmissionService {
         submission.manuscriptDetails = details;
         return await this.submissionRepository.update(submission);
     }
+
+    async addEditorDetails(
+        id: SubmissionId,
+        opposedReviewersReason?: string,
+        opposedReviewingEditorsReason?: string,
+        opposedSeniorEditorsReason?: string,
+    ): Promise<Submission> {
+        const submission = await this.submissionRepository.findById(id);
+        if (!submission) {
+            throw new Error('Unable to find submission with id: ' + id);
+        }
+        submission.addEditorFeedback(opposedReviewersReason, opposedReviewingEditorsReason, opposedSeniorEditorsReason);
+        return await this.submissionRepository.update(submission);
+    }
 }
