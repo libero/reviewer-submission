@@ -24,50 +24,67 @@ export class SemanticExtractionService {
         return await this.semanticExtractionRepository.getSuggestionBySubmissionId(submissionId);
     }
 
-    async extractTitle(
+    async getSuggestionsFromData(submissionId: SubmissionId, response: Buffer): Promise<boolean> {
+        let success = false;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const xmlData: any = await xml2js.parseStringPromise(response.toString());
+        if (xmlData && xmlData.article) {
+            const firstArticle = xmlData.article.front[0];
+            const articleMeta = firstArticle['article-meta'];
+            const firstMeta = articleMeta[0];
+            const titleGroup = firstMeta['title-group'];
+            const firstTitleGroup = titleGroup[0];
+            const titleArray = firstTitleGroup['article-title'];
+            const title = titleArray[0];
+
+            try {
+                await this.semanticExtractionRepository.create({
+                    id: SemanticExtractionId.fromUuid(uuid()),
+                    submissionId,
+                    fieldName: 'title',
+                    value: title,
+                });
+                success = true;
+            } catch (error) {
+                logger.error(`Could not write the suggestions. Failed with ${error}`);
+            }
+        } else {
+            logger.error('Unexpected return value from Sciencebeam');
+        }
+        return success;
+    }
+
+    async extractSuggestions(
         fileContents: Buffer,
         mimeType: string,
         filename: string,
         submissionId: SubmissionId,
-    ): Promise<string> {
+    ): Promise<boolean> {
+        logger.info(`Sciencebeam extracting ${this.scienceBeamConfig.api_url}`);
         const include = 'title';
-        let title = '';
-        let titleArray;
-
-        try {
-            const xmlBuffer = await axios.post(this.scienceBeamConfig.api_url, {
-                body: fileContents,
-                qs: {
-                    filename,
-                    include,
-                },
-                headers: { 'content-type': mimeType },
-                timeout: this.scienceBeamConfig.timeout,
+        const timeout = this.scienceBeamConfig.timeout;
+        let success = false;
+        await axios
+            .post(this.scienceBeamConfig.api_url, fileContents, {
+                headers: { 'Content-Type': mimeType },
+                params: { filename, include },
+                timeout,
+            })
+            .then(async response => {
+                if (response.status == 200) {
+                    success = await this.getSuggestionsFromData(submissionId, response.data);
+                } else {
+                    logger.error(`Sciencebeam responded with: ${response.status} and returned ${response.data}`);
+                }
+            })
+            .catch(error => {
+                logger.error(
+                    `Sciencebeam Error: ${error.response.status} returned:${JSON.stringify(error.response.data)}`,
+                );
+                logger.error(
+                    `Issue with semantic extraction: MimeType: ${mimeType}, filename: ${filename} | submission id: ${submissionId}`,
+                );
             });
-
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const xmlData: any = await xml2js.parseStringPromise(xmlBuffer.data.toString());
-
-            if (xmlData.article) {
-                const firstArticle = xmlData.article.front[0];
-                const articleMeta = firstArticle['article-meta'];
-                const firstMeta = articleMeta[0];
-                const titleGroup = firstMeta['title-group'];
-                const firstTitleGroup = titleGroup[0];
-                titleArray = firstTitleGroup['article-title'];
-                title = titleArray[0];
-            }
-
-            await this.semanticExtractionRepository.create({
-                id: SemanticExtractionId.fromUuid(uuid()),
-                submissionId,
-                fieldName: 'title',
-                value: title,
-            });
-        } catch (e) {
-            logger.error(`issue with semantic extraction - file id - ${filename} - submission id - ${submissionId}`);
-        }
-
-        return title;
+        return success;
     }
 }

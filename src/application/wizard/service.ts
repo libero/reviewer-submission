@@ -157,7 +157,7 @@ export class WizardService {
                 pubsub,
                 submissionId,
             );
-            await this.semanticExtractionService.extractTitle(fileContents, mimeType, filename, submissionId);
+            await this.semanticExtractionService.extractSuggestions(fileContents, mimeType, filename, submissionId);
         } catch (e) {
             logger.error(submissionId, 'MANUSCRIPT UPLOAD ERROR', e);
             manuscriptFile.setStatusToCancelled();
