@@ -280,7 +280,6 @@ describe('Wizard->Files Integration Tests', () => {
 
         expect(deleteResponse.status).toBe(200);
         expect(deleteResponse.data.errors).toBeUndefined();
-        expect(deleteResponse.data.errors).toBeUndefined();
         expect(deleteResponse.data.data.deleteSupportingFile).toEqual(uploadResponse.data.data.uploadSupportingFile.id);
     });
 
