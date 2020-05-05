@@ -78,7 +78,7 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
             const { fileId, submissionId } = variables;
             const user = await userService.getCurrentUser(context.authorizationHeader);
             const deletedFileId = await wizard.deleteSupportingFile(fileId, submissionId, user);
-            return deletedFileId.value;
+            return deletedFileId.toString();
         },
         async saveFilesPage(
             _,
