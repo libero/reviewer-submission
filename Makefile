@@ -19,6 +19,7 @@ setup: ## perform setup tasks
 
 start: ## start s3, postgres and reviewer-submission in development mode
 	${DOCKER_COMPOSE} up -d s3 postgres
+	$(MAKE) build_dev
 	${DOCKER_COMPOSE} up reviewer-submission
 
 stop: ## stop all containers
@@ -60,7 +61,10 @@ load_schema: ## load xpub schema
 		$(LOAD_SCHEMA)
 	endif
 
-build: ## build the image for production
+build_dev: ## build the image for development
+	${DOCKER_COMPOSE} build reviewer-submission
+
+build_prod: ## build the image for production
 	${DOCKER_COMPOSE_BUILD} build reviewer-submission
 
 push: ## push the image

@@ -1,14 +1,15 @@
-## This is only a single container right now but in future this should bring up supporting services needed for development ie: postgres, audit service ect.
-version: '3'
+version: '3.4'
 services:
   reviewer-submission:
-    image: node:12-alpine@sha256:5646d1e5bc470500414feb3540186c02845db0e0e1788621c271fbf3a0c1830d
+    build:
+      context: './'
+      target: dev
+    image: libero/reviewer-submission:${IMAGE_TAG:-local}
     ports:
       - "3000:3000"
-    working_dir: "/src"
     healthcheck:
-      test: "curl localhost:3000/health"
-      interval: 1m
+      test: 'echo -e "GET /\n\n" | nc localhost 9000'
+      interval: 3s
       timeout: 10s
       retries: 3
     command: ["sh", "-c", "yarn && yarn run start:dev"]
@@ -33,7 +34,15 @@ services:
       SCIENCE_BEAM_TIMEOUT: 20000
     volumes:
       - ./config:/etc/reviewer
-      - ./:/src/:z
+      - ./.eslintignore:/app/.eslintignore
+      - ./.eslintrc.js:/app/.eslintrc.js
+      - ./.prettierrc.js:/app/.prettierrc.js
+      - ./jest.config.js:/app/jest.config.js
+      - ./src/:/app/src
+      - ./package.json:/app/package.json
+      - ./yarn.json:/app/yarn.json
+      - ./tests/:/app/tests
+      - ./tsconfig.json:/app/tsconfig.json
     networks:
       - "reviewer"
 
