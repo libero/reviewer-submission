@@ -34,7 +34,6 @@ export interface ClientPublicConfig {
     };
 }
 
-// const configPath = process.env.CONFIG_PATH ? process.env.CONFIG_PATH : '/etc/reviewer/config.json';
 const clientConfigPath = process.env.CLIENT_CONFIG_PATH
     ? process.env.CLIENT_CONFIG_PATH
     : '/etc/reviewer/config.client.json';
