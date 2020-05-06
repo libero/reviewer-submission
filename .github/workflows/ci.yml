@@ -50,7 +50,7 @@ jobs:
 
       - name: Build and Package Container Images
         run: |
-          make build
+          make build_prod
           make build_xpub_postgres
           mkdir -p docker-image
           docker save -o docker-image/reviewer-submission.tar libero/reviewer-submission:${IMAGE_TAG}
@@ -85,6 +85,7 @@ jobs:
           docker load -i docker-image/reviewer-submission.tar
           docker load -i docker-image/reviewer-xpub-postgres.tar
           make setup
+          make start_ci
           make test_integration
 
       - name: Push Images if on master
