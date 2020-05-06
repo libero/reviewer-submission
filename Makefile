@@ -67,27 +67,12 @@ test_integration: ## run integration tests
 	CLIENT_CONFIG_PATH=config/config.client.json yarn run test:integration
 
 run_ci: ## run as if in ci
-	# make lint
-	# make test
+	make lint
+	make test
 	make build_prod
 	make start_ci
 	make test_integration
 	make stop
-
-# setup_integration: ## bring up service containers for integration tests
-# 	${DOCKER_COMPOSE_TEST} pull reviewer-mocks postgres
-# 	${DOCKER_COMPOSE_TEST} down
-# 	${DOCKER_COMPOSE_TEST} up -d postgres s3 reviewer-mocks
-# 	./.scripts/docker/wait-healthy.sh test_postgres 20
-# 	./.scripts/docker/wait-healthy.sh test_s3 30
-# 	./.scripts/docker/wait-healthy.sh test_reviewer_mocks 30
-# 	${DOCKER_COMPOSE_TEST} up -d s3_create-bucket
-
-# test_integration: setup_integration ## run integration tests
-# 	${DOCKER_COMPOSE_TEST} up -d reviewer-submission
-# 	./.scripts/docker/wait-healthy.sh test_reviewer-submission 20
-# 	CLIENT_CONFIG_PATH=config/config.client.json yarn run test:integration
-# 	${DOCKER_COMPOSE_TEST} down
 
 load_schema: ## load xpub schema
 	ifeq ($(shell $(GET_SCHEMA_TABLES)),14)

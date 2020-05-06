@@ -23,7 +23,7 @@ make setup
 ## Start in development mode
 
 ```sh
-make start
+make start_dev
 ```
 
 ## Start in development mode for testing

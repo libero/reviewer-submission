@@ -9,11 +9,10 @@ services:
     ports:
       - "3000:3000"
     healthcheck:
-      test: 'echo -e "GET /\n\n" | nc localhost 9000'
+      test: 'echo -e "GET /\n\n" | nc localhost 3000'
       interval: 3s
       timeout: 10s
       retries: 3
-    command: ["sh", "-c", "yarn && yarn run start:dev"]
     environment:
       DATABASE_NAME: postgres
       DATABASE_USER: postgres
