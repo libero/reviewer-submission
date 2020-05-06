@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { readFileSync } from 'fs';
 import { Config as KnexConfig } from 'knex';
 
 export interface S3Config {
@@ -12,7 +11,7 @@ export interface S3Config {
 
 export interface ScienceBeamConfig {
     api_url: string;
-    timeout: string;
+    timeout: number;
 }
 
 export interface Config {
@@ -33,10 +32,6 @@ export interface ClientPublicConfig {
         maxSizeMB: number;
     };
 }
-
-const clientConfigPath = process.env.CLIENT_CONFIG_PATH
-    ? process.env.CLIENT_CONFIG_PATH
-    : '/etc/reviewer/config.client.json';
 
 const appConfig: Config = {
     port: 3000,
@@ -64,12 +59,8 @@ const appConfig: Config = {
     user_adapter_url: process.env.USER_ADAPTER_URL || '',
     science_beam: {
         api_url: process.env.SCIENCE_BEAM_URL || '',
-        timeout: process.env.SCIENCE_BEAM_TIMEROUT || '',
+        timeout: Number(process.env.SCIENCE_BEAM_TIMEOUT),
     },
 };
 
-const clientConfig: ClientPublicConfig = JSON.parse(readFileSync(clientConfigPath, 'utf8'));
-
 export default appConfig;
-
-export { clientConfig };

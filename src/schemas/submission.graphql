@@ -8,7 +8,7 @@ type Submission {
     author: AuthorDetails
     manuscriptDetails: ManuscriptDetails
     files: FileDetails
-    editors: EditorDetails
+    editorDetails: EditorDetails
     disclosure: DisclosureDetails
     suggestions: [Suggestion]
 }
@@ -28,8 +28,6 @@ type File {
     url: String
     mimeType: String
     size: Int
-    lastChangeDate: DateTime!
-    lastChangeUser: User!
     status: String!
     downloadLink: String!
 }
@@ -71,9 +69,47 @@ type FileDetails {
 }
 
 type EditorDetails {
+    suggestedSeniorEditors: [ID]
+    opposedSeniorEditors: [ID]
     opposedSeniorEditorsReason: String
+    suggestedReviewingEditors: [ID]
+    opposedReviewingEditors: [ID]
     opposedReviewingEditorsReason: String
+    suggestedReviewers: [ReviewerAlias]
+    opposedReviewers: [OpposedReviewer]
     opposedReviewersReason: String
+}
+
+input EditorDetailsInput {
+    suggestedSeniorEditors: [ID]
+    opposedSeniorEditors: [ID]
+    opposedSeniorEditorsReason: String
+    suggestedReviewingEditors: [ID]
+    opposedReviewingEditors: [ID]
+    opposedReviewingEditorsReason: String
+    suggestedReviewers: [ReviewerAliasInput]
+    opposedReviewers: [OpposedReviewerInput]
+    opposedReviewersReason: String
+}
+
+type ReviewerAlias {
+    name: String
+    email: String
+}
+
+input ReviewerAliasInput {
+    name: String
+    email: String
+}
+
+input OpposedReviewerInput {
+    name: String
+    email: String
+}
+
+type OpposedReviewer {
+    name: String
+    email: String
 }
 
 type DisclosureDetails {

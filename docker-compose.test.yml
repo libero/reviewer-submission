@@ -4,8 +4,7 @@ services:
     container_name: reviewer-submission_app
     environment:
       MAX_FILE_SIZE_IN_BYTES: 1000000
-    volumes:
-      - ./tests/config/reviewer-submission-client.json:/etc/reviewer/config.client.json
+      NEW_RELIC_NO_CONFIG_FILE: "true"
 
   reviewer-mocks:
     image: liberoadmin/reviewer-mocks:latest
