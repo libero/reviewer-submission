@@ -3,8 +3,9 @@
 
 IMAGE_TAG ?= "local"
 DOCKER_COMPOSE = IMAGE_TAG=${IMAGE_TAG} docker-compose
+DOCKER_COMPOSE_TEST = IMAGE_TAG=${IMAGE_TAG} docker-compose -f docker-compose.yml -f docker-compose.test.yml
+DOCKER_COMPOSE_CI = IMAGE_TAG=${IMAGE_TAG} docker-compose -f docker-compose.yml -f docker-compose.ci.yml
 DOCKER_COMPOSE_BUILD = IMAGE_TAG=${IMAGE_TAG} docker-compose -f docker-compose.build.yml
-DOCKER_COMPOSE_TEST = IMAGE_TAG=${IMAGE_TAG} docker-compose -f docker-compose.test.yml
 DOCKER_COMPOSE_XPUB_POSTGRES = IMAGE_TAG=${IMAGE_TAG} docker-compose -f docker-compose.xpub-postgres.yml
 PUSH_COMMAND = IMAGE_TAG=${IMAGE_TAG} .scripts/travis/push-image.sh
 GET_SCHEMA_TABLES = psql -q -t -U postgres postgres -c "select count(*) from information_schema.tables where table_schema='public';" | xargs
@@ -16,18 +17,42 @@ help:
 setup: ## perform setup tasks
 	-@ git submodule update --init --recursive
 	-@ docker network create reviewer > /dev/null 2>&1 || true
+	-$(MAKE) install
 
-start: ## start s3, postgres and reviewer-submission in development mode
-	${DOCKER_COMPOSE} up -d s3 postgres
+install: ## install dependencies
+	yarn
+
+start_dev: ## start in development mode with s3 and postgres
+	${DOCKER_COMPOSE} pull s3 postgres
 	$(MAKE) build_dev
+	${DOCKER_COMPOSE} up -d s3 postgres
+	./.scripts/docker/wait-healthy.sh reviewer-submission_postgres 20
+	./.scripts/docker/wait-healthy.sh reviewer-submission_s3 40
 	${DOCKER_COMPOSE} up reviewer-submission
+
+start_test: ## start in development mode for local testing with s3, postgres and reviewer-mocks
+	${DOCKER_COMPOSE_TEST} pull s3 postgres reviewer-mocks
+	$(MAKE) build_dev
+	${DOCKER_COMPOSE_TEST} up -d s3 postgres reviewer-mocks
+	./.scripts/docker/wait-healthy.sh reviewer-submission_postgres 20
+	./.scripts/docker/wait-healthy.sh reviewer-submission_s3 40
+	./.scripts/docker/wait-healthy.sh reviewer-submission_mocks 20
+	${DOCKER_COMPOSE_TEST} up -d s3_create-bucket
+	${DOCKER_COMPOSE_TEST} up reviewer-submission
+
+start_ci: ## start in prod mode with s3 and postgres
+	${DOCKER_COMPOSE_CI} pull s3 postgres reviewer-mocks
+	${DOCKER_COMPOSE_CI} up -d s3 postgres reviewer-mocks
+	./.scripts/docker/wait-healthy.sh reviewer-submission_postgres 20
+	./.scripts/docker/wait-healthy.sh reviewer-submission_s3 40
+	./.scripts/docker/wait-healthy.sh reviewer-submission_mocks 20
+	${DOCKER_COMPOSE_CI} up -d s3_create-bucket
+	${DOCKER_COMPOSE_CI} up -d reviewer-submission
+	./.scripts/docker/wait-healthy.sh reviewer-submission_app 20
 
 stop: ## stop all containers
 	${DOCKER_COMPOSE_TEST} down
 	${DOCKER_COMPOSE} down
-
-install: ## install dependencies
-	yarn
 
 lint: install ## lint code
 	yarn lint
@@ -38,20 +63,31 @@ test: install ## run unit tests
 	echo "***** Running normal test suite..."
 	yarn test
 
-setup_integration: ## bring up service containers for integration tests
-	${DOCKER_COMPOSE_TEST} pull reviewer-mocks postgres
-	${DOCKER_COMPOSE_TEST} down
-	${DOCKER_COMPOSE_TEST} up -d postgres s3 reviewer-mocks
-	./.scripts/docker/wait-healthy.sh test_postgres 20
-	./.scripts/docker/wait-healthy.sh test_s3 30
-	./.scripts/docker/wait-healthy.sh test_reviewer_mocks 30
-	${DOCKER_COMPOSE_TEST} up -d s3_create-bucket
-
-test_integration: setup_integration ## run integration tests
-	${DOCKER_COMPOSE_TEST} up -d reviewer-submission
-	./.scripts/docker/wait-healthy.sh test_reviewer-submission 20
+test_integration: ## run integration tests
 	CLIENT_CONFIG_PATH=config/config.client.json yarn run test:integration
-	${DOCKER_COMPOSE_TEST} down
+
+run_ci: ## run as if in ci
+	# make lint
+	# make test
+	make build_prod
+	make start_ci
+	make test_integration
+	make stop
+
+# setup_integration: ## bring up service containers for integration tests
+# 	${DOCKER_COMPOSE_TEST} pull reviewer-mocks postgres
+# 	${DOCKER_COMPOSE_TEST} down
+# 	${DOCKER_COMPOSE_TEST} up -d postgres s3 reviewer-mocks
+# 	./.scripts/docker/wait-healthy.sh test_postgres 20
+# 	./.scripts/docker/wait-healthy.sh test_s3 30
+# 	./.scripts/docker/wait-healthy.sh test_reviewer_mocks 30
+# 	${DOCKER_COMPOSE_TEST} up -d s3_create-bucket
+
+# test_integration: setup_integration ## run integration tests
+# 	${DOCKER_COMPOSE_TEST} up -d reviewer-submission
+# 	./.scripts/docker/wait-healthy.sh test_reviewer-submission 20
+# 	CLIENT_CONFIG_PATH=config/config.client.json yarn run test:integration
+# 	${DOCKER_COMPOSE_TEST} down
 
 load_schema: ## load xpub schema
 	ifeq ($(shell $(GET_SCHEMA_TABLES)),14)

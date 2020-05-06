@@ -20,34 +20,27 @@ To run the setup and install all dependencies
 make setup
 ```
 
-## Start locally
+## Start in development mode
 
 ```sh
-yarn run start:dev
+make start
 ```
 
-## Run integration tests
+## Start in development mode for testing
 
-Build the docker container first
+This will allow you to run the integration tests locally while having the main app run with hot reloading
+
+In one terminal run:
 ```sh
-make setup
-make build
+make start_test
+```
+
+In another terminal:
+```sh
 make test_integration
 ```
 
-## Run integration tests locally
-
-This can be handy when debugging the submission service and avoid rebuilding the container every
-time you make a change.
-
-Start the services
+## Run like in CI
 ```sh
-make setup_integration
-yarn run start:dev
-```
-
-In another terminal
-
-```sh
-CONFIG_PATH=./config/config.local.json yarn run test:integration
+make run_ci
 ```
