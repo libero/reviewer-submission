@@ -64,7 +64,7 @@ test: install ## run unit tests
 	yarn test
 
 test_integration: ## run integration tests
-	CLIENT_CONFIG_PATH=config/config.client.json yarn run test:integration
+	yarn run test:integration
 
 run_ci: ## run as if in ci
 	make lint
