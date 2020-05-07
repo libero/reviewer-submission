@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: setup start stop install lint test setup_integration test_integration load_schema build push build_xpub_postgres push_xpub_postgres
+.PHONY: build_dev help load_schema run_ci start_dev test build_prod install push setup start_test test_integration build_xpub_postgres lint push_xpub_postgres start_ci stop
 
 IMAGE_TAG ?= "local"
 DOCKER_COMPOSE = IMAGE_TAG=${IMAGE_TAG} docker-compose
@@ -7,7 +7,6 @@ DOCKER_COMPOSE_TEST = IMAGE_TAG=${IMAGE_TAG} docker-compose -f docker-compose.ym
 DOCKER_COMPOSE_CI = IMAGE_TAG=${IMAGE_TAG} docker-compose -f docker-compose.yml -f docker-compose.ci.yml
 DOCKER_COMPOSE_BUILD = IMAGE_TAG=${IMAGE_TAG} docker-compose -f docker-compose.build.yml
 DOCKER_COMPOSE_XPUB_POSTGRES = IMAGE_TAG=${IMAGE_TAG} docker-compose -f docker-compose.xpub-postgres.yml
-PUSH_COMMAND = IMAGE_TAG=${IMAGE_TAG} .scripts/travis/push-image.sh
 GET_SCHEMA_TABLES = psql -q -t -U postgres postgres -c "select count(*) from information_schema.tables where table_schema='public';" | xargs
 LOAD_SCHEMA = psql -U postgres -f xpub-schema.sql
 
@@ -88,11 +87,5 @@ build_dev: ## build the image for development
 build_prod: ## build the image for production
 	${DOCKER_COMPOSE_BUILD} build reviewer-submission
 
-push: ## push the image
-	${PUSH_COMMAND} reviewer-submission
-
 build_xpub_postgres: ## build the xpub postgres image
 	${DOCKER_COMPOSE_XPUB_POSTGRES} build xpub-postgres
-
-push_xpub_postgres: ## push the xpub postgres image
-	${PUSH_COMMAND} reviewer-xpub-postgres
