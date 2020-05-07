@@ -1,42 +1,70 @@
-## This is only a single container right now but in future this should bring up supporting services needed for development ie: postgres, audit service ect.
-version: '3'
+version: '3.4'
 services:
-  application:
-    image: node:12-alpine@sha256:5646d1e5bc470500414feb3540186c02845db0e0e1788621c271fbf3a0c1830d
+  reviewer-submission:
+    container_name: reviewer-submission_app
+    build:
+      context: './'
+      target: dev
+    image: libero/reviewer-submission:${IMAGE_TAG:-local}
     ports:
-      - "${SERVER_PORT:-3000}:3000"
-    working_dir: "/src"
+      - "3000:3000"
     healthcheck:
-      test: "curl localhost:3000/health"
-      interval: 1m
+      test: 'echo -e "GET /\n\n" | nc localhost 3000'
+      interval: 3s
       timeout: 10s
       retries: 3
-    command: ["bash", "-c", "yarn && yarn run start:dev"]
     environment:
-      NEW_RELIC_HOME: ${NEW_RELIC_HOME:-/etc/reviewer/}
+      DATABASE_NAME: postgres
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: postgres
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      S3_AWS_ENDPOINT: http://s3:9000
+      S3_ACCESS_KEY_ID: minio
+      S3_SECRET_ACCESS_KEY: minio123
+      S3_FORCE_PATH_STYLE: 'true'
+      S3_FILE_BUCKET: test
+      NEW_RELIC_HOME: /etc/reviewer/
+      MAX_QL_COMPLEXITY: 100
+      MAX_QL_DEPTH: 5
+      MAX_FILE_SIZE_IN_BYTES: 100000000
+      AUTHENTICATION_JWT_SECRET: super_secret_jam
+      USER_ADAPTER_URL: http://reviewer-mocks:3003/current-user
+      SCIENCE_BEAM_URL: http://reviewer-mocks:3003/science-beam/convert
+      SCIENCE_BEAM_TIMEOUT: 20000
     volumes:
-      - ./:/src/:z
-      - ./config/:/etc/reviewer/:z
+      - ./config:/etc/reviewer
+      - ./.eslintignore:/app/.eslintignore
+      - ./.eslintrc.js:/app/.eslintrc.js
+      - ./.prettierrc.js:/app/.prettierrc.js
+      - ./jest.config.js:/app/jest.config.js
+      - ./src/:/app/src
+      - ./package.json:/app/package.json
+      - ./yarn.json:/app/yarn.json
+      - ./tests/:/app/tests
+      - ./tsconfig.json:/app/tsconfig.json
     networks:
-      - "infra_api"
+      - "reviewer"
 
   postgres:
     image: liberoadmin/reviewer-xpub-postgres:latest
-    container_name: test_postgres
-    ports:
-      - "5432:5432"
+    container_name: reviewer-submission_postgres
     environment:
       POSTGRES_DB: postgres
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+      POSTGRES_PORT: 5432
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 2s
       timeout: 30s
       retries: 10
-
+    networks:
+      - "reviewer"
+  
   s3:
-    image: minio/minio:latest
+    image: minio/minio:RELEASE.2020-02-27T00-23-05Z
+    container_name: reviewer-submission_s3
     ports:
       - "9004:9000"
     environment:
@@ -48,8 +76,26 @@ services:
       interval: 30s
       timeout: 20s
       retries: 3
+    networks:
+      - "reviewer"
 
+  s3_create-bucket:
+    image: minio/mc
+    depends_on:
+      - s3
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc config host add submission http://s3:9000 minio minio123;
+      /usr/bin/mc rm -r --force submission/test;
+      /usr/bin/mc mb submission/test;
+      /usr/bin/mc policy set download submission/test;
+      /usr/bin/mc policy set public submission/test;
+      exit 0;
+      "
+    networks:
+      - "reviewer"
+  
 networks:
-  infra_api:
+  reviewer:
     external:
-      name: "infra_api"
+      name: "reviewer"

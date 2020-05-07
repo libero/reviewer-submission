@@ -5,9 +5,9 @@ import {
     uploadManuscript,
     uploadLargeManuscript,
     uploadTooLargeManuscript,
+    authenticationJwtSecret,
 } from './test.utils';
 import { sign } from 'jsonwebtoken';
-import config from '../src/config';
 import * as FormData from 'form-data';
 import * as WebSocket from 'ws';
 
@@ -122,24 +122,23 @@ describe('Wizard->Files Integration Tests', () => {
         });
     });
 
-        it('uploads a manuscript file and replace previous', async () => {
-            const startSubmissionResponse = await startSubmissionAlt('research-article');
-            const submissionId = startSubmissionResponse.data.data.startSubmission.id;
-    
-            const uploadResponse = await uploadManuscript(submissionId);
-    
-            expect(uploadResponse.status).toBe(200);
-            expect(uploadResponse.data.data.uploadManuscript.id).toBe(submissionId);
-            expect(uploadResponse.data.data.uploadManuscript.files.manuscriptFile).not.toBeNull();
-            const manuscriptFileId = uploadResponse.data.data.uploadManuscript.files.manuscriptFile.id;
-            const uploadResponse2 = await uploadManuscript(submissionId);
-    
-            expect(uploadResponse2.status).toBe(200);
-            expect(uploadResponse2.data.data.uploadManuscript.id).toBe(submissionId);
-            expect(uploadResponse2.data.data.uploadManuscript.files.manuscriptFile).not.toBeNull();
-            expect(uploadResponse2.data.data.uploadManuscript.files.manuscriptFile.id).not.toBe(manuscriptFileId);
-        });
+    it('uploads a manuscript file and replace previous', async () => {
+        const startSubmissionResponse = await startSubmissionAlt('research-article');
+        const submissionId = startSubmissionResponse.data.data.startSubmission.id;
 
+        const uploadResponse = await uploadManuscript(submissionId);
+
+        expect(uploadResponse.status).toBe(200);
+        expect(uploadResponse.data.data.uploadManuscript.id).toBe(submissionId);
+        expect(uploadResponse.data.data.uploadManuscript.files.manuscriptFile).not.toBeNull();
+        const manuscriptFileId = uploadResponse.data.data.uploadManuscript.files.manuscriptFile.id;
+        const uploadResponse2 = await uploadManuscript(submissionId);
+
+        expect(uploadResponse2.status).toBe(200);
+        expect(uploadResponse2.data.data.uploadManuscript.id).toBe(submissionId);
+        expect(uploadResponse2.data.data.uploadManuscript.files.manuscriptFile).not.toBeNull();
+        expect(uploadResponse2.data.data.uploadManuscript.files.manuscriptFile.id).not.toBe(manuscriptFileId);
+    });
 
     it('uploads a large manuscript file', async () => {
         const startSubmissionResponse = await startSubmissionAlt('research-article');
@@ -221,7 +220,7 @@ describe('Wizard->Files Integration Tests', () => {
         expect(uploadResponse.data.errors).toBeUndefined();
         expect(uploadResponse.data.data.uploadSupportingFile).not.toBeNull();
         expect(uploadResponse.data.data.uploadSupportingFile.id).toBeDefined();
-        const imposterToken = sign({ sub: 'c0e74a86-2feb-435d-a50f-01f920334bc4' }, config.authentication_jwt_secret);
+        const imposterToken = sign({ sub: 'c0e74a86-2feb-435d-a50f-01f920334bc4' }, authenticationJwtSecret);
 
         const deleteResponse = await axios.post(
             'http://localhost:3000/graphql',

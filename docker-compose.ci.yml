@@ -2,9 +2,13 @@ version: '3.4'
 services:
   reviewer-submission:
     container_name: reviewer-submission_app
+    build:
+      context: './'
+      target: prod
     environment:
       MAX_FILE_SIZE_IN_BYTES: 1000000
-      NEW_RELIC_NO_CONFIG_FILE: "true"
+    volumes:
+      - ./tests/config/reviewer-submission-client.json:/etc/reviewer/config.client.json
 
   reviewer-mocks:
     image: liberoadmin/reviewer-mocks:latest
