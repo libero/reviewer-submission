@@ -44,3 +44,21 @@ make test_integration
 ```sh
 make run_ci
 ```
+
+## Use of `reviewer-mocks`
+
+The compose files use `liberoadmin/reviewer-mocks:latest`.
+
+- make sure you have the current image with:  
+  ```sh
+  docker pull liberoadmin/reviewer-mocks:latest
+  ```
+- when changing mocks locally, tag it accordingly:  
+  ```sh
+  cd ../reviewer-mocks
+  make build
+  docker tag \
+    libero/reviewer-mocks:local \
+    liberoadmin/reviewer-mocks:latest
+  ```
+  
