@@ -27,6 +27,7 @@ start_dev: ## start in development mode with s3 and postgres
 	${DOCKER_COMPOSE} up -d s3 postgres
 	./.scripts/docker/wait-healthy.sh reviewer-submission_postgres 20
 	./.scripts/docker/wait-healthy.sh reviewer-submission_s3 40
+	${DOCKER_COMPOSE_TEST} up -d s3_create-bucket
 	${DOCKER_COMPOSE} up reviewer-submission
 
 start_test: ## start in development mode for local testing with s3, postgres and reviewer-mocks
