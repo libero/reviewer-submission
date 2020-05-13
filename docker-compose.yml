@@ -40,7 +40,7 @@ services:
       - ./jest.config.js:/app/jest.config.js
       - ./src/:/app/src
       - ./package.json:/app/package.json
-      - ./yarn.json:/app/yarn.json
+      - ./yarn.lock:/app/yarn.lock
       - ./tests/:/app/tests
       - ./tsconfig.json:/app/tsconfig.json
     networks:
