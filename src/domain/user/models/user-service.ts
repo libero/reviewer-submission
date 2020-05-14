@@ -4,7 +4,7 @@ import { RestUserRepository } from '../infrastructure/rest-user';
 export class UserService {
     userApiGetCurrentUser: RestUserRepository;
     constructor(userAdapterUrl: string) {
-        this.userApiGetCurrentUser = new RestUserRepository(userAdapterUrl + '/current_user');
+        this.userApiGetCurrentUser = new RestUserRepository(userAdapterUrl + '/current-user');
     }
 
     async getCurrentUser(header: string): Promise<User> {
