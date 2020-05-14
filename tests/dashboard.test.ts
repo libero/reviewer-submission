@@ -19,10 +19,10 @@ describe('Dashboard Integration Tests', () => {
 
     it('returns no errors on valid research article', async () => {
         const response = await startSubmission(apollo, 'research-article');
-        const data = response.data;
+        const data = response.data ? response.data : null;
 
-        expect(response.data.errors).toBeUndefined();
-        const id = data.startSubmission.id;
+        expect(data).toBeTruthy();
+        const id = data && data.startSubmission ? data.startSubmission.id : '';
         expect(id).toHaveLength(36);
     });
 
