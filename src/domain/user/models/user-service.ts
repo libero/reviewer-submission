@@ -2,13 +2,13 @@ import { User } from '../user';
 import { RestUserRepository } from '../infrastructure/rest-user';
 
 export class UserService {
-    restUserRepository: RestUserRepository;
+    userApiGetCurrentUser: RestUserRepository;
     constructor(userAdapterUrl: string) {
-        this.restUserRepository = new RestUserRepository(userAdapterUrl);
+        this.userApiGetCurrentUser = new RestUserRepository(userAdapterUrl + '/current-user');
     }
 
     async getCurrentUser(header: string): Promise<User> {
-        const user = await this.restUserRepository.getCurrentUser(header);
+        const user = await this.userApiGetCurrentUser.getCurrentUser(header);
         switch (user.role) {
             case 'executive':
                 user.role = 'staff';

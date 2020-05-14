@@ -29,7 +29,7 @@ services:
       MAX_QL_DEPTH: 5
       MAX_FILE_SIZE_IN_BYTES: 100000000
       AUTHENTICATION_JWT_SECRET: super_secret_jam
-      USER_ADAPTER_URL: http://reviewer-mocks:3003/current-user
+      USER_API_URL: http://reviewer-mocks:3003
       SCIENCE_BEAM_URL: http://reviewer-mocks:3003/science-beam/convert
       SCIENCE_BEAM_TIMEOUT: 20000
     volumes:
@@ -61,7 +61,7 @@ services:
       retries: 10
     networks:
       - "reviewer"
-  
+
   s3:
     image: minio/minio:RELEASE.2020-02-27T00-23-05Z
     container_name: reviewer-submission_s3
@@ -94,7 +94,7 @@ services:
       "
     networks:
       - "reviewer"
-  
+
 networks:
   reviewer:
     external:

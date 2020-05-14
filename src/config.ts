@@ -17,7 +17,7 @@ export interface ScienceBeamConfig {
 export interface Config {
     port: number;
     knex: KnexConfig;
-    user_adapter_url: string;
+    user_api_url: string;
     authentication_jwt_secret: string;
     max_ql_complexity: number;
     max_ql_depth: number;
@@ -56,7 +56,7 @@ const appConfig: Config = {
     max_ql_complexity: Number(process.env.MAX_QL_COMPLEXITY),
     max_file_size_in_bytes: Number(process.env.MAX_FILE_SIZE_IN_BYTES),
     authentication_jwt_secret: process.env.AUTHENTICATION_JWT_SECRET || '',
-    user_adapter_url: process.env.USER_ADAPTER_URL || '',
+    user_api_url: process.env.USER_API_URL || '',
     science_beam: {
         api_url: process.env.SCIENCE_BEAM_URL || '',
         timeout: Number(process.env.SCIENCE_BEAM_TIMEOUT),
