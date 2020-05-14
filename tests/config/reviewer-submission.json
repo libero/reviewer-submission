@@ -21,7 +21,7 @@
     },
     "max_file_size_in_bytes": 1000000,
     "authentication_jwt_secret": "super_secret_jam",
-    "user_adapter_url": "http://test_reviewer_mocks:3003/current-user",
+    "user_api_url": "http://test_reviewer_mocks:3003",
     "science_beam": {
         "api_url": "http://reviewer-mocks:3003/science-beam/convert",
         "timeout": 20000
