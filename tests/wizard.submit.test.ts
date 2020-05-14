@@ -10,6 +10,7 @@ describe('Submit Integration Tests', () => {
 
     it('cannot submit an invalid submission', async () => {
         const response = await startSubmission(apollo, 'research-article');
+        expect(response.data.errors).toBeUndefined();
         const data = response.data ? response.data : null;
 
         expect(data).toBeTruthy();

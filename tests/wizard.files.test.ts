@@ -115,6 +115,7 @@ describe('Wizard->Files Integration Tests', () => {
         expect(uploadResponse.status).toBe(200);
 
         expect(uploadResponse.status).toBe(200);
+        expect(uploadResponse.data.errors).toBeUndefined();
         expect(uploadResponse.data.data.uploadManuscript.id).toBe(submissionId);
         expect(uploadResponse.data.data.uploadManuscript.suggestions[0]).toEqual({
             value: 'Impact of Coronavirus on Velociraptors',
@@ -129,12 +130,14 @@ describe('Wizard->Files Integration Tests', () => {
         const uploadResponse = await uploadManuscript(submissionId);
 
         expect(uploadResponse.status).toBe(200);
+        expect(uploadResponse.data.errors).toBeUndefined();
         expect(uploadResponse.data.data.uploadManuscript.id).toBe(submissionId);
         expect(uploadResponse.data.data.uploadManuscript.files.manuscriptFile).not.toBeNull();
         const manuscriptFileId = uploadResponse.data.data.uploadManuscript.files.manuscriptFile.id;
         const uploadResponse2 = await uploadManuscript(submissionId);
 
         expect(uploadResponse2.status).toBe(200);
+        expect(uploadResponse2.data.errors).toBeUndefined();
         expect(uploadResponse2.data.data.uploadManuscript.id).toBe(submissionId);
         expect(uploadResponse2.data.data.uploadManuscript.files.manuscriptFile).not.toBeNull();
         expect(uploadResponse2.data.data.uploadManuscript.files.manuscriptFile.id).not.toBe(manuscriptFileId);
@@ -147,6 +150,7 @@ describe('Wizard->Files Integration Tests', () => {
         const uploadResponse = await uploadLargeManuscript(submissionId);
 
         expect(uploadResponse.status).toBe(200);
+        expect(uploadResponse.data.errors).toBeUndefined();
         expect(uploadResponse.data.data.uploadManuscript.id).toBe(submissionId);
         expect(uploadResponse.data.data.uploadManuscript.files.manuscriptFile).not.toBeNull();
     });
@@ -167,6 +171,7 @@ describe('Wizard->Files Integration Tests', () => {
 
         const uploadResponse = await uploadManuscript(submissionId);
         expect(uploadResponse.status).toBe(200);
+        expect(uploadResponse.data.errors).toBeUndefined();
 
         const deleteResponse = await axios.post(
             'http://localhost:3000/graphql',
@@ -284,6 +289,7 @@ describe('Wizard->Files Integration Tests', () => {
 
     it('should give back progress on manuscript upload', async done => {
         const startResponse = await startSubmissionAlt('research-article');
+        expect(startResponse.data.errors).toBeUndefined();
         const submissionId = startResponse.data.data.startSubmission.id;
         let percentage: string;
 

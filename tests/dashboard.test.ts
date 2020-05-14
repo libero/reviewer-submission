@@ -22,6 +22,7 @@ describe('Dashboard Integration Tests', () => {
         const data = response.data ? response.data : null;
 
         expect(data).toBeTruthy();
+        expect(response.data.errors).toBeUndefined();
         const id = data && data.startSubmission ? data.startSubmission.id : '';
         expect(id).toHaveLength(36);
     });

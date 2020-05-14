@@ -5,6 +5,7 @@ import { sign } from 'jsonwebtoken';
 describe('Wizard->Pages Integration Tests', () => {
     it('it should allow a user to get their submission', async () => {
         const startSubmissionResponse = await startSubmissionAlt('research-article');
+        expect(startSubmissionResponse.data.errors).toBeUndefined();
         const submissionId = startSubmissionResponse.data.data.startSubmission.id;
 
         const getResponse = await axios.post(
@@ -27,12 +28,14 @@ describe('Wizard->Pages Integration Tests', () => {
             },
         );
         expect(getResponse.status).toBe(200);
+        expect(getResponse.data.errors).toBeUndefined();
         expect(getResponse.data.data.getSubmission.id).toBe(submissionId);
         expect(getResponse.data.data.getSubmission.articleType).toBe('research-article');
     });
 
     it('it should allow a user to get their submissions', async () => {
-        await startSubmissionAlt('research-article');
+        const startResponse = await startSubmissionAlt('research-article');
+        expect(startResponse.data.errors).toBeUndefined();
         const getResponse = await axios.post(
             'http://localhost:3000/graphql',
             {
@@ -50,12 +53,14 @@ describe('Wizard->Pages Integration Tests', () => {
             },
         );
         expect(getResponse.status).toBe(200);
+        expect(getResponse.data.errors).toBeUndefined();
         expect(Array.isArray(getResponse.data.data.getSubmissions)).toBe(true);
         expect(getResponse.data.data.getSubmissions.length).toBeGreaterThan(1);
     });
 
     it('it should allow a user to set details', async () => {
         const startSubmissionResponse = await startSubmissionAlt('research-article');
+        expect(startSubmissionResponse.data.errors).toBeUndefined();
         const submissionId = startSubmissionResponse.data.data.startSubmission.id;
         const details = {
             title: 'title',
@@ -97,6 +102,7 @@ describe('Wizard->Pages Integration Tests', () => {
 
     it("it should not allow a user to save details of another user's submission", async () => {
         const startSubmissionResponse = await startSubmissionAlt('research-article');
+        expect(startSubmissionResponse.data.errors).toBeUndefined();
         const submissionId = startSubmissionResponse.data.data.startSubmission.id;
         const details = {
             title: 'title',
@@ -139,6 +145,7 @@ describe('Wizard->Pages Integration Tests', () => {
 
     it('it should set author details', async () => {
         const startSubmissionResponse = await startSubmissionAlt('research-article');
+        expect(startSubmissionResponse.data.errors).toBeUndefined();
         const submissionId = startSubmissionResponse.data.data.startSubmission.id;
         const details = {
             firstName: 'jimmy',
@@ -180,6 +187,7 @@ describe('Wizard->Pages Integration Tests', () => {
 
     it('it should allow user to set editor details', async () => {
         const startSubmissionResponse = await startSubmissionAlt('research-article');
+        expect(startSubmissionResponse.data.errors).toBeUndefined();
         const submissionId = startSubmissionResponse.data.data.startSubmission.id;
         const details = {
             suggestedSeniorEditors: ['1111'],
