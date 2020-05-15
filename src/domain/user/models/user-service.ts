@@ -20,7 +20,6 @@ export class UserService {
     }
 
     async getEditors(role: string): Promise<EditorAlias[]> {
-        // query /people off continuum -> via continuum-adaptor
-        return [];
+        return this.userApi.getEditors(role);
     }
 }
