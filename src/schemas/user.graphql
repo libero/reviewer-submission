@@ -1,11 +1,20 @@
 type User {
-  id: ID!
-  name: String!
-  role: String!
-  email: String
-  aff: String
+    id: ID!
+    name: String!
+    role: String!
+    email: String
+    aff: String
+}
+
+type EditorAlias {
+    id: String
+    name: String
+    aff: String
+    focuses: [String]
+    expertises: [String]
 }
 
 type Query {
-  getCurrentUser: User!
+    getCurrentUser: User!
+    getEditors(role: String): [EditorAlias]
 }
