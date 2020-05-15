@@ -68,9 +68,11 @@ describe('Dashboard Integration Tests', () => {
 
     it('it should throw a user tries to delete a file unrelated to their submission', async () => {
         const startSubmissionResponse = await startSubmissionAlt('research-article');
+        expect(startSubmissionResponse.data.errors).toBeUndefined();
         const submissionId = startSubmissionResponse.data.data.startSubmission.id;
 
         const uploadResponse = await uploadManuscript(submissionId);
+        expect(uploadResponse.data.errors).toBeUndefined();
         expect(uploadResponse.status).toBe(200);
 
         const imposterToken = sign({ sub: 'c0e74a86-2feb-435d-a50f-01f920334bc4' }, authenticationJwtSecret);
@@ -100,6 +102,7 @@ describe('Dashboard Integration Tests', () => {
 
     it('it should allow a user to delete their submission', async () => {
         const startSubmissionResponse = await startSubmissionAlt('research-article');
+        expect(startSubmissionResponse.data.errors).toBeUndefined();
         const submissionId = startSubmissionResponse.data.data.startSubmission.id;
 
         const deleteResponse = await axios.post(
@@ -125,6 +128,7 @@ describe('Dashboard Integration Tests', () => {
 
     it('it should throw if the user tries to delete a submission that is not their own', async () => {
         const startSubmissionResponse = await startSubmissionAlt('research-article');
+        expect(startSubmissionResponse.data.errors).toBeUndefined();
         const submissionId = startSubmissionResponse.data.data.startSubmission.id;
         const imposterToken = sign({ sub: 'c0e74a86-2feb-435d-a50f-01f920334bc4' }, authenticationJwtSecret);
 
