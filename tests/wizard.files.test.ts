@@ -10,6 +10,7 @@ import {
 import { sign } from 'jsonwebtoken';
 import * as FormData from 'form-data';
 import * as WebSocket from 'ws';
+import * as nock from 'nock';
 
 export const uploadSupportingFile = async (submissionId: string): Promise<AxiosResponse> => {
     const body = new FormData();
@@ -121,6 +122,24 @@ describe('Wizard->Files Integration Tests', () => {
             value: 'Impact of Coronavirus on Velociraptors',
             fieldName: 'title',
         });
+    });
+
+    it('uploads a manuscript file despite science beam timeout', async () => {
+        nock('http://reviewer-mocks:3003')
+            .get('/science-beam/convert')
+            .reply(500);
+        const startSubmissionResponse = await startSubmissionAlt('research-article');
+        const submissionId = startSubmissionResponse.data.data.startSubmission.id;
+
+        const uploadResponse = await uploadManuscript(submissionId);
+        expect(uploadResponse.status).toBe(200);
+
+        expect(uploadResponse.status).toBe(200);
+        expect(uploadResponse.data.errors).toBeUndefined();
+        expect(uploadResponse.data.data.uploadManuscript.id).toBe(submissionId);
+        expect(uploadResponse.data.data.uploadManuscript.suggestion).toBeFalsy();
+        nock.cleanAll();
+        nock.enableNetConnect();
     });
 
     it('uploads a manuscript file and replace previous', async () => {
