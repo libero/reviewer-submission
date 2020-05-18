@@ -64,27 +64,32 @@ export class SemanticExtractionService {
         const include = 'title';
         const timeout = this.scienceBeamConfig.timeout;
         let success = false;
-        await axios
-            .post(this.scienceBeamConfig.api_url, fileContents, {
+        try {
+            const response = await axios.post(this.scienceBeamConfig.api_url, fileContents, {
                 headers: { 'Content-Type': mimeType },
                 params: { filename, include },
                 timeout,
-            })
-            .then(async response => {
-                if (response.status == 200) {
-                    success = await this.getSuggestionsFromData(submissionId, response.data);
-                } else {
-                    logger.error(`Sciencebeam responded with: ${response.status} and returned ${response.data}`);
-                }
-            })
-            .catch(error => {
+            });
+            if (response.status == 200) {
+                success = await this.getSuggestionsFromData(submissionId, response.data);
+            } else {
+                logger.error(`Sciencebeam responded with: ${response.status} and returned ${response.data}`);
+            }
+        } catch (error) {
+            if (error.response) {
                 logger.error(
                     `Sciencebeam Error: ${error.response.status} returned:${JSON.stringify(error.response.data)}`,
                 );
                 logger.error(
                     `Issue with semantic extraction: MimeType: ${mimeType}, filename: ${filename} | submission id: ${submissionId}`,
                 );
-            });
+            } else if (error.request) {
+                logger.error('No response response recieved for request');
+            } else {
+                logger.error(`Error ${error.message}`);
+            }
+        }
+
         return success;
     }
 }
