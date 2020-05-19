@@ -10,7 +10,6 @@ import {
 import { sign } from 'jsonwebtoken';
 import * as FormData from 'form-data';
 import * as WebSocket from 'ws';
-import * as nock from 'nock';
 
 export const uploadSupportingFile = async (submissionId: string): Promise<AxiosResponse> => {
     const body = new FormData();

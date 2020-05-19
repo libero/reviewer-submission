@@ -62,6 +62,41 @@ describe('scienceBeamApi', () => {
         expect(result).toBe(true);
     });
 
+    it('silently fails if no response and request object', async () => {
+        const id = SubmissionId.fromUuid('2c2d1f54-a2cb-4f0d-95c0-27d3aa444f4e');
+        jest.resetAllMocks();
+        const mockedPost = mocked(axios.post, true);
+
+        mockedPost.mockImplementationOnce(() => {
+            return Promise.reject(Error('error'));
+        });
+        const result = await service.extractSuggestions(emptyBuffer, 'application/pdf', 'test.pdf', id);
+
+        expect(mockCreate).toBeCalledTimes(0);
+        expect(logger.error).toBeCalledTimes(1);
+        expect(logger.error).toHaveBeenNthCalledWith(1, 'Error error');
+
+        expect(result).toBe(false);
+    });
+
+    it('silently fails if no response object but has request', async () => {
+        const id = SubmissionId.fromUuid('2c2d1f54-a2cb-4f0d-95c0-27d3aa444f4e');
+        jest.resetAllMocks();
+        const mockedPost = mocked(axios.post, true);
+
+        mockedPost.mockImplementationOnce(() => {
+            return Promise.reject({
+                request: {},
+            });
+        });
+        const result = await service.extractSuggestions(emptyBuffer, 'application/pdf', 'test.pdf', id);
+
+        expect(mockCreate).toBeCalledTimes(0);
+        expect(logger.error).toBeCalledTimes(1);
+        expect(logger.error).toHaveBeenNthCalledWith(1, 'No response response recieved for request');
+        expect(result).toBe(false);
+    });
+
     it('silently fails if status code not 200', async () => {
         returnedStatus = 400;
         returnedContents = emptyBuffer;
