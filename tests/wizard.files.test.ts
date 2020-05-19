@@ -123,19 +123,6 @@ describe('Wizard->Files Integration Tests', () => {
         });
     });
 
-    it('uploads a manuscript file despite science beam timeout', async () => {
-        const startSubmissionResponse = await startSubmissionAlt('research-article');
-        const submissionId = startSubmissionResponse.data.data.startSubmission.id;
-
-        const uploadResponse = await uploadManuscript(submissionId);
-        expect(uploadResponse.status).toBe(200);
-
-        expect(uploadResponse.status).toBe(200);
-        expect(uploadResponse.data.errors).toBeUndefined();
-        expect(uploadResponse.data.data.uploadManuscript.id).toBe(submissionId);
-        expect(uploadResponse.data.data.uploadManuscript.suggestion).toBeFalsy();
-    });
-
     it('uploads a manuscript file and replace previous', async () => {
         const startSubmissionResponse = await startSubmissionAlt('research-article');
         const submissionId = startSubmissionResponse.data.data.startSubmission.id;
