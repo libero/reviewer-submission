@@ -125,9 +125,6 @@ describe('Wizard->Files Integration Tests', () => {
     });
 
     it('uploads a manuscript file despite science beam timeout', async () => {
-        nock('http://reviewer-mocks:3003')
-            .get('/science-beam/convert')
-            .reply(500);
         const startSubmissionResponse = await startSubmissionAlt('research-article');
         const submissionId = startSubmissionResponse.data.data.startSubmission.id;
 
@@ -138,8 +135,6 @@ describe('Wizard->Files Integration Tests', () => {
         expect(uploadResponse.data.errors).toBeUndefined();
         expect(uploadResponse.data.data.uploadManuscript.id).toBe(submissionId);
         expect(uploadResponse.data.data.uploadManuscript.suggestion).toBeFalsy();
-        nock.cleanAll();
-        nock.enableNetConnect();
     });
 
     it('uploads a manuscript file and replace previous', async () => {
