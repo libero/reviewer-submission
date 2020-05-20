@@ -11,8 +11,8 @@ export class RestUserRepository implements UserRepository {
     }
     private readonly userApiUrl: string;
 
-    public async getEditors(role: string): Promise<EditorAlias[]> {
-        return this.get(this.editors + `?role=${role}`) as Promise<EditorAlias[]>;
+    public async getEditors(authHeader: string, role: string): Promise<EditorAlias[]> {
+        return this.get(this.editors + `?role=${role}`, authHeader) as Promise<EditorAlias[]>;
     }
 
     public async getCurrentUser(authHeader: string): Promise<User> {

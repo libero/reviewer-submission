@@ -19,7 +19,7 @@ export class UserService {
         return user;
     }
 
-    async getEditors(role: string): Promise<EditorAlias[]> {
-        return this.userApi.getEditors(role);
+    async getEditors(header: string, role: string): Promise<EditorAlias[]> {
+        return this.userApi.getEditors(header, role);
     }
 }

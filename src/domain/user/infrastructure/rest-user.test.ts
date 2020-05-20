@@ -34,9 +34,11 @@ describe('User Repository', () => {
         mockedFetch.mockResolvedValue(Promise.resolve(mockFetchPromise as Response));
 
         const repo = new RestUserRepository('user-url');
-        const user = await repo.getEditors('ham&egg');
+        const user = await repo.getEditors('header', 'ham&egg');
         expect(user).toMatchObject({ value: 42 });
         expect(mockedFetch).toHaveBeenCalled();
-        expect(mockedFetch).toHaveBeenCalledWith('user-url/editors?role=ham&egg', {});
+        expect(mockedFetch).toHaveBeenCalledWith('user-url/editors?role=ham&egg', {
+            headers: [['authorization', 'header']],
+        });
     });
 });
