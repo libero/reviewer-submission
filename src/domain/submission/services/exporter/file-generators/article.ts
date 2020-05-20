@@ -4,7 +4,7 @@ import axios from 'axios';
 import Submission, { ArticleType } from '../../models/submission';
 import user_api_url from '../../../../../config';
 
-interface Person {
+interface Editor {
     id: string;
     email: string;
     name: {
@@ -14,25 +14,18 @@ interface Person {
     affiliations: string;
 }
 
-interface PersonAffiliationResource {
+interface Affiliation {
     name: string[];
 }
 
-interface PersonResource {
+interface ContinuumPerson {
     id: string;
     name: {
         surname: string;
         givenNames: string;
     };
     emailAddresses: { value: string }[];
-    affiliations?: PersonAffiliationResource[];
-}
-
-interface EditorContrib {
-    '@content-type': string;
-    contrib: {
-        '@contrib-type': string;
-    };
+    affiliations?: Affiliation[];
 }
 
 const articleTypeMap: { [key in ArticleType]: number } = {
@@ -65,14 +58,34 @@ const majorSubjectAreas: { [key: string]: string } = {
     'structural-biology-molecular-biophysics': 'Structural Biology and Molecular Biophysics',
 };
 
+// @todo: this should go in test setup
+const existingNames = [{ id: 1, first: 'J. Edward', last: 'Reviewer' }];
+
+// @todo: replace with ejp_name lookup
+const splitName = (name: string): { surname: string; givenNames: string } => {
+    const existing = existingNames.find(n => `${n.first} ${n.last}` === name);
+
+    if (existing) {
+        return {
+            surname: existing.last,
+            givenNames: existing.first,
+        };
+    }
+
+    const surname = name.substring(name.indexOf(' ') + 1);
+    const givenNames = name.substring(0, name.length - surname.length - 1);
+
+    return { surname, givenNames };
+};
+
 export default class ArticleGenerator {
-    private editors: Person[] = [];
+    private editors: Editor[] = [];
     private affiliations: string[] = [];
 
     constructor(private readonly submission: Submission) {}
 
-    async getPerson(id: string): Promise<Person | null> {
-        const { data } = await axios.get<PersonResource>(`${user_api_url}/editors/${id}`);
+    async getEditor(id: string): Promise<Editor | null> {
+        const { data } = await axios.get<ContinuumPerson>(`${user_api_url}/editors/${id}`);
 
         if (!data) {
             return null;
@@ -88,7 +101,7 @@ export default class ArticleGenerator {
             },
             email: data.emailAddresses.length ? data.emailAddresses[0].value : '',
             affiliations: affiliations
-                .map((affiliation: PersonAffiliationResource): string => affiliation.name.join(', '))
+                .map((affiliation: Affiliation): string => affiliation.name.join(', '))
                 .join(', '),
         };
     }
@@ -102,14 +115,21 @@ export default class ArticleGenerator {
                 opposedReviewingEditors = [],
             },
         } = this.submission;
-        const editorIds = suggestedSeniorEditors
+        const editorIds = [
+            ...opposedReviewingEditors,
+            ...suggestedSeniorEditors,
+            ...opposedSeniorEditors,
+            ...suggestedReviewingEditors,
+        ];
+
+        suggestedSeniorEditors
             .concat(opposedSeniorEditors)
             .concat(suggestedReviewingEditors)
             .concat(opposedReviewingEditors);
 
-        this.editors = (await Promise.all(editorIds.map(async id => await this.getPerson(id)))).filter(
+        this.editors = (await Promise.all(editorIds.map(async id => await this.getEditor(id)))).filter(
             person => person !== null,
-        ) as Person[];
+        ) as Editor[];
         this.affiliations = this.editors.map(editor => editor.affiliations || '');
 
         if (this.submission.author) {
@@ -121,7 +141,7 @@ export default class ArticleGenerator {
         return `aff${this.affiliations.indexOf(affiliation)}`;
     }
 
-    _getEditor(id: string): Person | null {
+    _getEditor(id: string): Editor | null {
         return this.editors.find(editor => editor.id === id) || null;
     }
 
@@ -149,25 +169,26 @@ export default class ArticleGenerator {
         };
     }
 
-    _editorContribXml(editorId: string, contentType: string, contribType: string): {} | null {
-        const editor = this._getEditor(editorId);
+    _editorContribXml(editorIds: string[], contribType: string): object[] {
+        return editorIds
+            .map((editorId: string): object | null => {
+                const editor = this._getEditor(editorId);
 
-        if (!editor) {
-            return null;
-        }
+                if (!editor) {
+                    return null;
+                }
 
-        return {
-            '@content-type': contentType,
-            contrib: {
-                '@contrib-type': contribType,
-                xref: {
-                    '@ref-type': 'aff',
-                    '@rid': this._getAffiliationId(editor.affiliations),
-                },
-                name: editor.name,
-                email: editor.email,
-            },
-        };
+                return {
+                    '@contrib-type': contribType,
+                    name: editor.name,
+                    email: editor.email,
+                    xref: {
+                        '@ref-type': 'aff',
+                        '@rid': this._getAffiliationId(editor.affiliations),
+                    },
+                };
+            })
+            .filter(editor => editor !== null) as object[];
     }
 
     _affiliationsXml(): object[] {
@@ -177,17 +198,21 @@ export default class ArticleGenerator {
         }));
     }
 
-    _reviewerContribXml(reviewer: { name: string; email: string }): {} | null {
-        const parts = reviewer.name.split(' ');
-        const surname = parts.pop();
+    _reviewerContribXml(reviewers: { name: string; email: string }[], contribType: string): object[] {
+        return reviewers
+            .map((reviewer: { name: string; email: string }): object => {
+                const { surname, givenNames } = splitName(reviewer.name);
 
-        return {
-            name: {
-                'given-names': parts.join(' '),
-                surname,
-            },
-            email: reviewer.email,
-        };
+                return {
+                    '@contrib-type': contribType,
+                    name: {
+                        surname,
+                        'given-names': givenNames,
+                    },
+                    email: reviewer.email,
+                };
+            })
+            .filter(editor => editor !== null) as object[];
     }
 
     _authorContribXml(): {} {
@@ -209,51 +234,60 @@ export default class ArticleGenerator {
         };
     }
 
-    _opposedReviewerContribXml(): object[] {
-        return (this.submission.editorDetails.opposedReviewers || [])
-            .map(reviewer => this._reviewerContribXml(reviewer))
-            .filter(item => item !== null) as object[];
+    _potentialReviewersContribXml(): object {
+        const {
+            editorDetails: { suggestedReviewers = [], opposedReviewers = [] },
+        } = this.submission;
+
+        const contrib = [
+            ...this._reviewerContribXml(suggestedReviewers, 'suggested_reviewer'),
+            ...this._reviewerContribXml(opposedReviewers, 'opposed_reviewer'),
+        ];
+
+        return {
+            '@content-type': 'potential_reviewers',
+            contrib,
+        };
     }
 
-    _suggestedReviewerContribXml(): object[] {
-        return (this.submission.editorDetails.suggestedReviewers || [])
-            .map(reviewer => this._reviewerContribXml(reviewer))
-            .filter(item => item !== null) as object[];
+    _potentialReviewingEditorsContribXml(): object {
+        const {
+            editorDetails: { suggestedReviewingEditors = [], opposedReviewingEditors = [] },
+        } = this.submission;
+
+        const contrib = [
+            ...this._editorContribXml(suggestedReviewingEditors, 'suggested_reviewing_editor'),
+            ...this._editorContribXml(opposedReviewingEditors, 'opposed_reviewing_editor'),
+        ];
+
+        return {
+            '@content-type': 'potential_reviewing_editors',
+            contrib,
+        };
     }
 
-    _opposedReviewingEditorsContribXml(): object[] {
-        return (this.submission.editorDetails.opposedReviewingEditors || [])
-            .map(id => this._editorContribXml(id, 'potential_reviewing_editors', 'opposed_reviewing_editor'))
-            .filter(item => item !== null) as object[];
-    }
+    _potentialSeniorEditorsContribXml(): object {
+        const {
+            editorDetails: { suggestedSeniorEditors = [], opposedSeniorEditors = [] },
+        } = this.submission;
 
-    _suggestedReviewingEditorsContribXml(): object[] {
-        return (this.submission.editorDetails.suggestedReviewingEditors || [])
-            .map(id => this._editorContribXml(id, 'potential_reviewing_editors', 'suggested_reviewing_editor'))
-            .filter(item => item !== null) as object[];
-    }
+        const contrib = [
+            ...this._editorContribXml(suggestedSeniorEditors, 'suggested_senior_editor'),
+            ...this._editorContribXml(opposedSeniorEditors, 'opposed_senior_editor'),
+        ];
 
-    _opposedSeniorEditorsContribXml(): object[] {
-        return (this.submission.editorDetails.opposedSeniorEditors || [])
-            .map(id => this._editorContribXml(id, 'potential_senior_editors', 'opposed_senior_editor'))
-            .filter(item => item !== null) as object[];
-    }
-
-    _suggestedSeniorEditorsContribXml(): object[] {
-        return (this.submission.editorDetails.suggestedSeniorEditors || [])
-            .map(id => this._editorContribXml(id, 'potential_senior_editors', 'suggested_senior_editor'))
-            .filter(item => item !== null) as object[];
+        return {
+            '@content-type': 'potential_senior_editors',
+            contrib,
+        };
     }
 
     _contribGroupXml(): object[] {
         return [
             this._authorContribXml(),
-            ...this._suggestedSeniorEditorsContribXml(),
-            ...this._opposedSeniorEditorsContribXml(),
-            ...this._suggestedReviewingEditorsContribXml(),
-            ...this._opposedReviewingEditorsContribXml(),
-            ...this._suggestedReviewerContribXml(),
-            ...this._opposedReviewerContribXml(),
+            this._potentialSeniorEditorsContribXml(),
+            this._potentialReviewingEditorsContribXml(),
+            this._potentialReviewersContribXml(),
         ];
     }
 
@@ -307,7 +341,6 @@ export default class ArticleGenerator {
 
     async execute(): Promise<string> {
         await this._prepare();
-        console.log(this.affiliations);
         const front = this._frontXml();
 
         return xmlbuilder

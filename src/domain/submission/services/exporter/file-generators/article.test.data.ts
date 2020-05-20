@@ -29,6 +29,7 @@ submission.manuscriptDetails = {
 
 submission.editorDetails = {
     opposedReviewingEditors: ['87f34696'],
+    suggestedReviewingEditors: ['6fabd619', 'fd8295ba'],
     suggestedSeniorEditors: ['1e9e661f', '3edb2ed8'],
     opposedSeniorEditors: ['232d9893'],
     suggestedReviewers: [
