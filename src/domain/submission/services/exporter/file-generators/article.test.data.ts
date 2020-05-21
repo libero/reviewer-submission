@@ -15,7 +15,7 @@ const submission = new Submission({
 submission.author = {
     firstName: 'Test',
     lastName: 'User',
-    email: 'a94e85089c7efea17a0563010705cb29',
+    email: 'test.user@example.com',
     aff: 'University of eLife',
 };
 
