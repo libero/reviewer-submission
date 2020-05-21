@@ -106,7 +106,7 @@ export default class ArticleGenerator {
         };
     }
 
-    async _prepare(): Promise<void> {
+    async _collectEditorInfo(): Promise<void> {
         const {
             editorDetails: {
                 suggestedSeniorEditors = [],
@@ -340,7 +340,7 @@ export default class ArticleGenerator {
     }
 
     async execute(): Promise<string> {
-        await this._prepare();
+        await this._collectEditorInfo();
         const front = this._frontXml();
 
         return xmlbuilder
