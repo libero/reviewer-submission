@@ -8,15 +8,7 @@ export class UserService {
     }
 
     async getCurrentUser(header: string): Promise<User> {
-        const user = await this.userApi.getCurrentUser(header);
-        switch (user.role) {
-            case 'executive':
-                user.role = 'staff';
-                break;
-            default:
-                user.role = 'user';
-        }
-        return user;
+        return await this.userApi.getCurrentUser(header);
     }
 
     async getEditors(header: string, role: string): Promise<EditorAlias[]> {
