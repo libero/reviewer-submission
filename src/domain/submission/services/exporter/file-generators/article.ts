@@ -133,7 +133,7 @@ export default class ArticleGenerator {
         this.affiliations = this.editors.map(editor => editor.affiliations || '');
 
         if (this.submission.author) {
-            this.affiliations.push(this.submission.author?.aff);
+            this.affiliations.push(this.submission.author.aff);
         }
     }
 
@@ -350,7 +350,5 @@ export default class ArticleGenerator {
                 { sysID: 'JATS-journalpublishing1.dtd' },
             )
             .end({ pretty: true });
-
-        return '';
     }
 }
