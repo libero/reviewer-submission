@@ -5,38 +5,6 @@ import submission from './article.test.data';
 
 jest.mock('axios');
 
-// const md5 = (s: string): string =>
-//     crypto
-//         .createHash('md5')
-//         .update(s)
-//         .digest('hex');
-
-// const obfuscate = (s: string, re: RegExp): string => {
-//     let m;
-//     const matches = [];
-//     do {
-//         m = re.exec(s);
-//         if (m) {
-//             matches.push({ str: m[1], index: m.index });
-//         }
-//     } while (m);
-
-//     let newStr = s;
-
-//     matches.forEach(item => {
-//         // make sure this is idempotent
-//         if (includes(item.str, '.') && includes(item.str, '@')) {
-//             newStr = replace(newStr, item.str, md5(item.str));
-//         }
-//     });
-//     return newStr;
-// };
-
-// const obfuscateEmail = (s: string): string => {
-//     const re = new RegExp('<email>([^<>]+)</email>', 'g');
-//     return obfuscate(s, re);
-// };
-
 const generateEditor = (surname: string, givenNames: string, email: string, affiliation: string): object => ({
     name: {
         surname,

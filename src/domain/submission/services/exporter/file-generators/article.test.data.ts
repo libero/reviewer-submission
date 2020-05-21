@@ -71,7 +71,6 @@ submission.files = {
     manuscriptFile: new File({
         status: 'CREATED',
         id: FileId.fromUuid('00000000-6c48-4747-851c-ef806e8486b2'),
-        // url: 'uploads/604e06ca-882d-4b5b-a147-e016893e60e9/f357bfb6b9b0886c2afc1ea1ddcabc61.pdf',
         size: 0,
         type: FileType.MANUSCRIPT_SOURCE,
         filename: '00000000-6c48-4747-851c-ef806e8486b2.pdf',
@@ -82,7 +81,6 @@ submission.files = {
         new File({
             status: 'CREATED',
             id: FileId.fromUuid('00000001-6c48-4747-851c-ef806e8486b2'),
-            // url: 'uploads/604e06ca-882d-4b5b-a147-e016893e60e9/f357bfb6b9b0886c2afc1ea1ddcabc61.pdf',
             size: 0,
             type: FileType.SUPPORTING_FILE,
             filename: '👉👉👉00000001&1.docx',
@@ -94,7 +92,6 @@ submission.files = {
             submissionId: SubmissionId.fromUuid('604e06ca-882d-4b5b-a147-e016893e60e9'),
             type: FileType.SUPPORTING_FILE,
             filename: '👍👍👍000000002©.pdf',
-            // url: 'uploads/604e06ca-882d-4b5b-a147-e016893e60e9/f357bfb6b9b0886c2afc1ea1ddcabc61.pdf',
             mimeType: 'application/pdf',
             size: 0,
             status: 'CREATED',
