@@ -1,9 +1,9 @@
 import { SubmissionId } from '../../types';
 import { SubmissionExporter } from './types';
-import { FileService } from '../../../file/services/file-service';
+// import { FileService } from '../../../file/services/file-service';
 
 export class MecaExporter implements SubmissionExporter {
-    constructor(private readonly fileService: FileService) {}
+    // constructor(private readonly fileService: FileService) {}
 
     async export(submissionId: SubmissionId): Promise<Buffer> {
         return Promise.resolve(new Buffer(`this-is-a-test ${submissionId}`));

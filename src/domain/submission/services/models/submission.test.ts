@@ -51,6 +51,7 @@ describe('Submission Entity', () => {
     it('new submission is submittable when fields set', () => {
         submission.manuscriptDetails.title = 'Test';
         submission.files.coverLetter = 'Accept please!';
+        submission.disclosure.submitterSignature = 'signature';
         const file = new File({
             id: FileId.fromUuid(uuid()),
             submissionId: id,
