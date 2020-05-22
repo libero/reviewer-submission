@@ -1,19 +1,19 @@
 import * as PDFParser from 'pdf2json';
 import { makeDisclosurePdf } from './disclosure';
-import { sampleManuscript } from './article.test.data';
+import submission from './article.test.data';
 
 describe('Disclosure PDF generator', () => {
     it('returns a string of a PDF', async () => {
         const document = await makeDisclosurePdf(
-            sampleManuscript.id,
-            sampleManuscript.title,
+            submission.id,
+            submission.manuscriptDetails.title || '',
             {
                 firstName: 'Test',
                 lastName: 'User',
                 email: 'elife@mailinator.com',
                 aff: 'University of eLife',
             },
-            sampleManuscript.submitterSignature,
+            submission.disclosure.submitterSignature || '',
             '1.2.3.4',
         );
 

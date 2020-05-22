@@ -44,7 +44,9 @@ export const submissionSchema = Joi.object({
         supportingFiles: Joi.array().items(fileSchema),
     },
     editorDetails: {},
-    disclosure: {},
+    disclosure: {
+        submitterSignature: Joi.string().required(),
+    },
 
     suggestions: Joi.array().items(suggestionSchema),
     /*

@@ -1,0 +1,201 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ArticleGenerator generates correct xml 1`] = `
+"<?xml version=\\"1.0\\" encoding=\\"UTF-8\\"?>
+<!DOCTYPE article SYSTEM \\"JATS-journalpublishing1.dtd\\">
+<article>
+  <front>
+    <journal-meta>
+      <journal-id journal-id-type=\\"pmc\\"/>
+      <journal-id journal-id-type=\\"publisher\\"/>
+      <issn/>
+      <publisher>
+        <publisher-name/>
+      </publisher>
+    </journal-meta>
+    <article-meta>
+      <article-id pub-id-type=\\"manuscript\\">604e06ca-882d-4b5b-a147-e016893e60e9</article-id>
+      <article-categories>
+        <subj-group subj-group-type=\\"article_type\\">
+          <subject>5</subject>
+        </subj-group>
+        <subj-group>
+          <subj-group subj-group-type=\\"subject_areas\\">
+            <subject>Biochemistry and Chemical Biology</subject>
+          </subj-group>
+        </subj-group>
+        <subj-group>
+          <subj-group subj-group-type=\\"subject_areas\\">
+            <subject>Chromosomes and Gene Expression</subject>
+          </subj-group>
+        </subj-group>
+      </article-categories>
+      <title-group>
+        <article-title>Test Manuscript</article-title>
+      </title-group>
+      <contrib-group content-type=\\"authors\\">
+        <contrib contrib-type=\\"author\\" corresp=\\"yes\\">
+          <name>
+            <surname>User</surname>
+            <given-names>Test</given-names>
+          </name>
+          <email>test.user@example.com</email>
+          <xref ref-type=\\"aff\\" rid=\\"aff6\\"/>
+        </contrib>
+      </contrib-group>
+      <contrib-group content-type=\\"potential_senior_editors\\">
+        <contrib contrib-type=\\"suggested_senior_editor\\">
+          <name>
+            <surname>Bluth</surname>
+            <given-names>Michael</given-names>
+          </name>
+          <email>m.bluth@example.com</email>
+          <xref ref-type=\\"aff\\" rid=\\"aff1\\"/>
+        </contrib>
+        <contrib contrib-type=\\"suggested_senior_editor\\">
+          <name>
+            <surname>Holt</surname>
+            <given-names>Steve</given-names>
+          </name>
+          <email>s.holt@example.com</email>
+          <xref ref-type=\\"aff\\" rid=\\"aff2\\"/>
+        </contrib>
+        <contrib contrib-type=\\"opposed_senior_editor\\">
+          <name>
+            <surname>Funke</surname>
+            <given-names>Tobias</given-names>
+          </name>
+          <email>t.funke@example.com</email>
+          <xref ref-type=\\"aff\\" rid=\\"aff3\\"/>
+        </contrib>
+      </contrib-group>
+      <contrib-group content-type=\\"potential_reviewing_editors\\">
+        <contrib contrib-type=\\"suggested_reviewing_editor\\">
+          <name>
+            <surname>Funke</surname>
+            <given-names>Lindsay</given-names>
+          </name>
+          <email>l.funke@example.com</email>
+          <xref ref-type=\\"aff\\" rid=\\"aff4\\"/>
+        </contrib>
+        <contrib contrib-type=\\"suggested_reviewing_editor\\">
+          <name>
+            <surname>Bluth</surname>
+            <given-names>Lucille</given-names>
+          </name>
+          <email>l.bluth@example.com</email>
+          <xref ref-type=\\"aff\\" rid=\\"aff5\\"/>
+        </contrib>
+        <contrib contrib-type=\\"opposed_reviewing_editor\\">
+          <name>
+            <surname>Bluth</surname>
+            <given-names>Gob</given-names>
+          </name>
+          <email>g.bluth@example.com</email>
+          <xref ref-type=\\"aff\\" rid=\\"aff0\\"/>
+        </contrib>
+      </contrib-group>
+      <contrib-group content-type=\\"potential_reviewers\\">
+        <contrib contrib-type=\\"suggested_reviewer\\">
+          <name>
+            <surname>Reviewer</surname>
+            <given-names>J. Edward</given-names>
+          </name>
+          <email>edward@example.com</email>
+        </contrib>
+        <contrib contrib-type=\\"suggested_reviewer\\">
+          <name>
+            <surname>de Reviewer</surname>
+            <given-names>Frances</given-names>
+          </name>
+          <email>frances@example.org</email>
+        </contrib>
+        <contrib contrib-type=\\"suggested_reviewer\\">
+          <name>
+            <surname>Reviewer</surname>
+            <given-names>Gertrude</given-names>
+          </name>
+          <email>gertrude@example.net</email>
+        </contrib>
+        <contrib contrib-type=\\"opposed_reviewer\\">
+          <name>
+            <surname>Hoo</surname>
+            <given-names/>
+          </name>
+          <email>laughing@example.com</email>
+        </contrib>
+        <contrib contrib-type=\\"opposed_reviewer\\">
+          <name>
+            <surname>Who</surname>
+            <given-names/>
+          </name>
+          <email>singing@example.com</email>
+        </contrib>
+      </contrib-group>
+      <aff id=\\"aff0\\">
+        <institution>Magician circle</institution>
+      </aff>
+      <aff id=\\"aff1\\">
+        <institution>Bluth research centre</institution>
+      </aff>
+      <aff id=\\"aff2\\">
+        <institution>High School</institution>
+      </aff>
+      <aff id=\\"aff3\\">
+        <institution>Blue man group</institution>
+      </aff>
+      <aff id=\\"aff4\\">
+        <institution>Home</institution>
+      </aff>
+      <aff id=\\"aff5\\">
+        <institution>Balboa Towers</institution>
+      </aff>
+      <aff id=\\"aff6\\">
+        <institution>University of eLife</institution>
+      </aff>
+      <author-notes>
+        <fn>
+          <p/>
+        </fn>
+      </author-notes>
+      <pub-date>
+        <day/>
+        <month/>
+        <year/>
+      </pub-date>
+      <related-article related-article-type=\\"companion\\">
+        <article-title>asdassss</article-title>
+      </related-article>
+      <related-article related-article-type=\\"companion\\">
+        <article-title>Another</article-title>
+      </related-article>
+      <custom-meta-group>
+        <custom-meta>
+          <meta-name>opposed-senior-editor-comment</meta-name>
+          <meta-value>From another galaxy</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>opposed-reviewing-editor-comment</meta-name>
+          <meta-value>Not any more</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>opposed-reviewer-comment</meta-name>
+          <meta-value>Wandering days are over</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>previously-discussed</meta-name>
+          <meta-value>Talked to bob about it</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>previously-submitted</meta-name>
+          <meta-value>Original Test Title</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>created-by</meta-name>
+          <meta-value>6d8cd1ce-15b6-46c1-b901-bc91598c8f2d</meta-value>
+        </custom-meta>
+      </custom-meta-group>
+    </article-meta>
+  </front>
+</article>"
+`;

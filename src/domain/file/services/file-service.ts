@@ -11,6 +11,8 @@ import { PubSub } from 'apollo-server-express';
 import { PromiseResult } from 'aws-sdk/lib/request';
 import { AWSError } from 'aws-sdk/lib/error';
 import { ReadStream } from 'fs';
+import { Readable } from 'stream';
+import { Blob } from 'aws-sdk/lib/dynamodb/document_client';
 
 const s3MinChunkSize = 5 * 1024 * 1024; // at least 5MB (non rounded)
 
@@ -283,6 +285,17 @@ export class FileService {
         submissionId: SubmissionId,
     ): Promise<void> {
         await this.handleFileUpload(pubsub, submissionId, userId, file, stream, FileType.SUPPORTING_FILE);
+    }
+
+    async getFileContent(file: File): Promise<Buffer | Uint8Array | Blob | string | Readable | Blob | undefined> {
+        const { Body } = await this.s3
+            .getObject({
+                Bucket: this.bucket,
+                Key: file.url,
+            })
+            .promise();
+
+        return Body;
     }
 
     private addDownloadLink(file: File): void {

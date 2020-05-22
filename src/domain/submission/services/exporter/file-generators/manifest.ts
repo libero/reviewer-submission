@@ -1,7 +1,7 @@
 import * as fs from 'fs-extra';
 import * as entities from 'entities';
 import { removeUnicode } from './remove-unicode';
-import { FileData } from '../../../../file/services/models/file';
+import File from '../../../../file/services/models/file';
 
 // replace a single key with a value
 const replaceAll = (template: string, key: string, value: string): string => {
@@ -19,7 +19,7 @@ const replaceDictionary = (template: string, dictionary: { key: string; value: s
     return result;
 };
 
-const supplementaryXml = (files: FileData[]): string => {
+const supplementaryXml = (files: File[]): string => {
     const fileList = files.filter(fileObject => fileObject.type === 'SUPPORTING_FILE');
 
     let supplementaryFileXml = '';
@@ -38,7 +38,7 @@ const supplementaryXml = (files: FileData[]): string => {
     return supplementaryFileXml;
 };
 
-export const makeManifestFile = (files: FileData[]): string => {
+export const makeManifestFile = (files: File[]): string => {
     if (!Array.isArray(files)) {
         throw new TypeError(`Expecting array: ${typeof files}`);
     }
