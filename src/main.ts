@@ -42,11 +42,25 @@ const estimators = [
     simpleEstimator({ defaultComplexity: 1 }),
 ];
 
+const dumpConfig = (): void => {
+    logger.info(`config: ${JSON.stringify(config, null, 4)}`);
+    logger.info(`config.port: ${config.port}`);
+    logger.info(`config.db_connection.host: ${config.db_connection.host}`);
+    logger.info(`config.s3.awsEndPoint: ${config.s3.awsEndPoint}`);
+    logger.info(`config.s3.fileBucket: ${config.s3.fileBucket}`);
+    logger.info(`config.user_api_url: ${config.user_api_url}`);
+    logger.info(`config.science_beam.api_url: ${config.science_beam.api_url}`);
+};
+
 const init = async (): Promise<void> => {
     logger.info('Starting service');
+    dumpConfig();
     // Start the application
     const app: Express = express();
-    const knexConnection = knex(config.knex);
+    const knexConnection = knex({
+        client: 'pg',
+        connection: config.db_connection,
+    });
 
     const shutDown = async (server: Server): Promise<void> => {
         await knexConnection.destroy();

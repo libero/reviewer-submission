@@ -1,37 +1,30 @@
 import { SubmissionId } from '../../types';
 import { SubmissionExporter } from './types';
+// import { FileService } from '../../../file/services/file-service';
 
 export class MecaExporter implements SubmissionExporter {
-    export(id: SubmissionId): Promise<Buffer> {
-        return Promise.resolve(new Buffer(`this-is-a-test ${id}`));
-        /*
-        @todo: Implement something like...
+    // constructor(private readonly fileService: FileService) {}
 
-        const uploadedFiles = manuscript.files.map((file, index) => ({
-          id: file.id,
-          filename: file.filename,
-          content: getContent(file),
-          type: file.type,
-          mimeType: file.mimeType,
-          index,
-        }))
+    async export(submissionId: SubmissionId): Promise<Buffer> {
+        return Promise.resolve(new Buffer(`this-is-a-test ${submissionId}`));
+        // const manuscriptFile = await this.fileService.findManuscriptFile(submissionId);
+        // const supportingFiles = await this.fileService.getSupportingFiles(submissionId);
 
-        const manditoryFiles = [
-          { filename: 'article.xml', content: articleGenerator(manuscript) },
-          {
-            filename: 'cover_letter.pdf',
-            content: coverLetterGenerator(manuscript),
-          },
-          {
-            filename: 'disclosure.pdf',
-            content: disclosureGenerator(manuscript, clientIp),
-          },
-          { filename: 'manifest.xml', content: manifestGenerator(uploadedFiles) },
-          { filename: 'transfer.xml', content: transferGenerator('') },
-        ]
+        // if (!manuscriptFile) {
+        //     throw new Error('No manuscript file');
+        // }
 
-        const allFiles = manditoryFiles.concat(uploadedFiles)
-        return archiveGenerator(allFiles)
-        */
+        // const uploadedFiles = await Promise.all(
+        //     [manuscriptFile, ...supportingFiles].map(async (file, index) => ({
+        //         id: file.id,
+        //         filename: file.filename,
+        //         content: await this.fileService.getFileContent(file),
+        //         type: file.type,
+        //         mimeType: file.mimeType,
+        //         index,
+        //     })),
+        // );
+
+        // const mandatoryFiles = [{ filename: 'article.xml', content: articleGenerator }];
     }
 }
