@@ -1,5 +1,5 @@
 import * as PDFParser from 'pdf2json';
-import { makeCoverLetter } from './coverLetter';
+import { generateCoverLetter } from './coverLetter';
 
 export interface ThingWithR {
     R: ThingWithT[];
@@ -13,13 +13,13 @@ const coverLetter = "<h1>Pick Me!</h1><p>I'm simply the best</p>";
 
 describe('Cover letter PDF generator', () => {
     it('returns PDF document', async () => {
-        const pdf = await makeCoverLetter(coverLetter);
+        const pdf = await generateCoverLetter(coverLetter);
         const pdfString = pdf.toString();
         expect(pdfString.indexOf('%PDF')).toBe(0);
     });
 
     it('PDF document contains the cover letter', async () => {
-        const document = await makeCoverLetter(coverLetter);
+        const document = await generateCoverLetter(coverLetter);
 
         const pdfParser = new PDFParser();
         let errors = 0;

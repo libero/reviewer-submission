@@ -60,6 +60,6 @@ export class MecaExporter implements SubmissionExporter {
             }),
         );
 
-        return zip.generateAsync({ type: 'nodebuffer', compression: 'DEFLATE' })
+        return zip.generateAsync({ type: 'nodebuffer', compression: 'DEFLATE' });
     }
 }
