@@ -19,7 +19,7 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
     Mutation: {
         async submit(_, { id: submissionId }: { id: SubmissionId }, context): Promise<Submission | null> {
             const user = await userService.getCurrentUser(context.authorizationHeader);
-            return wizard.submit(user, submissionId);
+            return wizard.submit(user, submissionId, context.ip);
         },
         async saveAuthorPage(
             _,

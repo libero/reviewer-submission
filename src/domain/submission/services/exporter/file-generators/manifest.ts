@@ -2,6 +2,7 @@ import * as fs from 'fs-extra';
 import * as entities from 'entities';
 import { removeUnicode } from './remove-unicode';
 import File from '../../../../file/services/models/file';
+import Submission from '../../models/submission';
 
 // replace a single key with a value
 const replaceAll = (template: string, key: string, value: string): string => {
@@ -38,21 +39,18 @@ const supplementaryXml = (files: File[]): string => {
     return supplementaryFileXml;
 };
 
-export const makeManifestFile = (files: File[]): string => {
-    if (!Array.isArray(files)) {
-        throw new TypeError(`Expecting array: ${typeof files}`);
+export const generateManifest = (submission: Submission): string => {
+    const manuscriptFile = submission.files.manuscriptFile;
+    if (!manuscriptFile) {
+        throw new Error(`Could not determine the manuscript: ${submission.id}`);
     }
-    const manuscriptFiles = files.filter(file => file.type === 'MANUSCRIPT_SOURCE');
-    if (manuscriptFiles.length > 1) {
-        throw new Error(`Could not determine the manuscript, ${JSON.stringify(files, null, 4)}`);
-    }
-    const manuscript = manuscriptFiles[0];
+
     const template = fs.readFileSync(`${__dirname}/templates/manifest.xml`, 'utf8');
-    const manuscriptFilename = removeUnicode(manuscript.filename, 0);
+    const manuscriptFilename = removeUnicode(manuscriptFile.filename, 0);
 
     const result = template
-        .replace('{supplementaryFiles}', supplementaryXml(files))
-        .replace('{manuscript.mimeType}', manuscript.mimeType);
+        .replace('{supplementaryFiles}', supplementaryXml(submission.files.supportingFiles || []))
+        .replace('{manuscript.mimeType}', manuscriptFile.mimeType);
 
     return replaceAll(result, 'manuscript.filename', manuscriptFilename);
 };

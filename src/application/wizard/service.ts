@@ -103,14 +103,14 @@ export class WizardService {
         return this.getFullSubmission(submissionId);
     }
 
-    async submit(user: User, submissionId: SubmissionId): Promise<Submission> {
+    async submit(user: User, submissionId: SubmissionId, ip: string): Promise<Submission> {
         const submission = await this.submissionService.get(submissionId);
         const allowed = this.permissionService.userCanWithSubmission(user, SubmissionOperation.UPDATE, submission);
         if (!allowed) {
             throw new Error('User not allowed to submit');
         }
 
-        this.submissionService.submit(submissionId);
+        this.submissionService.submit(submissionId, ip);
 
         return this.getFullSubmission(submissionId);
     }

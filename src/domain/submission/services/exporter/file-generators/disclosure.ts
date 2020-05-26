@@ -1,5 +1,6 @@
 import * as PDFDocument from 'pdfkit';
 import { AuthorDetails, SubmissionId } from '../../../types';
+import Submission from '../../models/submission';
 
 const privacyPolicy =
     'Our privacy policy explains that we share your personal information with various third parties to enable us to review ' +
@@ -12,19 +13,20 @@ const privacyPolicy =
     'any time (by emailing data@elifesciences.org). Please enter your name and check the box below to give this consent. ' +
     'Without this consent we will not be able to evaluate your submission.';
 
-export const makeDisclosurePdf = (
-    id: SubmissionId,
-    title: string,
-    author: AuthorDetails,
-    submitterSignature: string,
+export const generateDisclosure = (
+    // id: SubmissionId,
+    // title: string,
+    // author: AuthorDetails,
+    // submitterSignature: string,
+    submission: Submission,
     clientIp: string,
 ): Promise<Buffer> => {
     const header = {
         Journal: 'eLife',
-        'Manuscript #': id,
-        Title: title,
-        Submitter: `${author.firstName} ${author.lastName}`,
-        Signature: `${submitterSignature}`,
+        'Manuscript #': submission.id,
+        Title: submission.manuscriptDetails.title,
+        Submitter: `${submission.author?.firstName} ${submission.author?.lastName}`,
+        Signature: `${submission.disclosure.submitterSignature}`,
         Date: new Date(),
         'IP Address': clientIp,
     };

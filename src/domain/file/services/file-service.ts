@@ -287,7 +287,7 @@ export class FileService {
         await this.handleFileUpload(pubsub, submissionId, userId, file, stream, FileType.SUPPORTING_FILE);
     }
 
-    async getFileContent(file: File): Promise<Buffer | Uint8Array | Blob | string | Readable | Blob | undefined> {
+    async getFileContent(file: File): Promise<string> {
         const { Body } = await this.s3
             .getObject({
                 Bucket: this.bucket,
@@ -295,7 +295,7 @@ export class FileService {
             })
             .promise();
 
-        return Body;
+        return Body ? Body.toString('utf-8') : '';
     }
 
     private addDownloadLink(file: File): void {
