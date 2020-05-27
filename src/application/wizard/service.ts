@@ -121,7 +121,7 @@ export class WizardService {
         if (!allowed) {
             throw new Error('User not allowed to delete files');
         }
-        return await this.fileService.deleteManuscript(fileId, submissionId);
+        return await this.fileService.deleteManuscript(user, fileId, submissionId);
     }
 
     async saveManuscriptFile(
@@ -142,6 +142,7 @@ export class WizardService {
         const { filename, mimetype: mimeType, createReadStream } = await file;
         const stream = createReadStream();
         const manuscriptFile = await this.fileService.create(
+            user,
             submissionId,
             filename,
             mimeType,
@@ -160,12 +161,12 @@ export class WizardService {
             await this.semanticExtractionService.extractSuggestions(fileContents, mimeType, filename, submissionId);
         } catch (e) {
             logger.error(submissionId, 'MANUSCRIPT UPLOAD ERROR', e);
-            manuscriptFile.setStatusToCancelled();
+            this.fileService.setStatusToCancelled(manuscriptFile);
             await this.fileService.update(manuscriptFile);
             throw new Error('Manuscript upload failed to store file.');
         }
 
-        manuscriptFile.setStatusToStored();
+        this.fileService.setStatusToStored(manuscriptFile);
         await this.fileService.update(manuscriptFile);
 
         return this.getFullSubmission(submissionId);
@@ -189,6 +190,7 @@ export class WizardService {
         const { filename, mimetype: mimeType, createReadStream } = await file;
         const stream = createReadStream();
         const supportingFile = await this.fileService.create(
+            user,
             submissionId,
             filename,
             mimeType,
@@ -200,12 +202,12 @@ export class WizardService {
             await this.fileService.uploadSupportingFile(supportingFile, stream, user.id, pubsub, submissionId);
         } catch (e) {
             logger.error(submissionId, 'SUPPORTING UPLOAD ERROR', e);
-            supportingFile.setStatusToCancelled();
+            this.fileService.setStatusToCancelled(supportingFile);
             await this.fileService.update(supportingFile);
             throw new Error('Supporting upload failed to store file.');
         }
 
-        supportingFile.setStatusToStored();
+        this.fileService.setStatusToStored(supportingFile);
         await this.fileService.update(supportingFile);
 
         return supportingFile;
@@ -217,7 +219,7 @@ export class WizardService {
         if (!allowed) {
             throw new Error('User not allowed to delete files');
         }
-        return await this.fileService.deleteSupportingFile(fileId, submissionId);
+        return await this.fileService.deleteSupportingFile(user, fileId, submissionId);
     }
 
     async saveFilesPage(user: User, submissionId: SubmissionId, coverLetter: string): Promise<Submission> {

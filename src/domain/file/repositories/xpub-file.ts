@@ -55,19 +55,14 @@ export default class XpubFileRepository {
         return files.length > 0 ? this.entryToModel(files[0]) : null;
     }
 
-    async deleteByIdAndSubmissionId(id: FileId, submissionId: SubmissionId): Promise<boolean> {
-        const file = await this.findFileById(id);
-        if (file === null) {
-            throw new Error(`Unable to find entry with id: ${id}`);
-        }
+    async deleteByIdAndSubmissionId(file: File, submissionId: SubmissionId): Promise<boolean> {
         file.updated = new Date();
-        file.status = FileStatus.DELETED;
         const entryToSave = this.modelToEntry(file);
         const query = this._query
             .builder()
             .table(this.TABLE_NAME)
             .update(entryToSave)
-            .where({ id: id, manuscript_id: submissionId });
+            .where({ id: file.id, manuscript_id: submissionId });
         await this._query.executor(query);
         return true;
     }

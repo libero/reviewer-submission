@@ -1,5 +1,5 @@
 import * as Knex from 'knex';
-import { v4 as uuid } from 'uuid';
+import { v4 as uuid, v4 } from 'uuid';
 import * as S3 from 'aws-sdk/clients/s3';
 import { createKnexAdapter } from '../../knex-table-adapter';
 import XpubFileRepository from '../repositories/xpub-file';
@@ -13,15 +13,19 @@ import { AWSError } from 'aws-sdk/lib/error';
 import { ReadStream } from 'fs';
 import { Readable } from 'stream';
 import { Blob } from 'aws-sdk/lib/dynamodb/document_client';
+import { AuditService } from '../../audit/services/audit';
+import { AuditId, ObjectId, UserId } from '../../audit/types';
+import { User } from 'src/domain/user/user';
 
 const s3MinChunkSize = 5 * 1024 * 1024; // at least 5MB (non rounded)
 
 export class FileService {
     fileRepository: XpubFileRepository;
     s3: S3;
+    auditService: AuditService;
     bucket: string;
 
-    constructor(knex: Knex<{}, unknown[]>, s3config: S3Config) {
+    constructor(knex: Knex<{}, unknown[]>, s3config: S3Config, auditService: AuditService) {
         const adapter = createKnexAdapter(knex, 'public');
         this.fileRepository = new XpubFileRepository(adapter);
         const defaultOptions = {
@@ -34,6 +38,7 @@ export class FileService {
         const s3Options = s3config.awsEndPoint ? { ...defaultOptions, endpoint: s3config.awsEndPoint } : defaultOptions;
         this.bucket = s3config.fileBucket;
         this.s3 = new S3(s3Options);
+        this.auditService = auditService;
     }
 
     private getFileS3Key(fileType: FileType, submissionId: SubmissionId, fileId: FileId): string {
@@ -110,25 +115,38 @@ export class FileService {
             .promise();
     }
 
-    async deleteManuscript(fileId: FileId, submissionId: SubmissionId): Promise<boolean> {
-        await this.fileRepository.deleteByIdAndSubmissionId(fileId, submissionId);
+    async deleteManuscript(user: User, fileId: FileId, submissionId: SubmissionId): Promise<boolean> {
+        const file = await this.fileRepository.findFileById(fileId);
+        if (file === null) {
+            throw new Error(`Unable to find entry with id: ${fileId}`);
+        }
+
+        await this.fileRepository.deleteByIdAndSubmissionId(file, submissionId);
         await this.s3.deleteObject({
             Bucket: this.bucket,
             Key: this.getFileS3Key(FileType.MANUSCRIPT_SOURCE, submissionId, fileId),
         });
+        await this.auditFileStatusChange(user.id, file);
         return true;
     }
 
-    async deleteSupportingFile(fileId: FileId, submissionId: SubmissionId): Promise<FileId> {
-        await this.fileRepository.deleteByIdAndSubmissionId(fileId, submissionId);
+    async deleteSupportingFile(user: User, fileId: FileId, submissionId: SubmissionId): Promise<FileId> {
+        const file = await this.fileRepository.findFileById(fileId);
+        if (file === null) {
+            throw new Error(`Unable to find entry with id: ${fileId}`);
+        }
+
+        await this.fileRepository.deleteByIdAndSubmissionId(file, submissionId);
         await this.s3.deleteObject({
             Bucket: this.bucket,
             Key: this.getFileS3Key(FileType.SUPPORTING_FILE, submissionId, fileId),
         });
+        await this.auditFileStatusChange(user.id, file);
         return fileId;
     }
 
     async create(
+        user: User,
         submissionId: SubmissionId,
         filename: string,
         mimeType: string,
@@ -139,7 +157,7 @@ export class FileService {
             const manuscriptFile = await this.findManuscriptFile(submissionId);
             // we have a file so delete it
             if (manuscriptFile !== null) {
-                await this.deleteManuscript(manuscriptFile.id, submissionId);
+                await this.deleteManuscript(user, manuscriptFile.id, submissionId);
             }
         }
         const id = FileId.fromUuid(uuid());
@@ -156,7 +174,42 @@ export class FileService {
             size,
             status,
         });
-        return await this.fileRepository.create(file);
+        const createdFile = await this.fileRepository.create(file);
+        this.auditFileStatusChange(user.id, file);
+        return createdFile;
+    }
+
+    public setStatusToDeleted(file: File): void {
+        file.status = FileStatus.DELETED;
+    }
+
+    public setStatusToUploaded(file: File): void {
+        if (file.status === FileStatus.CREATED) {
+            file.status = FileStatus.UPLOADED;
+        }
+    }
+
+    public setStatusToStored(file: File): void {
+        if (file.status === FileStatus.CREATED || FileStatus.UPLOADED) {
+            file.status = FileStatus.STORED;
+        }
+    }
+
+    public setStatusToCancelled(file: File): void {
+        file.status = FileStatus.CANCELLED;
+    }
+
+    async auditFileStatusChange(userId: string, file: File): Promise<boolean> {
+        return this.auditService.recordAudit({
+            id: AuditId.fromUuid(v4()),
+            userId: UserId.fromUuid(userId),
+            action: file.status,
+            value: 'success',
+            objectType: file.type,
+            objectId: ObjectId.fromUuid(file.id.value),
+            created: new Date(),
+            updated: new Date(),
+        });
     }
 
     async update(file: File): Promise<File> {
@@ -274,7 +327,9 @@ export class FileService {
             stream,
             FileType.MANUSCRIPT_SOURCE,
         );
-        return Buffer.concat(chunks);
+        const buffer = Buffer.concat(chunks);
+
+        return buffer;
     }
 
     async uploadSupportingFile(

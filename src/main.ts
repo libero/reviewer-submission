@@ -25,6 +25,7 @@ import { TeamService } from './domain/teams/services/team-service';
 import { PermissionService } from './application/permission/service';
 import { SemanticExtractionService } from './domain/semantic-extraction/services/semantic-extraction-service';
 import { FileService } from './domain/file/services/file-service';
+import { AuditService } from './domain/audit/services/audit';
 
 // Apollo server express does not export this, but its express
 export interface ExpressContext {
@@ -68,11 +69,12 @@ const init = async (): Promise<void> => {
     };
 
     logger.info(`Initialising domain services...`);
+    const srvAudit = new AuditService(knexConnection);
     const srvSubmission = new SubmissionService(knexConnection);
     const srvSurvey = new SurveyService(knexConnection);
     const srvUser = new UserService(config.user_api_url);
     const srvTeam = new TeamService(knexConnection);
-    const srvFile = new FileService(knexConnection, config.s3);
+    const srvFile = new FileService(knexConnection, config.s3, srvAudit);
     const srvExtractionService = new SemanticExtractionService(knexConnection, config.science_beam);
 
     logger.info(`Initialising application services...`);
