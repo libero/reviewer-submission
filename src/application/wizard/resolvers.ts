@@ -6,18 +6,21 @@ import { UserService } from 'src/domain/user';
 import { WizardService } from './service';
 import { FileId } from '../../domain/file/types';
 import File from '../../domain/file/services/models/file';
+import { InfraLogger as logger } from '../../logger';
 
 const pubsub = new PubSub();
 
 const resolvers = (wizard: WizardService, userService: UserService): IResolvers => ({
     Query: {
         async getSubmission(_, { id }: { id: SubmissionId }, context): Promise<Submission | null> {
+            logger.info(`resolver: getSubmission(${id})`);
             const user = await userService.getCurrentUser(context.authorizationHeader);
             return await wizard.getSubmission(user, id);
         },
     },
     Mutation: {
         async submit(_, { id: submissionId }: { id: SubmissionId }, context): Promise<Submission | null> {
+            logger.info(`resolver: submit(${submissionId})`);
             const user = await userService.getCurrentUser(context.authorizationHeader);
             return wizard.submit(user, submissionId);
         },
@@ -26,6 +29,7 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
             { id: submissionId, details }: { id: SubmissionId; details: AuthorDetails },
             context,
         ): Promise<Submission | null> {
+            logger.info(`resolver: saveAuthorPage(${submissionId})`);
             const user = await userService.getCurrentUser(context.authorizationHeader);
             return wizard.saveAuthorPage(user, submissionId, details);
         },
@@ -35,6 +39,7 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
             { id: submissionId, details }: { id: SubmissionId; details: EditorDetails },
             context,
         ): Promise<Submission | null> {
+            logger.info(`resolver: saveEditorPage(${submissionId})`);
             const user = await userService.getCurrentUser(context.authorizationHeader);
             return wizard.saveEditorPage(user, submissionId, details);
         },
@@ -45,6 +50,7 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
             context,
         ): Promise<Submission> {
             const { file, id: submissionId, fileSize } = variables;
+            logger.info(`resolver: uploadManuscript(${submissionId}, ${JSON.stringify(file)})`);
             const user = await userService.getCurrentUser(context.authorizationHeader);
             const submission = await wizard.saveManuscriptFile(user, submissionId, file, fileSize, pubsub);
 
@@ -56,6 +62,7 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
             context,
         ): Promise<boolean> {
             const { fileId, submissionId } = variables;
+            logger.info(`resolver: deleteManuscript(${submissionId})`);
             const user = await userService.getCurrentUser(context.authorizationHeader);
             return await wizard.deleteManuscriptFile(fileId, submissionId, user);
         },
@@ -65,6 +72,7 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
             context,
         ): Promise<File> {
             const { file, id: submissionId, fileSize } = variables;
+            logger.info(`resolver: uploadSupportingFile(${submissionId})`);
             const user = await userService.getCurrentUser(context.authorizationHeader);
             const supportingFile = await wizard.saveSupportingFile(user, submissionId, file, fileSize, pubsub);
 
@@ -76,6 +84,7 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
             context,
         ): Promise<string> {
             const { fileId, submissionId } = variables;
+            logger.info(`resolver: deleteSupportingFile(${submissionId})`);
             const user = await userService.getCurrentUser(context.authorizationHeader);
             const deletedFileId = await wizard.deleteSupportingFile(fileId, submissionId, user);
             return deletedFileId.toString();
@@ -85,6 +94,7 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
             { id: submissionId, coverLetter }: { id: SubmissionId; coverLetter: string },
             context,
         ): Promise<Submission> {
+            logger.info(`resolver: saveFilesPage(${submissionId})`);
             const user = await userService.getCurrentUser(context.authorizationHeader);
             return await wizard.saveFilesPage(user, submissionId, coverLetter);
         },
@@ -100,6 +110,7 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
             },
             context,
         ): Promise<Submission> {
+            logger.info(`resolver: saveDetailsPage(${submissionId})`);
             const user = await userService.getCurrentUser(context.authorizationHeader);
             return wizard.saveDetailsPage(user, submissionId, details);
         },
