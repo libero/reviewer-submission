@@ -37,6 +37,20 @@ export const submissionSchema = Joi.object({
     articleType: Joi.string().required(),
     manuscriptDetails: {
         title: Joi.string().required(),
+        subjects: Joi.alternatives().when('articleType', {
+            is: 'feature',
+            then: Joi.array().max(2),
+            otherwise: Joi.array()
+                .min(1)
+                .max(2)
+                .required(),
+        }),
+
+        previouslyDiscussed: Joi.string().allow('', null),
+        previouslySubmitted: Joi.array().items(Joi.string()),
+        cosubmission: Joi.array()
+            .items(Joi.string())
+            .required(),
     },
     files: {
         coverLetter: Joi.string().required(),
@@ -96,6 +110,7 @@ export const submissionSchema = Joi.object({
     },
     disclosure: {
         submitterSignature: Joi.string().required(),
+        disclosureConsent: Joi.bool().required(),
     },
 
     suggestions: Joi.array().items(suggestionSchema),
@@ -109,22 +124,4 @@ export const submissionSchema = Joi.object({
             aff: Joi.string().required(),
         })
         .required(),
-    /*
-    subjects: Joi.alternatives().when('articleType', {
-        is: 'feature',
-        then: Joi.array().max(2),
-        otherwise: Joi.array()
-            .min(1)
-            .max(2)
-            .required(),
-    }),
-
-    previouslyDiscussed: Joi.string().allow('', null),
-    previouslySubmitted: Joi.array().items(Joi.string()),
-    cosubmission: Joi.array()
-        .items(Joi.string())
-        .required(),
-    submitterSignature: Joi.string().required(),
-    disclosureConsent: Joi.bool().required(),
-    */
 });
