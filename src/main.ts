@@ -67,7 +67,7 @@ const init = async (): Promise<void> => {
         process.exit();
     };
 
-    // init domain services
+    logger.info(`Initialising domain services...`);
     const srvSubmission = new SubmissionService(knexConnection);
     const srvSurvey = new SurveyService(knexConnection);
     const srvUser = new UserService(config.user_api_url);
@@ -75,18 +75,19 @@ const init = async (): Promise<void> => {
     const srvFile = new FileService(knexConnection, config.s3);
     const srvExtractionService = new SemanticExtractionService(knexConnection, config.science_beam);
 
-    // init application services
+    logger.info(`Initialising application services...`);
     const srvPermission = new PermissionService();
     const srvDashboard = new DashboardService(srvPermission, srvSubmission);
     const srvWizard = new WizardService(srvPermission, srvSubmission, srvTeam, srvFile, srvExtractionService, config);
 
-    // init resolvers
     const resolvers = [
         DashboardResolvers(srvDashboard, srvUser),
         SurveyResolvers(srvSurvey),
         UserResolvers(srvUser),
         WizardResolvers(srvWizard, srvUser),
     ];
+
+    logger.info(`Initialising Express...`);
 
     // best to mount helmet so soon as possible to ensure headers are set: defaults - https://www.npmjs.com/package/helmet#how-it-works
     app.use(helmet());
@@ -98,6 +99,7 @@ const init = async (): Promise<void> => {
         skipGraphQLImport: true,
     });
     const schema = makeExecutableSchema({ typeDefs, resolvers });
+    logger.info(`Initialising ApolloServer...`);
     const apolloServer = new ApolloServer({
         schema,
         uploads: {
