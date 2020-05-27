@@ -3,7 +3,7 @@ import Submission from '../../domain/submission/services/models/submission';
 import { SubmissionId } from '../../domain/submission/types';
 import { IResolvers } from 'apollo-server-express';
 import { UserService } from 'src/domain/user';
-import { InfraLogger as logger } from '../../../logger';
+import { InfraLogger as logger } from '../../logger';
 
 const resolvers = (dashboard: DashboardService, userService: UserService): IResolvers => ({
     Query: {

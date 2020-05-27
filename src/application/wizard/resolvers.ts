@@ -6,7 +6,7 @@ import { UserService } from 'src/domain/user';
 import { WizardService } from './service';
 import { FileId } from '../../domain/file/types';
 import File from '../../domain/file/services/models/file';
-import { InfraLogger as logger } from '../../../logger';
+import { InfraLogger as logger } from '../../logger';
 
 const pubsub = new PubSub();
 
