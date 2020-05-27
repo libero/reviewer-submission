@@ -43,7 +43,6 @@ const estimators = [
 ];
 
 const dumpConfig = (): void => {
-    logger.info(`config: ${JSON.stringify(config, null, 4)}`);
     logger.info(`config.port: ${config.port}`);
     logger.info(`config.db_connection.host: ${config.db_connection.host}`);
     logger.info(`config.s3.awsEndPoint: ${config.s3.awsEndPoint}`);
