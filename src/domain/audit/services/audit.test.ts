@@ -8,7 +8,7 @@ jest.mock('knex');
 
 describe('Audit Service', () => {
     it('should add a log item', async () => {
-        const controller = new AuditService((null as unknown) as Knex);
+        const service = new AuditService((null as unknown) as Knex);
         const timestamp = new Date();
         const userId = v4();
 
@@ -24,7 +24,7 @@ describe('Audit Service', () => {
         };
         KnexAuditRepository.prototype.putLog = jest.fn().mockReturnValue(true);
 
-        const result = await controller.recordAudit(item);
+        const result = await service.recordAudit(item);
         expect(result).toBe(true);
     });
 });

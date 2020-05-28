@@ -140,7 +140,7 @@ export class FileService {
             Bucket: this.bucket,
             Key: this.getFileS3Key(FileType.SUPPORTING_FILE, submissionId, fileId),
         });
-        await this.auditFileStatusChange(user.id, file);
+        await this.setStatusToDeleted(user, file);
         return fileId;
     }
 
@@ -336,8 +336,7 @@ export class FileService {
             stream,
             FileType.MANUSCRIPT_SOURCE,
         );
-        const buffer = Buffer.concat(chunks);
-        return buffer;
+        return Buffer.concat(chunks);
     }
 
     async uploadSupportingFile(

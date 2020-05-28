@@ -9,7 +9,7 @@ export class KnexAuditRepository implements AuditRepository {
     public constructor(private readonly _query: KnexTableAdapter) {}
 
     public async putLog(item: DtoAuditLog): Promise<boolean> {
-        logger.info(`Auditing ${JSON.stringify(item)}`);
+        logger.debug(`Auditing ${JSON.stringify(item)}`);
         const record = {
             id: item.id,
             created: item.created,
