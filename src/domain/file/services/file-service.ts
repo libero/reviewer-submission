@@ -1,5 +1,5 @@
 import * as Knex from 'knex';
-import { v4 as uuid, v4 } from 'uuid';
+import { v4 as uuid } from 'uuid';
 import * as S3 from 'aws-sdk/clients/s3';
 import { createKnexAdapter } from '../../knex-table-adapter';
 import XpubFileRepository from '../repositories/xpub-file';
@@ -125,7 +125,7 @@ export class FileService {
             Bucket: this.bucket,
             Key: this.getFileS3Key(FileType.MANUSCRIPT_SOURCE, submissionId, fileId),
         });
-        await this.auditFileStatusChange(user.id, file);
+        await this.setStatusToDeleted(user, file);
         return true;
     }
 
@@ -178,29 +178,37 @@ export class FileService {
         return createdFile;
     }
 
-    public setStatusToDeleted(file: File): void {
+    public async setStatusToDeleted(user: User, file: File): Promise<void> {
         file.status = FileStatus.DELETED;
+        await this.auditFileStatusChange(user.id, file);
     }
 
-    public setStatusToUploaded(file: File): void {
+    public async setStatusToUploaded(user: User, file: File): Promise<void> {
         if (file.status === FileStatus.CREATED) {
             file.status = FileStatus.UPLOADED;
+            await this.auditFileStatusChange(user.id, file);
+        } else {
+            throw new Error(`Cannot set file status to UPLOADED: ${file.id}`);
         }
     }
 
-    public setStatusToStored(file: File): void {
+    public async setStatusToStored(user: User, file: File): Promise<void> {
         if (file.status === FileStatus.CREATED || FileStatus.UPLOADED) {
             file.status = FileStatus.STORED;
+            await this.auditFileStatusChange(user.id, file);
+        } else {
+            throw new Error(`Cannot set file status to STORED: ${file.id}`);
         }
     }
 
-    public setStatusToCancelled(file: File): void {
+    public async setStatusToCancelled(user: User, file: File): Promise<void> {
         file.status = FileStatus.CANCELLED;
+        await this.auditFileStatusChange(user.id, file);
     }
 
     async auditFileStatusChange(userId: string, file: File): Promise<boolean> {
-        return this.auditService.recordAudit({
-            id: AuditId.fromUuid(v4()),
+        const result = await this.auditService.recordAudit({
+            id: AuditId.fromUuid(uuid()),
             userId: UserId.fromUuid(userId),
             action: AuditAction.UPDATED,
             value: file.status,
@@ -209,6 +217,8 @@ export class FileService {
             created: new Date(),
             updated: new Date(),
         });
+        await this.update(file);
+        return result;
     }
 
     async update(file: File): Promise<File> {
@@ -327,7 +337,6 @@ export class FileService {
             FileType.MANUSCRIPT_SOURCE,
         );
         const buffer = Buffer.concat(chunks);
-
         return buffer;
     }
 

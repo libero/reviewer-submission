@@ -53,7 +53,6 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
             logger.info(`resolver: uploadManuscript(${submissionId}, ${JSON.stringify(file)})`);
             const user = await userService.getCurrentUser(context.authorizationHeader);
             const submission = await wizard.saveManuscriptFile(user, submissionId, file, fileSize, pubsub);
-
             return submission;
         },
         async deleteManuscript(

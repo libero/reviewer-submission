@@ -86,6 +86,10 @@ export default class XpubFileRepository {
             .where({ manuscript_id: id, type: FileType.MANUSCRIPT_SOURCE, status: FileStatus.STORED });
 
         const files = await this._query.executor<DatabaseEntry[]>(query);
+        if (files.length > 1) {
+            const ids = files.map(item => item.id);
+            throw new Error(`Too many manuscripts on submission: ${JSON.stringify(ids, null, 4)}`);
+        }
         return files.length > 0 ? this.entryToModel(files[0]) : null;
     }
 

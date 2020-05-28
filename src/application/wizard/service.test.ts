@@ -331,11 +331,9 @@ describe('saveManuscript', () => {
             userCanWithSubmission: jest.fn(() => true),
         } as unknown) as PermissionService;
 
-        const mockUpdate = jest.fn();
         const mockFileService = ({
             setStatusToCancelled: jest.fn(),
             create: jest.fn(),
-            update: mockUpdate,
             uploadManuscript: jest.fn(() => Promise.reject('test error')),
         } as unknown) as FileService;
 
@@ -359,7 +357,6 @@ describe('saveManuscript', () => {
         ).rejects.toThrow('Manuscript upload failed to store file.');
         expect(mockFileService.create).toBeCalled();
         expect(mockFileService.setStatusToCancelled).toBeCalled();
-        expect(mockUpdate).toBeCalled();
     });
 });
 
@@ -426,11 +423,9 @@ describe('saveSupporting', () => {
             userCanWithSubmission: jest.fn(() => true),
         } as unknown) as PermissionService;
 
-        const mockUpdate = jest.fn();
         const mockFileService = ({
             setStatusToCancelled: jest.fn(),
             create: jest.fn(),
-            update: mockUpdate,
             uploadManuscript: jest.fn(() => Promise.reject('test error')),
         } as unknown) as FileService;
 
@@ -454,7 +449,6 @@ describe('saveSupporting', () => {
         ).rejects.toThrow('Supporting upload failed to store file.');
         expect(mockFileService.create).toBeCalled();
         expect(mockFileService.setStatusToCancelled).toBeCalled();
-        expect(mockUpdate).toBeCalled();
     });
     it('should return the file that has been added on upload', async (): Promise<void> => {
         const permissionService = ({
