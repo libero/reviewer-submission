@@ -7,6 +7,14 @@ export class ObjectId extends uuidType<'ObjectId'>() {}
 // The way to read this log entry is like this:
 // This <userId> performed this <action> with these <value>(s) on this <objectId>
 
+export enum AuditAction {
+    CREATED = 'CREATED',
+    UPDATED = 'UPDATED',
+    DELETED = 'DELETED',
+    LOGGED_IN = 'LOGGED_IN',
+    MECA_RESULT = 'MECA_RESULT',
+}
+
 export interface DtoAuditLog {
     id: AuditId;
     created: Date;
@@ -15,7 +23,7 @@ export interface DtoAuditLog {
     objectType: string;
     updated: Date;
     value: string;
-    action: string;
+    action: AuditAction;
 }
 
 export interface AuditRepository {

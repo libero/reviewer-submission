@@ -9,7 +9,7 @@ import { TeamId } from '../../domain/teams/types';
 import { PermissionService } from '../permission/service';
 import { FileService } from '../../domain/file/services/file-service';
 import { SemanticExtractionService } from '../../domain/semantic-extraction/services/semantic-extraction-service';
-import { Suggestion } from '../../domain/semantic-extraction/services/models/sugestion';
+import { Suggestion } from '../../domain/semantic-extraction/services/models/suggestion';
 import File from '../../domain/file/services/models/file';
 import { FileId, FileType } from '../../domain/file/types';
 

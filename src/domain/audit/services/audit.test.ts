@@ -1,6 +1,6 @@
 import { v4 } from 'uuid';
 import { AuditService } from './audit';
-import { DtoAuditLog, UserId, ObjectId, AuditId } from '../types';
+import { DtoAuditLog, UserId, ObjectId, AuditId, AuditAction } from '../types';
 import Knex from 'knex';
 import { KnexAuditRepository } from '../repositories/audit';
 
@@ -15,7 +15,7 @@ describe('Audit Service', () => {
         const item: DtoAuditLog = {
             id: AuditId.fromUuid(v4()),
             userId: UserId.fromUuid(userId),
-            action: 'some action',
+            action: AuditAction.LOGGED_IN,
             value: 'authorized',
             objectType: 'User',
             objectId: ObjectId.fromUuid(userId),

@@ -13,7 +13,7 @@ import { AWSError } from 'aws-sdk/lib/error';
 import { ReadStream } from 'fs';
 import { Readable } from 'stream';
 import { Blob } from 'aws-sdk/lib/dynamodb/document_client';
-import { Auditor, AuditId, ObjectId, UserId } from '../../audit/types';
+import { Auditor, AuditId, ObjectId, UserId, AuditAction } from '../../audit/types';
 import { User } from 'src/domain/user/user';
 
 const s3MinChunkSize = 5 * 1024 * 1024; // at least 5MB (non rounded)
@@ -202,8 +202,8 @@ export class FileService {
         return this.auditService.recordAudit({
             id: AuditId.fromUuid(v4()),
             userId: UserId.fromUuid(userId),
-            action: file.status,
-            value: 'success',
+            action: AuditAction.UPDATED,
+            value: file.status,
             objectType: file.type,
             objectId: ObjectId.fromUuid(file.id.toString()),
             created: new Date(),

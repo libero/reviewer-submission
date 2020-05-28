@@ -9,7 +9,7 @@ import {
 import * as Joi from 'joi';
 import { submissionSchema } from './submission-schema';
 import logger from '../../../../logger';
-import { Suggestion } from '../../../semantic-extraction/services/models/sugestion';
+import { Suggestion } from '../../../semantic-extraction/services/models/suggestion';
 
 export enum ArticleType {
     RESEARCH_ARTICLE = 'research-article',
