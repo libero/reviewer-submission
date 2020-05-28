@@ -15,7 +15,7 @@ describe('Audit Service', () => {
         const item: DtoAuditLog = {
             id: AuditId.fromUuid(v4()),
             userId: UserId.fromUuid(userId),
-            action: AuditAction.LOGGED_IN,
+            action: AuditAction.CREATED,
             value: 'authorized',
             objectType: 'User',
             objectId: ObjectId.fromUuid(userId),
