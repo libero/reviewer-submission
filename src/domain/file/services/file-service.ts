@@ -13,8 +13,7 @@ import { AWSError } from 'aws-sdk/lib/error';
 import { ReadStream } from 'fs';
 import { Readable } from 'stream';
 import { Blob } from 'aws-sdk/lib/dynamodb/document_client';
-import { AuditService } from '../../audit/services/audit';
-import { AuditId, ObjectId, UserId } from '../../audit/types';
+import { Auditor, AuditId, ObjectId, UserId } from '../../audit/types';
 import { User } from 'src/domain/user/user';
 
 const s3MinChunkSize = 5 * 1024 * 1024; // at least 5MB (non rounded)
@@ -22,10 +21,10 @@ const s3MinChunkSize = 5 * 1024 * 1024; // at least 5MB (non rounded)
 export class FileService {
     fileRepository: XpubFileRepository;
     s3: S3;
-    auditService: AuditService;
+    auditService: Auditor;
     bucket: string;
 
-    constructor(knex: Knex<{}, unknown[]>, s3config: S3Config, auditService: AuditService) {
+    constructor(knex: Knex<{}, unknown[]>, s3config: S3Config, auditService: Auditor) {
         const adapter = createKnexAdapter(knex, 'public');
         this.fileRepository = new XpubFileRepository(adapter);
         const defaultOptions = {
@@ -206,7 +205,7 @@ export class FileService {
             action: file.status,
             value: 'success',
             objectType: file.type,
-            objectId: ObjectId.fromUuid(file.id.value),
+            objectId: ObjectId.fromUuid(file.id.toString()),
             created: new Date(),
             updated: new Date(),
         });

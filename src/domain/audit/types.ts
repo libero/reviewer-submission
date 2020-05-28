@@ -21,3 +21,7 @@ export interface DtoAuditLog {
 export interface AuditRepository {
     putLog(item: DtoAuditLog): Promise<boolean>;
 }
+
+export interface Auditor {
+    recordAudit(item: DtoAuditLog): Promise<boolean>;
+}

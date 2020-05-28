@@ -331,17 +331,19 @@ describe('saveManuscript', () => {
             userCanWithSubmission: jest.fn(() => true),
         } as unknown) as PermissionService;
 
-        const mockManuscriptFile = { setStatusToCancelled: jest.fn() };
         const mockUpdate = jest.fn();
+        const mockFileService = ({
+            setStatusToCancelled: jest.fn(),
+            create: jest.fn(),
+            update: mockUpdate,
+            uploadManuscript: jest.fn(() => Promise.reject('test error')),
+        } as unknown) as FileService;
+
         const wizardService = new WizardService(
             permissionService,
             ({ get: jest.fn(() => Promise.resolve()) } as unknown) as SubmissionService,
             (jest.fn() as unknown) as TeamService,
-            ({
-                create: jest.fn(() => mockManuscriptFile),
-                update: mockUpdate,
-                uploadManuscript: jest.fn(() => Promise.reject('test error')),
-            } as unknown) as FileService,
+            mockFileService,
             (jest.fn() as unknown) as SemanticExtractionService,
             mockConfig,
         );
@@ -355,7 +357,8 @@ describe('saveManuscript', () => {
                 (jest.fn() as unknown) as PubSub,
             ),
         ).rejects.toThrow('Manuscript upload failed to store file.');
-        expect(mockManuscriptFile.setStatusToCancelled).toBeCalled();
+        expect(mockFileService.create).toBeCalled();
+        expect(mockFileService.setStatusToCancelled).toBeCalled();
         expect(mockUpdate).toBeCalled();
     });
 });
@@ -423,17 +426,19 @@ describe('saveSupporting', () => {
             userCanWithSubmission: jest.fn(() => true),
         } as unknown) as PermissionService;
 
-        const mockManuscriptFile = { setStatusToCancelled: jest.fn() };
         const mockUpdate = jest.fn();
+        const mockFileService = ({
+            setStatusToCancelled: jest.fn(),
+            create: jest.fn(),
+            update: mockUpdate,
+            uploadManuscript: jest.fn(() => Promise.reject('test error')),
+        } as unknown) as FileService;
+
         const wizardService = new WizardService(
             permissionService,
             ({ get: jest.fn(() => Promise.resolve()) } as unknown) as SubmissionService,
             (jest.fn() as unknown) as TeamService,
-            ({
-                create: jest.fn(() => mockManuscriptFile),
-                update: mockUpdate,
-                uploadSupportingFile: jest.fn(() => Promise.reject('test error')),
-            } as unknown) as FileService,
+            mockFileService,
             (jest.fn() as unknown) as SemanticExtractionService,
             mockConfig,
         );
@@ -447,7 +452,8 @@ describe('saveSupporting', () => {
                 (jest.fn() as unknown) as PubSub,
             ),
         ).rejects.toThrow('Supporting upload failed to store file.');
-        expect(mockManuscriptFile.setStatusToCancelled).toBeCalled();
+        expect(mockFileService.create).toBeCalled();
+        expect(mockFileService.setStatusToCancelled).toBeCalled();
         expect(mockUpdate).toBeCalled();
     });
     it('should return the file that has been added on upload', async (): Promise<void> => {
@@ -467,15 +473,18 @@ describe('saveSupporting', () => {
             filename: 'bob',
             id: fileId,
         });
+        const mockFileService = ({
+            setStatusToStored: jest.fn(),
+            create: jest.fn(() => testFile),
+            update: mockUpdate,
+            uploadSupportingFile: jest.fn(() => Promise.resolve(testFile)),
+        } as unknown) as FileService;
+
         const wizardService = new WizardService(
             permissionService,
             ({ get: jest.fn(() => Promise.resolve()) } as unknown) as SubmissionService,
             (jest.fn() as unknown) as TeamService,
-            ({
-                create: jest.fn(() => testFile),
-                update: mockUpdate,
-                uploadSupportingFile: jest.fn(() => Promise.resolve(testFile)),
-            } as unknown) as FileService,
+            mockFileService,
             (jest.fn() as unknown) as SemanticExtractionService,
             mockConfig,
         );
@@ -487,6 +496,7 @@ describe('saveSupporting', () => {
             0,
             (jest.fn() as unknown) as PubSub,
         );
+        expect(mockFileService.setStatusToStored).toHaveBeenCalled();
         expect(supportingFile.id).toBe(fileId);
     });
 });

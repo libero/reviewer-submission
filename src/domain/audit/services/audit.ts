@@ -1,9 +1,9 @@
 import { createKnexAdapter } from '../../knex-table-adapter';
-import { DtoAuditLog } from '../types';
+import { DtoAuditLog, Auditor } from '../types';
 import { KnexAuditRepository } from '../repositories/audit';
 import Knex from 'knex';
 
-export class AuditService {
+export class AuditService implements Auditor {
     auditRepo: KnexAuditRepository;
 
     public constructor(knex: Knex<{}, unknown[]>) {

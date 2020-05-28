@@ -84,7 +84,7 @@ export class SemanticExtractionService {
                     `Issue with semantic extraction: MimeType: ${mimeType}, filename: ${filename} | submission id: ${submissionId}`,
                 );
             } else if (error.request) {
-                logger.error('No response response recieved for request');
+                logger.error('No response response received for request');
             } else {
                 logger.error(`Error ${error.message}`);
             }

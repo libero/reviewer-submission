@@ -93,7 +93,7 @@ describe('scienceBeamApi', () => {
 
         expect(mockCreate).toBeCalledTimes(0);
         expect(logger.error).toBeCalledTimes(1);
-        expect(logger.error).toHaveBeenNthCalledWith(1, 'No response response recieved for request');
+        expect(logger.error).toHaveBeenNthCalledWith(1, 'No response response received for request');
         expect(result).toBe(false);
     });
 

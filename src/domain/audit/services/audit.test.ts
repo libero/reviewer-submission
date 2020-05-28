@@ -1,29 +1,30 @@
 import { v4 } from 'uuid';
 import { AuditService } from './audit';
-import { DtoAuditLog, AuditAction, UserId, ObjectId, AuditId } from '../types';
+import { DtoAuditLog, UserId, ObjectId, AuditId } from '../types';
+import Knex from 'knex';
+import { KnexAuditRepository } from '../repositories/audit';
+
+jest.mock('knex');
 
 describe('Audit Service', () => {
-    it('should add a log item', () => {
-        const repo = {
-            putLog: jest.fn(),
-        };
-        const controller = new AuditService(repo);
+    it('should add a log item', async () => {
+        const controller = new AuditService((null as unknown) as Knex);
         const timestamp = new Date();
         const userId = v4();
 
         const item: DtoAuditLog = {
             id: AuditId.fromUuid(v4()),
             userId: UserId.fromUuid(userId),
-            action: AuditAction.LOGGED_IN,
+            action: 'some action',
             value: 'authorized',
             objectType: 'User',
             objectId: ObjectId.fromUuid(userId),
             created: timestamp,
             updated: timestamp,
         };
+        KnexAuditRepository.prototype.putLog = jest.fn().mockReturnValue(true);
 
-        controller.recordAudit(item);
-        expect(repo.putLog).toHaveBeenCalledTimes(1);
-        expect(repo.putLog).toHaveBeenCalledWith(item);
+        const result = await controller.recordAudit(item);
+        expect(result).toBe(true);
     });
 });
