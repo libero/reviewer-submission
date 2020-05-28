@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { KnexAuditRepository } from './audit';
-import { DtoAuditLog, AuditId, UserId, ObjectId } from '../types';
+import { DtoAuditLog, AuditId, UserId, ObjectId, AuditAction } from '../types';
 import { createMockAdapter, MockKnex } from '../../test-mocks/knex-mock';
 import { KnexTableAdapter } from '../../knex-table-adapter';
 
@@ -16,7 +16,7 @@ describe('KnexAuditRepository', (): void => {
         objectType: 'type',
         updated: mockDate,
         value: 'value',
-        action: 'action',
+        action: AuditAction.DELETED,
     };
     const expectedValues = {
         id: AuditId.fromUuid('f3572ce7-c670-4b1b-8b89-a05ff1b40df4'),
@@ -26,7 +26,7 @@ describe('KnexAuditRepository', (): void => {
         object_type: 'type',
         updated: mockDate,
         value: 'value',
-        action: 'action',
+        action: AuditAction.DELETED,
     };
     beforeEach(() => {
         jest.resetAllMocks();
