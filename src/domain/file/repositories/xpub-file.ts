@@ -55,18 +55,6 @@ export default class XpubFileRepository {
         return files.length > 0 ? this.entryToModel(files[0]) : null;
     }
 
-    async deleteByIdAndSubmissionId(file: File, submissionId: SubmissionId): Promise<boolean> {
-        file.updated = new Date();
-        const entryToSave = this.modelToEntry(file);
-        const query = this._query
-            .builder()
-            .table(this.TABLE_NAME)
-            .update(entryToSave)
-            .where({ id: file.id, manuscript_id: submissionId });
-        await this._query.executor(query);
-        return true;
-    }
-
     async findManuscriptBySubmissionId(id: SubmissionId): Promise<File | null> {
         const query = this._query
             .builder()
@@ -109,11 +97,10 @@ export default class XpubFileRepository {
                 'updated',
             )
             .from(this.TABLE_NAME)
-            .where({ manuscript_id: id, type: FileType.SUPPORTING_FILE });
+            .where({ manuscript_id: id, type: FileType.SUPPORTING_FILE, status: FileStatus.STORED });
 
         const files = await this._query.executor<DatabaseEntry[]>(query);
-
-        return files.map(this.entryToModel);
+        return files.length > 0 ? files.map(this.entryToModel) : [];
     }
 
     async update(file: File): Promise<File> {
