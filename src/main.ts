@@ -3,7 +3,7 @@ import * as helmet from 'helmet';
 import * as knex from 'knex';
 import { Express, Request, Response } from 'express';
 import { ApolloServer, AuthenticationError, makeExecutableSchema, UserInputError } from 'apollo-server-express';
-import config from './config';
+import config, { S3Config } from './config';
 import { InfraLogger as logger } from './logger';
 import { join } from 'path';
 import { importSchema } from 'graphql-import';
@@ -26,6 +26,7 @@ import { PermissionService } from './application/permission/service';
 import { SemanticExtractionService } from './domain/semantic-extraction/services/semantic-extraction-service';
 import { FileService } from './domain/file/services/file-service';
 import { AuditService } from './domain/audit/services/audit';
+import S3 from 'aws-sdk/clients/s3';
 
 // Apollo server express does not export this, but its express
 export interface ExpressContext {
@@ -52,6 +53,17 @@ const dumpConfig = (): void => {
     logger.info(`config.science_beam.api_url: ${config.science_beam.api_url}`);
 };
 
+const createS3 = (s3config: S3Config): S3 => {
+    const defaultOptions = {
+        accessKeyId: s3config.accessKeyId,
+        secretAccessKey: s3config.secretAccessKey,
+        apiVersion: '2006-03-01',
+        signatureVersion: 'v4',
+        s3ForcePathStyle: s3config.s3ForcePathStyle,
+    };
+    const s3Options = s3config.awsEndPoint ? { ...defaultOptions, endpoint: s3config.awsEndPoint } : defaultOptions;
+    return new S3(s3Options);
+};
 const init = async (): Promise<void> => {
     logger.info('Starting service');
     dumpConfig();
@@ -73,7 +85,7 @@ const init = async (): Promise<void> => {
     const srvSurvey = new SurveyService(knexConnection);
     const srvUser = new UserService(config.user_api_url);
     const srvTeam = new TeamService(knexConnection);
-    const srvFile = new FileService(knexConnection, config.s3, srvAudit);
+    const srvFile = new FileService(knexConnection, createS3(config.s3), config.s3.fileBucket, srvAudit);
     const srvSubmission = new SubmissionService(knexConnection, srvFile);
     const srvExtractionService = new SemanticExtractionService(knexConnection, config.science_beam);
 
