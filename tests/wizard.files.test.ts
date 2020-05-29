@@ -133,13 +133,14 @@ describe('Wizard->Files Integration Tests', () => {
         expect(uploadResponse.data.errors).toBeUndefined();
         expect(uploadResponse.data.data.uploadManuscript.id).toBe(submissionId);
         expect(uploadResponse.data.data.uploadManuscript.files.manuscriptFile).not.toBeNull();
+        expect(uploadResponse.data.data.uploadManuscript.files.manuscriptFile.status).toBe('STORED');
         const manuscriptFileId = uploadResponse.data.data.uploadManuscript.files.manuscriptFile.id;
         const uploadResponse2 = await uploadManuscript(submissionId);
-
         expect(uploadResponse2.status).toBe(200);
         expect(uploadResponse2.data.errors).toBeUndefined();
         expect(uploadResponse2.data.data.uploadManuscript.id).toBe(submissionId);
         expect(uploadResponse2.data.data.uploadManuscript.files.manuscriptFile).not.toBeNull();
+        expect(uploadResponse2.data.data.uploadManuscript.files.manuscriptFile.status).toBe('STORED');
         expect(uploadResponse2.data.data.uploadManuscript.files.manuscriptFile.id).not.toBe(manuscriptFileId);
     });
 

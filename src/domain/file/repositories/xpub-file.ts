@@ -55,23 +55,6 @@ export default class XpubFileRepository {
         return files.length > 0 ? this.entryToModel(files[0]) : null;
     }
 
-    async deleteByIdAndSubmissionId(id: FileId, submissionId: SubmissionId): Promise<boolean> {
-        const file = await this.findFileById(id);
-        if (file === null) {
-            throw new Error(`Unable to find entry with id: ${id}`);
-        }
-        file.updated = new Date();
-        file.status = FileStatus.DELETED;
-        const entryToSave = this.modelToEntry(file);
-        const query = this._query
-            .builder()
-            .table(this.TABLE_NAME)
-            .update(entryToSave)
-            .where({ id: id, manuscript_id: submissionId });
-        await this._query.executor(query);
-        return true;
-    }
-
     async findManuscriptBySubmissionId(id: SubmissionId): Promise<File | null> {
         const query = this._query
             .builder()
@@ -91,6 +74,10 @@ export default class XpubFileRepository {
             .where({ manuscript_id: id, type: FileType.MANUSCRIPT_SOURCE, status: FileStatus.STORED });
 
         const files = await this._query.executor<DatabaseEntry[]>(query);
+        if (files.length > 1) {
+            const ids = files.map(item => item.id);
+            throw new Error(`Too many manuscripts on submission: ${JSON.stringify(ids, null, 4)}`);
+        }
         return files.length > 0 ? this.entryToModel(files[0]) : null;
     }
 
@@ -110,11 +97,10 @@ export default class XpubFileRepository {
                 'updated',
             )
             .from(this.TABLE_NAME)
-            .where({ manuscript_id: id, type: FileType.SUPPORTING_FILE });
+            .where({ manuscript_id: id, type: FileType.SUPPORTING_FILE, status: FileStatus.STORED });
 
         const files = await this._query.executor<DatabaseEntry[]>(query);
-
-        return files.map(this.entryToModel);
+        return files.length > 0 ? files.map(this.entryToModel) : [];
     }
 
     async update(file: File): Promise<File> {
