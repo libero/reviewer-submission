@@ -1,4 +1,4 @@
-import JSZip from 'jszip';
+import * as JSZip from 'jszip';
 import { SubmissionExporter } from './types';
 import Submission from '../models/submission';
 import { FileService } from '../../../file/services/file-service';
@@ -44,9 +44,9 @@ export class MecaExporter implements SubmissionExporter {
         );
 
         const mandatoryFiles = [
-            { filename: 'article.xml', content: generateArticle(submission) },
-            { filename: 'cover_letter.pdf', content: generateCoverLetter(submission.files.coverLetter || '') },
-            { filename: 'disclosure.pdf', content: generateDisclosure(submission, ip) },
+            { filename: 'article.xml', content: await generateArticle(submission) },
+            { filename: 'cover_letter.pdf', content: await generateCoverLetter(submission.files.coverLetter || '') },
+            { filename: 'disclosure.pdf', content: await generateDisclosure(submission, ip) },
             { filename: 'manifest.xml', content: generateManifest(submission) },
             { filename: 'transfer.xml', content: generateTransfer('') },
         ];
