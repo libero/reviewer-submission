@@ -4,7 +4,7 @@ import { KnexTableAdapter } from '../../knex-table-adapter';
 import { SubmissionId } from '../../submission/types';
 import { SemanticExtractionId } from '../types';
 import SemanticExtraction from '../services/models/semantic-extraction';
-import { Suggestion } from '../services/models/sugestion';
+import { Suggestion } from '../services/models/suggestion';
 
 type DatabaseEntry = {
     id: SemanticExtractionId;

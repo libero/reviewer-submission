@@ -55,19 +55,14 @@ export default class XpubFileRepository {
         return files.length > 0 ? this.entryToModel(files[0]) : null;
     }
 
-    async deleteByIdAndSubmissionId(id: FileId, submissionId: SubmissionId): Promise<boolean> {
-        const file = await this.findFileById(id);
-        if (file === null) {
-            throw new Error(`Unable to find entry with id: ${id}`);
-        }
+    async deleteByIdAndSubmissionId(file: File, submissionId: SubmissionId): Promise<boolean> {
         file.updated = new Date();
-        file.status = FileStatus.DELETED;
         const entryToSave = this.modelToEntry(file);
         const query = this._query
             .builder()
             .table(this.TABLE_NAME)
             .update(entryToSave)
-            .where({ id: id, manuscript_id: submissionId });
+            .where({ id: file.id, manuscript_id: submissionId });
         await this._query.executor(query);
         return true;
     }
@@ -91,6 +86,10 @@ export default class XpubFileRepository {
             .where({ manuscript_id: id, type: FileType.MANUSCRIPT_SOURCE, status: FileStatus.STORED });
 
         const files = await this._query.executor<DatabaseEntry[]>(query);
+        if (files.length > 1) {
+            const ids = files.map(item => item.id);
+            throw new Error(`Too many manuscripts on submission: ${JSON.stringify(ids, null, 4)}`);
+        }
         return files.length > 0 ? this.entryToModel(files[0]) : null;
     }
 

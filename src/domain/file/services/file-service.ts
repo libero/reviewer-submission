@@ -13,15 +13,18 @@ import { AWSError } from 'aws-sdk/lib/error';
 import { ReadStream } from 'fs';
 import { Readable } from 'stream';
 import { Blob } from 'aws-sdk/lib/dynamodb/document_client';
+import { Auditor, AuditId, ObjectId, UserId, AuditAction } from '../../audit/types';
+import { User } from 'src/domain/user/user';
 
 const s3MinChunkSize = 5 * 1024 * 1024; // at least 5MB (non rounded)
 
 export class FileService {
     fileRepository: XpubFileRepository;
     s3: S3;
+    auditService: Auditor;
     bucket: string;
 
-    constructor(knex: Knex<{}, unknown[]>, s3config: S3Config) {
+    constructor(knex: Knex<{}, unknown[]>, s3config: S3Config, auditService: Auditor) {
         const adapter = createKnexAdapter(knex, 'public');
         this.fileRepository = new XpubFileRepository(adapter);
         const defaultOptions = {
@@ -34,6 +37,7 @@ export class FileService {
         const s3Options = s3config.awsEndPoint ? { ...defaultOptions, endpoint: s3config.awsEndPoint } : defaultOptions;
         this.bucket = s3config.fileBucket;
         this.s3 = new S3(s3Options);
+        this.auditService = auditService;
     }
 
     private getFileS3Key(fileType: FileType, submissionId: SubmissionId, fileId: FileId): string {
@@ -110,25 +114,38 @@ export class FileService {
             .promise();
     }
 
-    async deleteManuscript(fileId: FileId, submissionId: SubmissionId): Promise<boolean> {
-        await this.fileRepository.deleteByIdAndSubmissionId(fileId, submissionId);
+    async deleteManuscript(user: User, fileId: FileId, submissionId: SubmissionId): Promise<boolean> {
+        const file = await this.fileRepository.findFileById(fileId);
+        if (file === null) {
+            throw new Error(`Unable to find entry with id: ${fileId}`);
+        }
+
+        await this.fileRepository.deleteByIdAndSubmissionId(file, submissionId);
         await this.s3.deleteObject({
             Bucket: this.bucket,
             Key: this.getFileS3Key(FileType.MANUSCRIPT_SOURCE, submissionId, fileId),
         });
+        await this.setStatusToDeleted(user, file);
         return true;
     }
 
-    async deleteSupportingFile(fileId: FileId, submissionId: SubmissionId): Promise<FileId> {
-        await this.fileRepository.deleteByIdAndSubmissionId(fileId, submissionId);
+    async deleteSupportingFile(user: User, fileId: FileId, submissionId: SubmissionId): Promise<FileId> {
+        const file = await this.fileRepository.findFileById(fileId);
+        if (file === null) {
+            throw new Error(`Unable to find entry with id: ${fileId}`);
+        }
+
+        await this.fileRepository.deleteByIdAndSubmissionId(file, submissionId);
         await this.s3.deleteObject({
             Bucket: this.bucket,
             Key: this.getFileS3Key(FileType.SUPPORTING_FILE, submissionId, fileId),
         });
+        await this.setStatusToDeleted(user, file);
         return fileId;
     }
 
     async create(
+        user: User,
         submissionId: SubmissionId,
         filename: string,
         mimeType: string,
@@ -139,7 +156,7 @@ export class FileService {
             const manuscriptFile = await this.findManuscriptFile(submissionId);
             // we have a file so delete it
             if (manuscriptFile !== null) {
-                await this.deleteManuscript(manuscriptFile.id, submissionId);
+                await this.deleteManuscript(user, manuscriptFile.id, submissionId);
             }
         }
         const id = FileId.fromUuid(uuid());
@@ -156,7 +173,52 @@ export class FileService {
             size,
             status,
         });
-        return await this.fileRepository.create(file);
+        const createdFile = await this.fileRepository.create(file);
+        this.auditFileStatusChange(user.id, file);
+        return createdFile;
+    }
+
+    public async setStatusToDeleted(user: User, file: File): Promise<void> {
+        file.status = FileStatus.DELETED;
+        await this.auditFileStatusChange(user.id, file);
+    }
+
+    public async setStatusToUploaded(user: User, file: File): Promise<void> {
+        if (file.status === FileStatus.CREATED) {
+            file.status = FileStatus.UPLOADED;
+            await this.auditFileStatusChange(user.id, file);
+        } else {
+            throw new Error(`Cannot set file status to UPLOADED: ${file.id}`);
+        }
+    }
+
+    public async setStatusToStored(user: User, file: File): Promise<void> {
+        if (file.status === FileStatus.CREATED || FileStatus.UPLOADED) {
+            file.status = FileStatus.STORED;
+            await this.auditFileStatusChange(user.id, file);
+        } else {
+            throw new Error(`Cannot set file status to STORED: ${file.id}`);
+        }
+    }
+
+    public async setStatusToCancelled(user: User, file: File): Promise<void> {
+        file.status = FileStatus.CANCELLED;
+        await this.auditFileStatusChange(user.id, file);
+    }
+
+    async auditFileStatusChange(userId: string, file: File): Promise<boolean> {
+        const result = await this.auditService.recordAudit({
+            id: AuditId.fromUuid(uuid()),
+            userId: UserId.fromUuid(userId),
+            action: AuditAction.UPDATED,
+            value: file.status,
+            objectType: file.type,
+            objectId: ObjectId.fromUuid(file.id.toString()),
+            created: new Date(),
+            updated: new Date(),
+        });
+        await this.update(file);
+        return result;
     }
 
     async update(file: File): Promise<File> {
