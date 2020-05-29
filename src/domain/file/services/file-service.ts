@@ -11,8 +11,6 @@ import { PubSub } from 'apollo-server-express';
 import { PromiseResult } from 'aws-sdk/lib/request';
 import { AWSError } from 'aws-sdk/lib/error';
 import { ReadStream } from 'fs';
-import { Readable } from 'stream';
-import { Blob } from 'aws-sdk/lib/dynamodb/document_client';
 import { Auditor, AuditId, ObjectId, UserId, AuditAction } from '../../audit/types';
 import { User } from 'src/domain/user/user';
 
@@ -349,7 +347,7 @@ export class FileService {
         await this.handleFileUpload(pubsub, submissionId, userId, file, stream, FileType.SUPPORTING_FILE);
     }
 
-    async getFileContent(file: File): Promise<Buffer | Uint8Array | Blob | string | Readable | Blob | undefined> {
+    async getFileContent(file: File): Promise<string> {
         const { Body } = await this.s3
             .getObject({
                 Bucket: this.bucket,
@@ -357,7 +355,7 @@ export class FileService {
             })
             .promise();
 
-        return Body;
+        return Body ? Body.toString('utf-8') : '';
     }
 
     private addDownloadLink(file: File): void {

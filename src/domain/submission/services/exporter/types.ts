@@ -1,5 +1,5 @@
-import { SubmissionId } from '../../types';
+import Submission from '../models/submission';
 
 export interface SubmissionExporter {
-    export(id: SubmissionId): Promise<Buffer>;
+    export(submission: Submission, ip: string): Promise<Buffer>;
 }

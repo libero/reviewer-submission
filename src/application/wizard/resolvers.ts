@@ -22,7 +22,7 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
         async submit(_, { id: submissionId }: { id: SubmissionId }, context): Promise<Submission | null> {
             logger.info(`resolver: submit(${submissionId})`);
             const user = await userService.getCurrentUser(context.authorizationHeader);
-            return wizard.submit(user, submissionId);
+            return wizard.submit(user, submissionId, context.ip);
         },
         async saveAuthorPage(
             _,

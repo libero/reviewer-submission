@@ -1,6 +1,6 @@
 import { mocked } from 'ts-jest/utils';
 import Axios from 'axios';
-import ArticleGenerator from './article';
+import { generateArticle } from './article';
 import submission from './article.test.data';
 
 jest.mock('axios');
@@ -37,8 +37,7 @@ describe('ArticleGenerator', () => {
             });
         });
 
-        const articleGenerator = new ArticleGenerator(submission);
-        const output = await articleGenerator.execute();
+        const output = await generateArticle(submission);
 
         expect(output).toMatchSnapshot();
     });

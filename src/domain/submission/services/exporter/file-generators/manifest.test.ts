@@ -1,14 +1,10 @@
 import * as xml2json from 'xml2json';
 import submission from './article.test.data';
-import { makeManifestFile } from './manifest';
+import { generateManifest } from './manifest';
 
 describe('Manifest XML generator', () => {
     it('returns required items', () => {
-        const files = submission.files.supportingFiles || [];
-        if (submission.files.manuscriptFile) {
-            files.push(submission.files.manuscriptFile);
-        }
-        const xml = makeManifestFile(files);
+        const xml = generateManifest(submission);
 
         // has article xml
         expect(xml).toContain('<instance media-type="application/xml" href="article.xml"/>');

@@ -77,8 +77,7 @@ const splitName = (name: string): { surname: string; givenNames: string } => {
 
     return { surname, givenNames };
 };
-
-export default class ArticleGenerator {
+class ArticleGenerator {
     private editors: Editor[] = [];
     private affiliations: string[] = [];
 
@@ -352,3 +351,7 @@ export default class ArticleGenerator {
             .end({ pretty: true });
     }
 }
+
+export const generateArticle = async (submission: Submission): Promise<string> => {
+    return new ArticleGenerator(submission).execute();
+};
