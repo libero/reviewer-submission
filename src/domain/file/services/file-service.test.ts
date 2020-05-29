@@ -122,9 +122,6 @@ describe('File Service', () => {
             const findFileByIdSpy = jest
                 .spyOn(XpubFileRepository.prototype, 'findFileById')
                 .mockReturnValue(Promise.resolve(new File(files[0])));
-            const deleteByIdAndSubmissionIdSpy = jest
-                .spyOn(XpubFileRepository.prototype, 'deleteByIdAndSubmissionId')
-                .mockReturnValueOnce(Promise.resolve(true));
 
             S3.prototype.deleteObject = jest.fn().mockImplementationOnce(() => true);
             const update = jest.fn();
@@ -155,7 +152,6 @@ describe('File Service', () => {
             });
 
             findFileByIdSpy.mockRestore();
-            deleteByIdAndSubmissionIdSpy.mockRestore();
         });
 
         it('should throw if manuscript not found', async () => {

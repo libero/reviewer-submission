@@ -4,7 +4,7 @@ import { DtoAuditLog, AuditId, UserId, ObjectId, AuditAction } from '../types';
 import { createMockAdapter, MockKnex } from '../../test-mocks/knex-mock';
 import { KnexTableAdapter } from '../../knex-table-adapter';
 
-describe('KnexAuditRepository', (): void => {
+describe('KnexAuditRepository', () => {
     let adapter: KnexTableAdapter;
     let mock: MockKnex;
     const mockDate = new Date();
