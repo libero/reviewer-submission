@@ -11,8 +11,6 @@ import { PubSub } from 'apollo-server-express';
 import { PromiseResult } from 'aws-sdk/lib/request';
 import { AWSError } from 'aws-sdk/lib/error';
 import { ReadStream } from 'fs';
-import { Readable } from 'stream';
-import { Blob } from 'aws-sdk/lib/dynamodb/document_client';
 import { Auditor, AuditId, ObjectId, UserId, AuditAction } from '../../audit/types';
 import { User } from 'src/domain/user/user';
 
