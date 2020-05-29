@@ -6,12 +6,10 @@ import {
     EditorDetails,
     FileDetails,
 } from '../../types';
-import File from '../../../file/services/models/file';
-import { FileId } from '../../../file/types';
 import * as Joi from 'joi';
 import { submissionSchema } from './submission-schema';
 import logger from '../../../../logger';
-import { Suggestion } from '../../../semantic-extraction/services/models/sugestion';
+import { Suggestion } from '../../../semantic-extraction/services/models/suggestion';
 
 export enum ArticleType {
     RESEARCH_ARTICLE = 'research-article',
@@ -98,38 +96,6 @@ export default class Submission {
         this.editorDetails.opposedReviewersReason = opposedReviewersReason;
         this.editorDetails.opposedReviewingEditorsReason = opposedReviewingEditorsReason;
         this.editorDetails.opposedSeniorEditorsReason = opposedSeniorEditorsReason;
-    }
-
-    public setManuscriptFile(fileId: FileId, filename: string, mimeType: string, fileSize: number): void {
-        if (!this.files) {
-            throw new Error('Object invalid! No files member.');
-        }
-
-        if (this.files.manuscriptFile) {
-            throw new Error('Manuscript file already present');
-        }
-
-        this.files.manuscriptFile = File.makeManuscriptFile(fileId, this.id, filename, mimeType, fileSize);
-    }
-
-    public getManuscriptFile(): File | null {
-        if (!this.files.manuscriptFile) {
-            return null;
-        }
-
-        return this.files.manuscriptFile;
-    }
-
-    public setManuscriptFileStatusToStored(): void {
-        if (this.files.manuscriptFile) {
-            this.files.manuscriptFile.setStatusToStored();
-        }
-    }
-
-    public setManuscriptFileStatusToCancelled(): void {
-        if (this.files.manuscriptFile) {
-            this.files.manuscriptFile.setStatusToCancelled();
-        }
     }
 
     public isSubmittable(): boolean {

@@ -25,6 +25,7 @@ import { TeamService } from './domain/teams/services/team-service';
 import { PermissionService } from './application/permission/service';
 import { SemanticExtractionService } from './domain/semantic-extraction/services/semantic-extraction-service';
 import { FileService } from './domain/file/services/file-service';
+import { AuditService } from './domain/audit/services/audit';
 
 // Apollo server express does not export this, but its express
 export interface ExpressContext {
@@ -42,11 +43,24 @@ const estimators = [
     simpleEstimator({ defaultComplexity: 1 }),
 ];
 
+const dumpConfig = (): void => {
+    logger.info(`config.port: ${config.port}`);
+    logger.info(`config.db_connection.host: ${config.db_connection.host}`);
+    logger.info(`config.s3.awsEndPoint: ${config.s3.awsEndPoint}`);
+    logger.info(`config.s3.fileBucket: ${config.s3.fileBucket}`);
+    logger.info(`config.user_api_url: ${config.user_api_url}`);
+    logger.info(`config.science_beam.api_url: ${config.science_beam.api_url}`);
+};
+
 const init = async (): Promise<void> => {
     logger.info('Starting service');
+    dumpConfig();
     // Start the application
     const app: Express = express();
-    const knexConnection = knex(config.knex);
+    const knexConnection = knex({
+        client: 'pg',
+        connection: config.db_connection,
+    });
 
     const shutDown = async (server: Server): Promise<void> => {
         await knexConnection.destroy();
@@ -54,26 +68,28 @@ const init = async (): Promise<void> => {
         process.exit();
     };
 
-    // init domain services
+    logger.info(`Initialising domain services...`);
+    const srvAudit = new AuditService(knexConnection);
     const srvSurvey = new SurveyService(knexConnection);
     const srvUser = new UserService(config.user_api_url);
     const srvTeam = new TeamService(knexConnection);
-    const srvFile = new FileService(knexConnection, config.s3);
+    const srvFile = new FileService(knexConnection, config.s3, srvAudit);
     const srvSubmission = new SubmissionService(knexConnection, srvFile);
     const srvExtractionService = new SemanticExtractionService(knexConnection, config.science_beam);
 
-    // init application services
+    logger.info(`Initialising application services...`);
     const srvPermission = new PermissionService();
     const srvDashboard = new DashboardService(srvPermission, srvSubmission);
     const srvWizard = new WizardService(srvPermission, srvSubmission, srvTeam, srvFile, srvExtractionService, config);
 
-    // init resolvers
     const resolvers = [
         DashboardResolvers(srvDashboard, srvUser),
         SurveyResolvers(srvSurvey),
         UserResolvers(srvUser),
         WizardResolvers(srvWizard, srvUser),
     ];
+
+    logger.info(`Initialising Express...`);
 
     // best to mount helmet so soon as possible to ensure headers are set: defaults - https://www.npmjs.com/package/helmet#how-it-works
     app.use(helmet());
@@ -85,6 +101,7 @@ const init = async (): Promise<void> => {
         skipGraphQLImport: true,
     });
     const schema = makeExecutableSchema({ typeDefs, resolvers });
+    logger.info(`Initialising ApolloServer...`);
     const apolloServer = new ApolloServer({
         schema,
         uploads: {

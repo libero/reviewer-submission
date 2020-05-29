@@ -8,7 +8,7 @@ import { SemanticExtractionId } from '../types';
 import { InfraLogger as logger } from '../../../logger';
 import { SubmissionId } from '../../submission/types';
 import { ScienceBeamConfig } from '../../../config';
-import { Suggestion } from './models/sugestion';
+import { Suggestion } from './models/suggestion';
 
 export class SemanticExtractionService {
     semanticExtractionRepository: XpubSemanticExtractionRepository;
@@ -84,7 +84,7 @@ export class SemanticExtractionService {
                     `Issue with semantic extraction: MimeType: ${mimeType}, filename: ${filename} | submission id: ${submissionId}`,
                 );
             } else if (error.request) {
-                logger.error('No response response recieved for request');
+                logger.error('No response response received for request');
             } else {
                 logger.error(`Error ${error.message}`);
             }

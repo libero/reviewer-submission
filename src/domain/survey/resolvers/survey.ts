@@ -4,6 +4,7 @@ import { SurveyId } from '../survey';
 import { SubmissionId } from '../../submission/types';
 import { SurveyAnswer } from '../services/models/survey-answer';
 import { SurveyResponse } from '../services/models/survey-response';
+import { InfraLogger as logger } from '../../../logger';
 
 const resolvers = (surveyService: SurveyService): IResolvers => ({
     Mutation: {
@@ -13,6 +14,7 @@ const resolvers = (surveyService: SurveyService): IResolvers => ({
             args: { surveyId: string; submissionId: string; answers: SurveyAnswer[] },
         ): Promise<SurveyResponse> {
             const { surveyId, submissionId, answers } = args;
+            logger.info(`resolver: submitSurveyResponse(${submissionId})`);
             const surveyResponse = await surveyService.submitResponse(
                 SurveyId.fromUuid(surveyId),
                 SubmissionId.fromUuid(submissionId),

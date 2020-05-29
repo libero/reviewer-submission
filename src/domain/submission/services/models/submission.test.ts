@@ -53,7 +53,6 @@ describe('Submission Entity', () => {
         submission.manuscriptDetails.cosubmission = ['Test'];
         submission.files.coverLetter = 'Accept please!';
         submission.disclosure.submitterSignature = 'signature';
-
         submission.editorDetails.suggestedSeniorEditors = ['123', '321'];
         submission.editorDetails.opposedSeniorEditors = ['234', '432'];
         submission.editorDetails.opposedSeniorEditorsReason = 'reason';
