@@ -93,7 +93,7 @@ const init = async (): Promise<void> => {
     const s3Store = new S3Store(config.s3, config.meca_config);
     const sftpStore = new SftpStore();
     const mecaExporter = new MecaExporter(srvFile);
-    const srvSubmission = new SubmissionService(knexConnection, srvFile, mecaExporter, s3Store, sftpStore);
+    const srvSubmission = new SubmissionService(knexConnection, mecaExporter, s3Store, sftpStore);
     const srvExtractionService = new SemanticExtractionService(knexConnection, config.science_beam);
 
     logger.info(`Initialising application services...`);
