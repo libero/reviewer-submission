@@ -7,7 +7,7 @@ import { KnexAuditRepository } from '../repositories/audit';
 jest.mock('knex');
 
 describe('Audit Service', () => {
-    it('should add a log item', async () => {
+    it('calling recordAudit should call putLog in the repo', async () => {
         const service = new AuditService((null as unknown) as Knex);
         const timestamp = new Date();
         const userId = v4();

@@ -78,14 +78,4 @@ export default class File implements FileData {
     public isDeleted(): unknown {
         return this.status === FileStatus.DELETED;
     }
-
-    public setTypeToSource(): void {
-        if (this.type === FileType.SUPPORTING_FILE) {
-            throw new Error('Cannot set to source');
-        }
-
-        if (this.type === FileType.MANUSCRIPT_SOURCE_PENDING) {
-            this.type = FileType.MANUSCRIPT_SOURCE;
-        }
-    }
 }
