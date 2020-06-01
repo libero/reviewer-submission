@@ -12,6 +12,7 @@ import { AWSError } from 'aws-sdk/lib/error';
 import { ReadStream } from 'fs';
 import { Auditor, AuditId, ObjectId, UserId, AuditAction } from '../../audit/types';
 import { User } from 'src/domain/user/user';
+import { InfraLogger as logger } from '../../../logger';
 
 const s3MinChunkSize = 5 * 1024 * 1024; // at least 5MB (non rounded)
 
@@ -319,6 +320,7 @@ export class FileService {
             buffer = Buffer.concat(chunks);
             await this.setStatusToStored(userId, file);
         } catch (e) {
+            logger.error(e);
             await this.setStatusToCancelled(userId, file);
         }
 

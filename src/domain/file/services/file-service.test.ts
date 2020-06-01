@@ -9,6 +9,7 @@ import File from '../services/models/file';
 import { Auditor } from '../../audit/types';
 import { PubSub } from 'apollo-server-express';
 import S3 from 'aws-sdk/clients/s3';
+jest.mock('aws-sdk/clients/s3');
 
 const submissionId = v4();
 const firstFileId = FileId.fromUuid('cc65c0c1-233d-4a3f-bdd5-eaf0f4e05b33');
@@ -25,22 +26,35 @@ const files = [
     },
 ];
 
-jest.mock('aws-sdk/clients/s3');
+const mockRecordAudit = jest.fn();
+const mockAudit: Auditor = {
+    recordAudit: mockRecordAudit,
+};
+const mockPubSub = ({ publish: jest.fn() } as unknown) as PubSub;
+
+const mockUser = {
+    id: '72ef483e-8975-4d94-99a1-dc00c2dae519',
+    name: 'Bob',
+    role: 'user',
+};
+
+const mockFileUploadManager = {
+    promise: jest.fn().mockReturnValue(0),
+    UploadId: 'abc123',
+};
+const downloadLink = 'http://s3/download/link';
+const createMultipartUpload = jest.fn();
+const mockS3 = {
+    createMultipartUpload: createMultipartUpload.mockReturnValue(mockFileUploadManager),
+    completeMultipartUpload: jest.fn().mockReturnValue(mockFileUploadManager),
+    getSignedUrl: jest.fn().mockReturnValue(downloadLink),
+    deleteObject: jest.fn().mockImplementationOnce(() => true),
+};
 
 describe('File Service', () => {
-    const mockS3 = ({} as unknown) as S3;
-    const mockRecordAudit = jest.fn();
-    const mockAudit: Auditor = {
-        recordAudit: mockRecordAudit,
-    };
-    const mockUser = {
-        id: '72ef483e-8975-4d94-99a1-dc00c2dae519',
-        name: 'Bob',
-        role: 'user',
-    };
-
     beforeEach(() => {
-        jest.resetAllMocks();
+        jest.restoreAllMocks();
+        mockRecordAudit.mockReset();
     });
 
     describe('create', () => {
@@ -48,7 +62,7 @@ describe('File Service', () => {
             XpubFileRepository.prototype.findManuscriptBySubmissionId = jest.fn().mockReturnValue(null);
             XpubFileRepository.prototype.create = jest.fn().mockReturnValue(files[0]);
             XpubFileRepository.prototype.update = jest.fn();
-            const service = new FileService((null as unknown) as Knex, mockS3, 'bucket', mockAudit);
+            const service = new FileService((null as unknown) as Knex, (mockS3 as unknown) as S3, 'bucket', mockAudit);
             const result = await service.create(
                 mockUser,
                 SubmissionId.fromUuid(submissionId),
@@ -73,9 +87,8 @@ describe('File Service', () => {
             XpubFileRepository.prototype.getSupportingFilesBySubmissionId = jest
                 .fn()
                 .mockReturnValue([{ ...files[0] }]);
-            const downloadLink = 'http://s3/download/link';
-            mockS3.getSignedUrl = jest.fn().mockReturnValue(downloadLink);
-            const service = new FileService((null as unknown) as Knex, mockS3, 'bucket', mockAudit);
+
+            const service = new FileService((null as unknown) as Knex, (mockS3 as unknown) as S3, 'bucket', mockAudit);
             const result = await service.getSupportingFiles(SubmissionId.fromUuid(submissionId));
 
             expect(result[0].downloadLink === downloadLink);
@@ -89,7 +102,7 @@ describe('File Service', () => {
             XpubFileRepository.prototype.findManuscriptBySubmissionId = jest.fn().mockReturnValue({ ...files[0] });
             const downloadLink = 'http://s3/download/link';
             mockS3.getSignedUrl = jest.fn().mockReturnValue(downloadLink);
-            const service = new FileService((null as unknown) as Knex, mockS3, 'bucket', mockAudit);
+            const service = new FileService((null as unknown) as Knex, (mockS3 as unknown) as S3, 'bucket', mockAudit);
             const result = await service.findManuscriptFile(SubmissionId.fromUuid(submissionId));
 
             expect(result).toBeTruthy();
@@ -101,14 +114,15 @@ describe('File Service', () => {
 
     describe('deleteManuscript', () => {
         it('should delete manuscript', async () => {
+            expect(mockAudit.recordAudit).toHaveBeenCalledTimes(0);
+
             const findFileByIdSpy = jest
                 .spyOn(XpubFileRepository.prototype, 'findFileById')
                 .mockReturnValue(Promise.resolve(new File(files[0])));
 
-            mockS3.deleteObject = jest.fn().mockImplementationOnce(() => true);
             const update = jest.fn();
             FileService.prototype.update = update;
-            const service = new FileService((null as unknown) as Knex, mockS3, 'bucket', mockAudit);
+            const service = new FileService((null as unknown) as Knex, (mockS3 as unknown) as S3, 'bucket', mockAudit);
 
             const result = await service.deleteManuscript(mockUser, firstFileId, SubmissionId.fromUuid(submissionId));
 
@@ -142,7 +156,7 @@ describe('File Service', () => {
             const findFileByIdSpy = jest
                 .spyOn(XpubFileRepository.prototype, 'findFileById')
                 .mockImplementation(() => Promise.resolve(null));
-            const service = new FileService((null as unknown) as Knex, mockS3, 'bucket', mockAudit);
+            const service = new FileService((null as unknown) as Knex, (mockS3 as unknown) as S3, 'bucket', mockAudit);
             const fileId = v4();
             await expect(
                 service.deleteManuscript(mockUser, FileId.fromUuid(fileId), SubmissionId.fromUuid(submissionId)),
@@ -152,22 +166,33 @@ describe('File Service', () => {
         });
     });
 
-    describe('hasManuscriptFile', () => {});
+    describe('hasManuscriptFile', () => {
+        it('returns false when submission does not exist', async () => {
+            XpubFileRepository.prototype.findManuscriptBySubmissionId = jest.fn().mockReturnValue(null);
+
+            const service = new FileService((null as unknown) as Knex, (mockS3 as unknown) as S3, 'bucket', mockAudit);
+            const result = await service.hasManuscriptFile(
+                SubmissionId.fromUuid('091dcef8-f6ee-46ef-a5c1-cdee1b9c1641'),
+            );
+            expect(result).toBe(false);
+        });
+        it('returns true when submission has a manuscript', async () => {
+            XpubFileRepository.prototype.findManuscriptBySubmissionId = jest.fn().mockReturnValue({ ...files[0] });
+
+            const service = new FileService((null as unknown) as Knex, (mockS3 as unknown) as S3, 'bucket', mockAudit);
+            const result = await service.hasManuscriptFile(
+                SubmissionId.fromUuid('091dcef8-f6ee-46ef-a5c1-cdee1b9c1641'),
+            );
+            expect(result).toBe(true);
+        });
+     });
 
     describe('uploadManuscript', () => {
-        it('when successful it has used S3 and audit', async () => {
+        it('returns the file contents', async () => {
             XpubFileRepository.prototype.update = jest.fn();
-            const service = new FileService((null as unknown) as Knex, mockS3, 'bucket', mockAudit);
             const file = new File(files[0]);
             file.status = FileStatus.CREATED;
-
-            const fileUploadManager = {
-                promise: jest.fn().mockReturnValue(0),
-            };
-
-            mockS3.createMultipartUpload = jest.fn().mockReturnValue(fileUploadManager);
-            mockS3.completeMultipartUpload = jest.fn().mockReturnValue(fileUploadManager);
-            const mockPubSub = ({ publish: jest.fn() } as unknown) as PubSub;
+            const service = new FileService((null as unknown) as Knex, (mockS3 as unknown) as S3, 'bucket', mockAudit);
 
             const result = await service.uploadManuscript(
                 file,
@@ -177,8 +202,23 @@ describe('File Service', () => {
                 files[0].submissionId,
             );
 
-            expect(mockS3.createMultipartUpload).toHaveBeenCalled();
-            expect(mockS3.completeMultipartUpload).toHaveBeenCalled();
+            expect(result).not.toBeNull();
+            expect(result.toString()).toContain('"name": "reviewer-submission"');
+        });
+
+        it('calls to pubsub', async () => {
+            XpubFileRepository.prototype.update = jest.fn();
+            const file = new File(files[0]);
+            file.status = FileStatus.CREATED;
+            const service = new FileService((null as unknown) as Knex, (mockS3 as unknown) as S3, 'bucket', mockAudit);
+
+            await service.uploadManuscript(
+                file,
+                fs.createReadStream('./package.json'),
+                mockUser.id,
+                mockPubSub,
+                files[0].submissionId,
+            );
             expect(mockPubSub.publish).toHaveBeenCalledWith('UPLOAD_STATUS', {
                 fileUploadProgress: {
                     fileId: 'cc65c0c1-233d-4a3f-bdd5-eaf0f4e05b33',
@@ -189,15 +229,49 @@ describe('File Service', () => {
                     userId: '72ef483e-8975-4d94-99a1-dc00c2dae519',
                 },
             });
+        });
+
+        it('calls S3 Upload functions', async () => {
+            XpubFileRepository.prototype.update = jest.fn();
+            const file = new File(files[0]);
+            file.status = FileStatus.CREATED;
+            const service = new FileService((null as unknown) as Knex, (mockS3 as unknown) as S3, 'bucket', mockAudit);
+
+            await service.uploadManuscript(
+                file,
+                fs.createReadStream('./package.json'),
+                mockUser.id,
+                mockPubSub,
+                files[0].submissionId,
+            );
+
+            expect(createMultipartUpload).toHaveBeenCalled();
+            expect(createMultipartUpload.mock.calls[0][0]).toMatchObject({
+                Bucket: 'bucket',
+                Key: `manuscripts/${submissionId}/${file.id}`,
+            });
+            expect(mockS3.completeMultipartUpload).toHaveBeenCalled();
             expect(mockS3.completeMultipartUpload).toHaveBeenCalledWith({
                 Bucket: 'bucket',
                 Key: `manuscripts/${file.submissionId}/${file.id}`,
                 MultipartUpload: { Parts: [] },
                 UploadId: '',
             });
+        });
 
-            expect(result).not.toBeNull();
-            expect(result.toString()).toContain('"name": "reviewer-submission"');
+        it('audits the upload and file is stored', async () => {
+            XpubFileRepository.prototype.update = jest.fn();
+            const file = new File(files[0]);
+            file.status = FileStatus.CREATED;
+            const service = new FileService((null as unknown) as Knex, (mockS3 as unknown) as S3, 'bucket', mockAudit);
+
+            await service.uploadManuscript(
+                file,
+                fs.createReadStream('./package.json'),
+                mockUser.id,
+                mockPubSub,
+                files[0].submissionId,
+            );
 
             expect(mockAudit.recordAudit).toHaveBeenCalled();
             expect(mockRecordAudit.mock.calls[0][0]).toMatchObject({
@@ -208,6 +282,33 @@ describe('File Service', () => {
             });
             expect(file.status).toBe(FileStatus.STORED);
         });
-        it('when unsuccessful it has been cancelled and audited', async () => {});
+
+        it('when unsuccessful it has been cancelled and audited', async () => {
+            XpubFileRepository.prototype.update = jest.fn();
+            const file = new File(files[0]);
+            file.status = FileStatus.CREATED;
+            mockS3.completeMultipartUpload.mockImplementation(() => {
+                throw new Error('some random error')
+            });
+
+            const service = new FileService((null as unknown) as Knex, (mockS3 as unknown) as S3, 'bucket', mockAudit);
+
+            await service.uploadManuscript(
+                file,
+                fs.createReadStream('./package.json'),
+                mockUser.id,
+                mockPubSub,
+                files[0].submissionId,
+            );
+
+            expect(mockAudit.recordAudit).toHaveBeenCalled();
+            expect(mockRecordAudit.mock.calls[0][0]).toMatchObject({
+                action: 'UPDATED',
+                objectType: 'MANUSCRIPT_SOURCE',
+                userId: mockUser.id,
+                value: 'CANCELLED',
+            });
+            expect(file.status).toBe(FileStatus.CANCELLED);
+        });
     });
 });

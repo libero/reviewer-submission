@@ -26,7 +26,7 @@ import { PermissionService } from './application/permission/service';
 import { SemanticExtractionService } from './domain/semantic-extraction/services/semantic-extraction-service';
 import { FileService } from './domain/file/services/file-service';
 import { AuditService } from './domain/audit/services/audit';
-import S3 from 'aws-sdk/clients/s3';
+import * as S3 from 'aws-sdk/clients/s3';
 
 // Apollo server express does not export this, but its express
 export interface ExpressContext {
@@ -64,6 +64,7 @@ const createS3 = (s3config: S3Config): S3 => {
     const s3Options = s3config.awsEndPoint ? { ...defaultOptions, endpoint: s3config.awsEndPoint } : defaultOptions;
     return new S3(s3Options);
 };
+
 const init = async (): Promise<void> => {
     logger.info('Starting service');
     dumpConfig();
