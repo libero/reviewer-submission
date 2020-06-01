@@ -9,12 +9,16 @@ import { S3Store } from './storage/s3-store';
 import { SftpStore } from './storage/sftp-store';
 import { SubmissionStore } from './storage/submission-store';
 import { InfraLogger as logger } from '../../../logger';
-import { FileService } from 'src/domain/file/services/file-service';
 
 export class SubmissionService {
     submissionRepository: XpubSubmissionRootRepository;
 
-    constructor(knex: Knex<{}, unknown[]>, private readonly fileService: FileService) {
+    constructor(
+        knex: Knex<{}, unknown[]>,
+        private readonly mecaExporter: MecaExporter,
+        private readonly s3Store: S3Store,
+        private readonly sftpStore: SftpStore,
+    ) {
         const adapter = createKnexAdapter(knex, 'public');
         this.submissionRepository = new XpubSubmissionRootRepository(adapter);
     }
@@ -61,11 +65,10 @@ export class SubmissionService {
             throw new Error(`The submission ${id} cannot be submitted.`);
         }
 
-        const exporter = new MecaExporter(this.fileService);
-        const buffer = await exporter.export(submission, ip);
+        const buffer = await this.mecaExporter.export(submission, ip);
 
         // @todo: initialise with config
-        const store = new SubmissionStore([new S3Store(), new SftpStore()]);
+        const store = new SubmissionStore([this.s3Store, this.sftpStore]);
         const locations = await store.write(id, buffer);
         logger.info(`Submission ${id} saved to ${locations}`);
 

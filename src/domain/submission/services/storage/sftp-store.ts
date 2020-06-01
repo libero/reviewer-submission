@@ -1,5 +1,5 @@
 import { SubmissionId } from '../../types';
-import { PackageLocation, SubmissionWriter } from './types';
+import { PackageLocation, SubmissionWriter, PackageLocationType } from './types';
 
 export class SftpStore implements SubmissionWriter {
     private remotePath = 'somewhere-in-AWS';
@@ -11,7 +11,7 @@ export class SftpStore implements SubmissionWriter {
         // @todo: Implement
         return Promise.resolve({
             location: `${this.remotePath}/${id}${this.mecaPostfix}`,
-            type: 'SFTP',
+            type: PackageLocationType.SFTP,
             submissionId: id,
         });
     }

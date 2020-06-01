@@ -1,8 +1,13 @@
 import { SubmissionId } from '../../types';
 
+export enum PackageLocationType {
+    S3 = 'S3',
+    SFTP = 'SFTP',
+}
+
 export interface PackageLocation {
     location: string;
-    type: string; // @todo: Make this an enumeration.
+    type: PackageLocationType;
     submissionId: SubmissionId;
 }
 
