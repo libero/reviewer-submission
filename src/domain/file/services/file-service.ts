@@ -6,13 +6,13 @@ import XpubFileRepository from '../repositories/xpub-file';
 import { FileId, FileType, FileStatus } from '../types';
 import File from './models/file';
 import { SubmissionId } from '../../../domain/submission/types';
-import { S3Config } from '../../../config';
 import { PubSub } from 'apollo-server-express';
 import { PromiseResult } from 'aws-sdk/lib/request';
 import { AWSError } from 'aws-sdk/lib/error';
 import { ReadStream } from 'fs';
 import { Auditor, AuditId, ObjectId, UserId, AuditAction } from '../../audit/types';
 import { User } from 'src/domain/user/user';
+import { InfraLogger as logger } from '../../../logger';
 
 const s3MinChunkSize = 5 * 1024 * 1024; // at least 5MB (non rounded)
 
@@ -22,19 +22,11 @@ export class FileService {
     auditService: Auditor;
     bucket: string;
 
-    constructor(knex: Knex<{}, unknown[]>, s3config: S3Config, auditService: Auditor) {
+    constructor(knex: Knex<{}, unknown[]>, s3: S3, bucket: string, auditService: Auditor) {
         const adapter = createKnexAdapter(knex, 'public');
         this.fileRepository = new XpubFileRepository(adapter);
-        const defaultOptions = {
-            accessKeyId: s3config.accessKeyId,
-            secretAccessKey: s3config.secretAccessKey,
-            apiVersion: '2006-03-01',
-            signatureVersion: 'v4',
-            s3ForcePathStyle: s3config.s3ForcePathStyle,
-        };
-        const s3Options = s3config.awsEndPoint ? { ...defaultOptions, endpoint: s3config.awsEndPoint } : defaultOptions;
-        this.bucket = s3config.fileBucket;
-        this.s3 = new S3(s3Options);
+        this.bucket = bucket;
+        this.s3 = s3;
         this.auditService = auditService;
     }
 
@@ -122,7 +114,7 @@ export class FileService {
             Bucket: this.bucket,
             Key: this.getFileS3Key(FileType.MANUSCRIPT_SOURCE, submissionId, fileId),
         });
-        await this.setStatusToDeleted(user, file);
+        await this.setStatusToDeleted(user.id, file);
         return true;
     }
 
@@ -136,7 +128,7 @@ export class FileService {
             Bucket: this.bucket,
             Key: this.getFileS3Key(FileType.SUPPORTING_FILE, submissionId, fileId),
         });
-        await this.setStatusToDeleted(user, file);
+        await this.setStatusToDeleted(user.id, file);
         return fileId;
     }
 
@@ -170,39 +162,30 @@ export class FileService {
             status,
         });
         const createdFile = await this.fileRepository.create(file);
-        this.auditFileStatusChange(user.id, file);
+        await this.auditFileStatusChange(user.id, file);
         return createdFile;
     }
 
-    public async setStatusToDeleted(user: User, file: File): Promise<void> {
+    private async setStatusToDeleted(userId: string, file: File): Promise<void> {
         file.status = FileStatus.DELETED;
-        await this.auditFileStatusChange(user.id, file);
+        await this.auditFileStatusChange(userId, file);
     }
 
-    public async setStatusToUploaded(user: User, file: File): Promise<void> {
+    private async setStatusToStored(userId: string, file: File): Promise<void> {
         if (file.status === FileStatus.CREATED) {
-            file.status = FileStatus.UPLOADED;
-            await this.auditFileStatusChange(user.id, file);
-        } else {
-            throw new Error(`Cannot set file status to UPLOADED: ${file.id}`);
-        }
-    }
-
-    public async setStatusToStored(user: User, file: File): Promise<void> {
-        if (file.status === FileStatus.CREATED || FileStatus.UPLOADED) {
             file.status = FileStatus.STORED;
-            await this.auditFileStatusChange(user.id, file);
+            await this.auditFileStatusChange(userId, file);
         } else {
             throw new Error(`Cannot set file status to STORED: ${file.id}`);
         }
     }
 
-    public async setStatusToCancelled(user: User, file: File): Promise<void> {
+    private async setStatusToCancelled(userId: string, file: File): Promise<void> {
         file.status = FileStatus.CANCELLED;
-        await this.auditFileStatusChange(user.id, file);
+        await this.auditFileStatusChange(userId, file);
     }
 
-    async auditFileStatusChange(userId: string, file: File): Promise<boolean> {
+    private async auditFileStatusChange(userId: string, file: File): Promise<boolean> {
         const result = await this.auditService.recordAudit({
             id: AuditId.fromUuid(uuid()),
             userId: UserId.fromUuid(userId),
@@ -324,15 +307,24 @@ export class FileService {
         pubsub: PubSub,
         submissionId: SubmissionId,
     ): Promise<Buffer> {
-        const chunks = await this.handleFileUpload(
-            pubsub,
-            submissionId,
-            userId,
-            file,
-            stream,
-            FileType.MANUSCRIPT_SOURCE,
-        );
-        return Buffer.concat(chunks);
+        let buffer: Buffer = new Buffer('');
+        try {
+            const chunks = await this.handleFileUpload(
+                pubsub,
+                submissionId,
+                userId,
+                file,
+                stream,
+                FileType.MANUSCRIPT_SOURCE,
+            );
+            buffer = Buffer.concat(chunks);
+            await this.setStatusToStored(userId, file);
+        } catch (e) {
+            logger.error(e);
+            await this.setStatusToCancelled(userId, file);
+        }
+
+        return buffer;
     }
 
     async uploadSupportingFile(

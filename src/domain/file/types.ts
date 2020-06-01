@@ -2,7 +2,6 @@ import { uuidType } from 'typesafe-uuid';
 
 export enum FileStatus {
     CREATED = 'CREATED',
-    UPLOADED = 'UPLOADED',
     STORED = 'STORED',
     CANCELLED = 'CANCELLED',
     DELETED = 'DELETED',

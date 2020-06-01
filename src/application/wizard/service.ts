@@ -161,11 +161,8 @@ export class WizardService {
             await this.semanticExtractionService.extractSuggestions(fileContents, mimeType, filename, submissionId);
         } catch (e) {
             logger.error(submissionId, 'MANUSCRIPT UPLOAD ERROR', e);
-            await this.fileService.setStatusToCancelled(user, manuscriptFile);
             throw new Error('Manuscript upload failed to store file.');
         }
-
-        await this.fileService.setStatusToStored(user, manuscriptFile);
 
         return this.getFullSubmission(submissionId);
     }
@@ -200,11 +197,8 @@ export class WizardService {
             await this.fileService.uploadSupportingFile(supportingFile, stream, user.id, pubsub, submissionId);
         } catch (e) {
             logger.error(submissionId, 'SUPPORTING UPLOAD ERROR', e);
-            await this.fileService.setStatusToCancelled(user, supportingFile);
             throw new Error('Supporting upload failed to store file.');
         }
-
-        await this.fileService.setStatusToStored(user, supportingFile);
 
         return supportingFile;
     }
