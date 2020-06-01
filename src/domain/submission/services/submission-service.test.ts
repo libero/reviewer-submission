@@ -25,7 +25,6 @@ const submissionModels: Submission[] = [
         updated: new Date('2020-02-18T15:14:53.155Z'),
     }),
 ];
-const fileServiceMock = (jest.fn() as unknown) as FileService;
 jest.mock('../repositories/xpub-submission-root');
 
 const makeSubmissionService = (): SubmissionService =>
