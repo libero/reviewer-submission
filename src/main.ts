@@ -26,6 +26,9 @@ import { PermissionService } from './application/permission/service';
 import { SemanticExtractionService } from './domain/semantic-extraction/services/semantic-extraction-service';
 import { FileService } from './domain/file/services/file-service';
 import { AuditService } from './domain/audit/services/audit';
+import { S3Store } from './domain/submission/services/storage/s3-store';
+import { SftpStore } from './domain/submission/services/storage/sftp-store';
+import { MecaExporter } from './domain/submission/services/exporter/meca-exporter';
 
 // Apollo server express does not export this, but its express
 export interface ExpressContext {
@@ -74,7 +77,10 @@ const init = async (): Promise<void> => {
     const srvUser = new UserService(config.user_api_url);
     const srvTeam = new TeamService(knexConnection);
     const srvFile = new FileService(knexConnection, config.s3, srvAudit);
-    const srvSubmission = new SubmissionService(knexConnection, srvFile);
+    const s3Store = new S3Store(config.s3, config.meca_config);
+    const sftpStore = new SftpStore();
+    const mecaExporter = new MecaExporter(srvFile);
+    const srvSubmission = new SubmissionService(knexConnection, mecaExporter, s3Store, sftpStore);
     const srvExtractionService = new SemanticExtractionService(knexConnection, config.science_beam);
 
     logger.info(`Initialising application services...`);

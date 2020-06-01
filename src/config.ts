@@ -14,6 +14,10 @@ export interface ScienceBeamConfig {
     timeout: number;
 }
 
+export interface MecaConfig {
+    s3_path: string;
+}
+
 export interface Config {
     port: number;
     db_connection: KnexConfig;
@@ -24,6 +28,7 @@ export interface Config {
     s3: S3Config;
     science_beam: ScienceBeamConfig;
     max_file_size_in_bytes: number;
+    meca_config: MecaConfig;
 }
 
 export interface ClientPublicConfig {
@@ -61,6 +66,9 @@ const appConfig: Config = {
     science_beam: {
         api_url: envOrEmpty('SCIENCE_BEAM_URL'),
         timeout: Number(envOrEmpty('SCIENCE_BEAM_TIMEOUT')),
+    },
+    meca_config: {
+        s3_path: envOrEmpty('MECA_S3_PATH'),
     },
 };
 
