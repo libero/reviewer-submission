@@ -185,7 +185,7 @@ describe('File Service', () => {
             );
             expect(result).toBe(true);
         });
-     });
+    });
 
     describe('uploadManuscript', () => {
         it('returns the file contents', async () => {
@@ -288,7 +288,7 @@ describe('File Service', () => {
             const file = new File(files[0]);
             file.status = FileStatus.CREATED;
             mockS3.completeMultipartUpload.mockImplementation(() => {
-                throw new Error('some random error')
+                throw new Error('some random error');
             });
 
             const service = new FileService((null as unknown) as Knex, (mockS3 as unknown) as S3, 'bucket', mockAudit);
