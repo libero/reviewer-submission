@@ -4,7 +4,6 @@ import { v4 } from 'uuid';
 import Knex = require('knex');
 import { SubmissionId } from '../types';
 import Submission, { SubmissionStatus, ArticleType } from './models/submission';
-import { FileService } from 'src/domain/file/services/file-service';
 import { S3Store } from './storage/s3-store';
 import { MecaExporter } from './exporter/meca-exporter';
 import { SftpStore } from './storage/sftp-store';
