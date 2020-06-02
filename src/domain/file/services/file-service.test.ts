@@ -157,10 +157,10 @@ describe('File Service', () => {
                 .spyOn(XpubFileRepository.prototype, 'findFileById')
                 .mockImplementation(() => Promise.resolve(null));
             const service = new FileService((null as unknown) as Knex, (mockS3 as unknown) as S3, 'bucket', mockAudit);
-            const fileId = v4();
+            const fileId = FileId.fromUuid('18f0d56a-600c-4007-b140-f3de9acf5ff9');
             await expect(
-                service.deleteManuscript(mockUser, FileId.fromUuid(fileId), SubmissionId.fromUuid(submissionId)),
-            ).rejects.toThrow();
+                service.deleteManuscript(mockUser, fileId, SubmissionId.fromUuid(submissionId)),
+            ).rejects.toThrow('Unable to find entry with id: 18f0d56a-600c-4007-b140-f3de9acf5ff9');
 
             findFileByIdSpy.mockRestore();
         });

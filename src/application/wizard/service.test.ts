@@ -55,7 +55,7 @@ describe('saveAuthorPage', () => {
                 email: 'john.smith@example.com',
                 aff: 'aff',
             }),
-        ).rejects.toThrow();
+        ).rejects.toThrow('No submission found');
     });
 
     it('should throw if submission ownership is invalid', async () => {
@@ -94,7 +94,7 @@ describe('saveAuthorPage', () => {
                 email: 'john.smith@example.com',
                 aff: 'aff',
             }),
-        ).rejects.toThrow();
+        ).rejects.toThrow('User not allowed to save submission');
     });
 
     it('should update when team exists', async () => {
@@ -262,7 +262,7 @@ describe('saveAuthorPage', () => {
                 email: 'john.smith@example.com',
                 aff: 'aff',
             }),
-        ).rejects.toThrow();
+        ).rejects.toThrow('User not allowed to save submission');
     });
 });
 

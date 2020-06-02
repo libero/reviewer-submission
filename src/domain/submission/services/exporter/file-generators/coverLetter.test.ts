@@ -23,21 +23,26 @@ describe('Cover letter PDF generator', () => {
 
         const pdfParser = new PDFParser();
         let errors = 0;
+
         pdfParser.on('pdfParser_dataError', (err: string) => {
             if (err) errors += 1;
         });
+        expect.assertions(3);
+        const donePromise = new Promise<boolean>(resolve => {
+            pdfParser.on('pdfParser_dataReady', () => {
+                expect(errors).toBe(0);
+                expect(pdfParser.data).not.toBe(null);
 
-        expect(() => pdfParser.parseBuffer(document)).not.toThrow();
-        pdfParser.on('pdfParser_dataReady', () => {
-            expect(errors).toBe(0);
-            expect(pdfParser.data).not.toBe(null);
+                const text = pdfParser.data.Pages[0].Texts.map((item: ThingWithR) =>
+                    item.R.map((t: ThingWithT) => t.T).reduce((prev: string, curr: string) => prev + curr),
+                ).reduce((prev: string, curr: string) => prev + curr);
 
-            const text = pdfParser.data.Pages[0].Texts.map((item: ThingWithR) =>
-                item.R.map((t: ThingWithT) => t.T).reduce((prev: string, curr: string) => prev + curr),
-            ).reduce((prev: string, curr: string) => prev + curr);
-
-            const jsonData = JSON.stringify(text, null, 2);
-            expect(jsonData).toBe('"%20C%20overLetterPickMe!I\'msimplythebest"');
+                const jsonData = JSON.stringify(text, null, 2);
+                expect(jsonData).toBe('"%20C%20overLetterPickMe!I\'msimplythebest"');
+                resolve();
+            });
         });
+        await pdfParser.parseBuffer(document);
+        await donePromise;
     });
 });

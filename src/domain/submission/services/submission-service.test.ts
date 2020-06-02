@@ -76,7 +76,7 @@ describe('Submission Service', () => {
         it('throws if an invalid articleType is passed', async (): Promise<void> => {
             XpubSubmissionRootRepository.prototype.create = jest.fn(async (submission: Submission) => submission);
             const service = makeSubmissionService();
-            await expect(service.create('articleType', 'userId')).rejects.toThrow();
+            await expect(service.create('articleType', 'userId')).rejects.toThrow('Invalid article type');
         });
         it('returns a created Submission when correct values are sent', async (): Promise<void> => {
             XpubSubmissionRootRepository.prototype.create = jest.fn(async (submission: Submission) => submission);
