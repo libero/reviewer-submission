@@ -1,18 +1,29 @@
+import * as SftpClient from 'ssh2-sftp-client';
 import { SubmissionId } from '../../types';
 import { PackageLocation, SubmissionWriter, PackageLocationType } from './types';
+import { MecaConfig } from 'src/config';
 
 export class SftpStore implements SubmissionWriter {
-    private remotePath = 'somewhere-in-AWS';
     private mecaPostfix = '-meca.zip';
+    private sftpClient: SftpClient;
 
-    // todo: remove this for next PR
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    write(id: SubmissionId, buffer: Buffer): Promise<PackageLocation> {
-        // @todo: Implement
+    constructor(private readonly mecaConfig: MecaConfig) {
+        this.sftpClient = new SftpClient();
+    }
+
+    async write(submissionId: SubmissionId, buffer: Buffer): Promise<PackageLocation> {
+        const remotePath = this.mecaConfig.sftp.path;
+        await this.sftpClient.mkdir(remotePath, true);
+        const transferName = `${remotePath}/${submissionId}.transfer`;
+        const finalName = `${remotePath}/${submissionId}${this.mecaPostfix}`;
+        await this.sftpClient.put(buffer, transferName);
+        await this.sftpClient.rename(transferName, finalName);
+        await this.sftpClient.end();
+
         return Promise.resolve({
-            location: `${this.remotePath}/${id}${this.mecaPostfix}`,
+            location: `${remotePath}/${submissionId}${this.mecaPostfix}`,
             type: PackageLocationType.SFTP,
-            submissionId: id,
+            submissionId,
         });
     }
 }
