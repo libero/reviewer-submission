@@ -8,6 +8,7 @@ export default class SemanticExtraction {
     submissionId: SubmissionId;
     fieldName: string;
     value: string;
+    createdBy: string;
 
     public constructor(
         id: SemanticExtractionId,
@@ -15,11 +16,14 @@ export default class SemanticExtraction {
         created: Date,
         fieldName: string,
         value: string,
+        createdBy = 'sciencebeam',
     ) {
         this.id = id;
         this.submissionId = submissionId;
         this.created = created;
+        this.updated = created;
         this.fieldName = fieldName;
         this.value = value;
+        this.createdBy = createdBy;
     }
 }

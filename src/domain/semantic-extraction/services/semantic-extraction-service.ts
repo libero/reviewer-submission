@@ -4,11 +4,11 @@ import axios from 'axios';
 import * as xml2js from 'xml2js';
 import { createKnexAdapter } from '../../knex-table-adapter';
 import XpubSemanticExtractionRepository from '../repositories/xpub-semantic-extraction';
-import { SemanticExtractionId } from '../types';
+import { SemanticExtractionId, Suggestion } from '../types';
 import { InfraLogger as logger } from '../../../logger';
 import { SubmissionId } from '../../submission/types';
 import { ScienceBeamConfig } from '../../../config';
-import { Suggestion } from './models/suggestion';
+import SemanticExtraction from './models/semantic-extraction';
 
 export class SemanticExtractionService {
     semanticExtractionRepository: XpubSemanticExtractionRepository;
@@ -38,12 +38,14 @@ export class SemanticExtractionService {
             const title = titleArray[0];
 
             try {
-                await this.semanticExtractionRepository.create({
-                    id: SemanticExtractionId.fromUuid(uuid()),
+                const seObject = new SemanticExtraction(
+                    SemanticExtractionId.fromUuid(uuid()),
                     submissionId,
-                    fieldName: 'title',
-                    value: title,
-                });
+                    new Date(),
+                    'title',
+                    title,
+                );
+                await this.semanticExtractionRepository.create(seObject);
                 success = true;
             } catch (error) {
                 logger.error(`Could not write the suggestions. Failed with ${error}`);
