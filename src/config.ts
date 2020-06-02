@@ -16,6 +16,13 @@ export interface ScienceBeamConfig {
 
 export interface MecaConfig {
     s3_path: string;
+    sftp: {
+        host: string;
+        port: number;
+        username: string;
+        password: string;
+        path: string;
+    };
 }
 
 export interface Config {
@@ -69,6 +76,13 @@ const appConfig: Config = {
     },
     meca_config: {
         s3_path: envOrEmpty('MECA_S3_PATH'),
+        sftp: {
+            host: envOrEmpty('MECA_SFTP_PATH'),
+            port: Number(envOrEmpty('MECA_SFTP_PORT')) || 22,
+            username: envOrEmpty('MECA_SFTP_USERNAME'),
+            password: envOrEmpty('MECA_SFTP_PASSWORD'),
+            path: envOrEmpty('MECA_SFTP_PATH'),
+        },
     },
 };
 

@@ -3,6 +3,7 @@ import { S3Store } from './s3-store';
 import { SubmissionId } from '../../types';
 import { PackageLocationType } from './types';
 import * as S3 from 'aws-sdk/clients/s3';
+import { MecaConfig } from 'src/config';
 
 jest.mock('aws-sdk/clients/s3');
 
@@ -21,7 +22,7 @@ describe('S3Store', () => {
         };
         const mecaConfig = {
             s3_path: '/meca',
-        };
+        } as MecaConfig;
         const putObjectMock = jest.fn();
         const promiseMock = jest.fn();
 

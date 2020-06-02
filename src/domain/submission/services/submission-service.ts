@@ -67,7 +67,6 @@ export class SubmissionService {
 
         const buffer = await this.mecaExporter.export(submission, ip);
 
-        // @todo: initialise with config
         const store = new SubmissionStore([this.s3Store, this.sftpStore]);
         const locations = await store.write(id, buffer);
         logger.info(`Submission ${id} saved to ${locations}`);
