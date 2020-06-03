@@ -3,13 +3,6 @@ import File from '../file/services/models/file';
 
 export class SubmissionId extends uuidType<'SubmissionId'>() {}
 
-export interface Person {
-    firstName: string;
-    lastName: string;
-    email: string;
-    institution: string;
-}
-
 export type AuthorDetails = {
     firstName: string;
     lastName: string;

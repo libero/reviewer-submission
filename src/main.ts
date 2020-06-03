@@ -31,12 +31,6 @@ import { SftpStore } from './domain/submission/services/storage/sftp-store';
 import { MecaExporter } from './domain/submission/services/exporter/meca-exporter';
 import * as S3 from 'aws-sdk/clients/s3';
 
-// Apollo server express does not export this, but its express
-export interface ExpressContext {
-    req: Request;
-    res: Response;
-}
-
 // found via https://github.com/digicatapult/graphql-complexity-experiment/blob/master/app/apollo.js
 const estimators = [
     // complexity based on field extension in resolver
