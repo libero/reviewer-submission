@@ -33,7 +33,7 @@ export class DashboardService {
     }
 
     async deleteSubmission(user: User, id: SubmissionId): Promise<boolean> {
-        const submission = await this.getSubmission(user, id);
+        const submission = await this.submissionService.get(id);
         const allowed = this.permissionService.userCanWithSubmission(user, SubmissionOperation.DELETE, submission);
         if (!allowed) {
             throw new Error('User not allowed to delete submission');

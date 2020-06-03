@@ -2,15 +2,13 @@
 import { SemanticExtractionRepository } from '../repositories/types';
 import { KnexTableAdapter } from '../../knex-table-adapter';
 import { SubmissionId } from '../../submission/types';
-import { SemanticExtractionId } from '../types';
+import { Suggestion, SemanticExtractionId } from '../types';
 import SemanticExtraction from '../services/models/semantic-extraction';
-import { Suggestion } from '../services/models/suggestion';
 
 type DatabaseEntry = {
     id: SemanticExtractionId;
     manuscript_id: SubmissionId;
     updated: Date;
-    created_by: string;
     field_name: string;
     value: string;
 };
@@ -40,8 +38,8 @@ export default class XpubSemanticExtractionRepository implements SemanticExtract
         return this.entryToDTO(entryToSave);
     }
 
-    private modelToEntry(SemanticExtraction: SemanticExtraction): DatabaseEntry {
-        const { submissionId, fieldName, ...rest } = SemanticExtraction;
+    private modelToEntry(semanticExtraction: SemanticExtraction): DatabaseEntry {
+        const { submissionId, fieldName, ...rest } = semanticExtraction;
         return {
             ...rest,
             manuscript_id: submissionId,
@@ -50,11 +48,10 @@ export default class XpubSemanticExtractionRepository implements SemanticExtract
     }
 
     private entryToDTO(record: DatabaseEntry): SemanticExtraction {
-        const { manuscript_id, created_by, field_name, ...rest } = record;
+        const { manuscript_id, field_name, ...rest } = record;
         return {
             ...rest,
             submissionId: manuscript_id,
-            createdBy: created_by,
             fieldName: field_name,
         } as SemanticExtraction;
     }

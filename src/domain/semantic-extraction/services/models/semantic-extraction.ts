@@ -19,6 +19,7 @@ export default class SemanticExtraction {
         this.id = id;
         this.submissionId = submissionId;
         this.created = created;
+        this.updated = created;
         this.fieldName = fieldName;
         this.value = value;
     }

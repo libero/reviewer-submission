@@ -151,7 +151,6 @@ describe('Dashboard Integration Tests', () => {
 
         expect(deleteResponse.status).toBe(200);
         expect(deleteResponse.data.errors).toBeDefined();
-        // It's read rather than delete because you need to be able to read it first before deleting.
-        expect(deleteResponse.data.errors[0].message).toBe('User not allowed to read submission');
+        expect(deleteResponse.data.errors[0].message).toBe('User not allowed to delete submission');
     });
 });

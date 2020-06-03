@@ -9,7 +9,7 @@ import {
 import * as Joi from 'joi';
 import { submissionSchema } from './submission-schema';
 import logger from '../../../../logger';
-import { Suggestion } from '../../../semantic-extraction/services/models/suggestion';
+import { Suggestion } from '../../../semantic-extraction/types';
 
 export enum ArticleType {
     RESEARCH_ARTICLE = 'research-article',
@@ -88,7 +88,7 @@ export default class Submission {
         }
     }
 
-    public addEditorFeedback(
+    public addOppositionReasons(
         opposedReviewersReason?: string,
         opposedReviewingEditorsReason?: string,
         opposedSeniorEditorsReason?: string,

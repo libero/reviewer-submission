@@ -9,7 +9,7 @@ import { TeamId } from '../../domain/teams/types';
 import { PermissionService } from '../permission/service';
 import { FileService } from '../../domain/file/services/file-service';
 import { SemanticExtractionService } from '../../domain/semantic-extraction/services/semantic-extraction-service';
-import { Suggestion } from '../../domain/semantic-extraction/services/models/suggestion';
+import { Suggestion } from '../../domain/semantic-extraction/types';
 import File from '../../domain/file/services/models/file';
 import { FileId, FileType } from '../../domain/file/types';
 
@@ -55,7 +55,7 @@ describe('saveAuthorPage', () => {
                 email: 'john.smith@example.com',
                 aff: 'aff',
             }),
-        ).rejects.toThrow();
+        ).rejects.toThrow('No submission found');
     });
 
     it('should throw if submission ownership is invalid', async () => {
@@ -94,7 +94,7 @@ describe('saveAuthorPage', () => {
                 email: 'john.smith@example.com',
                 aff: 'aff',
             }),
-        ).rejects.toThrow();
+        ).rejects.toThrow('User not allowed to save submission');
     });
 
     it('should update when team exists', async () => {
@@ -262,7 +262,7 @@ describe('saveAuthorPage', () => {
                 email: 'john.smith@example.com',
                 aff: 'aff',
             }),
-        ).rejects.toThrow();
+        ).rejects.toThrow('User not allowed to save submission');
     });
 });
 

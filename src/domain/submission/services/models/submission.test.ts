@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid';
-import Submission, { SubmissionStatus } from './submission';
+import Submission, { SubmissionStatus, ArticleType } from './submission';
 import { SubmissionId } from '../../types';
 import File from '../../../file/services/models/file';
 import { FileId, FileType } from '../../../file/types';
@@ -27,6 +27,11 @@ describe('Submission Entity', () => {
             expect(submission.articleType).toBe('research-article');
             expect(submission.createdBy).toBe('123');
             expect(submission.updated).toBeDefined();
+            expect(submission.editorDetails).toStrictEqual({});
+            expect(submission.disclosure).toStrictEqual({});
+            expect(submission.manuscriptDetails).toStrictEqual({});
+            expect(submission.author).toBeUndefined();
+            expect(submission.suggestions).toStrictEqual([]);
         });
 
         it('throws if an invalid articleType is passed', () => {
@@ -40,51 +45,127 @@ describe('Submission Entity', () => {
                 });
             }).toThrow('Invalid article type');
         });
-    });
-
-    it('new submission is not submittable', () => {
-        expect(() => submission.isSubmittable()).toThrow(
-            'child "manuscriptDetails" fails because [child "title" fails because ["title" is required]]',
-        );
-    });
-
-    it('new submission is submittable when fields set', () => {
-        submission.manuscriptDetails.title = 'Test';
-        submission.manuscriptDetails.cosubmission = ['Test'];
-        submission.files.coverLetter = 'Accept please!';
-        submission.disclosure.submitterSignature = 'signature';
-        submission.editorDetails.suggestedSeniorEditors = ['123', '321'];
-        submission.editorDetails.opposedSeniorEditors = ['234', '432'];
-        submission.editorDetails.opposedSeniorEditorsReason = 'reason';
-        submission.editorDetails.suggestedReviewingEditors = ['567', '765'];
-        submission.editorDetails.opposedReviewingEditors = ['8910'];
-        submission.editorDetails.opposedReviewingEditorsReason = 'reason 2';
-        submission.editorDetails.suggestedReviewers = [{ name: 'name1', email: 'name1@elifesciences.org' }];
-        submission.editorDetails.opposedReviewers = [{ name: 'name2', email: 'name2@elifesciences.org' }];
-        submission.editorDetails.opposedReviewersReason = 'because';
-
-        submission.disclosure.disclosureConsent = false;
-
-        submission.author = {
-            firstName: 'smith',
-            lastName: 'Jane',
-            email: 'email@elifesciences.org',
-            aff: 'int',
-        };
-
-        const file = new File({
-            id: FileId.fromUuid(uuid()),
-            submissionId: id,
-            created: new Date(),
-            updated: new Date(),
-            type: FileType.MANUSCRIPT_SOURCE,
-            filename: 'readme',
-            mimeType: 'text',
-            size: 100,
-            status: 'ok',
+        describe('can create all valid articleTypes', () => {
+            it('research-article', () => {
+                const s = new Submission({
+                    id,
+                    status: SubmissionStatus.INITIAL,
+                    createdBy: '123',
+                    updated: new Date(),
+                    articleType: 'research-article',
+                });
+                expect(s.articleType).toBe(ArticleType.RESEARCH_ARTICLE);
+            });
+            it('feature', () => {
+                const s = new Submission({
+                    id,
+                    status: SubmissionStatus.INITIAL,
+                    createdBy: '123',
+                    updated: new Date(),
+                    articleType: 'feature',
+                });
+                expect(s.articleType).toBe(ArticleType.FEATURE_ARTICLE);
+            });
+            it('research-advance', () => {
+                const s = new Submission({
+                    id,
+                    status: SubmissionStatus.INITIAL,
+                    createdBy: '123',
+                    updated: new Date(),
+                    articleType: 'research-advance',
+                });
+                expect(s.articleType).toBe(ArticleType.RESEARCH_ADVANCE);
+            });
+            it('scientific-correspondence', () => {
+                const s = new Submission({
+                    id,
+                    status: SubmissionStatus.INITIAL,
+                    createdBy: '123',
+                    updated: new Date(),
+                    articleType: 'scientific-correspondence',
+                });
+                expect(s.articleType).toBe(ArticleType.SCIENTIFIC_CORRESPONDENCE);
+            });
+            it('tools-resources', () => {
+                const s = new Submission({
+                    id,
+                    status: SubmissionStatus.INITIAL,
+                    createdBy: '123',
+                    updated: new Date(),
+                    articleType: 'tools-resources',
+                });
+                expect(s.articleType).toBe(ArticleType.TOOLS_RESOURCES);
+            });
+            it('short-report', () => {
+                const s = new Submission({
+                    id,
+                    status: SubmissionStatus.INITIAL,
+                    createdBy: '123',
+                    updated: new Date(),
+                    articleType: 'short-report',
+                });
+                expect(s.articleType).toBe(ArticleType.SHORT_REPORT);
+            });
         });
-        submission.files.manuscriptFile = file;
+        it('articleType has 6 values', () => {
+            expect(Object.keys(ArticleType).length).toBe(6);
+        });
+    });
 
-        expect(submission.isSubmittable()).toBe(true);
+    describe('isSubmittable', () => {
+        it('new submission is not submittable', () => {
+            expect(() => submission.isSubmittable()).toThrow(
+                'child "manuscriptDetails" fails because [child "title" fails because ["title" is required]]',
+            );
+        });
+
+        it('new submission is submittable when fields set', () => {
+            submission.manuscriptDetails.title = 'Test';
+            submission.manuscriptDetails.cosubmission = ['Test'];
+            submission.files.coverLetter = 'Accept please!';
+            submission.disclosure.submitterSignature = 'signature';
+            submission.editorDetails.suggestedSeniorEditors = ['123', '321'];
+            submission.editorDetails.opposedSeniorEditors = ['234', '432'];
+            submission.editorDetails.opposedSeniorEditorsReason = 'reason';
+            submission.editorDetails.suggestedReviewingEditors = ['567', '765'];
+            submission.editorDetails.opposedReviewingEditors = ['8910'];
+            submission.editorDetails.opposedReviewingEditorsReason = 'reason 2';
+            submission.editorDetails.suggestedReviewers = [{ name: 'name1', email: 'name1@elifesciences.org' }];
+            submission.editorDetails.opposedReviewers = [{ name: 'name2', email: 'name2@elifesciences.org' }];
+            submission.editorDetails.opposedReviewersReason = 'because';
+
+            submission.disclosure.disclosureConsent = false;
+
+            submission.author = {
+                firstName: 'smith',
+                lastName: 'Jane',
+                email: 'email@elifesciences.org',
+                aff: 'int',
+            };
+
+            const file = new File({
+                id: FileId.fromUuid(uuid()),
+                submissionId: id,
+                created: new Date(),
+                updated: new Date(),
+                type: FileType.MANUSCRIPT_SOURCE,
+                filename: 'readme',
+                mimeType: 'text',
+                size: 100,
+                status: 'ok',
+            });
+            submission.files.manuscriptFile = file;
+
+            expect(submission.isSubmittable()).toBe(true);
+        });
+    });
+
+    describe('addOppositionReasons', () => {
+        it('add opposed editors reasons on the right fields', () => {
+            submission.addOppositionReasons('one', 'two', 'three');
+            expect(submission.editorDetails.opposedReviewersReason).toBe('one');
+            expect(submission.editorDetails.opposedReviewingEditorsReason).toBe('two');
+            expect(submission.editorDetails.opposedSeniorEditorsReason).toBe('three');
+        });
     });
 });
