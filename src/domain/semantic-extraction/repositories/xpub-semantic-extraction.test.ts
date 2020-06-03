@@ -55,14 +55,13 @@ describe('KnexAuditRepository', () => {
         });
         it('returns the entry', async (): Promise<void> => {
             const result = await repo.create(
-                new SemanticExtraction(mockSEId, mockSubmissionId, new Date(), 'field', 'value', 'test-script'),
+                new SemanticExtraction(mockSEId, mockSubmissionId, new Date(), 'field', 'value'),
             );
             expect(result).toMatchObject({
                 fieldName: 'field',
                 value: 'value',
                 id: mockSEId,
                 submissionId: mockSubmissionId,
-                createdBy: 'test-script',
             });
         });
     });

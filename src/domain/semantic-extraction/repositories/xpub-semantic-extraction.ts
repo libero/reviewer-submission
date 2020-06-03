@@ -9,7 +9,6 @@ type DatabaseEntry = {
     id: SemanticExtractionId;
     manuscript_id: SubmissionId;
     updated: Date;
-    created_by: string;
     field_name: string;
     value: string;
 };
@@ -40,21 +39,19 @@ export default class XpubSemanticExtractionRepository implements SemanticExtract
     }
 
     private modelToEntry(semanticExtraction: SemanticExtraction): DatabaseEntry {
-        const { submissionId, fieldName, createdBy, ...rest } = semanticExtraction;
+        const { submissionId, fieldName, ...rest } = semanticExtraction;
         return {
             ...rest,
             manuscript_id: submissionId,
             field_name: fieldName,
-            created_by: createdBy,
         } as DatabaseEntry;
     }
 
     private entryToDTO(record: DatabaseEntry): SemanticExtraction {
-        const { manuscript_id, created_by, field_name, ...rest } = record;
+        const { manuscript_id, field_name, ...rest } = record;
         return {
             ...rest,
             submissionId: manuscript_id,
-            createdBy: created_by,
             fieldName: field_name,
         } as SemanticExtraction;
     }
