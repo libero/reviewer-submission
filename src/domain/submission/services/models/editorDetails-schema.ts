@@ -9,12 +9,23 @@ const MAX_OPPOSED_REVIEWING_EDITORS = 2;
 const MAX_OPPOSED_SENIOR_EDITORS = 1;
 const MAX_OPPOSED_REVIEWERS = 2;
 
-export const editorDetailsSchema = Joi.object({
-    suggestedSeniorEditors: Joi.array()
-        .items(Joi.string().required())
-        .min(MIN_SUGGESTED_SENIOR_EDITORS)
-        .max(MAX_SUGGESTED_SENIOR_EDITORS)
-        .required(),
+const suggestedSeniorEditorsSchema = Joi.array()
+    .items(Joi.string().required())
+    .min(MIN_SUGGESTED_SENIOR_EDITORS)
+    .max(MAX_SUGGESTED_SENIOR_EDITORS)
+    .required();
+
+const suggestedReviewingEditorsSchema = Joi.array()
+    .items(Joi.string().required())
+    .min(MIN_SUGGESTED_REVIEWING_EDITORS)
+    .max(MAX_SUGGESTED_REVIEWING_EDITORS)
+    .required();
+
+const featureSuggestedSeniorEditorsSchema = Joi.array().max(MAX_SUGGESTED_SENIOR_EDITORS);
+
+const featureSuggestedReviewingEditorsSchema = Joi.array().max(MAX_SUGGESTED_REVIEWING_EDITORS);
+
+const base = {
     opposedSeniorEditors: Joi.array()
         .items(Joi.string())
         .required()
@@ -24,11 +35,6 @@ export const editorDetailsSchema = Joi.object({
         then: Joi.string().required(),
         otherwise: Joi.string().allow(''),
     }),
-    suggestedReviewingEditors: Joi.array()
-        .items(Joi.string().required())
-        .min(MIN_SUGGESTED_REVIEWING_EDITORS)
-        .max(MAX_SUGGESTED_REVIEWING_EDITORS)
-        .required(),
     opposedReviewingEditors: Joi.array()
         .items(Joi.string())
         .required()
@@ -63,4 +69,16 @@ export const editorDetailsSchema = Joi.object({
         then: Joi.string().required(),
         otherwise: Joi.string().allow(''),
     }),
+};
+
+export const editorDetailsSchema = Joi.object({
+    ...base,
+    suggestedSeniorEditors: suggestedSeniorEditorsSchema,
+    suggestedReviewingEditors: suggestedReviewingEditorsSchema,
+});
+
+export const featureEditorDetailsSchema = Joi.object({
+    ...base,
+    suggestedSeniorEditors: featureSuggestedSeniorEditorsSchema,
+    suggestedReviewingEditors: featureSuggestedReviewingEditorsSchema,
 });

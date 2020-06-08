@@ -1,7 +1,7 @@
 import * as Joi from 'joi';
 import { filesSchema } from './files-schema';
-import { manuscriptDetailsSchema } from './manuscriptDetails-schema';
-import { editorDetailsSchema } from './editorDetails-schema';
+import { manuscriptDetailsSchema, featureManuscriptDetailsSchema } from './manuscriptDetails-schema';
+import { editorDetailsSchema, featureEditorDetailsSchema } from './editorDetails-schema';
 import { authorSchema } from './authorDetails-schema';
 import { disclosureSchema } from './disclosure-schema';
 
@@ -9,12 +9,31 @@ export const submissionSchema = Joi.object({
     id: Joi.string().required(),
     created: Joi.date().required(),
     updated: Joi.date().required(),
-    status: Joi.string().required(),
+    status: Joi.string()
+        .required()
+        .equal('INITIAL'),
     createdBy: Joi.string().required(),
-    articleType: Joi.string().required(),
-    manuscriptDetails: manuscriptDetailsSchema,
+    articleType: Joi.string()
+        .required()
+        .valid([
+            'research-article',
+            'feature',
+            'research-advance',
+            'scientific-correspondence',
+            'tools-resources',
+            'short-report',
+        ]),
+    manuscriptDetails: Joi.when('articleType', {
+        is: 'feature',
+        then: featureManuscriptDetailsSchema,
+        otherwise: manuscriptDetailsSchema,
+    }),
     files: filesSchema,
-    editorDetails: editorDetailsSchema,
+    editorDetails: Joi.when('articleType', {
+        is: 'feature',
+        then: featureEditorDetailsSchema,
+        otherwise: editorDetailsSchema,
+    }),
     disclosure: disclosureSchema,
     suggestions: Joi.array(), // allow anything as not required for submission
     author: authorSchema,

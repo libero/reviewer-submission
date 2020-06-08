@@ -10,7 +10,7 @@ describe('Submission Entity', () => {
 
     const setValidSubmission = (): void => {
         submission.manuscriptDetails.title = 'Test';
-        submission.manuscriptDetails.cosubmission = ['Test'];
+        submission.manuscriptDetails.subjects = ['Test'];
 
         submission.editorDetails.suggestedSeniorEditors = ['123', '321'];
         submission.editorDetails.opposedSeniorEditors = ['234'];
@@ -159,20 +159,23 @@ describe('Submission Entity', () => {
         });
     });
 
-    describe('isSubmittable', () => {
-        it('new submission is not submittable', () => {
+    describe('Un-Submittable when', () => {
+        it('is a new submission', () => {
             expect(() => submission.isSubmittable()).toThrow(
                 'child "manuscriptDetails" fails because [child "title" fails because ["title" is required]]',
             );
         });
 
-        it('is submittable when fields set', () => {
+        it('status is MECA_IMPORT_SUCCEEDED', () => {
             setValidSubmission();
-            expect(submission.isSubmittable()).toBe(true);
+            submission.status = 'MECA_IMPORT_SUCCEEDED';
+            expect(() => submission.isSubmittable()).toThrow(
+                'child "status" fails because ["status" must be one of [INITIAL]]',
+            );
         });
 
         // one test from disclosure-schema
-        it('is not submittable when no disclosure consent', () => {
+        it('no disclosure consent', () => {
             setValidSubmission();
             submission.disclosure.disclosureConsent = false;
             expect(() => submission.isSubmittable()).toThrow(
@@ -181,7 +184,7 @@ describe('Submission Entity', () => {
         });
 
         // one test from files-schema
-        it('is not submittable when manuscript file not in STORED state', () => {
+        it('manuscript file not in STORED state', () => {
             setValidSubmission();
             if (submission.files.manuscriptFile) {
                 submission.files.manuscriptFile.status = FileStatus.CREATED;
@@ -192,7 +195,7 @@ describe('Submission Entity', () => {
         });
 
         // one test from authorDetail-schema
-        it('is not submittable when author has no email', () => {
+        it('author has no email', () => {
             setValidSubmission();
             if (submission.author) {
                 submission.author.email = '';
@@ -203,7 +206,7 @@ describe('Submission Entity', () => {
         });
 
         // one test from editorDetails-schema
-        it('is not submittable when no suggested senior editors', () => {
+        it('no suggested senior editors', () => {
             setValidSubmission();
             if (submission.editorDetails) {
                 submission.editorDetails.suggestedSeniorEditors = [];
@@ -214,7 +217,7 @@ describe('Submission Entity', () => {
         });
 
         // one test from manuscriptDetails-schema
-        it('is not submittable when there is no title', () => {
+        it('there is no title', () => {
             setValidSubmission();
             if (submission.manuscriptDetails) {
                 submission.manuscriptDetails.title = '';
@@ -222,6 +225,31 @@ describe('Submission Entity', () => {
             expect(() => submission.isSubmittable()).toThrow(
                 'child "manuscriptDetails" fails because [child "title" fails because ["title" is not allowed to be empty]]',
             );
+        });
+    });
+
+    describe('Submittable when', () => {
+        it('fields set', () => {
+            setValidSubmission();
+            expect(submission.isSubmittable()).toBe(true);
+        });
+        it('is feature article and no subjects', () => {
+            setValidSubmission();
+            submission.articleType = ArticleType.FEATURE_ARTICLE;
+            submission.manuscriptDetails.subjects = [];
+            expect(submission.isSubmittable()).toBe(true);
+        });
+        it('is feature article and no suggested senior editors', () => {
+            setValidSubmission();
+            submission.articleType = ArticleType.FEATURE_ARTICLE;
+            submission.editorDetails.suggestedSeniorEditors = [];
+            expect(submission.isSubmittable()).toBe(true);
+        });
+        it('is feature article and no suggested reviewing editors', () => {
+            setValidSubmission();
+            submission.articleType = ArticleType.FEATURE_ARTICLE;
+            submission.editorDetails.suggestedReviewingEditors = [];
+            expect(submission.isSubmittable()).toBe(true);
         });
     });
 });
