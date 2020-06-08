@@ -2,11 +2,49 @@ import { v4 as uuid } from 'uuid';
 import Submission, { SubmissionStatus, ArticleType } from './submission';
 import { SubmissionId } from '../../types';
 import File from '../../../file/services/models/file';
-import { FileId, FileType } from '../../../file/types';
+import { FileId, FileType, FileStatus } from '../../../file/types';
 
 describe('Submission Entity', () => {
     let id: SubmissionId;
     let submission: Submission;
+
+    const setValidSubmission = (): void => {
+        submission.manuscriptDetails.title = 'Test';
+        submission.manuscriptDetails.subjects = ['Test'];
+
+        submission.editorDetails.suggestedSeniorEditors = ['123', '321'];
+        submission.editorDetails.opposedSeniorEditors = ['234'];
+        submission.editorDetails.opposedSeniorEditorsReason = 'reason';
+        submission.editorDetails.suggestedReviewingEditors = ['567', '765'];
+        submission.editorDetails.opposedReviewingEditors = ['8910'];
+        submission.editorDetails.opposedReviewingEditorsReason = 'reason 2';
+        submission.editorDetails.suggestedReviewers = [{ name: 'name1', email: 'name1@elifesciences.org' }];
+        submission.editorDetails.opposedReviewers = [{ name: 'name2', email: 'name2@elifesciences.org' }];
+        submission.editorDetails.opposedReviewersReason = 'because';
+
+        submission.disclosure.disclosureConsent = true;
+        submission.disclosure.submitterSignature = 'signature';
+
+        submission.author = {
+            firstName: 'Jane',
+            lastName: 'Smith',
+            email: 'email@elifesciences.org',
+            aff: 'int',
+        };
+
+        submission.files.coverLetter = 'Accept please!';
+        submission.files.manuscriptFile = new File({
+            id: FileId.fromUuid(uuid()),
+            submissionId: id,
+            created: new Date(),
+            updated: new Date(),
+            type: FileType.MANUSCRIPT_SOURCE,
+            filename: 'readme',
+            mimeType: 'text',
+            size: 100,
+            status: 'STORED',
+        });
+    };
 
     beforeEach(() => {
         id = SubmissionId.fromUuid(uuid());
@@ -112,60 +150,106 @@ describe('Submission Entity', () => {
         });
     });
 
-    describe('isSubmittable', () => {
-        it('new submission is not submittable', () => {
-            expect(() => submission.isSubmittable()).toThrow(
-                'child "manuscriptDetails" fails because [child "title" fails because ["title" is required]]',
-            );
-        });
-
-        it('new submission is submittable when fields set', () => {
-            submission.manuscriptDetails.title = 'Test';
-            submission.manuscriptDetails.cosubmission = ['Test'];
-            submission.files.coverLetter = 'Accept please!';
-            submission.disclosure.submitterSignature = 'signature';
-            submission.editorDetails.suggestedSeniorEditors = ['123', '321'];
-            submission.editorDetails.opposedSeniorEditors = ['234', '432'];
-            submission.editorDetails.opposedSeniorEditorsReason = 'reason';
-            submission.editorDetails.suggestedReviewingEditors = ['567', '765'];
-            submission.editorDetails.opposedReviewingEditors = ['8910'];
-            submission.editorDetails.opposedReviewingEditorsReason = 'reason 2';
-            submission.editorDetails.suggestedReviewers = [{ name: 'name1', email: 'name1@elifesciences.org' }];
-            submission.editorDetails.opposedReviewers = [{ name: 'name2', email: 'name2@elifesciences.org' }];
-            submission.editorDetails.opposedReviewersReason = 'because';
-
-            submission.disclosure.disclosureConsent = false;
-
-            submission.author = {
-                firstName: 'smith',
-                lastName: 'Jane',
-                email: 'email@elifesciences.org',
-                aff: 'int',
-            };
-
-            const file = new File({
-                id: FileId.fromUuid(uuid()),
-                submissionId: id,
-                created: new Date(),
-                updated: new Date(),
-                type: FileType.MANUSCRIPT_SOURCE,
-                filename: 'readme',
-                mimeType: 'text',
-                size: 100,
-                status: 'ok',
-            });
-            submission.files.manuscriptFile = file;
-
-            expect(submission.isSubmittable()).toBe(true);
-        });
-    });
-
     describe('addOppositionReasons', () => {
         it('add opposed editors reasons on the right fields', () => {
             submission.addOppositionReasons('one', 'two', 'three');
             expect(submission.editorDetails.opposedReviewersReason).toBe('one');
             expect(submission.editorDetails.opposedReviewingEditorsReason).toBe('two');
             expect(submission.editorDetails.opposedSeniorEditorsReason).toBe('three');
+        });
+    });
+
+    describe('Un-Submittable when', () => {
+        it('is a new submission', () => {
+            expect(() => submission.isSubmittable()).toThrow(
+                'child "manuscriptDetails" fails because [child "title" fails because ["title" is required]]',
+            );
+        });
+
+        it('status is MECA_IMPORT_SUCCEEDED', () => {
+            setValidSubmission();
+            submission.status = 'MECA_IMPORT_SUCCEEDED';
+            expect(() => submission.isSubmittable()).toThrow(
+                'child "status" fails because ["status" must be one of [INITIAL]]',
+            );
+        });
+
+        // one test from disclosure-schema
+        it('no disclosure consent', () => {
+            setValidSubmission();
+            submission.disclosure.disclosureConsent = false;
+            expect(() => submission.isSubmittable()).toThrow(
+                'child "disclosure" fails because [child "disclosureConsent" fails because ["disclosureConsent" must be one of [true]]]',
+            );
+        });
+
+        // one test from files-schema
+        it('manuscript file not in STORED state', () => {
+            setValidSubmission();
+            if (submission.files.manuscriptFile) {
+                submission.files.manuscriptFile.status = FileStatus.CREATED;
+            }
+            expect(() => submission.isSubmittable()).toThrow(
+                'child "files" fails because [child "manuscriptFile" fails because [child "status" fails because ["status" must be one of [STORED]]]]',
+            );
+        });
+
+        // one test from authorDetail-schema
+        it('author has no email', () => {
+            setValidSubmission();
+            if (submission.author) {
+                submission.author.email = '';
+            }
+            expect(() => submission.isSubmittable()).toThrow(
+                'child "author" fails because [child "email" fails because ["email" is not allowed to be empty]]',
+            );
+        });
+
+        // one test from editorDetails-schema
+        it('no suggested senior editors', () => {
+            setValidSubmission();
+            if (submission.editorDetails) {
+                submission.editorDetails.suggestedSeniorEditors = [];
+            }
+            expect(() => submission.isSubmittable()).toThrow(
+                'child "editorDetails" fails because [child "suggestedSeniorEditors" fails because ["suggestedSeniorEditors" does not contain 1 required value(s)]]',
+            );
+        });
+
+        // one test from manuscriptDetails-schema
+        it('there is no title', () => {
+            setValidSubmission();
+            if (submission.manuscriptDetails) {
+                submission.manuscriptDetails.title = '';
+            }
+            expect(() => submission.isSubmittable()).toThrow(
+                'child "manuscriptDetails" fails because [child "title" fails because ["title" is not allowed to be empty]]',
+            );
+        });
+    });
+
+    describe('Submittable when', () => {
+        it('fields set', () => {
+            setValidSubmission();
+            expect(submission.isSubmittable()).toBe(true);
+        });
+        it('is feature article and no subjects', () => {
+            setValidSubmission();
+            submission.articleType = ArticleType.FEATURE_ARTICLE;
+            submission.manuscriptDetails.subjects = [];
+            expect(submission.isSubmittable()).toBe(true);
+        });
+        it('is feature article and no suggested senior editors', () => {
+            setValidSubmission();
+            submission.articleType = ArticleType.FEATURE_ARTICLE;
+            submission.editorDetails.suggestedSeniorEditors = [];
+            expect(submission.isSubmittable()).toBe(true);
+        });
+        it('is feature article and no suggested reviewing editors', () => {
+            setValidSubmission();
+            submission.articleType = ArticleType.FEATURE_ARTICLE;
+            submission.editorDetails.suggestedReviewingEditors = [];
+            expect(submission.isSubmittable()).toBe(true);
         });
     });
 });
