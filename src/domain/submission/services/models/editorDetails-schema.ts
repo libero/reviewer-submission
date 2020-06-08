@@ -58,7 +58,6 @@ export const editorDetailsSchema = Joi.object({
             }),
         )
         .max(MAX_OPPOSED_REVIEWERS),
-
     opposedReviewersReason: Joi.string().when('opposedReviewers', {
         is: Joi.array().min(1),
         then: Joi.string().required(),
