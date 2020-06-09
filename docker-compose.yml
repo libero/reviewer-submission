@@ -32,6 +32,12 @@ services:
       USER_API_URL: http://reviewer-mocks:3003
       SCIENCE_BEAM_URL: http://reviewer-mocks:3003/science-beam/convert
       SCIENCE_BEAM_TIMEOUT: 20000
+      MECA_S3_PATH: 'meca-archive'
+      MECA_SFTP_PATH: '/upload'
+      MECA_SFTP_HOST: 'sftp'
+      MECA_SFTP_USERNAME: 'test'
+      MECA_SFTP_PASSWORD: 'test'
+      MECA_SFTP_PORT: 22
     volumes:
       - ./config:/etc/reviewer
       - ./.eslintignore:/app/.eslintignore
