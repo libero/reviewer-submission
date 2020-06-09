@@ -114,6 +114,7 @@ describe('saveAuthorPage', () => {
         };
         const teamServiceMock = ({
             find: jest.fn().mockImplementationOnce(() => existingTeam),
+            updateOrCreateAuthor: jest.fn(),
             update: jest.fn(),
             create: jest.fn(),
         } as unknown) as TeamService;
@@ -142,20 +143,12 @@ describe('saveAuthorPage', () => {
             aff: 'aff',
         });
 
-        expect(teamServiceMock.update).toHaveBeenCalledTimes(1);
-        expect(teamServiceMock.update).toHaveBeenCalledWith({
-            id: existingTeam.id,
-            teamMembers: [
-                {
-                    alias: {
-                        firstName: 'John',
-                        lastName: 'Smith',
-                        email: 'john.smith@example.com',
-                        aff: 'aff',
-                    },
-                    meta: { corresponding: true },
-                },
-            ],
+        expect(teamServiceMock.updateOrCreateAuthor).toHaveBeenCalledTimes(1);
+        expect(teamServiceMock.updateOrCreateAuthor).toHaveBeenCalledWith('89e0aec8-b9fc-4413-8a37-5cc775edbe3a', {
+            firstName: 'John',
+            lastName: 'Smith',
+            email: 'john.smith@example.com',
+            aff: 'aff',
         });
     });
     it('should create when team does not exist', async () => {
@@ -171,6 +164,7 @@ describe('saveAuthorPage', () => {
         } as unknown) as SubmissionService;
         const existingTeam = null;
         const teamServiceMock = ({
+            updateOrCreateAuthor: jest.fn(),
             find: jest.fn().mockImplementationOnce(() => existingTeam),
             update: jest.fn(),
             createAuthor: jest.fn(),
@@ -203,23 +197,13 @@ describe('saveAuthorPage', () => {
             aff: 'aff',
         });
 
-        expect(teamServiceMock.createAuthor).toHaveBeenCalledTimes(1);
-        expect(teamServiceMock.createAuthor).toHaveBeenCalledWith(
-            'author',
-            [
-                {
-                    alias: {
-                        firstName: 'John',
-                        lastName: 'Smith',
-                        email: 'john.smith@example.com',
-                        aff: 'aff',
-                    },
-                    meta: { corresponding: true },
-                },
-            ],
-            subId.toString(),
-            'manuscript',
-        );
+        expect(teamServiceMock.updateOrCreateAuthor).toHaveBeenCalledTimes(1);
+        expect(teamServiceMock.updateOrCreateAuthor).toHaveBeenCalledWith(subId.toString(), {
+            firstName: 'John',
+            lastName: 'Smith',
+            email: 'john.smith@example.com',
+            aff: 'aff',
+        });
     });
 
     it('should throw when userId is not owner', async () => {
