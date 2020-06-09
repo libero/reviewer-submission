@@ -3,7 +3,13 @@ import { SubmissionService } from '../../domain/submission';
 import { TeamService } from '../../domain/teams/services/team-service';
 import { FileService } from '../../domain/file/services/file-service';
 import { SemanticExtractionService } from '../../domain/semantic-extraction/services/semantic-extraction-service';
-import { AuthorDetails, SubmissionId, ManuscriptDetails, EditorDetails } from '../../domain/submission/types';
+import {
+    AuthorDetails,
+    SubmissionId,
+    ManuscriptDetails,
+    EditorDetails,
+    DisclosureDetails,
+} from '../../domain/submission/types';
 import Submission from '../../domain/submission/services/models/submission';
 import { AuthorTeamMember, EditorTeamMember, EditorReviewerTeamMember } from '../../domain/teams/repositories/types';
 import { PermissionService, SubmissionOperation } from '../permission/service';
@@ -99,6 +105,21 @@ export class WizardService {
             details.opposedReviewingEditorsReason,
             details.opposedSeniorEditorsReason,
         );
+
+        return this.getFullSubmission(submissionId);
+    }
+
+    async saveDisclosurePage(user: User, submissionId: SubmissionId, details: DisclosureDetails): Promise<Submission> {
+        const submission = await this.submissionService.get(submissionId);
+        if (submission === null) {
+            throw new Error('No submission found');
+        }
+        const allowed = this.permissionService.userCanWithSubmission(user, SubmissionOperation.UPDATE, submission);
+        if (!allowed) {
+            throw new Error('User not allowed to submit');
+        }
+
+        await this.submissionService.saveDisclosureDetails(submissionId, details);
 
         return this.getFullSubmission(submissionId);
     }

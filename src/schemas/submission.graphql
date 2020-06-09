@@ -116,3 +116,8 @@ type DisclosureDetails {
     submitterSignature: String
     disclosureConsent: Boolean
 }
+
+input DisclosureDetailsInput {
+    submitterSignature: String
+    disclosureConsent: Boolean
+}
