@@ -1,5 +1,5 @@
 import * as Knex from 'knex';
-import { SubmissionId, ManuscriptDetails } from '../types';
+import { SubmissionId, ManuscriptDetails, DisclosureDetails } from '../types';
 import XpubSubmissionRootRepository from '../repositories/xpub-submission-root';
 import { v4 as uuid } from 'uuid';
 import Submission from './models/submission';
@@ -109,6 +109,16 @@ export class SubmissionService {
             opposedReviewingEditorsReason,
             opposedSeniorEditorsReason,
         );
+        return await this.submissionRepository.update(submission);
+    }
+
+    async saveDisclosureDetails(id: SubmissionId, disclosureDetails: DisclosureDetails): Promise<Submission> {
+        const submission = await this.submissionRepository.findById(id);
+        if (!submission) {
+            throw new Error('Unable to find submission with id: ' + id);
+        }
+        submission.disclosure.submitterSignature = disclosureDetails.submitterSignature;
+        submission.disclosure.disclosureConsent = disclosureDetails.disclosureConsent;
         return await this.submissionRepository.update(submission);
     }
 }
