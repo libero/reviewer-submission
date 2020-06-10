@@ -7,7 +7,7 @@ type Mutation {
     deleteSupportingFile(fileId: ID!, submissionId: ID!): String!
     saveFilesPage(id: ID!, coverLetter: String): Submission!
     saveDetailsPage(id: ID!, details: ManuscriptDetailsInput!): Submission!
-    saveDisclosure(id: ID!, details: DisclosureDetailsInput!): Submission!
+    saveDisclosurePage(id: ID!, details: DisclosureDetailsInput!): Submission!
     submit(id: ID!): Submission!
 }
 

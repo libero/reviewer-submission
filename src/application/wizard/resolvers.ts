@@ -49,11 +49,12 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
             const user = await userService.getCurrentUser(context.authorizationHeader);
             return wizard.saveEditorPage(user, submissionId, details);
         },
-        async saveDisclosure(
+        async saveDisclosurePage(
             _,
             { id: submissionId, details }: { id: SubmissionId; details: DisclosureDetails },
             context,
         ): Promise<Submission | null> {
+            logger.info(`resolver: saveDisclosurePage(${submissionId})`);
             const user = await userService.getCurrentUser(context.authorizationHeader);
             return wizard.saveDisclosurePage(user, submissionId, details);
         },
