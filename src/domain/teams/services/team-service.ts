@@ -5,7 +5,7 @@ import Team from './models/team';
 import { v4 as uuid } from 'uuid';
 import { TeamId } from '../types';
 import { AuthorTeamMember, EditorTeamMember, EditorReviewerTeamMember } from '../repositories/types';
-import { EditorDetails } from 'src/domain/submission/types';
+import { EditorDetails, AuthorDetails } from '../../submission/types';
 
 export class TeamService {
     teamRepository: XpubTeamRepository;
@@ -117,7 +117,27 @@ export class TeamService {
         return results;
     }
 
-    async createTeamByRole(
+    async updateOrCreateAuthor(submissionId: string, details: AuthorDetails): Promise<Team> {
+        const team = await this.find(submissionId.toString(), 'author');
+        const teamMembers: Array<AuthorTeamMember> = [
+            {
+                alias: details,
+                meta: { corresponding: true },
+            },
+        ];
+        let author: Team;
+        if (team) {
+            author = await this.update({
+                ...team,
+                teamMembers,
+            });
+        } else {
+            author = await this.createAuthor(teamMembers, submissionId);
+        }
+        return author;
+    }
+
+    private async createTeamByRole(
         role: string,
         teamMembers: Array<EditorTeamMember | EditorReviewerTeamMember>,
         objectId: string,
@@ -128,13 +148,11 @@ export class TeamService {
         return await this.teamRepository.create(team);
     }
 
-    async createAuthor(
-        role: string,
-        teamMembers: Array<AuthorTeamMember>,
-        objectId: string,
-        objectType: string,
-    ): Promise<Team> {
+    private async createAuthor(teamMembers: Array<AuthorTeamMember>, objectId: string): Promise<Team> {
+        const role = 'author';
+        const objectType = 'manuscript';
         const id = TeamId.fromUuid(uuid());
+
         const team = new Team(id, new Date(), new Date(), teamMembers, role, objectId, objectType);
         return await this.teamRepository.create(team);
     }

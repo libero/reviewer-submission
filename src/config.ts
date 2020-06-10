@@ -38,13 +38,6 @@ export interface Config {
     meca_config: MecaConfig;
 }
 
-export interface ClientPublicConfig {
-    majorSubjectAreas: { [key: string]: string };
-    fileUpload: {
-        maxSizeMB: number;
-    };
-}
-
 const envOrEmpty = (name: string): string => {
     return process.env[name] ? (process.env[name] as string) : '';
 };
