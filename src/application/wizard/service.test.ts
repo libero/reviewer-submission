@@ -18,7 +18,6 @@ jest.mock('fs', () => ({
 }));
 jest.mock('../../logger');
 
-// TODO: write tests
 describe('getSubmission', () => {
     const mockConfig = ({} as unknown) as Config;
     it('it should return an exception if submission is not found', async () => {
