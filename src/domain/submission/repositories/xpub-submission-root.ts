@@ -43,6 +43,7 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
         'opposed_senior_editors_reason',
         'opposed_reviewing_editors_reason',
         'opposed_reviewers_reason',
+        'last_step_visited',
     ];
 
     public constructor(private readonly _query: KnexTableAdapter) {}
@@ -123,6 +124,7 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
             updated: submission.updated as Date,
             created_by: submission.createdBy,
             status: submission.status,
+            last_step_visited: submission.lastStepVisited,
             cover_letter: submission.files.coverLetter,
             previously_discussed: submission.manuscriptDetails.previouslyDiscussed,
             previously_submitted: previouslySubmitted ? [previouslySubmitted] : undefined,
@@ -148,6 +150,7 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
             createdBy: record.created_by,
         });
         const meta = record.meta;
+        result.lastStepVisited = record.last_step_visited;
         const details: ManuscriptDetails = {
             title: meta.title,
             subjects: meta.subjects,

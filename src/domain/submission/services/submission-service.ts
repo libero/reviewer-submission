@@ -9,6 +9,7 @@ import { S3Store } from './storage/s3-store';
 import { SftpStore } from './storage/sftp-store';
 import { SubmissionStore } from './storage/submission-store';
 import { InfraLogger as logger } from '../../../logger';
+import submission from './exporter/file-generators/article.test.data';
 
 export class SubmissionService {
     submissionRepository: XpubSubmissionRootRepository;
@@ -21,6 +22,10 @@ export class SubmissionService {
     ) {
         const adapter = createKnexAdapter(knex, 'public');
         this.submissionRepository = new XpubSubmissionRootRepository(adapter);
+    }
+
+    private setLastStepVisited(submission: Submission, step: string): void {
+        submission.lastStepVisited = `submit/${submission.id}/${step}`;
     }
 
     async findAll(): Promise<Submission[]> {
@@ -40,6 +45,7 @@ export class SubmissionService {
             status: 'INITIAL',
             createdBy: userId,
         });
+        this.setLastStepVisited(submission, 'author');
         return await this.submissionRepository.create(submission);
     }
 
@@ -76,12 +82,18 @@ export class SubmissionService {
         return this.get(id);
     }
 
-    async changeCoverLetter(id: SubmissionId, coverLetter: string): Promise<Submission> {
+    async saveAuthorPage(submission: Submission): Promise<Submission> {
+        this.setLastStepVisited(submission, 'author');
+        return await this.submissionRepository.update(submission);
+    }
+
+    async saveFilesPage(id: SubmissionId, coverLetter: string): Promise<Submission> {
         const submission = await this.submissionRepository.findById(id);
         if (!submission) {
             throw new Error('Unable to find submission with id: ' + id);
         }
         submission.files.coverLetter = coverLetter;
+        this.setLastStepVisited(submission, 'files');
         return await this.submissionRepository.update(submission);
     }
 
@@ -91,10 +103,11 @@ export class SubmissionService {
             throw new Error('Unable to find submission with id: ' + id);
         }
         submission.manuscriptDetails = details;
+        this.setLastStepVisited(submission, 'details');
         return await this.submissionRepository.update(submission);
     }
 
-    async addEditorDetails(
+    async saveEditorPage(
         id: SubmissionId,
         opposedReviewersReason?: string,
         opposedReviewingEditorsReason?: string,
@@ -109,6 +122,8 @@ export class SubmissionService {
             opposedReviewingEditorsReason,
             opposedSeniorEditorsReason,
         );
+        this.setLastStepVisited(submission, 'editors');
+
         return await this.submissionRepository.update(submission);
     }
 
@@ -119,6 +134,7 @@ export class SubmissionService {
         }
         submission.disclosure.submitterSignature = disclosureDetails.submitterSignature;
         submission.disclosure.disclosureConsent = disclosureDetails.disclosureConsent;
+        this.setLastStepVisited(submission, 'disclosure');
         return await this.submissionRepository.update(submission);
     }
 }
