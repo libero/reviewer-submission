@@ -71,7 +71,7 @@ export class WizardService {
 
         await this.teamService.updateOrCreateAuthor(submissionId.toString(), details);
 
-        await this.submissionService.saveAuthorPage(submission);
+        await this.submissionService.saveAuthorDetails(submission);
 
         return this.getFullSubmission(submissionId);
     }
@@ -87,8 +87,8 @@ export class WizardService {
         }
         await this.teamService.addOrUpdateEditorTeams(submissionId.toString(), details);
 
-        await this.submissionService.saveEditorPage(
-            submissionId,
+        await this.submissionService.saveEditorDetails(
+            submission,
             details.opposedReviewersReason,
             details.opposedReviewingEditorsReason,
             details.opposedSeniorEditorsReason,
@@ -107,7 +107,7 @@ export class WizardService {
             throw new Error('User not allowed to submit');
         }
 
-        await this.submissionService.saveDisclosureDetails(submissionId, details);
+        await this.submissionService.saveDisclosureDetails(submission, details);
 
         return this.getFullSubmission(submissionId);
     }
@@ -228,7 +228,7 @@ export class WizardService {
             throw new Error('User not allowed to update submission');
         }
 
-        await this.submissionService.saveFilesPage(submissionId, coverLetter);
+        await this.submissionService.saveFilesDetails(submission, coverLetter);
 
         return this.getFullSubmission(submissionId);
     }
@@ -240,7 +240,7 @@ export class WizardService {
             throw new Error('User not allowed to update submission');
         }
 
-        await this.submissionService.saveDetailsPage(submissionId, details);
+        await this.submissionService.saveManuscriptDetails(submission, details);
 
         return this.getFullSubmission(submissionId);
     }

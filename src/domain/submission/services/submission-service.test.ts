@@ -1,6 +1,5 @@
 import { SubmissionService } from './submission-service';
 import XpubSubmissionRootRepository from '../repositories/xpub-submission-root';
-import { v4 } from 'uuid';
 import Knex = require('knex');
 import { SubmissionId } from '../types';
 import Submission, { SubmissionStatus, ArticleType } from './models/submission';
@@ -10,14 +9,14 @@ import { SftpStore } from './storage/sftp-store';
 
 const submissionModels: Submission[] = [
     new Submission({
-        id: SubmissionId.fromUuid(v4()),
+        id: SubmissionId.fromUuid('3647dbde-c192-4bcd-9ecd-9a5e52111863'),
         status: SubmissionStatus.INITIAL,
         createdBy: '123',
         articleType: ArticleType.FEATURE_ARTICLE,
         updated: new Date('2020-02-18T15:14:53.155Z'),
     }),
     new Submission({
-        id: SubmissionId.fromUuid(v4()),
+        id: SubmissionId.fromUuid('e0ba60c9-1966-43bc-ba83-6a09c6f3ab1c'),
         status: SubmissionStatus.INITIAL,
         createdBy: '124',
         articleType: ArticleType.RESEARCH_ADVANCE,
@@ -93,6 +92,7 @@ describe('Submission Service', () => {
             expect(submission.createdBy).toBe('userId');
             expect(submission.id).toBeDefined();
             expect(submission.updated).toBeDefined();
+            expect(submission.lastStepVisited).toBe(`/submit/${submission.id}/author`);
         });
     });
 
@@ -106,6 +106,164 @@ describe('Submission Service', () => {
             XpubSubmissionRootRepository.prototype.delete = jest.fn().mockReturnValue(false);
             const service = makeSubmissionService();
             await expect(service.delete(submissionModels[0].id)).resolves.toBe(false);
+        });
+    });
+
+    describe('saveAuthorDetails', () => {
+        it('should update author', async (): Promise<void> => {
+            XpubSubmissionRootRepository.prototype.update = jest.fn().mockReturnValue(true);
+            const service = makeSubmissionService();
+            await service.saveAuthorDetails(submissionModels[0]);
+
+            const expected = {
+                ...submissionModels[0],
+            };
+
+            await expect(XpubSubmissionRootRepository.prototype.update).toBeCalledWith(
+                expect.objectContaining(expected),
+            );
+        });
+
+        it('should set lastStepVisited', async (): Promise<void> => {
+            XpubSubmissionRootRepository.prototype.update = jest.fn().mockReturnValue(true);
+            const service = makeSubmissionService();
+            await service.saveAuthorDetails(submissionModels[0]);
+
+            await expect(XpubSubmissionRootRepository.prototype.update).toBeCalledWith(
+                expect.objectContaining({
+                    lastStepVisited: '/submit/3647dbde-c192-4bcd-9ecd-9a5e52111863/author',
+                }),
+            );
+        });
+    });
+
+    describe('saveFilesDetails', () => {
+        it('should update file details', async (): Promise<void> => {
+            XpubSubmissionRootRepository.prototype.update = jest.fn().mockReturnValue(true);
+            const service = makeSubmissionService();
+            await service.saveFilesDetails(submissionModels[0], 'letter');
+
+            const expected = {
+                ...submissionModels[0],
+            };
+
+            expected.files.coverLetter = 'letter';
+
+            await expect(XpubSubmissionRootRepository.prototype.update).toBeCalledWith(
+                expect.objectContaining(expected),
+            );
+        });
+        it('should set lastStepVisited', async (): Promise<void> => {
+            XpubSubmissionRootRepository.prototype.update = jest.fn().mockReturnValue(true);
+            const service = makeSubmissionService();
+            await service.saveFilesDetails(submissionModels[0], 'letter');
+            await expect(XpubSubmissionRootRepository.prototype.update).toBeCalledWith(
+                expect.objectContaining({
+                    lastStepVisited: '/submit/3647dbde-c192-4bcd-9ecd-9a5e52111863/files',
+                }),
+            );
+        });
+    });
+    describe('saveManuscriptDetails', () => {
+        it('should update manuscript details', async (): Promise<void> => {
+            XpubSubmissionRootRepository.prototype.update = jest.fn().mockReturnValue(true);
+            const service = makeSubmissionService();
+            const details = {
+                title: 'title',
+                subjects: ['s1', 's2'],
+                previouslyDiscussed: 'discussed',
+                previouslySubmitted: 'submitted',
+                cosubmission: ['1234', '2345'],
+            };
+
+            await service.saveManuscriptDetails(submissionModels[0], details);
+
+            const expected = {
+                ...submissionModels[0],
+            };
+            expected.manuscriptDetails = details;
+
+            await expect(XpubSubmissionRootRepository.prototype.update).toBeCalledWith(
+                expect.objectContaining(expected),
+            );
+        });
+        it('should set lastStepVisited', async (): Promise<void> => {
+            XpubSubmissionRootRepository.prototype.update = jest.fn().mockReturnValue(true);
+            const service = makeSubmissionService();
+            await service.saveManuscriptDetails(submissionModels[0], {});
+            await expect(XpubSubmissionRootRepository.prototype.update).toBeCalledWith(
+                expect.objectContaining({
+                    ...submissionModels[0],
+                    lastStepVisited: '/submit/3647dbde-c192-4bcd-9ecd-9a5e52111863/details',
+                }),
+            );
+        });
+    });
+    describe('saveEditorDetails', () => {
+        it('should update editor details', async (): Promise<void> => {
+            XpubSubmissionRootRepository.prototype.update = jest.fn().mockReturnValue(true);
+            const service = makeSubmissionService();
+            await service.saveEditorDetails(submissionModels[0], 'r1', 'r2', 'r3');
+
+            const expected = {
+                ...submissionModels[0],
+            };
+
+            expected.editorDetails.opposedReviewersReason = 'r1';
+            expected.editorDetails.opposedReviewingEditorsReason = 'r2';
+            expected.editorDetails.opposedSeniorEditorsReason = 'r3';
+
+            await expect(XpubSubmissionRootRepository.prototype.update).toBeCalledWith(
+                expect.objectContaining(expected),
+            );
+        });
+        it('should set lastStepVisited', async (): Promise<void> => {
+            XpubSubmissionRootRepository.prototype.update = jest.fn().mockReturnValue(true);
+            const service = makeSubmissionService();
+            await service.saveEditorDetails(submissionModels[0], 'r1', 'r2', 'r3');
+
+            await expect(XpubSubmissionRootRepository.prototype.update).toBeCalledWith(
+                expect.objectContaining({
+                    lastStepVisited: '/submit/3647dbde-c192-4bcd-9ecd-9a5e52111863/editors',
+                }),
+            );
+        });
+    });
+    describe('saveDisclosureDetails', () => {
+        it('should update disclousure details', async (): Promise<void> => {
+            XpubSubmissionRootRepository.prototype.update = jest.fn().mockReturnValue(true);
+            const service = makeSubmissionService();
+            const disclosure = {
+                submitterSignature: 'squiggle',
+                disclosureConsent: true,
+            };
+            await service.saveDisclosureDetails(submissionModels[0], disclosure);
+
+            const expected = {
+                ...submissionModels[0],
+            };
+
+            expected.disclosure = disclosure;
+
+            await expect(XpubSubmissionRootRepository.prototype.update).toBeCalledWith(
+                expect.objectContaining(expected),
+            );
+        });
+        it('should set lastStepVisited', async (): Promise<void> => {
+            XpubSubmissionRootRepository.prototype.update = jest.fn().mockReturnValue(true);
+            const service = makeSubmissionService();
+            await service.saveDisclosureDetails(submissionModels[0], {
+                submitterSignature: '',
+                disclosureConsent: true,
+            });
+
+            const expected = {
+                lastStepVisited: '/submit/3647dbde-c192-4bcd-9ecd-9a5e52111863/disclosure',
+            };
+
+            await expect(XpubSubmissionRootRepository.prototype.update).toBeCalledWith(
+                expect.objectContaining(expected),
+            );
         });
     });
 });

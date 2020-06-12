@@ -105,7 +105,7 @@ describe('saveAuthorPage', () => {
         };
 
         const submissionServiceMock = ({
-            saveAuthorPage: jest.fn(),
+            saveAuthorDetails: jest.fn(),
             get: jest.fn().mockImplementationOnce(() => ({
                 createdBy: user.id,
             })),
@@ -151,7 +151,7 @@ describe('saveAuthorPage', () => {
             email: 'john.smith@example.com',
             aff: 'aff',
         });
-        expect(submissionServiceMock.saveAuthorPage).toBeCalledTimes(1);
+        expect(submissionServiceMock.saveAuthorDetails).toBeCalledTimes(1);
     });
     it('should create when team does not exist', async () => {
         const user = {
@@ -160,7 +160,7 @@ describe('saveAuthorPage', () => {
             role: 'user',
         };
         const submissionServiceMock = ({
-            saveAuthorPage: jest.fn(),
+            saveAuthorDetails: jest.fn(),
             get: jest.fn().mockImplementationOnce(() => ({
                 createdBy: user.id,
             })),
@@ -207,7 +207,7 @@ describe('saveAuthorPage', () => {
             email: 'john.smith@example.com',
             aff: 'aff',
         });
-        expect(submissionServiceMock.saveAuthorPage).toBeCalledTimes(1);
+        expect(submissionServiceMock.saveAuthorDetails).toBeCalledTimes(1);
     });
 
     it('should throw when userId is not owner', async () => {
