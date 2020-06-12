@@ -214,6 +214,7 @@ export class WizardService {
 
     async deleteSupportingFile(fileId: FileId, submissionId: SubmissionId, user: User): Promise<FileId> {
         const submission = await this.submissionService.get(submissionId);
+        // TODO: handle case with submission being null.
         const allowed = this.permissionService.userCanWithSubmission(user, SubmissionOperation.DELETE, submission);
         if (!allowed) {
             throw new Error('User not allowed to delete files');

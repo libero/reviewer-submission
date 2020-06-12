@@ -371,7 +371,78 @@ describe('saveDisclosurePage', () => {});
 describe('submit', () => {});
 
 // TODO: write tests
-describe('deleteManuscriptFile', () => {});
+describe('deleteManuscriptFile', () => {
+    const mockConfig = ({} as unknown) as Config;
+    it.only('it should return an exception if submission is not found', async () => {
+        const submissionServiceMock = ({
+            get: jest.fn().mockImplementationOnce(() => null),
+        } as unknown) as SubmissionService;
+        const teamServiceMock = (jest.fn() as unknown) as TeamService;
+
+        const permissionService = new PermissionService();
+
+        const fileServiceMock = (jest.fn() as unknown) as FileService;
+        const semanticExtractionServiceMock = (jest.fn() as unknown) as SemanticExtractionService;
+        const wizardService = new WizardService(
+            permissionService,
+            submissionServiceMock,
+            teamServiceMock,
+            fileServiceMock,
+            semanticExtractionServiceMock,
+            mockConfig,
+        );
+        const user = {
+            id: '89e0aec8-b9fc-4413-8a37-5cc77567',
+            name: 'Bob',
+            role: 'user',
+        };
+
+        await expect(
+            wizardService.deleteSupportingFile(FileId.fromUuid('4e9d8262-8e4f-45b5-8edc-b8aba02cef8b'), SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'), user),
+        ).rejects.toThrow('No submission found');
+    });
+
+    it('it should return an exception if user is not owner', async () => {
+        const submissionServiceMock = ({
+            get: jest.fn().mockImplementationOnce(() => ({
+                id: '89e0aec8-b9fc-4413-8a37-5cc775edbe3a',
+                createdBy: '89e0aec8-b9fc-4413-8a37-10Dc77567',
+            })),
+        } as unknown) as SubmissionService;
+        const teamServiceMock = (jest.fn() as unknown) as TeamService;
+
+        const permissionService = new PermissionService();
+
+        const fileServiceMock = (jest.fn() as unknown) as FileService;
+        const semanticExtractionServiceMock = (jest.fn() as unknown) as SemanticExtractionService;
+        const wizardService = new WizardService(
+            permissionService,
+            submissionServiceMock,
+            teamServiceMock,
+            fileServiceMock,
+            semanticExtractionServiceMock,
+            mockConfig,
+        );
+        const user = {
+            id: '89e0aec8-b9fc-4413-8a37-5cc77567', // imposter
+            name: 'Bob',
+            role: 'user',
+        };
+
+        await expect(
+            wizardService.deleteSupportingFile(FileId.fromUuid('4e9d8262-8e4f-45b5-8edc-b8aba02cef8b'), SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'), user)
+        ).rejects.toThrow('User not allowed to read submission');
+    });
+
+    it('should delete if file', async() => {
+
+    });
+
+    it('should throw is file is not found', async() => {
+
+    });
+
+});
 
 describe('saveManuscript', () => {
     const mockUser = {
