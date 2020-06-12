@@ -18,6 +18,9 @@ jest.mock('fs', () => ({
 }));
 jest.mock('../../logger');
 
+// TODO: write tests
+describe('getSubmission', () => {});
+
 describe('saveAuthorPage', () => {
     const mockConfig = ({} as unknown) as Config;
     it('should throw if submission not found', async () => {
@@ -250,6 +253,18 @@ describe('saveAuthorPage', () => {
     });
 });
 
+// TODO: write tests
+describe('saveEditorPage', () => {});
+
+// TODO: write tests
+describe('saveDisclosurePage', () => {});
+
+// TODO: write tests
+describe('submit', () => {});
+
+// TODO: write tests
+describe('deleteManuscriptFile', () => {});
+
 describe('saveManuscript', () => {
     const mockUser = {
         id: '89e0aec8-b9fc-4413-8a37-cccccccc',
@@ -472,3 +487,12 @@ describe('saveSupporting', () => {
         expect(supportingFile.id).toBe(fileId);
     });
 });
+
+// TODO: write tests
+describe('deleteSupportingFile', () => {});
+
+// TODO: write tests
+describe('saveFilesPage', () => {});
+
+// TODO: write tests
+describe('saveDetailsPage', () => {});
