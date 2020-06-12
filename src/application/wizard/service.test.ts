@@ -56,7 +56,7 @@ describe('saveAuthorPage', () => {
                 firstName: 'John',
                 lastName: 'Smith',
                 email: 'john.smith@example.com',
-                aff: 'aff',
+                institution: 'aff',
             }),
         ).rejects.toThrow('No submission found');
     });
@@ -95,7 +95,7 @@ describe('saveAuthorPage', () => {
                 firstName: 'John',
                 lastName: 'Smith',
                 email: 'john.smith@example.com',
-                aff: 'aff',
+                institution: 'aff',
             }),
         ).rejects.toThrow('User not allowed to save submission');
     });
@@ -143,7 +143,7 @@ describe('saveAuthorPage', () => {
             firstName: 'John',
             lastName: 'Smith',
             email: 'john.smith@example.com',
-            aff: 'aff',
+            institution: 'aff',
         });
 
         expect(teamServiceMock.updateOrCreateAuthor).toHaveBeenCalledTimes(1);
@@ -151,7 +151,7 @@ describe('saveAuthorPage', () => {
             firstName: 'John',
             lastName: 'Smith',
             email: 'john.smith@example.com',
-            aff: 'aff',
+            institution: 'aff',
         });
     });
     it('should create when team does not exist', async () => {
@@ -197,7 +197,7 @@ describe('saveAuthorPage', () => {
             firstName: 'John',
             lastName: 'Smith',
             email: 'john.smith@example.com',
-            aff: 'aff',
+            institution: 'aff',
         });
 
         expect(teamServiceMock.updateOrCreateAuthor).toHaveBeenCalledTimes(1);
@@ -205,7 +205,7 @@ describe('saveAuthorPage', () => {
             firstName: 'John',
             lastName: 'Smith',
             email: 'john.smith@example.com',
-            aff: 'aff',
+            institution: 'aff',
         });
     });
 
@@ -247,7 +247,7 @@ describe('saveAuthorPage', () => {
                 firstName: 'John',
                 lastName: 'Smith',
                 email: 'john.smith@example.com',
-                aff: 'aff',
+                institution: 'aff',
             }),
         ).rejects.toThrow('User not allowed to save submission');
     });

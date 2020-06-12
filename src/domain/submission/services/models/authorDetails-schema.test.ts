@@ -2,14 +2,14 @@ import * as Joi from 'joi';
 import { authorSchema } from './authorDetails-schema';
 
 describe('author schema', () => {
-    let author: { firstName: string; lastName: string; email: string; aff: string };
+    let author: { firstName: string; lastName: string; email: string; institution: string };
 
     beforeEach(() => {
         author = {
             firstName: 'A',
             lastName: 'B',
             email: 'C@here.com',
-            aff: 'D',
+            institution: 'D',
         };
     });
 
@@ -36,10 +36,10 @@ describe('author schema', () => {
             );
         });
         it('no affiliation', () => {
-            author.aff = '';
+            author.institution = '';
             const { error } = Joi.validate(author, authorSchema);
             expect(error.toString()).toEqual(
-                'ValidationError: child "aff" fails because ["aff" is not allowed to be empty]',
+                'ValidationError: child "institution" fails because ["institution" is not allowed to be empty]',
             );
         });
         it('no email', () => {

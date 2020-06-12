@@ -7,6 +7,6 @@ export const authorSchema = Joi.object()
         email: Joi.string()
             .email()
             .required(),
-        aff: Joi.string().required(),
+        institution: Joi.string().required(),
     })
     .required();

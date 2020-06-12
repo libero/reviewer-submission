@@ -29,7 +29,7 @@ describe('Submission Entity', () => {
             firstName: 'Jane',
             lastName: 'Smith',
             email: 'email@elifesciences.org',
-            aff: 'int',
+            institution: 'int',
         };
 
         submission.files.coverLetter = 'Accept please!';
