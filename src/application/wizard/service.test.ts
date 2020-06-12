@@ -120,6 +120,7 @@ describe('getSubmission', () => {
         );
         const { files = null } = submission || {};
         expect(submission).toBeDefined();
+        expect(submission?.createdBy).toBe('89e0aec8-b9fc-4413-8a37-5cc77567');
         expect(files).toBeDefined();
     });
 });
