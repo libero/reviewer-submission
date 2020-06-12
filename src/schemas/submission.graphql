@@ -1,6 +1,6 @@
 scalar Upload
 
-# TODO : Missing created, status, lastStepVisted
+# TODO : Missing created, status
 type Submission {
     id: ID!
     updated: String!
@@ -11,6 +11,7 @@ type Submission {
     editorDetails: EditorDetails
     disclosure: DisclosureDetails
     suggestions: [Suggestion]
+    lastStepVisted: String
 }
 
 type Suggestion {

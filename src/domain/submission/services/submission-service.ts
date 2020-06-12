@@ -23,6 +23,10 @@ export class SubmissionService {
         this.submissionRepository = new XpubSubmissionRootRepository(adapter);
     }
 
+    private setLastStepVisited(submission: Submission, step: string): void {
+        submission.lastStepVisited = `/submit/${submission.id}/${step}`;
+    }
+
     async findAll(): Promise<Submission[]> {
         return await this.submissionRepository.findAll();
     }
@@ -40,6 +44,7 @@ export class SubmissionService {
             status: 'INITIAL',
             createdBy: userId,
         });
+        this.setLastStepVisited(submission, 'author');
         return await this.submissionRepository.create(submission);
     }
 
@@ -76,49 +81,43 @@ export class SubmissionService {
         return this.get(id);
     }
 
-    async changeCoverLetter(id: SubmissionId, coverLetter: string): Promise<Submission> {
-        const submission = await this.submissionRepository.findById(id);
-        if (!submission) {
-            throw new Error('Unable to find submission with id: ' + id);
-        }
+    async saveAuthorDetails(submission: Submission): Promise<Submission> {
+        this.setLastStepVisited(submission, 'author');
+        return await this.submissionRepository.update(submission);
+    }
+
+    async saveFilesDetails(submission: Submission, coverLetter: string): Promise<Submission> {
         submission.files.coverLetter = coverLetter;
+        this.setLastStepVisited(submission, 'files');
         return await this.submissionRepository.update(submission);
     }
 
-    async saveDetailsPage(id: SubmissionId, details: ManuscriptDetails): Promise<Submission> {
-        const submission = await this.submissionRepository.findById(id);
-        if (!submission) {
-            throw new Error('Unable to find submission with id: ' + id);
-        }
+    async saveManuscriptDetails(submission: Submission, details: ManuscriptDetails): Promise<Submission> {
         submission.manuscriptDetails = details;
+        this.setLastStepVisited(submission, 'details');
         return await this.submissionRepository.update(submission);
     }
 
-    async addEditorDetails(
-        id: SubmissionId,
+    async saveEditorDetails(
+        submission: Submission,
         opposedReviewersReason?: string,
         opposedReviewingEditorsReason?: string,
         opposedSeniorEditorsReason?: string,
     ): Promise<Submission> {
-        const submission = await this.submissionRepository.findById(id);
-        if (!submission) {
-            throw new Error('Unable to find submission with id: ' + id);
-        }
         submission.addOppositionReasons(
             opposedReviewersReason,
             opposedReviewingEditorsReason,
             opposedSeniorEditorsReason,
         );
+        this.setLastStepVisited(submission, 'editors');
+
         return await this.submissionRepository.update(submission);
     }
 
-    async saveDisclosureDetails(id: SubmissionId, disclosureDetails: DisclosureDetails): Promise<Submission> {
-        const submission = await this.submissionRepository.findById(id);
-        if (!submission) {
-            throw new Error('Unable to find submission with id: ' + id);
-        }
+    async saveDisclosureDetails(submission: Submission, disclosureDetails: DisclosureDetails): Promise<Submission> {
         submission.disclosure.submitterSignature = disclosureDetails.submitterSignature;
         submission.disclosure.disclosureConsent = disclosureDetails.disclosureConsent;
+        this.setLastStepVisited(submission, 'disclosure');
         return await this.submissionRepository.update(submission);
     }
 }

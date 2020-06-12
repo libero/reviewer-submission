@@ -17,6 +17,7 @@ const testDatabaseEntry = {
     },
     cover_letter: 'test cover',
     status: SubmissionStatus.INITIAL,
+    last_step_visited: 'p1',
     created_by: '123',
     updated: new Date('2020-02-18T15:14:53.255Z'),
     created: new Date('2020-02-18T15:14:53.155Z'),
@@ -30,6 +31,7 @@ const testDatabaseEntry2 = {
     },
     cover_letter: 'test cover',
     status: SubmissionStatus.INITIAL,
+    last_step_visited: 'p2',
     created_by: '124',
     updated: new Date('2020-02-18T15:14:53.255Z'),
     created: new Date('2020-02-18T15:14:53.155Z'),
@@ -67,6 +69,7 @@ describe('Knex Submission Repository', () => {
                 articleType: ArticleType.FEATURE_ARTICLE,
                 updated: new Date('2020-02-18T15:14:53.255Z'),
                 created: new Date('2020-02-18T15:14:53.155Z'),
+                lastStepVisited: 'p1',
                 disclosure: {},
                 editorDetails: {},
                 files: {
@@ -85,6 +88,7 @@ describe('Knex Submission Repository', () => {
                 id: entryId2,
                 status: SubmissionStatus.INITIAL,
                 createdBy: '124',
+                lastStepVisited: 'p2',
                 articleType: ArticleType.RESEARCH_ADVANCE,
                 updated: new Date('2020-02-18T15:14:53.255Z'),
                 created: new Date('2020-02-18T15:14:53.155Z'),
@@ -118,6 +122,7 @@ describe('Knex Submission Repository', () => {
                 'opposed_senior_editors_reason',
                 'opposed_reviewing_editors_reason',
                 'opposed_reviewers_reason',
+                'last_step_visited',
             );
             expect(mock.from).toBeCalledWith('manuscript');
         });
@@ -131,6 +136,7 @@ describe('Knex Submission Repository', () => {
                 id: entryId,
                 status: SubmissionStatus.INITIAL,
                 createdBy: '123',
+                lastStepVisited: 'p1',
                 articleType: ArticleType.FEATURE_ARTICLE,
                 updated: new Date('2020-02-18T15:14:53.255Z'),
                 created: new Date('2020-02-18T15:14:53.155Z'),
@@ -176,6 +182,7 @@ describe('Knex Submission Repository', () => {
                 'opposed_senior_editors_reason',
                 'opposed_reviewing_editors_reason',
                 'opposed_reviewers_reason',
+                'last_step_visited',
             );
             expect(mock.from).toBeCalledWith('manuscript');
             expect(mock.where).toBeCalledWith({ id: entryId });
