@@ -52,9 +52,9 @@ export class WizardService {
         if (submission === null) {
             throw new Error('No submission found');
         }
-        const allowed = this.permissionService.userCanWithSubmission(user, SubmissionOperation.UPDATE, submission);
+        const allowed = this.permissionService.userCanWithSubmission(user, SubmissionOperation.READ, submission);
         if (!allowed) {
-            throw new Error('User not allowed to save submission');
+            throw new Error('User not allowed to read submission');
         }
         return this.getFullSubmission(submissionId);
     }
