@@ -84,7 +84,7 @@ describe('Knex Submission Repository', () => {
                             firstName: 'John',
                             lastName: 'Smith',
                             email: 'john.smith@example.com',
-                            aff: 'aff',
+                            institution: 'aff',
                         },
                         meta: { corresponding: true },
                     },
