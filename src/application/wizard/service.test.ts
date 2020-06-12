@@ -746,5 +746,6 @@ describe('saveDetailsPage', () => {
         expect(submission.manuscriptDetails.previouslyDiscussed).toBe(details.previouslyDiscussed);
         expect(submission.manuscriptDetails.previouslySubmitted).toBe(details.previouslySubmitted);
         expect(submission.manuscriptDetails.subjects).toBe(details.subjects);
+        expect(submission?.createdBy).toBe('89e0aec8-b9fc-4413-8a37-5cc77567');
     });
 });
