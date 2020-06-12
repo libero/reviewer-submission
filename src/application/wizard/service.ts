@@ -235,6 +235,9 @@ export class WizardService {
 
     async saveDetailsPage(user: User, submissionId: SubmissionId, details: ManuscriptDetails): Promise<Submission> {
         const submission = await this.submissionService.get(submissionId);
+        if (submission === null) {
+            throw new Error('No submission found');
+        }
         const allowed = this.permissionService.userCanWithSubmission(user, SubmissionOperation.UPDATE, submission);
         if (!allowed) {
             throw new Error('User not allowed to update submission');

@@ -19,6 +19,9 @@ jest.mock('fs', () => ({
 jest.mock('../../logger');
 
 describe('getSubmission', () => {
+    beforeEach(() => {
+        jest.resetAllMocks();
+    });
     const mockConfig = ({} as unknown) as Config;
     it('it should return an exception if submission is not found', async () => {
         const submissionServiceMock = ({
@@ -629,13 +632,19 @@ describe('saveDetailsPage', () => {
         };
 
         await expect(
-            wizardService.getSubmission(user, SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a')),
+            wizardService.saveDetailsPage(user, SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'), {
+                title: 'title',
+                subjects: ['subjects'],
+                previouslyDiscussed: 'previouslyDiscussed',
+                previouslySubmitted: 'previouslySubmitted',
+                cosubmission: ['cosubmission'],
+            }),
         ).rejects.toThrow('No submission found');
     });
 
     it('it should return an exception if user is not owner', async () => {
         const submissionServiceMock = ({
-            get: jest.fn().mockImplementationOnce(() => ({
+            get: jest.fn().mockImplementation(() => ({
                 id: '89e0aec8-b9fc-4413-8a37-5cc775edbe3a',
                 createdBy: '89e0aec8-b9fc-4413-8a37-10Dc77567',
             })),
@@ -661,7 +670,13 @@ describe('saveDetailsPage', () => {
         };
 
         await expect(
-            wizardService.getSubmission(user, SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a')),
-        ).rejects.toThrow('User not allowed to read submission');
+            wizardService.saveDetailsPage(user, SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'), {
+                title: 'title',
+                subjects: ['subjects'],
+                previouslyDiscussed: 'previouslyDiscussed',
+                previouslySubmitted: 'previouslySubmitted',
+                cosubmission: ['cosubmission'],
+            }),
+        ).rejects.toThrow('User not allowed to update submission');
     });
 });
