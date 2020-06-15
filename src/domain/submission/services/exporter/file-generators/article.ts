@@ -132,7 +132,7 @@ class ArticleGenerator {
         this.affiliations = this.editors.map(editor => editor.affiliations || '');
 
         if (this.submission.author) {
-            this.affiliations.push(this.submission.author.aff);
+            this.affiliations.push(this.submission.author.institution);
         }
     }
 
@@ -227,7 +227,7 @@ class ArticleGenerator {
                 email: this.submission.author?.email,
                 xref: {
                     '@ref-type': 'aff',
-                    '@rid': this.submission.author ? this._getAffiliationId(this.submission.author.aff) : null,
+                    '@rid': this.submission.author ? this._getAffiliationId(this.submission.author.institution) : null,
                 },
             },
         };

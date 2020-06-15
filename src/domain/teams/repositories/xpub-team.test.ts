@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import { MockKnex, createMockAdapter } from '../../test-mocks/knex-mock';
 import { v4 } from 'uuid';
 import { TeamId } from '../types';
@@ -56,7 +57,6 @@ describe('Knex Submission Repository', () => {
             await repo.findByObjectIdAndRole('someObjectId', 'role');
             expect(mock.select).toBeCalledWith('id', 'updated', 'team_members', 'role');
             expect(mock.from).toBeCalledWith('team');
-            // eslint-disable-next-line @typescript-eslint/camelcase
             expect(mock.where).toBeCalledWith({ object_id: 'someObjectId', role: 'role' });
         });
         it('returns an empty array if there are no found team entries', async (): Promise<void> => {
@@ -65,35 +65,82 @@ describe('Knex Submission Repository', () => {
             const result = await repo.findByObjectIdAndRole('someObjectId', 'role');
             expect(result).toHaveLength(0);
         });
+        it('translates fromm aff to institution for authors', async (): Promise<void> => {
+            adapter.executor = jest.fn().mockReturnValue([
+                {
+                    ...databaseEntries[0],
+                    role: 'author',
+                    team_members: [
+                        {
+                            alias: {
+                                firstName: 'John',
+                                lastName: 'Smith',
+                                email: 'john.smith@example.com',
+                                aff: 'aff',
+                            },
+                            meta: { corresponding: true },
+                        },
+                    ],
+                },
+            ]);
+            const repo = new XpubTeamRepository(adapter);
+            await repo.findByObjectIdAndRole('someObjectId', 'role');
+        });
     });
 
     describe('create', () => {
+        const entity = {
+            id: entryId1,
+            role: 'role',
+            objectId: '1234',
+            objectType: 'type',
+            created: new Date(),
+            updated: new Date(),
+            teamMembers: [
+                {
+                    alias: {
+                        firstName: 'John',
+                        lastName: 'Smith',
+                        email: 'john.smith@example.com',
+                        institution: 'aff',
+                    },
+                    meta: { corresponding: true },
+                },
+            ] as Array<AuthorTeamMember>,
+        };
+
         it('should create a new Team using the passed in variables and pass that to knex', async () => {
             adapter.executor = jest.fn().mockReturnValue(databaseEntries);
             const repo = new XpubTeamRepository(adapter);
-            const entity = {
-                id: entryId1,
-                role: 'role',
-                objectId: '1234',
-                objectType: 'type',
-                created: new Date(),
-                updated: new Date(),
-                teamMembers: [
-                    {
-                        alias: {
-                            firstName: 'John',
-                            lastName: 'Smith',
-                            email: 'john.smith@example.com',
-                            aff: 'aff',
-                        },
-                        meta: { corresponding: true },
-                    },
-                ] as Array<AuthorTeamMember>,
-            };
             await repo.create(entity);
             expect(mock.insert).toBeCalledWith(
                 expect.objectContaining({
                     id: entity.id,
+                }),
+            );
+        });
+
+        it('should translate author institution field when inserting', async () => {
+            adapter.executor = jest.fn().mockReturnValue([]);
+            const repo = new XpubTeamRepository(adapter);
+            await repo.create({
+                ...entity,
+                role: 'author',
+            });
+            expect(mock.insert).toBeCalledWith(
+                expect.objectContaining({
+                    id: entity.id,
+                    team_members: [
+                        {
+                            alias: {
+                                firstName: 'John',
+                                lastName: 'Smith',
+                                email: 'john.smith@example.com',
+                                aff: 'aff',
+                            },
+                            meta: { corresponding: true },
+                        },
+                    ],
                 }),
             );
         });

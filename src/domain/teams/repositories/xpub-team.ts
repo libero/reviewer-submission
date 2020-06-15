@@ -4,11 +4,25 @@ import { TeamId } from '../types';
 import { KnexTableAdapter } from '../../knex-table-adapter';
 import Team from '../services/models/team';
 
+type DatabaseAuthorDetails = {
+    firstName: string;
+    lastName: string;
+    email: string;
+    aff: string;
+};
+
+type DatabaseAuthorTeamMember = {
+    alias: DatabaseAuthorDetails;
+    meta: { corresponding: true };
+};
+
+type DatabaseTeamMembers = Array<DatabaseAuthorTeamMember | EditorTeamMember | EditorReviewerTeamMember>;
+
 type DatabaseEntry = {
     id: TeamId;
     updated: Date;
     created: Date;
-    team_members: Array<AuthorTeamMember | EditorTeamMember | EditorReviewerTeamMember>;
+    team_members: DatabaseTeamMembers;
     role: string;
     object_id: string;
     object_type: string;
@@ -75,15 +89,17 @@ export default class XpubTeamRepository implements TeamRepository {
     }
 
     private toDatabaseEntry(team: Team): DatabaseEntry {
-        const {
-            teamMembers: team_members,
-            objectId: object_id,
-            objectType: object_type,
-            id,
-            updated,
-            created,
-            role,
-        } = team;
+        const { teamMembers, objectId: object_id, objectType: object_type, id, updated, created, role } = team;
+
+        // we need to convert AuthorTeamMember to DatabaseAuthorTeamMember since we are storing the 'institution'
+        // field as 'aff' in the database which is inherited from xpub.
+        const team_members = (team.role === 'author'
+            ? teamMembers.map(teamMember => {
+                  const { institution: aff, ...rest } = (teamMember as AuthorTeamMember).alias;
+                  return { ...teamMember, alias: { aff, ...rest } };
+              })
+            : teamMembers) as DatabaseTeamMembers;
+
         const databaseEntry: DatabaseEntry = {
             team_members,
             object_id,
@@ -98,7 +114,7 @@ export default class XpubTeamRepository implements TeamRepository {
 
     private toModel(databaseEntry: DatabaseEntry): Team {
         const {
-            team_members: teamMembers,
+            team_members,
             object_id: objectId,
             object_type: objectType,
             id,
@@ -106,6 +122,15 @@ export default class XpubTeamRepository implements TeamRepository {
             created,
             role,
         } = databaseEntry;
+
+        // we need to convert back from DatabaseAuthorTeamMember to AuthorTeamMember since we are storing the 'institution'
+        // field as 'aff' in the database which is inherited from xpub.
+        const teamMembers = (role === 'author'
+            ? team_members.map(teamMember => {
+                  const { aff: institution, ...rest } = (teamMember as DatabaseAuthorTeamMember).alias;
+                  return { ...teamMember, alias: { institution, ...rest } };
+              })
+            : team_members) as Array<AuthorTeamMember | EditorTeamMember | EditorReviewerTeamMember>;
 
         return new Team(id, created, updated, teamMembers, role, objectId, objectType);
     }

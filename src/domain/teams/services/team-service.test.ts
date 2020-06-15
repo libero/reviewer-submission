@@ -204,7 +204,7 @@ describe('Teams Service', () => {
                 firstName: 'Liz',
                 lastName: 'Windsor',
                 email: 'liz@buckingham.com',
-                aff: 'Royalty',
+                institution: 'Royalty',
             });
 
             expect(result).toStrictEqual('donkey');
@@ -217,7 +217,7 @@ describe('Teams Service', () => {
                     teamMembers: [
                         {
                             alias: {
-                                aff: 'Royalty',
+                                institution: 'Royalty',
                                 email: 'liz@buckingham.com',
                                 firstName: 'Liz',
                                 lastName: 'Windsor',
@@ -237,7 +237,7 @@ describe('Teams Service', () => {
                     teamMembers: [
                         {
                             alias: {
-                                aff: 'Royalty',
+                                institution: 'Royalty',
                                 email: 'charles@buckingham.com',
                                 firstName: 'Charles',
                                 lastName: 'Windsor',
@@ -254,7 +254,7 @@ describe('Teams Service', () => {
                 firstName: 'Liz',
                 lastName: 'Windsor',
                 email: 'liz@buckingham.com',
-                aff: 'Royalty',
+                institution: 'Royalty',
             });
 
             expect(result).toStrictEqual('donkey');
@@ -267,7 +267,7 @@ describe('Teams Service', () => {
                     teamMembers: [
                         {
                             alias: {
-                                aff: 'Royalty',
+                                institution: 'Royalty',
                                 email: 'liz@buckingham.com',
                                 firstName: 'Liz',
                                 lastName: 'Windsor',

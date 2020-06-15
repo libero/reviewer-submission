@@ -7,7 +7,7 @@ export type AuthorDetails = {
     firstName: string;
     lastName: string;
     email: string;
-    aff: string;
+    institution: string;
 };
 
 export type ManuscriptDetails = {

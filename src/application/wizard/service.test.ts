@@ -163,7 +163,7 @@ describe('saveAuthorPage', () => {
                 firstName: 'John',
                 lastName: 'Smith',
                 email: 'john.smith@example.com',
-                aff: 'aff',
+                institution: 'aff',
             }),
         ).rejects.toThrow('No submission found');
     });
@@ -202,7 +202,7 @@ describe('saveAuthorPage', () => {
                 firstName: 'John',
                 lastName: 'Smith',
                 email: 'john.smith@example.com',
-                aff: 'aff',
+                institution: 'aff',
             }),
         ).rejects.toThrow('User not allowed to save submission');
     });
@@ -251,7 +251,7 @@ describe('saveAuthorPage', () => {
             firstName: 'John',
             lastName: 'Smith',
             email: 'john.smith@example.com',
-            aff: 'aff',
+            institution: 'aff',
         });
 
         expect(teamServiceMock.updateOrCreateAuthor).toHaveBeenCalledTimes(1);
@@ -259,7 +259,7 @@ describe('saveAuthorPage', () => {
             firstName: 'John',
             lastName: 'Smith',
             email: 'john.smith@example.com',
-            aff: 'aff',
+            institution: 'aff',
         });
         expect(submissionServiceMock.saveAuthorDetails).toBeCalledTimes(1);
     });
@@ -307,7 +307,7 @@ describe('saveAuthorPage', () => {
             firstName: 'John',
             lastName: 'Smith',
             email: 'john.smith@example.com',
-            aff: 'aff',
+            institution: 'aff',
         });
 
         expect(teamServiceMock.updateOrCreateAuthor).toHaveBeenCalledTimes(1);
@@ -315,7 +315,7 @@ describe('saveAuthorPage', () => {
             firstName: 'John',
             lastName: 'Smith',
             email: 'john.smith@example.com',
-            aff: 'aff',
+            institution: 'aff',
         });
         expect(submissionServiceMock.saveAuthorDetails).toBeCalledTimes(1);
     });
@@ -358,7 +358,7 @@ describe('saveAuthorPage', () => {
                 firstName: 'John',
                 lastName: 'Smith',
                 email: 'john.smith@example.com',
-                aff: 'aff',
+                institution: 'aff',
             }),
         ).rejects.toThrow('User not allowed to save submission');
     });
