@@ -17,9 +17,6 @@ jest.mock('fs', () => ({
     readFileSync: jest.fn().mockReturnValue('{}'),
 }));
 
-jest.mock('aws-sdk/clients/s3', () => ({
-    deleteObject: jest.fn().mockReturnValue(true),
-}));
 jest.mock('../../logger');
 
 describe('getSubmission', () => {
