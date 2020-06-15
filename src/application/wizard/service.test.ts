@@ -19,6 +19,9 @@ jest.mock('fs', () => ({
 jest.mock('../../logger');
 
 describe('getSubmission', () => {
+    beforeEach(() => {
+        jest.resetAllMocks();
+    });
     const mockConfig = ({} as unknown) as Config;
     it('it should return an exception if submission is not found', async () => {
         const submissionServiceMock = ({
@@ -602,5 +605,147 @@ describe('deleteSupportingFile', () => {});
 // TODO: write tests
 describe('saveFilesPage', () => {});
 
-// TODO: write tests
-describe('saveDetailsPage', () => {});
+describe('saveDetailsPage', () => {
+    const mockConfig = ({} as unknown) as Config;
+    it('it should return an exception if submission is not found', async () => {
+        const submissionServiceMock = ({
+            get: jest.fn().mockImplementationOnce(() => null),
+        } as unknown) as SubmissionService;
+        const teamServiceMock = (jest.fn() as unknown) as TeamService;
+
+        const permissionService = new PermissionService();
+
+        const fileServiceMock = (jest.fn() as unknown) as FileService;
+        const semanticExtractionServiceMock = (jest.fn() as unknown) as SemanticExtractionService;
+        const wizardService = new WizardService(
+            permissionService,
+            submissionServiceMock,
+            teamServiceMock,
+            fileServiceMock,
+            semanticExtractionServiceMock,
+            mockConfig,
+        );
+        const user = {
+            id: '89e0aec8-b9fc-4413-8a37-5cc77567',
+            name: 'Bob',
+            role: 'user',
+        };
+
+        await expect(
+            wizardService.saveDetailsPage(user, SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'), {
+                title: 'title',
+                subjects: ['subjects'],
+                previouslyDiscussed: 'previouslyDiscussed',
+                previouslySubmitted: 'previouslySubmitted',
+                cosubmission: ['cosubmission'],
+            }),
+        ).rejects.toThrow('No submission found');
+    });
+
+    it('it should return an exception if user is not owner', async () => {
+        const submissionServiceMock = ({
+            get: jest.fn().mockImplementation(() => ({
+                id: '89e0aec8-b9fc-4413-8a37-5cc775edbe3a',
+                createdBy: '89e0aec8-b9fc-4413-8a37-10Dc77567',
+            })),
+        } as unknown) as SubmissionService;
+        const teamServiceMock = ({ findTeams: jest.fn().mockImplementation(() => []) } as unknown) as TeamService;
+
+        const permissionService = new PermissionService();
+
+        const fileServiceMock = ({
+            findManuscriptFile: jest.fn().mockImplementation(() => null),
+            getSupportingFiles: jest.fn().mockImplementation(() => []),
+        } as unknown) as FileService;
+        const semanticExtractionServiceMock = ({
+            getSuggestion: jest.fn().mockImplementation(() => null),
+        } as unknown) as SemanticExtractionService;
+        const wizardService = new WizardService(
+            permissionService,
+            submissionServiceMock,
+            teamServiceMock,
+            fileServiceMock,
+            semanticExtractionServiceMock,
+            mockConfig,
+        );
+
+        const user = {
+            id: '89e0aec8-b9fc-4413-8a37-5cc77567',
+            name: 'Bob',
+            role: 'user',
+        };
+
+        await expect(
+            wizardService.saveDetailsPage(user, SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'), {
+                title: 'title',
+                subjects: ['subjects'],
+                previouslyDiscussed: 'previouslyDiscussed',
+                previouslySubmitted: 'previouslySubmitted',
+                cosubmission: ['cosubmission'],
+            }),
+        ).rejects.toThrow('User not allowed to update submission');
+    });
+
+    it('should update the submission object with details', async () => {
+        const sub = {
+            id: '89e0aec8-b9fc-4413-8a37-5cc775edbe3a',
+            createdBy: '89e0aec8-b9fc-4413-8a37-5cc77567',
+            files: [],
+        };
+
+        const details = {
+            title: 'title',
+            subjects: ['subjects'],
+            previouslyDiscussed: 'previouslyDiscussed',
+            previouslySubmitted: 'previouslySubmitted',
+            cosubmission: ['cosubmission'],
+        };
+
+        const submissionServiceMock = ({
+            get: jest
+                .fn()
+                .mockImplementationOnce(() => sub)
+                .mockImplementationOnce(() => ({ ...sub, ...{ manuscriptDetails: { ...details } } })),
+            saveManuscriptDetails: jest.fn().mockImplementation(() => {}),
+        } as unknown) as SubmissionService;
+        const teamServiceMock = ({ findTeams: jest.fn().mockImplementation(() => []) } as unknown) as TeamService;
+
+        const permissionService = new PermissionService();
+
+        const fileServiceMock = ({
+            findManuscriptFile: jest.fn().mockImplementation(() => null),
+            getSupportingFiles: jest.fn().mockImplementation(() => []),
+        } as unknown) as FileService;
+        const semanticExtractionServiceMock = ({
+            getSuggestion: jest.fn().mockImplementation(() => null),
+        } as unknown) as SemanticExtractionService;
+        const wizardService = new WizardService(
+            permissionService,
+            submissionServiceMock,
+            teamServiceMock,
+            fileServiceMock,
+            semanticExtractionServiceMock,
+            mockConfig,
+        );
+
+        const user = {
+            id: '89e0aec8-b9fc-4413-8a37-5cc77567',
+            name: 'Bob',
+            role: 'user',
+        };
+
+        const submission = await wizardService.saveDetailsPage(
+            user,
+            SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'),
+            details,
+        );
+        expect(submissionServiceMock.saveManuscriptDetails).toHaveBeenCalledWith(sub, details);
+        expect(submission).toBeDefined();
+        expect(submission.manuscriptDetails.title).toBe(details.title);
+        expect(submission.manuscriptDetails.cosubmission).toBe(details.cosubmission);
+        expect(submission.manuscriptDetails.previouslyDiscussed).toBe(details.previouslyDiscussed);
+        expect(submission.manuscriptDetails.previouslySubmitted).toBe(details.previouslySubmitted);
+        expect(submission.manuscriptDetails.subjects).toBe(details.subjects);
+        expect(submission?.createdBy).toBe('89e0aec8-b9fc-4413-8a37-5cc77567');
+    });
+});
