@@ -126,6 +126,9 @@ export class WizardService {
 
     async deleteManuscriptFile(fileId: FileId, submissionId: SubmissionId, user: User): Promise<boolean> {
         const submission = await this.submissionService.get(submissionId);
+        if (submission === null) {
+            throw new Error('No submission found');
+        }
         const allowed = this.permissionService.userCanWithSubmission(user, SubmissionOperation.DELETE, submission);
         if (!allowed) {
             throw new Error('User not allowed to delete files');
@@ -214,6 +217,9 @@ export class WizardService {
 
     async deleteSupportingFile(fileId: FileId, submissionId: SubmissionId, user: User): Promise<FileId> {
         const submission = await this.submissionService.get(submissionId);
+        if (submission === null) {
+            throw new Error('No submission found');
+        }
         const allowed = this.permissionService.userCanWithSubmission(user, SubmissionOperation.DELETE, submission);
         if (!allowed) {
             throw new Error('User not allowed to delete files');
