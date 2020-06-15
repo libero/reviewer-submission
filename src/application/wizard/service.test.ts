@@ -16,6 +16,10 @@ import { FileId, FileType } from '../../domain/file/types';
 jest.mock('fs', () => ({
     readFileSync: jest.fn().mockReturnValue('{}'),
 }));
+
+jest.mock('aws-sdk/clients/s3', () => ({
+    deleteObject: jest.fn().mockReturnValue(true),
+}));
 jest.mock('../../logger');
 
 describe('getSubmission', () => {
@@ -370,10 +374,9 @@ describe('saveDisclosurePage', () => {});
 // TODO: write tests
 describe('submit', () => {});
 
-// TODO: write tests
 describe('deleteManuscriptFile', () => {
     const mockConfig = ({} as unknown) as Config;
-    it.only('it should return an exception if submission is not found', async () => {
+    it('it should return an exception if submission is not found', async () => {
         const submissionServiceMock = ({
             get: jest.fn().mockImplementationOnce(() => null),
         } as unknown) as SubmissionService;
@@ -398,7 +401,11 @@ describe('deleteManuscriptFile', () => {
         };
 
         await expect(
-            wizardService.deleteSupportingFile(FileId.fromUuid('4e9d8262-8e4f-45b5-8edc-b8aba02cef8b'), SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'), user),
+            wizardService.deleteSupportingFile(
+                FileId.fromUuid('4e9d8262-8e4f-45b5-8edc-b8aba02cef8b'),
+                SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'),
+                user,
+            ),
         ).rejects.toThrow('No submission found');
     });
 
@@ -430,18 +437,58 @@ describe('deleteManuscriptFile', () => {
         };
 
         await expect(
-            wizardService.deleteSupportingFile(FileId.fromUuid('4e9d8262-8e4f-45b5-8edc-b8aba02cef8b'), SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'), user)
-        ).rejects.toThrow('User not allowed to read submission');
+            wizardService.deleteSupportingFile(
+                FileId.fromUuid('4e9d8262-8e4f-45b5-8edc-b8aba02cef8b'),
+                SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'),
+                user,
+            ),
+        ).rejects.toThrow('User not allowed to delete files');
     });
 
-    it('should delete if file', async() => {
+    it('should delete and return true', async () => {
+        const submissionId = '26f61697-c936-4ceb-a90c-52d51e9f5468';
+        const submissionServiceMock = ({
+            get: jest.fn().mockImplementationOnce(() => ({
+                id: submissionId,
+                createdBy: '89e0aec8-b9fc-4413-8a37-5cc77567',
+            })),
+        } as unknown) as SubmissionService;
+        const teamServiceMock = (jest.fn() as unknown) as TeamService;
 
+        const permissionService = new PermissionService();
+
+        const fileServiceMock = ({
+            deleteManuscript: jest.fn().mockImplementationOnce(() => true),
+        } as unknown) as FileService;
+
+        const semanticExtractionServiceMock = (jest.fn() as unknown) as SemanticExtractionService;
+        const wizardService = new WizardService(
+            permissionService,
+            submissionServiceMock,
+            teamServiceMock,
+            fileServiceMock,
+            semanticExtractionServiceMock,
+            mockConfig,
+        );
+        const user = {
+            id: '89e0aec8-b9fc-4413-8a37-5cc77567',
+            name: 'Bob',
+            role: 'user',
+        };
+        const fileId = '4e9d8262-8e4f-45b5-8edc-b8aba02cef8b';
+
+        const response = await wizardService.deleteManuscriptFile(
+            FileId.fromUuid(fileId),
+            SubmissionId.fromUuid(submissionId),
+            user,
+        );
+        expect(response).toBe(true);
+        expect(fileServiceMock.deleteManuscript).toBeCalledWith(
+            user,
+            FileId.fromUuid(fileId),
+            SubmissionId.fromUuid(submissionId),
+        );
     });
-
-    it('should throw is file is not found', async() => {
-
-    });
-
 });
 
 describe('saveManuscript', () => {
@@ -667,8 +714,123 @@ describe('saveSupporting', () => {
     });
 });
 
-// TODO: write tests
-describe('deleteSupportingFile', () => {});
+describe('deleteSupportingFile', () => {
+    const mockConfig = ({} as unknown) as Config;
+    it('it should return an exception if submission is not found', async () => {
+        const submissionServiceMock = ({
+            get: jest.fn().mockImplementationOnce(() => null),
+        } as unknown) as SubmissionService;
+        const teamServiceMock = (jest.fn() as unknown) as TeamService;
+
+        const permissionService = new PermissionService();
+
+        const fileServiceMock = (jest.fn() as unknown) as FileService;
+        const semanticExtractionServiceMock = (jest.fn() as unknown) as SemanticExtractionService;
+        const wizardService = new WizardService(
+            permissionService,
+            submissionServiceMock,
+            teamServiceMock,
+            fileServiceMock,
+            semanticExtractionServiceMock,
+            mockConfig,
+        );
+        const user = {
+            id: '89e0aec8-b9fc-4413-8a37-5cc77567',
+            name: 'Bob',
+            role: 'user',
+        };
+
+        await expect(
+            wizardService.deleteSupportingFile(
+                FileId.fromUuid('4e9d8262-8e4f-45b5-8edc-b8aba02cef8b'),
+                SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'),
+                user,
+            ),
+        ).rejects.toThrow('No submission found');
+    });
+
+    it('it should return an exception if user is not owner', async () => {
+        const submissionServiceMock = ({
+            get: jest.fn().mockImplementationOnce(() => ({
+                id: '89e0aec8-b9fc-4413-8a37-5cc775edbe3a',
+                createdBy: '89e0aec8-b9fc-4413-8a37-10Dc77567',
+            })),
+        } as unknown) as SubmissionService;
+        const teamServiceMock = (jest.fn() as unknown) as TeamService;
+
+        const permissionService = new PermissionService();
+
+        const fileServiceMock = (jest.fn() as unknown) as FileService;
+        const semanticExtractionServiceMock = (jest.fn() as unknown) as SemanticExtractionService;
+        const wizardService = new WizardService(
+            permissionService,
+            submissionServiceMock,
+            teamServiceMock,
+            fileServiceMock,
+            semanticExtractionServiceMock,
+            mockConfig,
+        );
+        const user = {
+            id: '89e0aec8-b9fc-4413-8a37-5cc77567', // imposter
+            name: 'Bob',
+            role: 'user',
+        };
+
+        await expect(
+            wizardService.deleteSupportingFile(
+                FileId.fromUuid('4e9d8262-8e4f-45b5-8edc-b8aba02cef8b'),
+                SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'),
+                user,
+            ),
+        ).rejects.toThrow('User not allowed to delete files');
+    });
+
+    it('should delete and return fileId', async () => {
+        const submissionId = '26f61697-c936-4ceb-a90c-52d51e9f5468';
+        const submissionServiceMock = ({
+            get: jest.fn().mockImplementationOnce(() => ({
+                id: submissionId,
+                createdBy: '89e0aec8-b9fc-4413-8a37-5cc77567',
+            })),
+        } as unknown) as SubmissionService;
+        const teamServiceMock = (jest.fn() as unknown) as TeamService;
+
+        const permissionService = new PermissionService();
+
+        const fileServiceMock = ({
+            /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+            deleteSupportingFile: jest.fn().mockImplementationOnce((_, fileId, __) => fileId),
+        } as unknown) as FileService;
+
+        const semanticExtractionServiceMock = (jest.fn() as unknown) as SemanticExtractionService;
+        const wizardService = new WizardService(
+            permissionService,
+            submissionServiceMock,
+            teamServiceMock,
+            fileServiceMock,
+            semanticExtractionServiceMock,
+            mockConfig,
+        );
+        const user = {
+            id: '89e0aec8-b9fc-4413-8a37-5cc77567',
+            name: 'Bob',
+            role: 'user',
+        };
+        const fileId = '4e9d8262-8e4f-45b5-8edc-b8aba02cef8b';
+
+        const returnedFileId = await wizardService.deleteSupportingFile(
+            FileId.fromUuid(fileId),
+            SubmissionId.fromUuid(submissionId),
+            user,
+        );
+        expect(returnedFileId).toBe(fileId);
+        expect(fileServiceMock.deleteSupportingFile).toBeCalledWith(
+            user,
+            FileId.fromUuid(fileId),
+            SubmissionId.fromUuid(submissionId),
+        );
+    });
+});
 
 // TODO: write tests
 describe('saveFilesPage', () => {});
