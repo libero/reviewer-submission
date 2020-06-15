@@ -16,7 +16,7 @@ submission.author = {
     firstName: 'Test',
     lastName: 'User',
     email: 'test.user@example.com',
-    aff: 'University of eLife',
+    institution: 'University of eLife',
 };
 
 submission.manuscriptDetails = {
