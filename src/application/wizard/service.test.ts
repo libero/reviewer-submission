@@ -523,8 +523,169 @@ describe('saveEditorPage', () => {
     });
 });
 
-// TODO: write tests
-describe('saveDisclosurePage', () => {});
+describe('saveDisclosurePage', () => {
+    const mockConfig = ({} as unknown) as Config;
+    it('it should throw if not found', async () => {
+        const submissionServiceMock = ({
+            get: jest.fn().mockImplementation(() => null),
+            saveDisclosureDetails: jest.fn().mockImplementation(() => {}),
+        } as unknown) as SubmissionService;
+
+        const teamServiceMock = ({
+            addOrUpdateEditorTeams: jest.fn().mockImplementation(() => {}),
+            findTeams: jest.fn().mockImplementation(() => []),
+        } as unknown) as TeamService;
+
+        const permissionService = new PermissionService();
+
+        const fileServiceMock = ({
+            findManuscriptFile: jest.fn().mockImplementation(() => null),
+            getSupportingFiles: jest.fn().mockImplementation(() => []),
+        } as unknown) as FileService;
+
+        const semanticExtractionServiceMock = ({
+            getSuggestion: jest.fn().mockImplementation(() => null),
+        } as unknown) as SemanticExtractionService;
+
+        const wizardService = new WizardService(
+            permissionService,
+            submissionServiceMock,
+            teamServiceMock,
+            fileServiceMock,
+            semanticExtractionServiceMock,
+            mockConfig,
+        );
+        const user = {
+            id: '89e0aec8-b9fc-4413-8a37-5cc77567',
+            name: 'Bob',
+            role: 'user',
+        };
+        const details = {
+            submitterSignature: 'signature',
+            disclosureConsent: false,
+        };
+        await expect(
+            wizardService.saveDisclosurePage(
+                user,
+                SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'),
+                details,
+            ),
+        ).rejects.toThrow('No submission found');
+    });
+
+    it('it should throw if not the owner', async () => {
+        const submissionServiceMock = ({
+            get: jest.fn().mockImplementation(() => ({
+                id: '89e0aec8-b9fc-4413-8a37-5cc775edbe3a',
+                createdBy: '89e0aec8-b9fc-4413-8a37-65c77567',
+                files: [],
+            })),
+            saveDisclosureDetails: jest.fn().mockImplementation(() => {}),
+        } as unknown) as SubmissionService;
+
+        const teamServiceMock = ({
+            addOrUpdateEditorTeams: jest.fn().mockImplementation(() => {}),
+            findTeams: jest.fn().mockImplementation(() => []),
+        } as unknown) as TeamService;
+
+        const permissionService = new PermissionService();
+
+        const fileServiceMock = ({
+            findManuscriptFile: jest.fn().mockImplementation(() => null),
+            getSupportingFiles: jest.fn().mockImplementation(() => []),
+        } as unknown) as FileService;
+
+        const semanticExtractionServiceMock = ({
+            getSuggestion: jest.fn().mockImplementation(() => null),
+        } as unknown) as SemanticExtractionService;
+
+        const wizardService = new WizardService(
+            permissionService,
+            submissionServiceMock,
+            teamServiceMock,
+            fileServiceMock,
+            semanticExtractionServiceMock,
+            mockConfig,
+        );
+        const user = {
+            id: '89e0aec8-b9fc-4413-8a37-5cc77567',
+            name: 'Bob',
+            role: 'user',
+        };
+        const details = {
+            submitterSignature: 'signature',
+            disclosureConsent: false,
+        };
+        await expect(
+            wizardService.saveDisclosurePage(
+                user,
+                SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'),
+                details,
+            ),
+        ).rejects.toThrow('User not allowed to submit');
+    });
+
+    it('should call the required service', async () => {
+        const submissionServiceMock = ({
+            get: jest.fn().mockImplementation(() => ({
+                id: '89e0aec8-b9fc-4413-8a37-5cc775edbe3a',
+                createdBy: '89e0aec8-b9fc-4413-8a37-5cc77567',
+                files: [],
+            })),
+            saveDisclosureDetails: jest.fn().mockImplementation(() => {}),
+        } as unknown) as SubmissionService;
+
+        const teamServiceMock = ({
+            addOrUpdateEditorTeams: jest.fn().mockImplementation(() => {}),
+            findTeams: jest.fn().mockImplementation(() => []),
+        } as unknown) as TeamService;
+
+        const permissionService = new PermissionService();
+
+        const fileServiceMock = ({
+            findManuscriptFile: jest.fn().mockImplementation(() => null),
+            getSupportingFiles: jest.fn().mockImplementation(() => []),
+        } as unknown) as FileService;
+
+        const semanticExtractionServiceMock = ({
+            getSuggestion: jest.fn().mockImplementation(() => null),
+        } as unknown) as SemanticExtractionService;
+
+        const wizardService = new WizardService(
+            permissionService,
+            submissionServiceMock,
+            teamServiceMock,
+            fileServiceMock,
+            semanticExtractionServiceMock,
+            mockConfig,
+        );
+        const user = {
+            id: '89e0aec8-b9fc-4413-8a37-5cc77567',
+            name: 'Bob',
+            role: 'user',
+        };
+        const details = {
+            submitterSignature: 'signature',
+            disclosureConsent: false,
+        };
+        const submission = await wizardService.saveDisclosurePage(
+            user,
+            SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'),
+            details,
+        );
+
+        expect(submissionServiceMock.saveDisclosureDetails).toBeCalledWith(
+            {
+                id: '89e0aec8-b9fc-4413-8a37-5cc775edbe3a',
+                createdBy: '89e0aec8-b9fc-4413-8a37-5cc77567',
+                files: [],
+            },
+            details,
+        );
+        expect(submission).toBeDefined();
+        expect(submission?.createdBy).toBe('89e0aec8-b9fc-4413-8a37-5cc77567');
+    });
+});
 
 // TODO: write tests
 describe('submit', () => {});
