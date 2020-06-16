@@ -832,8 +832,121 @@ describe('deleteSupportingFile', () => {
     });
 });
 
-// TODO: write tests
-describe('saveFilesPage', () => {});
+describe('saveFilesPage', () => {
+    const mockConfig = ({} as unknown) as Config;
+    it('it should return an exception if submission is not found', async () => {
+        const submissionServiceMock = ({
+            get: jest.fn().mockImplementationOnce(() => null),
+        } as unknown) as SubmissionService;
+        const teamServiceMock = (jest.fn() as unknown) as TeamService;
+
+        const permissionService = new PermissionService();
+
+        const fileServiceMock = (jest.fn() as unknown) as FileService;
+        const semanticExtractionServiceMock = (jest.fn() as unknown) as SemanticExtractionService;
+        const wizardService = new WizardService(
+            permissionService,
+            submissionServiceMock,
+            teamServiceMock,
+            fileServiceMock,
+            semanticExtractionServiceMock,
+            mockConfig,
+        );
+        const user = {
+            id: '89e0aec8-b9fc-4413-8a37-5cc77567',
+            name: 'Bob',
+            role: 'user',
+        };
+
+        await expect(
+            wizardService.saveFilesPage(user, SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'), 'cover'),
+        ).rejects.toThrow('No submission found');
+    });
+
+    it('it should return an exception if user is not owner', async () => {
+        const submissionServiceMock = ({
+            get: jest.fn().mockImplementationOnce(() => ({
+                id: '89e0aec8-b9fc-4413-8a37-5cc775edbe3a',
+                createdBy: '89e0aec8-b9fc-4413-8a37-10Dc77567',
+                file: [],
+            })),
+        } as unknown) as SubmissionService;
+        const teamServiceMock = ({ findTeams: jest.fn().mockImplementation(() => []) } as unknown) as TeamService;
+
+        const permissionService = new PermissionService();
+
+        const fileServiceMock = ({
+            findManuscriptFile: jest.fn().mockImplementation(() => null),
+            getSupportingFiles: jest.fn().mockImplementation(() => []),
+        } as unknown) as FileService;
+        const semanticExtractionServiceMock = ({
+            getSuggestion: jest.fn().mockImplementation(() => null),
+        } as unknown) as SemanticExtractionService;
+        const wizardService = new WizardService(
+            permissionService,
+            submissionServiceMock,
+            teamServiceMock,
+            fileServiceMock,
+            semanticExtractionServiceMock,
+            mockConfig,
+        );
+
+        const user = {
+            id: '89e0aec8-b9fc-4413-8a37-5cc77567',
+            name: 'Bob',
+            role: 'user',
+        };
+
+        await expect(
+            wizardService.saveFilesPage(user, SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'), 'cover'),
+        ).rejects.toThrow('User not allowed to update submission');
+    });
+
+    it('it should called savefilesDetails with cover', async () => {
+        const sub = {
+            id: '89e0aec8-b9fc-4413-8a37-5cc775edbe3a',
+            createdBy: '89e0aec8-b9fc-4413-8a37-5cc77567',
+            files: [],
+        };
+        const submissionServiceMock = ({
+            get: jest.fn().mockImplementation(() => sub),
+            saveFilesDetails: jest.fn().mockImplementationOnce(() => true),
+        } as unknown) as SubmissionService;
+        const teamServiceMock = ({ findTeams: jest.fn().mockImplementation(() => []) } as unknown) as TeamService;
+
+        const permissionService = new PermissionService();
+
+        const fileServiceMock = ({
+            findManuscriptFile: jest.fn().mockImplementation(() => null),
+            getSupportingFiles: jest.fn().mockImplementation(() => []),
+        } as unknown) as FileService;
+        const semanticExtractionServiceMock = ({
+            getSuggestion: jest.fn().mockImplementation(() => null),
+        } as unknown) as SemanticExtractionService;
+        const wizardService = new WizardService(
+            permissionService,
+            submissionServiceMock,
+            teamServiceMock,
+            fileServiceMock,
+            semanticExtractionServiceMock,
+            mockConfig,
+        );
+
+        const user = {
+            id: '89e0aec8-b9fc-4413-8a37-5cc77567',
+            name: 'Bob',
+            role: 'user',
+        };
+
+        const submission = await wizardService.saveFilesPage(
+            user,
+            SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'),
+            'cover',
+        );
+        expect(submission.id).toBe('89e0aec8-b9fc-4413-8a37-5cc775edbe3a');
+        expect(submissionServiceMock.saveFilesDetails).toBeCalledWith(sub, 'cover');
+    });
+});
 
 describe('saveDetailsPage', () => {
     const mockConfig = ({} as unknown) as Config;
