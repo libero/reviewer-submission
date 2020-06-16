@@ -20,9 +20,6 @@ jest.mock('fs', () => ({
 jest.mock('../../logger');
 
 describe('getSubmission', () => {
-    beforeEach(() => {
-        jest.resetAllMocks();
-    });
     const mockConfig = ({} as unknown) as Config;
     it('it should return an exception if submission is not found', async () => {
         const submissionServiceMock = ({
@@ -131,9 +128,6 @@ describe('getSubmission', () => {
 });
 
 describe('saveAuthorPage', () => {
-    beforeEach(() => {
-        jest.resetAllMocks();
-    });
     const mockConfig = ({} as unknown) as Config;
     it('should throw if submission not found', async () => {
         const submissionServiceMock = ({
@@ -372,9 +366,6 @@ describe('saveAuthorPage', () => {
 });
 
 describe('saveEditorPage', () => {
-    beforeEach(() => {
-        jest.resetAllMocks();
-    });
     const mockConfig = ({} as unknown) as Config;
     it('it should return an exception if submission is not found', async () => {
         const submissionServiceMock = ({
@@ -533,9 +524,6 @@ describe('saveEditorPage', () => {
 });
 
 describe('saveDisclosurePage', () => {
-    beforeEach(() => {
-        jest.resetAllMocks();
-    });
     const mockConfig = ({} as unknown) as Config;
     it('it should throw if not found', async () => {
         const submissionServiceMock = ({
@@ -700,9 +688,6 @@ describe('saveDisclosurePage', () => {
 });
 
 describe('submit', () => {
-    beforeEach(() => {
-        jest.resetAllMocks();
-    });
     const mockConfig = ({} as unknown) as Config;
     const sub = {
         id: '89e0aec8-b9fc-4413-8a37-5cc775edbe3a',
@@ -794,9 +779,9 @@ describe('submit', () => {
 });
 
 describe('deleteManuscriptFile', () => {
-    beforeEach(() => {
-        jest.resetAllMocks();
-    });
+    // beforeEach(() => {
+    //     jest.resetAllMocks();
+    // });
     const mockConfig = ({} as unknown) as Config;
     it('it should return an exception if submission is not found', async () => {
         const submissionServiceMock = ({
@@ -914,9 +899,9 @@ describe('deleteManuscriptFile', () => {
 });
 
 describe('saveManuscript', () => {
-    beforeEach(() => {
-        jest.resetAllMocks();
-    });
+    // beforeEach(() => {
+    //     jest.resetAllMocks();
+    // });
     const mockUser = {
         id: '89e0aec8-b9fc-4413-8a37-cccccccc',
         name: 'Bob',
@@ -1009,9 +994,9 @@ describe('saveManuscript', () => {
 });
 
 describe('saveSupporting', () => {
-    beforeEach(() => {
-        jest.resetAllMocks();
-    });
+    // beforeEach(() => {
+    //     jest.resetAllMocks();
+    // });
     const mockUser = {
         id: '89e0aec8-b9fc-4413-8a37-cccccccc',
         name: 'Bob',
@@ -1143,9 +1128,9 @@ describe('saveSupporting', () => {
 });
 
 describe('deleteSupportingFile', () => {
-    beforeEach(() => {
-        jest.resetAllMocks();
-    });
+    // beforeEach(() => {
+    //     jest.resetAllMocks();
+    // });
     const mockConfig = ({} as unknown) as Config;
     it('it should return an exception if submission is not found', async () => {
         const submissionServiceMock = ({
@@ -1264,9 +1249,9 @@ describe('deleteSupportingFile', () => {
 });
 
 describe('saveFilesPage', () => {
-    beforeEach(() => {
-        jest.resetAllMocks();
-    });
+    // beforeEach(() => {
+    //     jest.resetAllMocks();
+    // });
     const mockConfig = ({} as unknown) as Config;
     it('it should return an exception if submission is not found', async () => {
         const submissionServiceMock = ({
@@ -1383,9 +1368,9 @@ describe('saveFilesPage', () => {
 });
 
 describe('saveDetailsPage', () => {
-    beforeEach(() => {
-        jest.resetAllMocks();
-    });
+    // beforeEach(() => {
+    //     jest.resetAllMocks();
+    // });
     const mockConfig = ({} as unknown) as Config;
     it('it should return an exception if submission is not found', async () => {
         const submissionServiceMock = ({
