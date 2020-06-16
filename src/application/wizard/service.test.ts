@@ -365,8 +365,163 @@ describe('saveAuthorPage', () => {
     });
 });
 
-// TODO: write tests
-describe('saveEditorPage', () => {});
+describe('saveEditorPage', () => {
+    const mockConfig = ({} as unknown) as Config;
+    it('it should return an exception if submission is not found', async () => {
+        const submissionServiceMock = ({
+            get: jest.fn().mockImplementationOnce(() => null),
+        } as unknown) as SubmissionService;
+        const teamServiceMock = (jest.fn() as unknown) as TeamService;
+
+        const permissionService = new PermissionService();
+
+        const fileServiceMock = (jest.fn() as unknown) as FileService;
+        const semanticExtractionServiceMock = (jest.fn() as unknown) as SemanticExtractionService;
+        const wizardService = new WizardService(
+            permissionService,
+            submissionServiceMock,
+            teamServiceMock,
+            fileServiceMock,
+            semanticExtractionServiceMock,
+            mockConfig,
+        );
+        const user = {
+            id: '89e0aec8-b9fc-4413-8a37-5cc77567',
+            name: 'Bob',
+            role: 'user',
+        };
+
+        const details = {
+            suggestedSeniorEditors: ['abc'],
+            opposedSeniorEditors: ['def'],
+            opposedSeniorEditorsReason: 'reason',
+            suggestedReviewingEditors: ['ghi'],
+            opposedReviewingEditors: ['jkl'],
+            opposedReviewingEditorsReason: 'reason 2',
+            suggestedReviewers: [{ name: 'bill', email: 'bill@bill.com' }],
+            opposedReviewers: [{ name: 'jane', email: 'jane@jane.com' }],
+            opposedReviewersReason: 'reason',
+        };
+
+        await expect(
+            wizardService.saveEditorPage(user, SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'), details),
+        ).rejects.toThrow('No submission found');
+    });
+
+    it('it should return an exception if user is not owner', async () => {
+        const submissionServiceMock = ({
+            get: jest.fn().mockImplementationOnce(() => ({
+                id: '89e0aec8-b9fc-4413-8a37-5cc775edbe3a',
+                createdBy: '89e0aec8-b9fc-4413-8a37-10Dc77567',
+            })),
+        } as unknown) as SubmissionService;
+        const teamServiceMock = (jest.fn() as unknown) as TeamService;
+
+        const permissionService = new PermissionService();
+
+        const fileServiceMock = (jest.fn() as unknown) as FileService;
+        const semanticExtractionServiceMock = (jest.fn() as unknown) as SemanticExtractionService;
+        const wizardService = new WizardService(
+            permissionService,
+            submissionServiceMock,
+            teamServiceMock,
+            fileServiceMock,
+            semanticExtractionServiceMock,
+            mockConfig,
+        );
+        const user = {
+            id: '89e0aec8-b9fc-4413-8a37-5cc77567', // imposter
+            name: 'Bob',
+            role: 'user',
+        };
+
+        const details = {
+            suggestedSeniorEditors: ['abc'],
+            opposedSeniorEditors: ['def'],
+            opposedSeniorEditorsReason: 'reason',
+            suggestedReviewingEditors: ['ghi'],
+            opposedReviewingEditors: ['jkl'],
+            opposedReviewingEditorsReason: 'reason 2',
+            suggestedReviewers: [{ name: 'bill', email: 'bill@bill.com' }],
+            opposedReviewers: [{ name: 'jane', email: 'jane@jane.com' }],
+            opposedReviewersReason: 'reason',
+        };
+
+        await expect(
+            wizardService.saveEditorPage(user, SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'), details),
+        ).rejects.toThrow('User not allowed to save submission');
+    });
+
+    it('should pass editor details to required services', async () => {
+        const submissionServiceMock = ({
+            get: jest.fn().mockImplementation(() => ({
+                id: '89e0aec8-b9fc-4413-8a37-5cc775edbe3a',
+                createdBy: '89e0aec8-b9fc-4413-8a37-5cc77567',
+                files: [],
+            })),
+            saveEditorDetails: jest.fn().mockImplementation(() => {}),
+        } as unknown) as SubmissionService;
+        const teamServiceMock = ({
+            addOrUpdateEditorTeams: jest.fn().mockImplementation(() => {}),
+            findTeams: jest.fn().mockImplementation(() => []),
+        } as unknown) as TeamService;
+
+        const permissionService = new PermissionService();
+
+        const fileServiceMock = ({
+            findManuscriptFile: jest.fn().mockImplementation(() => null),
+            getSupportingFiles: jest.fn().mockImplementation(() => []),
+        } as unknown) as FileService;
+        const semanticExtractionServiceMock = ({
+            getSuggestion: jest.fn().mockImplementation(() => null),
+        } as unknown) as SemanticExtractionService;
+        const wizardService = new WizardService(
+            permissionService,
+            submissionServiceMock,
+            teamServiceMock,
+            fileServiceMock,
+            semanticExtractionServiceMock,
+            mockConfig,
+        );
+        const user = {
+            id: '89e0aec8-b9fc-4413-8a37-5cc77567',
+            name: 'Bob',
+            role: 'user',
+        };
+
+        const details = {
+            suggestedSeniorEditors: ['abc'],
+            opposedSeniorEditors: ['def'],
+            opposedSeniorEditorsReason: 'reason',
+            suggestedReviewingEditors: ['ghi'],
+            opposedReviewingEditors: ['jkl'],
+            opposedReviewingEditorsReason: 'reason 2',
+            suggestedReviewers: [{ name: 'bill', email: 'bill@bill.com' }],
+            opposedReviewers: [{ name: 'jane', email: 'jane@jane.com' }],
+            opposedReviewersReason: 'reason',
+        };
+
+        const submission = await wizardService.saveEditorPage(
+            user,
+            SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'),
+            details,
+        );
+
+        expect(teamServiceMock.addOrUpdateEditorTeams).toBeCalledWith('89e0aec8-b9fc-4413-8a37-5cc775edbe3a', details);
+        expect(submissionServiceMock.saveEditorDetails).toBeCalledWith(
+            {
+                id: '89e0aec8-b9fc-4413-8a37-5cc775edbe3a',
+                createdBy: '89e0aec8-b9fc-4413-8a37-5cc77567',
+                files: [],
+            },
+            details.opposedReviewersReason,
+            details.opposedReviewingEditorsReason,
+            details.opposedSeniorEditorsReason,
+        );
+        expect(submission).toBeDefined();
+        expect(submission?.createdBy).toBe('89e0aec8-b9fc-4413-8a37-5cc77567');
+    });
+});
 
 // TODO: write tests
 describe('saveDisclosurePage', () => {});
