@@ -21,16 +21,24 @@ jest.mock('../../logger');
 
 describe('getSubmission', () => {
     const mockConfig = ({} as unknown) as Config;
+    const teamServiceMock = ({ findTeams: jest.fn().mockImplementation(() => []) } as unknown) as TeamService;
+
+    const permissionService = new PermissionService();
+
+    const fileServiceMock = ({
+        findManuscriptFile: jest.fn().mockImplementation(() => null),
+        getSupportingFiles: jest.fn().mockImplementation(() => []),
+    } as unknown) as FileService;
+
+    const semanticExtractionServiceMock = ({
+        getSuggestion: jest.fn().mockImplementation(() => null),
+    } as unknown) as SemanticExtractionService;
+
     it('it should return an exception if submission is not found', async () => {
         const submissionServiceMock = ({
             get: jest.fn().mockImplementationOnce(() => null),
         } as unknown) as SubmissionService;
-        const teamServiceMock = (jest.fn() as unknown) as TeamService;
 
-        const permissionService = new PermissionService();
-
-        const fileServiceMock = (jest.fn() as unknown) as FileService;
-        const semanticExtractionServiceMock = (jest.fn() as unknown) as SemanticExtractionService;
         const wizardService = new WizardService(
             permissionService,
             submissionServiceMock,
@@ -57,12 +65,7 @@ describe('getSubmission', () => {
                 createdBy: '89e0aec8-b9fc-4413-8a37-10Dc77567',
             })),
         } as unknown) as SubmissionService;
-        const teamServiceMock = (jest.fn() as unknown) as TeamService;
 
-        const permissionService = new PermissionService();
-
-        const fileServiceMock = (jest.fn() as unknown) as FileService;
-        const semanticExtractionServiceMock = (jest.fn() as unknown) as SemanticExtractionService;
         const wizardService = new WizardService(
             permissionService,
             submissionServiceMock,
@@ -90,18 +93,7 @@ describe('getSubmission', () => {
                 files: [],
             })),
         } as unknown) as SubmissionService;
-        const teamServiceMock = ({ findTeams: jest.fn().mockImplementation(() => []) } as unknown) as TeamService;
 
-        const permissionService = new PermissionService();
-
-        const fileServiceMock = ({
-            findManuscriptFile: jest.fn().mockImplementation(() => null),
-            getSupportingFiles: jest.fn().mockImplementation(() => []),
-        } as unknown) as FileService;
-
-        const semanticExtractionServiceMock = ({
-            getSuggestion: jest.fn().mockImplementation(() => null),
-        } as unknown) as SemanticExtractionService;
         const wizardService = new WizardService(
             permissionService,
             submissionServiceMock,
@@ -129,20 +121,30 @@ describe('getSubmission', () => {
 
 describe('saveAuthorPage', () => {
     const mockConfig = ({} as unknown) as Config;
+    const existingTeam = {
+        id: TeamId.fromUuid('cda3aef6-0034-4620-b843-1d15b7e815d1'),
+    };
+    const teamServiceMock = ({
+        find: jest.fn().mockImplementationOnce(() => existingTeam),
+        updateOrCreateAuthor: jest.fn(),
+        update: jest.fn(),
+        create: jest.fn(),
+    } as unknown) as TeamService;
+    const permissionService = new PermissionService();
+    const suggestion: Suggestion = { fieldName: 'title', value: 'title' };
+    const semanticExtractionServiceMock = ({
+        getSuggestion: jest.fn().mockReturnValue([suggestion]),
+    } as unknown) as SemanticExtractionService;
+
+    const fileServiceMock = ({
+        findManuscriptFile: jest.fn(),
+        getSupportingFiles: jest.fn().mockReturnValue([]),
+    } as unknown) as FileService;
+
     it('should throw if submission not found', async () => {
         const submissionServiceMock = ({
             get: jest.fn().mockImplementationOnce(() => null),
         } as unknown) as SubmissionService;
-        const teamServiceMock = ({
-            find: jest.fn(),
-            update: jest.fn(),
-            create: jest.fn(),
-        } as unknown) as TeamService;
-
-        const permissionService = new PermissionService();
-
-        const fileServiceMock = (jest.fn() as unknown) as FileService;
-        const semanticExtractionServiceMock = (jest.fn() as unknown) as SemanticExtractionService;
 
         const wizardService = new WizardService(
             permissionService,
@@ -173,15 +175,6 @@ describe('saveAuthorPage', () => {
                 createdBy: '3028aab5-ef74-484f-9dfd-aba3f8103f09',
             })),
         } as unknown) as SubmissionService;
-        const teamServiceMock = ({
-            find: jest.fn(),
-            update: jest.fn(),
-            create: jest.fn(),
-        } as unknown) as TeamService;
-
-        const permissionService = new PermissionService();
-        const fileServiceMock = (jest.fn() as unknown) as FileService;
-        const semanticExtractionServiceMock = (jest.fn() as unknown) as SemanticExtractionService;
 
         const wizardService = new WizardService(
             permissionService,
@@ -219,30 +212,11 @@ describe('saveAuthorPage', () => {
                 createdBy: user.id,
             })),
         } as unknown) as SubmissionService;
-        const existingTeam = {
-            id: TeamId.fromUuid('cda3aef6-0034-4620-b843-1d15b7e815d1'),
-        };
-        const teamServiceMock = ({
-            find: jest.fn().mockImplementationOnce(() => existingTeam),
-            updateOrCreateAuthor: jest.fn(),
-            update: jest.fn(),
-            create: jest.fn(),
-        } as unknown) as TeamService;
-        const permissionService = new PermissionService();
-        const suggestion: Suggestion = { fieldName: 'title', value: 'title' };
-        const semanticExtractionServiceMock = ({
-            getSuggestion: jest.fn().mockReturnValue([suggestion]),
-        } as unknown) as SemanticExtractionService;
-
-        const fileService = ({
-            findManuscriptFile: jest.fn(),
-            getSupportingFiles: jest.fn().mockReturnValue([]),
-        } as unknown) as FileService;
         const wizardService = new WizardService(
             permissionService,
             submissionServiceMock,
             teamServiceMock,
-            fileService,
+            fileServiceMock,
             semanticExtractionServiceMock,
             mockConfig,
         );
@@ -289,15 +263,11 @@ describe('saveAuthorPage', () => {
         } as unknown) as SemanticExtractionService;
         const subId = SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a');
 
-        const fileService = ({
-            findManuscriptFile: jest.fn(),
-            getSupportingFiles: jest.fn().mockReturnValue([]),
-        } as unknown) as FileService;
         const wizardService = new WizardService(
             permissionService,
             submissionServiceMock,
             teamServiceMock,
-            fileService,
+            fileServiceMock,
             semanticExtractionServiceMock,
             mockConfig,
         );
@@ -332,19 +302,6 @@ describe('saveAuthorPage', () => {
             })),
         } as unknown) as SubmissionService;
 
-        const existingTeam = {
-            id: TeamId.fromUuid('cda3aef6-0034-4620-b843-1d15b7e815d1'),
-        };
-        const teamServiceMock = ({
-            find: jest.fn().mockImplementationOnce(() => existingTeam),
-            update: jest.fn(),
-            create: jest.fn(),
-        } as unknown) as TeamService;
-
-        const permissionService = new PermissionService();
-        const fileServiceMock = (jest.fn() as unknown) as FileService;
-        const semanticExtractionServiceMock = (jest.fn() as unknown) as SemanticExtractionService;
-
         const wizardService = new WizardService(
             permissionService,
             submissionServiceMock,
@@ -367,16 +324,23 @@ describe('saveAuthorPage', () => {
 
 describe('saveEditorPage', () => {
     const mockConfig = ({} as unknown) as Config;
+    const teamServiceMock = ({
+        addOrUpdateEditorTeams: jest.fn().mockImplementation(() => true),
+        findTeams: jest.fn().mockImplementation(() => []),
+    } as unknown) as TeamService;
+    const permissionService = new PermissionService();
+    const fileServiceMock = ({
+        findManuscriptFile: jest.fn().mockImplementation(() => {}),
+        getSupportingFiles: jest.fn().mockImplementation(() => []),
+    } as unknown) as FileService;
+    const semanticExtractionServiceMock = ({
+        getSuggestion: jest.fn().mockImplementation(() => ''),
+    } as unknown) as SemanticExtractionService;
+
     it('it should return an exception if submission is not found', async () => {
         const submissionServiceMock = ({
             get: jest.fn().mockImplementationOnce(() => null),
         } as unknown) as SubmissionService;
-        const teamServiceMock = (jest.fn() as unknown) as TeamService;
-
-        const permissionService = new PermissionService();
-
-        const fileServiceMock = (jest.fn() as unknown) as FileService;
-        const semanticExtractionServiceMock = (jest.fn() as unknown) as SemanticExtractionService;
         const wizardService = new WizardService(
             permissionService,
             submissionServiceMock,
@@ -415,12 +379,7 @@ describe('saveEditorPage', () => {
                 createdBy: '89e0aec8-b9fc-4413-8a37-10Dc77567',
             })),
         } as unknown) as SubmissionService;
-        const teamServiceMock = (jest.fn() as unknown) as TeamService;
 
-        const permissionService = new PermissionService();
-
-        const fileServiceMock = (jest.fn() as unknown) as FileService;
-        const semanticExtractionServiceMock = (jest.fn() as unknown) as SemanticExtractionService;
         const wizardService = new WizardService(
             permissionService,
             submissionServiceMock,
@@ -461,20 +420,6 @@ describe('saveEditorPage', () => {
             })),
             saveEditorDetails: jest.fn().mockImplementation(() => {}),
         } as unknown) as SubmissionService;
-        const teamServiceMock = ({
-            addOrUpdateEditorTeams: jest.fn().mockImplementation(() => {}),
-            findTeams: jest.fn().mockImplementation(() => []),
-        } as unknown) as TeamService;
-
-        const permissionService = new PermissionService();
-
-        const fileServiceMock = ({
-            findManuscriptFile: jest.fn().mockImplementation(() => null),
-            getSupportingFiles: jest.fn().mockImplementation(() => []),
-        } as unknown) as FileService;
-        const semanticExtractionServiceMock = ({
-            getSuggestion: jest.fn().mockImplementation(() => null),
-        } as unknown) as SemanticExtractionService;
         const wizardService = new WizardService(
             permissionService,
             submissionServiceMock,
@@ -525,27 +470,28 @@ describe('saveEditorPage', () => {
 
 describe('saveDisclosurePage', () => {
     const mockConfig = ({} as unknown) as Config;
+
+    const teamServiceMock = ({
+        addOrUpdateEditorTeams: jest.fn().mockImplementation(() => {}),
+        findTeams: jest.fn().mockImplementation(() => []),
+    } as unknown) as TeamService;
+
+    const permissionService = new PermissionService();
+
+    const fileServiceMock = ({
+        findManuscriptFile: jest.fn().mockImplementation(() => null),
+        getSupportingFiles: jest.fn().mockImplementation(() => []),
+    } as unknown) as FileService;
+
+    const semanticExtractionServiceMock = ({
+        getSuggestion: jest.fn().mockImplementation(() => null),
+    } as unknown) as SemanticExtractionService;
+
     it('it should throw if not found', async () => {
         const submissionServiceMock = ({
             get: jest.fn().mockImplementation(() => null),
             saveDisclosureDetails: jest.fn().mockImplementation(() => {}),
         } as unknown) as SubmissionService;
-
-        const teamServiceMock = ({
-            addOrUpdateEditorTeams: jest.fn().mockImplementation(() => {}),
-            findTeams: jest.fn().mockImplementation(() => []),
-        } as unknown) as TeamService;
-
-        const permissionService = new PermissionService();
-
-        const fileServiceMock = ({
-            findManuscriptFile: jest.fn().mockImplementation(() => null),
-            getSupportingFiles: jest.fn().mockImplementation(() => []),
-        } as unknown) as FileService;
-
-        const semanticExtractionServiceMock = ({
-            getSuggestion: jest.fn().mockImplementation(() => null),
-        } as unknown) as SemanticExtractionService;
 
         const wizardService = new WizardService(
             permissionService,
@@ -583,22 +529,6 @@ describe('saveDisclosurePage', () => {
             saveDisclosureDetails: jest.fn().mockImplementation(() => {}),
         } as unknown) as SubmissionService;
 
-        const teamServiceMock = ({
-            addOrUpdateEditorTeams: jest.fn().mockImplementation(() => {}),
-            findTeams: jest.fn().mockImplementation(() => []),
-        } as unknown) as TeamService;
-
-        const permissionService = new PermissionService();
-
-        const fileServiceMock = ({
-            findManuscriptFile: jest.fn().mockImplementation(() => null),
-            getSupportingFiles: jest.fn().mockImplementation(() => []),
-        } as unknown) as FileService;
-
-        const semanticExtractionServiceMock = ({
-            getSuggestion: jest.fn().mockImplementation(() => null),
-        } as unknown) as SemanticExtractionService;
-
         const wizardService = new WizardService(
             permissionService,
             submissionServiceMock,
@@ -634,22 +564,6 @@ describe('saveDisclosurePage', () => {
             })),
             saveDisclosureDetails: jest.fn().mockImplementation(() => {}),
         } as unknown) as SubmissionService;
-
-        const teamServiceMock = ({
-            addOrUpdateEditorTeams: jest.fn().mockImplementation(() => {}),
-            findTeams: jest.fn().mockImplementation(() => []),
-        } as unknown) as TeamService;
-
-        const permissionService = new PermissionService();
-
-        const fileServiceMock = ({
-            findManuscriptFile: jest.fn().mockImplementation(() => null),
-            getSupportingFiles: jest.fn().mockImplementation(() => []),
-        } as unknown) as FileService;
-
-        const semanticExtractionServiceMock = ({
-            getSuggestion: jest.fn().mockImplementation(() => null),
-        } as unknown) as SemanticExtractionService;
 
         const wizardService = new WizardService(
             permissionService,
@@ -779,20 +693,18 @@ describe('submit', () => {
 });
 
 describe('deleteManuscriptFile', () => {
-    // beforeEach(() => {
-    //     jest.resetAllMocks();
-    // });
     const mockConfig = ({} as unknown) as Config;
+    const teamServiceMock = (jest.fn() as unknown) as TeamService;
+    const permissionService = new PermissionService();
+    const fileServiceMock = ({
+        deleteManuscript: jest.fn().mockImplementationOnce(() => true),
+    } as unknown) as FileService;
+    const semanticExtractionServiceMock = (jest.fn() as unknown) as SemanticExtractionService;
+
     it('it should return an exception if submission is not found', async () => {
         const submissionServiceMock = ({
             get: jest.fn().mockImplementationOnce(() => null),
         } as unknown) as SubmissionService;
-        const teamServiceMock = (jest.fn() as unknown) as TeamService;
-
-        const permissionService = new PermissionService();
-
-        const fileServiceMock = (jest.fn() as unknown) as FileService;
-        const semanticExtractionServiceMock = (jest.fn() as unknown) as SemanticExtractionService;
         const wizardService = new WizardService(
             permissionService,
             submissionServiceMock,
@@ -823,12 +735,6 @@ describe('deleteManuscriptFile', () => {
                 createdBy: '89e0aec8-b9fc-4413-8a37-10Dc77567',
             })),
         } as unknown) as SubmissionService;
-        const teamServiceMock = (jest.fn() as unknown) as TeamService;
-
-        const permissionService = new PermissionService();
-
-        const fileServiceMock = (jest.fn() as unknown) as FileService;
-        const semanticExtractionServiceMock = (jest.fn() as unknown) as SemanticExtractionService;
         const wizardService = new WizardService(
             permissionService,
             submissionServiceMock,
@@ -860,15 +766,7 @@ describe('deleteManuscriptFile', () => {
                 createdBy: '89e0aec8-b9fc-4413-8a37-5cc77567',
             })),
         } as unknown) as SubmissionService;
-        const teamServiceMock = (jest.fn() as unknown) as TeamService;
 
-        const permissionService = new PermissionService();
-
-        const fileServiceMock = ({
-            deleteManuscript: jest.fn().mockImplementationOnce(() => true),
-        } as unknown) as FileService;
-
-        const semanticExtractionServiceMock = (jest.fn() as unknown) as SemanticExtractionService;
         const wizardService = new WizardService(
             permissionService,
             submissionServiceMock,
