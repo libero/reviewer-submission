@@ -114,12 +114,15 @@ export class WizardService {
 
     async submit(user: User, submissionId: SubmissionId, ip: string): Promise<Submission> {
         const submission = await this.submissionService.get(submissionId);
+        if (submission === null) {
+            throw new Error('No submission found');
+        }
         const allowed = this.permissionService.userCanWithSubmission(user, SubmissionOperation.UPDATE, submission);
         if (!allowed) {
             throw new Error('User not allowed to submit');
         }
 
-        this.submissionService.submit(submissionId, ip);
+        await this.submissionService.submit(submissionId, ip);
 
         return this.getFullSubmission(submissionId);
     }

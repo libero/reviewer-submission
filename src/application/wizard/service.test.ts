@@ -101,6 +101,7 @@ describe('getSubmission', () => {
             findManuscriptFile: jest.fn().mockImplementation(() => null),
             getSupportingFiles: jest.fn().mockImplementation(() => []),
         } as unknown) as FileService;
+
         const semanticExtractionServiceMock = ({
             getSuggestion: jest.fn().mockImplementation(() => null),
         } as unknown) as SemanticExtractionService;
@@ -130,6 +131,9 @@ describe('getSubmission', () => {
 });
 
 describe('saveAuthorPage', () => {
+    beforeEach(() => {
+        jest.resetAllMocks();
+    });
     const mockConfig = ({} as unknown) as Config;
     it('should throw if submission not found', async () => {
         const submissionServiceMock = ({
@@ -327,11 +331,13 @@ describe('saveAuthorPage', () => {
             name: 'Bob',
             role: 'user',
         };
+
         const submissionServiceMock = ({
             get: jest.fn().mockImplementationOnce(() => ({
                 createdBy: '89e0aec8-b9fc-4413-8a37-5cc77567',
             })),
         } as unknown) as SubmissionService;
+
         const existingTeam = {
             id: TeamId.fromUuid('cda3aef6-0034-4620-b843-1d15b7e815d1'),
         };
@@ -366,6 +372,9 @@ describe('saveAuthorPage', () => {
 });
 
 describe('saveEditorPage', () => {
+    beforeEach(() => {
+        jest.resetAllMocks();
+    });
     const mockConfig = ({} as unknown) as Config;
     it('it should return an exception if submission is not found', async () => {
         const submissionServiceMock = ({
@@ -524,6 +533,9 @@ describe('saveEditorPage', () => {
 });
 
 describe('saveDisclosurePage', () => {
+    beforeEach(() => {
+        jest.resetAllMocks();
+    });
     const mockConfig = ({} as unknown) as Config;
     it('it should throw if not found', async () => {
         const submissionServiceMock = ({
@@ -687,10 +699,104 @@ describe('saveDisclosurePage', () => {
     });
 });
 
-// TODO: write tests
-describe('submit', () => {});
+describe('submit', () => {
+    beforeEach(() => {
+        jest.resetAllMocks();
+    });
+    const mockConfig = ({} as unknown) as Config;
+    const sub = {
+        id: '89e0aec8-b9fc-4413-8a37-5cc775edbe3a',
+        createdBy: '89e0aec8-b9fc-4413-8a37-5cc77567',
+        files: [],
+    };
+    const user = {
+        id: '89e0aec8-b9fc-4413-8a37-5cc77567',
+        name: 'Bob',
+        role: 'user',
+    };
+    const ip = '192.168.168.168';
+    const permissionService = new PermissionService();
+
+    const fileServiceMock = ({
+        findManuscriptFile: jest.fn().mockImplementation(() => null),
+        getSupportingFiles: jest.fn().mockImplementation(() => []),
+    } as unknown) as FileService;
+
+    const semanticExtractionServiceMock = ({
+        getSuggestion: jest.fn().mockImplementation(() => null),
+    } as unknown) as SemanticExtractionService;
+
+    const teamServiceMock = ({ findTeams: jest.fn().mockImplementation(() => []) } as unknown) as TeamService;
+
+    it('it should return an exception if submission is not found', async () => {
+        const submissionServiceMock = ({
+            get: jest.fn().mockImplementationOnce(() => null),
+        } as unknown) as SubmissionService;
+
+        const wizardService = new WizardService(
+            permissionService,
+            submissionServiceMock,
+            teamServiceMock,
+            fileServiceMock,
+            semanticExtractionServiceMock,
+            mockConfig,
+        );
+
+        await expect(
+            wizardService.submit(user, SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'), ip),
+        ).rejects.toThrow('No submission found');
+    });
+
+    it('it should return an exception if not owner', async () => {
+        const submissionServiceMock = ({
+            get: jest.fn().mockImplementationOnce(() => sub),
+        } as unknown) as SubmissionService;
+
+        const wizardService = new WizardService(
+            permissionService,
+            submissionServiceMock,
+            teamServiceMock,
+            fileServiceMock,
+            semanticExtractionServiceMock,
+            mockConfig,
+        );
+
+        const newUser = { ...user, id: '89aec8-b9fc-4413-8a37-5cc77567' };
+        await expect(
+            wizardService.submit(newUser, SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'), ip),
+        ).rejects.toThrow('User not allowed to submit');
+    });
+
+    it('it should return an call the service with required params', async () => {
+        const submissionServiceMock = ({
+            get: jest.fn().mockImplementation(() => sub),
+            submit: jest.fn().mockImplementationOnce(() => null),
+        } as unknown) as SubmissionService;
+
+        const wizardService = new WizardService(
+            permissionService,
+            submissionServiceMock,
+            teamServiceMock,
+            fileServiceMock,
+            semanticExtractionServiceMock,
+            mockConfig,
+        );
+
+        const submission = await wizardService.submit(
+            user,
+            SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'),
+            ip,
+        );
+        expect(submissionServiceMock.submit).toBeCalledWith('89e0aec8-b9fc-4413-8a37-5cc775edbe3a', ip);
+        expect(submission).toBeDefined();
+        expect(submission?.createdBy).toBe('89e0aec8-b9fc-4413-8a37-5cc77567');
+    });
+});
 
 describe('deleteManuscriptFile', () => {
+    beforeEach(() => {
+        jest.resetAllMocks();
+    });
     const mockConfig = ({} as unknown) as Config;
     it('it should return an exception if submission is not found', async () => {
         const submissionServiceMock = ({
@@ -808,6 +914,9 @@ describe('deleteManuscriptFile', () => {
 });
 
 describe('saveManuscript', () => {
+    beforeEach(() => {
+        jest.resetAllMocks();
+    });
     const mockUser = {
         id: '89e0aec8-b9fc-4413-8a37-cccccccc',
         name: 'Bob',
@@ -900,6 +1009,9 @@ describe('saveManuscript', () => {
 });
 
 describe('saveSupporting', () => {
+    beforeEach(() => {
+        jest.resetAllMocks();
+    });
     const mockUser = {
         id: '89e0aec8-b9fc-4413-8a37-cccccccc',
         name: 'Bob',
@@ -1031,6 +1143,9 @@ describe('saveSupporting', () => {
 });
 
 describe('deleteSupportingFile', () => {
+    beforeEach(() => {
+        jest.resetAllMocks();
+    });
     const mockConfig = ({} as unknown) as Config;
     it('it should return an exception if submission is not found', async () => {
         const submissionServiceMock = ({
@@ -1149,6 +1264,9 @@ describe('deleteSupportingFile', () => {
 });
 
 describe('saveFilesPage', () => {
+    beforeEach(() => {
+        jest.resetAllMocks();
+    });
     const mockConfig = ({} as unknown) as Config;
     it('it should return an exception if submission is not found', async () => {
         const submissionServiceMock = ({
@@ -1265,6 +1383,9 @@ describe('saveFilesPage', () => {
 });
 
 describe('saveDetailsPage', () => {
+    beforeEach(() => {
+        jest.resetAllMocks();
+    });
     const mockConfig = ({} as unknown) as Config;
     it('it should return an exception if submission is not found', async () => {
         const submissionServiceMock = ({
