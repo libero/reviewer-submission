@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { jwtToken, startSubmissionAlt, authenticationJwtSecret, startSubmission } from './test.utils';
+import { jwtToken, startSubmissionAlt, authenticationJwtSecret } from './test.utils';
 import { sign } from 'jsonwebtoken';
 
 describe('Wizard->Pages Integration Tests', () => {
