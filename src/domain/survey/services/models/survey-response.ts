@@ -1,4 +1,4 @@
-import { SurveyId, SurveyResponseId } from '../../survey';
+import { SurveyId, SurveyResponseId } from '../../types';
 import { Question } from './question';
 import { Answer } from './answer';
 import { SubmissionId } from '../../../submission/types';

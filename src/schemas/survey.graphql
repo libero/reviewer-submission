@@ -32,5 +32,4 @@ input InputSurveyAnswer {
 
 type Mutation {
   submitSurveyResponse(surveyId: String, submissionId: String, answers: [InputSurveyAnswer]!): SurveyResponse!
-  saveSurveyResults(surveyId: String, submissionId: String, answers: [InputSurveyAnswer]!): SurveyResponse!
 }

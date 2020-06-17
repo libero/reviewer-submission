@@ -14,7 +14,7 @@ import { FileId } from '../../domain/file/types';
 import File from '../../domain/file/services/models/file';
 import { InfraLogger as logger } from '../../logger';
 import { SurveyService } from '../../domain/survey/services/survey-service';
-import { SurveyId } from '../../domain/survey/Survey';
+import { SurveyId } from '../../domain/survey/types';
 import { SurveyAnswer } from '../../domain/survey/services/models/survey-answer';
 import { SurveyResponse } from '../../domain/survey/services/models/survey-response';
 
