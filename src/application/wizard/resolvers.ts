@@ -128,6 +128,21 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
             const user = await userService.getCurrentUser(context.authorizationHeader);
             return wizard.saveDetailsPage(user, submissionId, details);
         },
+
+        async submitSurveyResponse(
+            _,
+            args: { surveyId: string; submissionId: string; answers: SurveyAnswer[] },
+        ): Promise<SurveyResponse> {
+            const { surveyId, submissionId, answers } = args;
+            logger.info(`resolver: submitSurveyResponse(${submissionId})`);
+            const surveyResponse = await surveyService.submitResponse(
+                SurveyId.fromUuid(surveyId),
+                SubmissionId.fromUuid(submissionId),
+                answers,
+            );
+
+            return surveyResponse;
+        },
     },
     Subscription: {
         fileUploadProgress: {
