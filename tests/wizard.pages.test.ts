@@ -302,8 +302,8 @@ describe('Wizard->Pages Integration Tests', () => {
         expect(surveyResponse.status).toBe(200);
         expect(surveyResponse.data.errors).toBeUndefined();
         expect(surveyResponse.data.data).toBeDefined();
-        expect(surveyResponse.data.submitSurveyResponse).toBeDefined();
-        expect(surveyResponse.data.submitSurveyResponse.submissionId).toBe(submissionId);
-        expect(surveyResponse.data.submitSurveyResponse.surveyId).toBe('9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d');
+        expect(surveyResponse.data.data.submitSurveyResponse).toBeDefined();
+        expect(surveyResponse.data.data.submitSurveyResponse.submissionId).toBe(submissionId);
+        expect(surveyResponse.data.data.submitSurveyResponse.surveyId).toBe('9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d');
     });
 });
