@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { SurveyResponseRepository, SurveyResponseId, SurveyId } from '../survey';
+import { SurveyResponseId, SurveyId } from '../types';
+import { SurveyResponseRepository } from './types';
 import { KnexTableAdapter } from '../../knex-table-adapter';
 import { SurveyResponse } from '../services/models/survey-response';
 import { SubmissionId } from 'src/domain/submission/types';
