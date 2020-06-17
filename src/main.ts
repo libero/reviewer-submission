@@ -15,7 +15,7 @@ import { simpleEstimator, fieldExtensionsEstimator, directiveEstimator, getCompl
 import { separateOperations } from 'graphql';
 import { Server } from 'http';
 import { SubmissionService } from './domain/submission';
-import { SurveyResolvers, SurveyService } from './domain/survey';
+import { SurveyService } from './domain/survey';
 import { UserResolvers, UserService } from './domain/user';
 import { DashboardResolvers } from './application/dashboard/resolvers';
 import { DashboardService } from './application/dashboard/service';
@@ -97,9 +97,8 @@ const init = async (): Promise<void> => {
 
     const resolvers = [
         DashboardResolvers(srvDashboard, srvUser),
-        SurveyResolvers(srvSurvey),
         UserResolvers(srvUser),
-        WizardResolvers(srvWizard, srvUser),
+        WizardResolvers(srvWizard, srvUser, srvSurvey),
     ];
 
     logger.info(`Initialising Express...`);

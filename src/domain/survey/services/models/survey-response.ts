@@ -9,6 +9,8 @@ export class SurveyResponse {
     submissionId: SubmissionId;
     questions: Question[];
     answers: Answer[];
+    created?: Date;
+    updated?: Date;
 
     constructor(
         id: SurveyResponseId,
