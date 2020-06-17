@@ -16,9 +16,8 @@ describe('Submit Integration Tests', () => {
         const id = data && data.startSubmission ? data.startSubmission.id : '';
         expect(id).toHaveLength(36);
 
-        await submit(apollo, id);
-        // return expect().resolves.toThrow(
-        //     'child "manuscriptDetails" fails because [child "title" fails because ["title" is required]]',
-        // );
+        await expect(submit(apollo, id)).rejects.toThrow(
+            'GraphQL error: child \"manuscriptDetails\" fails because [child \"title\" fails because [\"title\" is required]]',
+        );
     });
 });
