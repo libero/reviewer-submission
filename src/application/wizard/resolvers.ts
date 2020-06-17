@@ -13,10 +13,14 @@ import { WizardService } from './service';
 import { FileId } from '../../domain/file/types';
 import File from '../../domain/file/services/models/file';
 import { InfraLogger as logger } from '../../logger';
+import { SurveyService } from '../../domain/survey/services/survey-service';
+import { SurveyId } from '../../domain/survey/Survey';
+import { SurveyAnswer } from '../../domain/survey/services/models/survey-answer';
+import { SurveyResponse } from '../../domain/survey/services/models/survey-response';
 
 const pubsub = new PubSub();
 
-const resolvers = (wizard: WizardService, userService: UserService): IResolvers => ({
+const resolvers = (wizard: WizardService, userService: UserService, surveyService: SurveyService): IResolvers => ({
     Query: {
         async getSubmission(_, { id }: { id: SubmissionId }, context): Promise<Submission | null> {
             logger.info(`resolver: getSubmission(${id})`);
