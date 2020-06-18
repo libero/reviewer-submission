@@ -2,7 +2,7 @@ import * as Knex from 'knex';
 import { KnexSurveyResponseRepository } from '../repositories/knex-survey-response';
 import { SurveyAnswer } from './models/survey-answer';
 import { SurveyResponse } from './models/survey-response';
-import { SurveyId, SurveyResponseId } from '../survey';
+import { SurveyId, SurveyResponseId } from '../types';
 import { SubmissionId } from '../../submission/types';
 import uuid = require('uuid');
 import { createKnexAdapter } from '../../knex-table-adapter';

@@ -9,6 +9,7 @@ type Mutation {
     saveDetailsPage(id: ID!, details: ManuscriptDetailsInput!): Submission!
     saveDisclosurePage(id: ID!, details: DisclosureDetailsInput!): Submission!
     submit(id: ID!): Submission!
+    submitSurveyResponse(surveyId: String, submissionId: String, answers: [InputSurveyAnswer]!): SurveyResponse!
 }
 
 type Query {

@@ -13,10 +13,14 @@ import { WizardService } from './service';
 import { FileId } from '../../domain/file/types';
 import File from '../../domain/file/services/models/file';
 import { InfraLogger as logger } from '../../logger';
+import { SurveyService } from '../../domain/survey/services/survey-service';
+import { SurveyId } from '../../domain/survey/types';
+import { SurveyAnswer } from '../../domain/survey/services/models/survey-answer';
+import { SurveyResponse } from '../../domain/survey/services/models/survey-response';
 
 const pubsub = new PubSub();
 
-const resolvers = (wizard: WizardService, userService: UserService): IResolvers => ({
+const resolvers = (wizard: WizardService, userService: UserService, surveyService: SurveyService): IResolvers => ({
     Query: {
         async getSubmission(_, { id }: { id: SubmissionId }, context): Promise<Submission | null> {
             logger.info(`resolver: getSubmission(${id})`);
@@ -127,6 +131,21 @@ const resolvers = (wizard: WizardService, userService: UserService): IResolvers 
             logger.info(`resolver: saveDetailsPage(${submissionId})`);
             const user = await userService.getCurrentUser(context.authorizationHeader);
             return wizard.saveDetailsPage(user, submissionId, details);
+        },
+
+        async submitSurveyResponse(
+            _,
+            args: { surveyId: string; submissionId: string; answers: SurveyAnswer[] },
+        ): Promise<SurveyResponse> {
+            const { surveyId, submissionId, answers } = args;
+            logger.info(`resolver: submitSurveyResponse(${submissionId})`);
+            const surveyResponse = await surveyService.submitResponse(
+                SurveyId.fromUuid(surveyId),
+                SubmissionId.fromUuid(submissionId),
+                answers,
+            );
+
+            return surveyResponse;
         },
     },
     Subscription: {

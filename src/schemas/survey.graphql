@@ -5,7 +5,7 @@ type SurveyResponse {
   created: DateTime!
   updated: DateTime
   surveyId: String!
-  manuscriptId: ID!
+  submissionId: ID!
   response: SurveyQuestionsAndAnswers
 }
 
@@ -28,8 +28,4 @@ input InputSurveyAnswer {
   questionId: ID!
   text: String!
   answer: String!
-}
-
-type Mutation {
-  submitSurveyResponse(surveyId: String, submissionId: String, answers: [InputSurveyAnswer]!): SurveyResponse!
 }
