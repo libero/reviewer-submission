@@ -8,36 +8,7 @@ import {
     authenticationJwtSecret,
 } from './test.utils';
 import { sign } from 'jsonwebtoken';
-import * as FormData from 'form-data';
 import * as WebSocket from 'ws';
-
-export const uploadSupportingFile = async (submissionId: string): Promise<AxiosResponse> => {
-    const body = new FormData();
-    const query = `mutation UploadSupportingFile($id: ID!, $file: Upload!, $fileSize: Int!) {
-        uploadSupportingFile(id: $id, file: $file, fileSize: $fileSize) {
-            id,
-            filename,
-            url
-        }
-    }`;
-
-    const operations = {
-        query: query,
-        variables: {
-            id: submissionId,
-            file: null,
-            fileSize: 1,
-        },
-    };
-
-    body.append('operations', JSON.stringify(operations));
-    body.append('map', '{ "1": ["variables.file"] }');
-    body.append('1', 'a', { filename: 'a.txt' });
-
-    return await axios.post('http://localhost:3000/graphql', body, {
-        headers: { Authorization: `Bearer ${jwtToken}`, ...body.getHeaders() },
-    });
-};
 
 describe('Wizard->Files Integration Tests', () => {
     it('it should allow a user to set a blank cover letter for their submission', async () => {

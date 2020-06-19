@@ -12,7 +12,8 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     python3 \
     make \
     g++ \
-    bzip2
+    bzip2 \
+    libfontconfig
 
 COPY  tsconfig.build.json \
       tsconfig.json \

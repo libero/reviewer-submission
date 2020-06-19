@@ -10,7 +10,7 @@ const featureSubjectSchema = Joi.array().max(2);
 const base = {
     title: Joi.string().required(),
     previouslyDiscussed: Joi.string().allow('', null),
-    previouslySubmitted: Joi.array().items(Joi.string()),
+    previouslySubmitted: Joi.string(),
     cosubmission: Joi.array().items(Joi.string()),
 };
 

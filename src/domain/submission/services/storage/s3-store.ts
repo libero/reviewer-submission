@@ -17,6 +17,7 @@ export class S3Store implements SubmissionWriter {
             s3ForcePathStyle: s3config.s3ForcePathStyle,
         };
         const s3Options = s3config.awsEndPoint ? { ...defaultOptions, endpoint: s3config.awsEndPoint } : defaultOptions;
+        console.log(s3Options);
         this.bucket = s3config.fileBucket;
         this.s3 = new S3(s3Options);
     }

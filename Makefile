@@ -33,7 +33,7 @@ start_dev: ## start in development mode with s3 and postgres
 start_test: ## start in development mode for local testing with s3, postgres and reviewer-mocks
 	${DOCKER_COMPOSE_TEST} pull s3 postgres reviewer-mocks
 	$(MAKE) build_dev
-	${DOCKER_COMPOSE_TEST} up -d s3 postgres reviewer-mocks
+	${DOCKER_COMPOSE_TEST} up -d s3 postgres reviewer-mocks sftp
 	./.scripts/docker/wait-healthy.sh reviewer-submission_postgres 20
 	./.scripts/docker/wait-healthy.sh reviewer-submission_s3 40
 	./.scripts/docker/wait-healthy.sh reviewer-submission_mocks 20

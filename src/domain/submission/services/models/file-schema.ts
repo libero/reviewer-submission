@@ -11,6 +11,7 @@ export const fileSchema = Joi.object({
     url: Joi.string().required(),
     mimeType: Joi.string().required(),
     size: Joi.number().required(),
+    downloadLink: Joi.string(),
     status: Joi.string()
         .required()
         .equal(FileStatus.STORED),

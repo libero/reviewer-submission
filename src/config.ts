@@ -70,7 +70,7 @@ const appConfig: Config = {
     meca_config: {
         s3_path: envOrEmpty('MECA_S3_PATH'),
         sftp: {
-            host: envOrEmpty('MECA_SFTP_PATH'),
+            host: envOrEmpty('MECA_SFTP_HOST'),
             port: Number(envOrEmpty('MECA_SFTP_PORT')) || 22,
             username: envOrEmpty('MECA_SFTP_USERNAME'),
             password: envOrEmpty('MECA_SFTP_PASSWORD'),
