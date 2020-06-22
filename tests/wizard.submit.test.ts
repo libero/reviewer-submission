@@ -62,10 +62,9 @@ describe('Submit Integration Tests', () => {
         const id = data && data.startSubmission ? data.startSubmission.id : '';
         expect(id).toHaveLength(36);
 
-        await submit(id);
-        // return expect().resolves.toThrow(
-        //     'child "manuscriptDetails" fails because [child "title" fails because ["title" is required]]',
-        // );
+        await expect(submit(id)).rejects.toThrow(
+            'GraphQL error: child \"manuscriptDetails\" fails because [child \"title\" fails because [\"title\" is required]]',
+        );
     });
 
     it('exports a meca archive', async () => {

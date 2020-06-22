@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { SurveyResponseRepository, SurveyResponseId, SurveyId } from '../survey';
+import { SurveyResponseId, SurveyId } from '../types';
+import { SurveyResponseRepository } from './types';
 import { KnexTableAdapter } from '../../knex-table-adapter';
 import { SurveyResponse } from '../services/models/survey-response';
 import { SubmissionId } from 'src/domain/submission/types';
@@ -14,8 +15,8 @@ type DatabaseEntry = {
         questions: Question[];
         answers: Answer[];
     };
-    created?: Date;
-    updated?: Date;
+    created?: string;
+    updated?: string;
 };
 
 export class KnexSurveyResponseRepository implements SurveyResponseRepository {
@@ -24,9 +25,12 @@ export class KnexSurveyResponseRepository implements SurveyResponseRepository {
     public constructor(private readonly _query: KnexTableAdapter) {}
 
     public async create(surveyResponse: SurveyResponse): Promise<SurveyResponse> {
+        const currentTimeStamp = new Date();
+        surveyResponse.created = currentTimeStamp;
+        surveyResponse.updated = currentTimeStamp;
         const query = this._query
             .builder()
-            .insert({ ...this.modelToEntry(surveyResponse), updated: new Date().toISOString() })
+            .insert({ ...this.modelToEntry(surveyResponse) })
             .into(this.TABLE_NAME);
         await this._query.executor<SurveyResponse[]>(query);
 
@@ -34,7 +38,15 @@ export class KnexSurveyResponseRepository implements SurveyResponseRepository {
     }
 
     private modelToEntry(surveyResponse: SurveyResponse): DatabaseEntry {
-        const { surveyId: survey_id, submissionId: manuscript_id, questions, answers, ...rest } = surveyResponse;
+        const {
+            created,
+            updated,
+            surveyId: survey_id,
+            submissionId: manuscript_id,
+            questions,
+            answers,
+            ...rest
+        } = surveyResponse;
 
         return {
             ...rest,
@@ -44,6 +56,8 @@ export class KnexSurveyResponseRepository implements SurveyResponseRepository {
             },
             survey_id,
             manuscript_id,
+            created: created?.toISOString(),
+            updated: updated?.toISOString(),
         };
     }
 

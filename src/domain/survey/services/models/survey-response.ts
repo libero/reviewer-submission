@@ -1,4 +1,4 @@
-import { SurveyId, SurveyResponseId } from '../../survey';
+import { SurveyId, SurveyResponseId } from '../../types';
 import { Question } from './question';
 import { Answer } from './answer';
 import { SubmissionId } from '../../../submission/types';
@@ -9,6 +9,8 @@ export class SurveyResponse {
     submissionId: SubmissionId;
     questions: Question[];
     answers: Answer[];
+    created?: Date;
+    updated?: Date;
 
     constructor(
         id: SurveyResponseId,

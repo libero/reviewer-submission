@@ -256,4 +256,52 @@ describe('Wizard->Pages Integration Tests', () => {
         expect(saveEditorPageResponse.data.data.saveEditorPage.editorDetails.opposedReviewersReason).toEqual(details.opposedReviewersReason);
 
     });
+
+    it('it should allow user to submit survey', async () => {
+        const startSubmissionResponse = await startSubmissionAlt('research-article');
+        expect(startSubmissionResponse.data.errors).toBeUndefined();
+        const submissionId = startSubmissionResponse.data.data.startSubmission.id;
+        const surveyResponse = await axios.post(
+            'http://localhost:3000/graphql',
+            {
+                query: `
+                    mutation submitSurveyResponse($surveyId: String, $submissionId: String, $answers: [InputSurveyAnswer]!) {
+                        submitSurveyResponse(surveyId: $surveyId, submissionId: $submissionId, answers: $answers) {
+                            id,
+                            created,
+                            updated,
+                            surveyId,
+                            submissionId
+                        }
+                    }
+                `,
+                variables: {
+                    surveyId: '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d',
+                    submissionId: submissionId,
+                    answers: [
+                        {
+                            questionId: '1',
+                            text: 'question text 1',
+                            answer: 'answer 1'
+                        },
+                        {
+                            questionId: '2',
+                            text: 'question text 2',
+                            answer: 'answer 2'
+                        }
+                    ]
+                },
+            },
+            {
+                headers: { Authorization: `Bearer ${jwtToken}` },
+            },
+        );
+
+        expect(surveyResponse.status).toBe(200);
+        expect(surveyResponse.data.errors).toBeUndefined();
+        expect(surveyResponse.data.data).toBeDefined();
+        expect(surveyResponse.data.data.submitSurveyResponse).toBeDefined();
+        expect(surveyResponse.data.data.submitSurveyResponse.submissionId).toBe(submissionId);
+        expect(surveyResponse.data.data.submitSurveyResponse.surveyId).toBe('9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d');
+    });
 });
