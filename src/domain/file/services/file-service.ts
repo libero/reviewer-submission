@@ -334,7 +334,14 @@ export class FileService {
         pubsub: PubSub,
         submissionId: SubmissionId,
     ): Promise<void> {
-        await this.handleFileUpload(pubsub, submissionId, userId, file, stream, FileType.SUPPORTING_FILE);
+        try {
+            await this.handleFileUpload(pubsub, submissionId, userId, file, stream, FileType.SUPPORTING_FILE);
+            await this.setStatusToStored(userId, file);
+        } catch (e) {
+            logger.error(e);
+            await this.setStatusToCancelled(userId, file);
+            throw e;
+        }
     }
 
     async getFileContent(file: File): Promise<string> {
