@@ -70,7 +70,10 @@ describe('Knex Submission Repository', () => {
                 updated: new Date('2020-02-18T15:14:53.255Z'),
                 created: new Date('2020-02-18T15:14:53.155Z'),
                 lastStepVisited: 'p1',
-                disclosure: {},
+                disclosure: {
+                    disclosureConsent: undefined,
+                    submitterSignature: undefined,
+                },
                 editorDetails: {},
                 files: {
                     coverLetter: 'test cover',
@@ -92,7 +95,10 @@ describe('Knex Submission Repository', () => {
                 articleType: ArticleType.RESEARCH_ADVANCE,
                 updated: new Date('2020-02-18T15:14:53.255Z'),
                 created: new Date('2020-02-18T15:14:53.155Z'),
-                disclosure: {},
+                disclosure: {
+                    disclosureConsent: undefined,
+                    submitterSignature: undefined,
+                },
                 editorDetails: {},
                 files: {
                     coverLetter: 'test cover',
@@ -119,10 +125,15 @@ describe('Knex Submission Repository', () => {
                 'status',
                 'meta',
                 'cover_letter',
+                'previously_discussed',
+                'previously_submitted',
+                'cosubmission',
                 'opposed_senior_editors_reason',
                 'opposed_reviewing_editors_reason',
                 'opposed_reviewers_reason',
                 'last_step_visited',
+                'submitter_signature',
+                'disclosure_consent',
             );
             expect(mock.from).toBeCalledWith('manuscript');
         });
@@ -140,7 +151,10 @@ describe('Knex Submission Repository', () => {
                 articleType: ArticleType.FEATURE_ARTICLE,
                 updated: new Date('2020-02-18T15:14:53.255Z'),
                 created: new Date('2020-02-18T15:14:53.155Z'),
-                disclosure: {},
+                disclosure: {
+                    disclosureConsent: undefined,
+                    submitterSignature: undefined,
+                },
                 editorDetails: {},
                 files: {
                     coverLetter: 'test cover',
@@ -179,10 +193,15 @@ describe('Knex Submission Repository', () => {
                 'status',
                 'meta',
                 'cover_letter',
+                'previously_discussed',
+                'previously_submitted',
+                'cosubmission',
                 'opposed_senior_editors_reason',
                 'opposed_reviewing_editors_reason',
                 'opposed_reviewers_reason',
                 'last_step_visited',
+                'submitter_signature',
+                'disclosure_consent',
             );
             expect(mock.from).toBeCalledWith('manuscript');
             expect(mock.where).toBeCalledWith({ id: entryId });

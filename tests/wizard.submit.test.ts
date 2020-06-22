@@ -68,7 +68,7 @@ describe('Submit Integration Tests', () => {
         // );
     });
 
-    it.only('exports a meca archive', async () => {
+    it('exports a meca archive', async () => {
         const startSubmissionResponse = await startSubmissionAlt('research-article');
         const submissionId = startSubmissionResponse.data.data.startSubmission.id;
         const authorDetails = {

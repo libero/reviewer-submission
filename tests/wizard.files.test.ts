@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 import {
     jwtToken,
     startSubmissionAlt,
@@ -6,6 +6,7 @@ import {
     uploadLargeManuscript,
     uploadTooLargeManuscript,
     authenticationJwtSecret,
+    uploadSupportingFile,
 } from './test.utils';
 import { sign } from 'jsonwebtoken';
 import * as WebSocket from 'ws';
