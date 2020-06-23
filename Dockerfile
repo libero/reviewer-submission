@@ -48,9 +48,14 @@ LABEL maintainer="eLife Reviewer Product Team <reviewer-product@elifesciences.or
 
 WORKDIR /app
 
+RUN apk add fontconfig
+
 COPY --from=dev /app/node_modules node_modules
 COPY --from=build-prod /app/dist/ dist/
 COPY src/schemas/*.graphql ./dist/schemas/
+RUN wget -qO- "https://github.com/dustinblackman/phantomized/releases/download/2.1.1a/dockerized-phantomjs.tar.gz" | tar xz -C /
+RUN yarn config set user 0
+RUN yarn global add phantomjs-prebuilt
 
 EXPOSE 3000
 
