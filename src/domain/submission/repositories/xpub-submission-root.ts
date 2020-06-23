@@ -40,10 +40,15 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
         'status',
         'meta',
         'cover_letter',
+        'previously_discussed',
+        'previously_submitted',
+        'cosubmission',
         'opposed_senior_editors_reason',
         'opposed_reviewing_editors_reason',
         'opposed_reviewers_reason',
         'last_step_visited',
+        'submitter_signature',
+        'disclosure_consent',
     ];
 
     public constructor(private readonly _query: KnexTableAdapter) {}
@@ -137,6 +142,8 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
                 title: submission.manuscriptDetails.title,
                 subjects: submission.manuscriptDetails.subjects,
             },
+            disclosure_consent: submission.disclosure.disclosureConsent ?? undefined,
+            submitter_signature: submission.disclosure.submitterSignature ?? undefined,
         };
     }
 
@@ -169,6 +176,9 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
         if (record.opposed_senior_editors_reason) {
             result.editorDetails.opposedSeniorEditorsReason = record.opposed_senior_editors_reason;
         }
+        result.disclosure.disclosureConsent = record.disclosure_consent;
+        result.disclosure.submitterSignature = record.submitter_signature;
+
         return result;
     }
 }

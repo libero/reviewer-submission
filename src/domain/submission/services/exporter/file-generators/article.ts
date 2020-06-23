@@ -2,7 +2,7 @@
 import * as xmlbuilder from 'xmlbuilder';
 import axios from 'axios';
 import Submission, { ArticleType } from '../../models/submission';
-import user_api_url from '../../../../../config';
+import config from '../../../../../config';
 
 interface Editor {
     id: string;
@@ -84,7 +84,7 @@ class ArticleGenerator {
     constructor(private readonly submission: Submission) {}
 
     async getEditor(id: string): Promise<Editor | null> {
-        const { data } = await axios.get<ContinuumPerson>(`${user_api_url}/editors/${id}`);
+        const { data } = await axios.get<ContinuumPerson>(`${config.user_api_url}/people/${id}`);
 
         if (!data) {
             return null;
@@ -98,7 +98,7 @@ class ArticleGenerator {
                 surname: data.name.surname,
                 'given-names': data.name.givenNames,
             },
-            email: data.emailAddresses.length ? data.emailAddresses[0].value : '',
+            email: data.emailAddresses ? (data.emailAddresses.length ? data.emailAddresses[0].value : '') : '',
             affiliations: affiliations
                 .map((affiliation: Affiliation): string => affiliation.name.join(', '))
                 .join(', '),

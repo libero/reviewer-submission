@@ -12,7 +12,8 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     python3 \
     make \
     g++ \
-    bzip2
+    bzip2 \
+    libfontconfig
 
 COPY  tsconfig.build.json \
       tsconfig.json \
@@ -36,6 +37,8 @@ FROM dev as build-prod
 
 COPY --from=dev /app/ .
 RUN yarn build
+RUN mkdir ./dist/domain/submission/services/exporter/file-generators/templates
+RUN cp -r ./src/domain/submission/services/exporter/file-generators/templates/* ./dist/domain/submission/services/exporter/file-generators/templates/
 
 #
 # Stage: Production environment
@@ -45,9 +48,14 @@ LABEL maintainer="eLife Reviewer Product Team <reviewer-product@elifesciences.or
 
 WORKDIR /app
 
+RUN apk add fontconfig
+
 COPY --from=dev /app/node_modules node_modules
 COPY --from=build-prod /app/dist/ dist/
 COPY src/schemas/*.graphql ./dist/schemas/
+RUN wget -qO- "https://github.com/dustinblackman/phantomized/releases/download/2.1.1a/dockerized-phantomjs.tar.gz" | tar xz -C /
+RUN yarn config set user 0
+RUN yarn global add phantomjs-prebuilt
 
 EXPOSE 3000
 

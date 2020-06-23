@@ -101,6 +101,15 @@ services:
     networks:
       - "reviewer"
 
+  sftp:
+    image: atmoz/sftp:alpine
+    container_name: reviewer-submission_sftp
+    ports:
+      - "2222:22"
+    command: test:test:::upload
+    networks:
+      - "reviewer"
+
 networks:
   reviewer:
     external:

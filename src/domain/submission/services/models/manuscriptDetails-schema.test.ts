@@ -6,7 +6,7 @@ describe('author schema', () => {
         title: string;
         subjects: string[];
         previouslyDiscussed: string | null;
-        previouslySubmitted: string[];
+        previouslySubmitted: string;
         cosubmission: string[];
     };
 
@@ -15,7 +15,7 @@ describe('author schema', () => {
             title: 'title',
             subjects: ['s1', 's2'],
             previouslyDiscussed: 'prev-d',
-            previouslySubmitted: ['prev-s1', 'prev-s2'],
+            previouslySubmitted: 'prev-s',
             cosubmission: ['a', 'b'],
         };
     });
@@ -39,7 +39,7 @@ describe('author schema', () => {
             expect(error).toBeNull();
         });
         it('previously submitted is empty', () => {
-            details.previouslySubmitted = [];
+            details.previouslySubmitted = '';
             const { error, value } = Joi.validate(details, manuscriptDetailsSchema);
             expect(value).toStrictEqual(details);
             expect(error).toBeNull();

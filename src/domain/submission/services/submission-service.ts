@@ -27,6 +27,17 @@ export class SubmissionService {
         submission.lastStepVisited = `/submit/${submission.id}/${step}`;
     }
 
+    private async runMecaExport(submission: Submission, ip: string): Promise<void> {
+        const buffer = await this.mecaExporter.export(submission, ip);
+        const id = submission.id;
+
+        const store = new SubmissionStore([this.s3Store, this.sftpStore]);
+        const locations = await store.write(id, buffer);
+        logger.info(`Submission ${id} saved to ${locations}`);
+
+        // @todo: email notification to author
+    }
+
     async findAll(): Promise<Submission[]> {
         return await this.submissionRepository.findAll();
     }
@@ -60,23 +71,13 @@ export class SubmissionService {
         return await this.submissionRepository.delete(id);
     }
 
-    async submit(id: SubmissionId, ip: string): Promise<Submission> {
-        const submission = await this.submissionRepository.findById(id);
-        if (!submission) {
-            throw new Error('Unable to find submission with id: ' + id);
-        }
-
+    async submit(submission: Submission, ip: string): Promise<Submission> {
+        const id = submission.id;
         if (!submission.isSubmittable()) {
             throw new Error(`The submission ${id} cannot be submitted.`);
         }
 
-        const buffer = await this.mecaExporter.export(submission, ip);
-
-        const store = new SubmissionStore([this.s3Store, this.sftpStore]);
-        const locations = await store.write(id, buffer);
-        logger.info(`Submission ${id} saved to ${locations}`);
-
-        // @todo: email notification to author
+        this.runMecaExport(submission, ip);
 
         return this.get(id);
     }

@@ -122,7 +122,7 @@ export class WizardService {
             throw new Error('User not allowed to submit');
         }
 
-        await this.submissionService.submit(submissionId, ip);
+        await this.submissionService.submit(await this.getFullSubmission(submissionId), ip);
 
         return this.getFullSubmission(submissionId);
     }
@@ -269,7 +269,10 @@ export class WizardService {
     private async getFullSubmission(submissionId: SubmissionId): Promise<Submission> {
         const submission = await this.submissionService.get(submissionId);
         if (submission) {
-            submission.files.manuscriptFile = await this.fileService.findManuscriptFile(submissionId);
+            submission.files.manuscriptFile = await this.fileService.findManuscriptFile(submission.id);
+            submission.files.supportingFiles = (await this.fileService.getSupportingFiles(submission.id)).filter(
+                file => !file.isCancelled() && !file.isDeleted(),
+            );
             submission.files.supportingFiles = (await this.fileService.getSupportingFiles(submissionId)).filter(
                 file => !file.isCancelled() && !file.isDeleted(),
             );

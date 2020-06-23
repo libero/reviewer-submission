@@ -30,7 +30,11 @@ export const createApolloClient = (): ApolloClient<unknown> => {
             onError(({ graphQLErrors, networkError }) => {
                 if (graphQLErrors)
                     graphQLErrors.forEach(({ message, locations, path }) =>
-                        console.log(`[GraphQL error]: Message: ${message}, Location: ${JSON.stringify(locations)}, Path: ${path}`),
+                        console.log(
+                            `[GraphQL error]: Message: ${message}, Location: ${JSON.stringify(
+                                locations,
+                            )}, Path: ${path}`,
+                        ),
                     );
                 if (networkError) console.log(`[Network error]: ${networkError}`);
             }),
@@ -148,11 +152,37 @@ export const uploadTooLargeManuscript = async (submissionId: string): Promise<Ax
 
     body.append('operations', JSON.stringify(operations));
     body.append('map', '{ "1": ["variables.file"] }');
-    body.append(
-        '1',
-        fs.createReadStream(path.join(__dirname, './mock-data/disallowed.txt')),
-        { filename: 'disallowed.txt' },
-    );
+    body.append('1', fs.createReadStream(path.join(__dirname, './mock-data/disallowed.txt')), {
+        filename: 'disallowed.txt',
+    });
+
+    return await axios.post('http://localhost:3000/graphql', body, {
+        headers: { Authorization: `Bearer ${jwtToken}`, ...body.getHeaders() },
+    });
+};
+
+export const uploadSupportingFile = async (submissionId: string): Promise<AxiosResponse> => {
+    const body = new FormData();
+    const query = `mutation UploadSupportingFile($id: ID!, $file: Upload!, $fileSize: Int!) {
+        uploadSupportingFile(id: $id, file: $file, fileSize: $fileSize) {
+            id,
+            filename,
+            url
+        }
+    }`;
+
+    const operations = {
+        query: query,
+        variables: {
+            id: submissionId,
+            file: null,
+            fileSize: 1,
+        },
+    };
+
+    body.append('operations', JSON.stringify(operations));
+    body.append('map', '{ "1": ["variables.file"] }');
+    body.append('1', 'a', { filename: 'a.txt' });
 
     return await axios.post('http://localhost:3000/graphql', body, {
         headers: { Authorization: `Bearer ${jwtToken}`, ...body.getHeaders() },
@@ -176,21 +206,23 @@ export const startSubmission = async (apollo: ApolloClient<unknown>, articleType
     });
 };
 
-export const submit = async (apollo: ApolloClient<unknown>, id: string): Promise<FetchResult> => {
-    const submit = gql`
-        mutation submit($id: ID!) {
-            submit(id: $id) {
-                id
-            }
-        }
-    `;
-
-    return apollo.mutate({
-        mutation: submit,
-        variables: {
-            id,
+export const submit = async (id: string): Promise<AxiosResponse> => {
+    return axios.post(
+        'http://localhost:3000/graphql',
+        {
+            query: `
+                mutation submit($id: ID!) {
+                    submit(id: $id) {
+                        id
+                    }
+                }
+            `,
+            variables: {
+                id,
+            },
         },
-    });
+        { headers: { Authorization: `Bearer ${jwtToken}` } },
+    );
 };
 
 /**
@@ -213,5 +245,158 @@ export const startSubmissionAlt = async (articleType: string): Promise<AxiosResp
             },
         },
         { headers: { Authorization: `Bearer ${jwtToken}` } },
+    );
+};
+
+export const saveAuthorDetails = async (submissionId: string, details: object): Promise<AxiosResponse> => {
+    return await axios.post(
+        'http://localhost:3000/graphql',
+        {
+            query: `
+                mutation saveAuthorPage($id: ID!, $details: AuthorDetailsInput!) {
+                    saveAuthorPage(id: $id, details: $details) {
+                        id,
+                        author {
+                            firstName,
+                            lastName,
+                            email,
+                            institution
+                        }
+                    }
+                }
+            `,
+            variables: {
+                id: submissionId,
+                details,
+            },
+        },
+        {
+            headers: { Authorization: `Bearer ${jwtToken}` },
+        },
+    );
+};
+
+export const saveCoverLetter = async (submissionId: string, coverLetter: string): Promise<AxiosResponse> => {
+    return await axios.post(
+        'http://localhost:3000/graphql',
+        {
+            query: `
+                mutation SaveFilesPage($id: ID!, $coverLetter: String) {
+                    saveFilesPage(id: $id, coverLetter: $coverLetter) {
+                        id,
+                        files {
+                            coverLetter
+                        }
+                    }
+                }
+            `,
+            variables: {
+                id: submissionId,
+                coverLetter,
+            },
+        },
+        {
+            headers: { Authorization: `Bearer ${jwtToken}` },
+        },
+    );
+};
+
+export const saveSubmissionDetails = async (submissionId: string, details: object): Promise<AxiosResponse> => {
+    return await axios.post(
+        'http://localhost:3000/graphql',
+        {
+            query: `
+                mutation saveDetailsPage($id: ID!, $details: ManuscriptDetailsInput!) {
+                    saveDetailsPage(id: $id, details: $details) {
+                        id,
+                        manuscriptDetails {
+                            title,
+                            subjects,
+                            previouslyDiscussed,
+                            previouslySubmitted,
+                            cosubmission,
+                        }
+                    }
+                }
+            `,
+            variables: {
+                id: submissionId,
+                details,
+            },
+        },
+        {
+            headers: { Authorization: `Bearer ${jwtToken}` },
+        },
+    );
+};
+
+export const saveEditorDetails = async (submissionId: string, details: object): Promise<AxiosResponse> => {
+    return await axios.post(
+        'http://localhost:3000/graphql',
+        {
+            query: `
+                mutation saveEditorPage($id: ID!, $details: EditorDetailsInput!) {
+                    saveEditorPage(id: $id, details: $details) {
+                        id,
+                        author {
+                            firstName,
+                            lastName,
+                            email,
+                            institution
+                        },
+                        editorDetails {
+                            suggestedSeniorEditors,
+                            opposedSeniorEditors,
+                            opposedSeniorEditorsReason,
+                            suggestedReviewingEditors,
+                            opposedReviewingEditors,
+                            opposedReviewingEditorsReason,
+                            suggestedReviewers {
+                                name,
+                                email
+                            },
+                            opposedReviewers {
+                                name,
+                                email
+                            },
+                            opposedReviewersReason
+                        }
+                    }
+                }
+            `,
+            variables: {
+                id: submissionId,
+                details,
+            },
+        },
+        {
+            headers: { Authorization: `Bearer ${jwtToken}` },
+        },
+    );
+};
+
+export const saveDisclosurePage = async (submissionId: string, details: object): Promise<AxiosResponse> => {
+    return await axios.post(
+        'http://localhost:3000/graphql',
+        {
+            query: `
+                mutation saveDisclosurePage($id: ID!, $details: DisclosureDetailsInput!) {
+                    saveDisclosurePage(id: $id, details: $details) {
+                        id,
+                        disclosure {
+                            submitterSignature,
+                            disclosureConsent
+                        }
+                    }
+                }
+            `,
+            variables: {
+                id: submissionId,
+                details,
+            },
+        },
+        {
+            headers: { Authorization: `Bearer ${jwtToken}` },
+        },
     );
 };

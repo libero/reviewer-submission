@@ -13,6 +13,12 @@ export class SftpStore implements SubmissionWriter {
 
     async write(submissionId: SubmissionId, buffer: Buffer): Promise<PackageLocation> {
         const remotePath = this.mecaConfig.sftp.path;
+        await this.sftpClient.connect({
+            host: this.mecaConfig.sftp.host,
+            port: this.mecaConfig.sftp.port,
+            username: this.mecaConfig.sftp.username,
+            password: this.mecaConfig.sftp.password,
+        });
         await this.sftpClient.mkdir(remotePath, true);
         const transferName = `${remotePath}/${submissionId}.transfer`;
         const finalName = `${remotePath}/${submissionId}${this.mecaPostfix}`;

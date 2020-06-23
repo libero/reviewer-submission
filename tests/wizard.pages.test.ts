@@ -297,8 +297,6 @@ describe('Wizard->Pages Integration Tests', () => {
             },
         );
 
-        console.log('surveyResponse.data', surveyResponse.data)
-
         expect(surveyResponse.status).toBe(200);
         expect(surveyResponse.data.errors).toBeUndefined();
         expect(surveyResponse.data.data).toBeDefined();

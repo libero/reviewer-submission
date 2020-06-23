@@ -20,6 +20,7 @@ export class DashboardService {
         if (!allowed) {
             throw new Error('User not allowed to create submission');
         }
+
         return this.submissionService.create(articleType, user.id);
     }
 

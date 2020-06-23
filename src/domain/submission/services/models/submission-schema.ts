@@ -37,4 +37,5 @@ export const submissionSchema = Joi.object({
     disclosure: disclosureSchema,
     suggestions: Joi.array(), // allow anything as not required for submission
     author: authorSchema,
+    lastStepVisited: Joi.string(),
 });
