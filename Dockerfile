@@ -37,6 +37,8 @@ FROM dev as build-prod
 
 COPY --from=dev /app/ .
 RUN yarn build
+RUN mkdir ./dist/domain/submission/services/exporter/file-generators/templates
+RUN cp -r ./src/domain/submission/services/exporter/file-generators/templates/* ./dist/domain/submission/services/exporter/file-generators/templates/
 
 #
 # Stage: Production environment

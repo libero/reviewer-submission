@@ -24,7 +24,7 @@ install: ## install dependencies
 start_dev: ## start in development mode with s3 and postgres
 	${DOCKER_COMPOSE} pull s3 postgres
 	$(MAKE) build_dev
-	${DOCKER_COMPOSE} up -d s3 postgres
+	${DOCKER_COMPOSE} up -d s3 postgres sftp
 	./.scripts/docker/wait-healthy.sh reviewer-submission_postgres 20
 	./.scripts/docker/wait-healthy.sh reviewer-submission_s3 40
 	${DOCKER_COMPOSE_TEST} up -d s3_create-bucket
@@ -42,7 +42,7 @@ start_test: ## start in development mode for local testing with s3, postgres and
 
 start_ci: ## start in prod mode with s3 and postgres
 	${DOCKER_COMPOSE_CI} pull s3 postgres reviewer-mocks
-	${DOCKER_COMPOSE_CI} up -d s3 postgres reviewer-mocks
+	${DOCKER_COMPOSE_CI} up -d s3 postgres reviewer-mocks sftp
 	./.scripts/docker/wait-healthy.sh reviewer-submission_postgres 20
 	./.scripts/docker/wait-healthy.sh reviewer-submission_s3 40
 	./.scripts/docker/wait-healthy.sh reviewer-submission_mocks 20
