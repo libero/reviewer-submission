@@ -637,10 +637,11 @@ describe('submit', () => {
         ).rejects.toThrow('User not allowed to submit');
     });
 
-    it('it should return an call the service with required params', async () => {
+    it.only('it should return an call the service with required params', async () => {
+        const submitMock = jest.fn().mockImplementationOnce(() => null);
         const submissionServiceMock = ({
             get: jest.fn().mockImplementation(() => sub),
-            submit: jest.fn().mockImplementationOnce(() => null),
+            submit: submitMock,
         } as unknown) as SubmissionService;
 
         const wizardService = new WizardService(
@@ -657,7 +658,14 @@ describe('submit', () => {
             SubmissionId.fromUuid('89e0aec8-b9fc-4413-8a37-5cc775edbe3a'),
             ip,
         );
-        expect(submissionServiceMock.submit).toBeCalledWith('89e0aec8-b9fc-4413-8a37-5cc775edbe3a', ip);
+        console.log(submitMock.mock.calls[0][0]);
+        expect(submitMock.mock.calls[0][0]).toEqual({
+            createdBy: '89e0aec8-b9fc-4413-8a37-5cc77567',
+            editorDetails: {},
+            files: [],
+            id: '89e0aec8-b9fc-4413-8a37-5cc775edbe3a',
+        });
+        expect(submitMock.mock.calls[0][1]).toEqual(ip);
         expect(submission).toBeDefined();
         expect(submission?.createdBy).toBe('89e0aec8-b9fc-4413-8a37-5cc77567');
     });
