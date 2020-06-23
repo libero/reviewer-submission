@@ -122,7 +122,7 @@ export class WizardService {
             throw new Error('User not allowed to submit');
         }
 
-        this.submissionService.submit(await this.getFullSubmission(submissionId), ip);
+        await this.submissionService.submit(await this.getFullSubmission(submissionId), ip);
 
         return this.getFullSubmission(submissionId);
     }

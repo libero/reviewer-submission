@@ -206,7 +206,7 @@ export const startSubmission = async (apollo: ApolloClient<unknown>, articleType
     });
 };
 
-export const submit = async (id: string): Promise<FetchResult> => {
+export const submit = async (id: string): Promise<AxiosResponse> => {
     return axios.post(
         'http://localhost:3000/graphql',
         {
