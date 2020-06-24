@@ -11,6 +11,7 @@ import {
     generateTransfer,
     removeUnicode,
 } from './file-generators';
+import { EJPNameRepository } from 'src/domain/ejp-name/repositories/types';
 
 interface ArchiveFile {
     id?: FileId;
@@ -21,7 +22,7 @@ interface ArchiveFile {
 }
 
 export class MecaExporter implements SubmissionExporter {
-    constructor(private readonly fileService: FileService) {}
+    constructor(private readonly fileService: FileService, private readonly ejpNames: EJPNameRepository) {}
 
     async export(submission: Submission, ip: string): Promise<Buffer> {
         const manuscriptFile = await this.fileService.findManuscriptFile(submission.id);
@@ -44,7 +45,7 @@ export class MecaExporter implements SubmissionExporter {
         );
 
         const mandatoryFiles = [
-            { filename: 'article.xml', content: await generateArticle(submission) },
+            { filename: 'article.xml', content: await generateArticle(submission, this.ejpNames) },
             { filename: 'cover_letter.pdf', content: await generateCoverLetter(submission.files.coverLetter || '') },
             { filename: 'disclosure.pdf', content: await generateDisclosure(submission, ip) },
             { filename: 'manifest.xml', content: generateManifest(submission) },

@@ -3,6 +3,7 @@ import * as xmlbuilder from 'xmlbuilder';
 import axios from 'axios';
 import Submission, { ArticleType } from '../../models/submission';
 import config from '../../../../../config';
+import { EJPNameRepository } from 'src/domain/ejp-name/repositories/types';
 
 interface Editor {
     id: string;
@@ -58,30 +59,11 @@ const majorSubjectAreas: { [key: string]: string } = {
     'structural-biology-molecular-biophysics': 'Structural Biology and Molecular Biophysics',
 };
 
-// @todo: this should go in test setup
-const existingNames = [{ id: 1, first: 'J. Edward', last: 'Reviewer' }];
-
-// @todo: replace with ejp_name lookup
-const splitName = (name: string): { surname: string; givenNames: string } => {
-    const existing = existingNames.find(n => `${n.first} ${n.last}` === name);
-
-    if (existing) {
-        return {
-            surname: existing.last,
-            givenNames: existing.first,
-        };
-    }
-
-    const surname = name.substring(name.indexOf(' ') + 1);
-    const givenNames = name.substring(0, name.length - surname.length - 1);
-
-    return { surname, givenNames };
-};
 class ArticleGenerator {
     private editors: Editor[] = [];
     private affiliations: string[] = [];
 
-    constructor(private readonly submission: Submission) {}
+    constructor(private readonly submission: Submission, private readonly ejpNames: EJPNameRepository) {}
 
     async getEditor(id: string): Promise<Editor | null> {
         const { data } = await axios.get<ContinuumPerson>(`${config.user_api_url}/people/${id}`);
@@ -197,21 +179,43 @@ class ArticleGenerator {
         }));
     }
 
-    _reviewerContribXml(reviewers: { name: string; email: string }[], contribType: string): object[] {
-        return reviewers
-            .map((reviewer: { name: string; email: string }): object => {
-                const { surname, givenNames } = splitName(reviewer.name);
+    async _splitName(name: string): Promise<{ surname: string; givenNames: string }> {
+        const ejpName = await this.ejpNames.findByName(name);
+        if (ejpName) {
+            return {
+                surname: ejpName.last,
+                givenNames: ejpName.first,
+            };
+        }
 
-                return {
-                    '@contrib-type': contribType,
-                    name: {
-                        surname,
-                        'given-names': givenNames,
+        const surname = name.substring(name.indexOf(' ') + 1);
+        const givenNames = name.substring(0, name.length - surname.length - 1);
+
+        return {
+            surname,
+            givenNames,
+        };
+    }
+
+    async _reviewerContribXml(reviewers: { name: string; email: string }[], contribType: string): Promise<object[]> {
+        return (
+            await Promise.all(
+                reviewers.map(
+                    async (reviewer: { name: string; email: string }): Promise<object> => {
+                        const { surname, givenNames } = await this._splitName(reviewer.name);
+
+                        return {
+                            '@contrib-type': contribType,
+                            name: {
+                                surname,
+                                'given-names': givenNames,
+                            },
+                            email: reviewer.email,
+                        };
                     },
-                    email: reviewer.email,
-                };
-            })
-            .filter(editor => editor !== null) as object[];
+                ),
+            )
+        ).filter(editor => editor !== null) as object[];
     }
 
     _authorContribXml(): {} {
@@ -233,14 +237,14 @@ class ArticleGenerator {
         };
     }
 
-    _potentialReviewersContribXml(): object {
+    async _potentialReviewersContribXml(): Promise<object> {
         const {
             editorDetails: { suggestedReviewers = [], opposedReviewers = [] },
         } = this.submission;
 
         const contrib = [
-            ...this._reviewerContribXml(suggestedReviewers, 'suggested_reviewer'),
-            ...this._reviewerContribXml(opposedReviewers, 'opposed_reviewer'),
+            ...(await this._reviewerContribXml(suggestedReviewers, 'suggested_reviewer')),
+            ...(await this._reviewerContribXml(opposedReviewers, 'opposed_reviewer')),
         ];
 
         return {
@@ -281,12 +285,12 @@ class ArticleGenerator {
         };
     }
 
-    _contribGroupXml(): object[] {
+    async _contribGroupXml(): Promise<object[]> {
         return [
             this._authorContribXml(),
             this._potentialSeniorEditorsContribXml(),
             this._potentialReviewingEditorsContribXml(),
-            this._potentialReviewersContribXml(),
+            await this._potentialReviewersContribXml(),
         ];
     }
 
@@ -313,7 +317,7 @@ class ArticleGenerator {
         };
     }
 
-    _frontXml(): {} {
+    async _frontXml(): Promise<object> {
         return {
             'journal-meta': {
                 'journal-id': [{ '@journal-id-type': 'pmc' }, { '@journal-id-type': 'publisher' }],
@@ -328,7 +332,7 @@ class ArticleGenerator {
                 'title-group': {
                     'article-title': this.submission.manuscriptDetails.title,
                 },
-                'contrib-group': this._contribGroupXml(),
+                'contrib-group': await this._contribGroupXml(),
                 aff: this._affiliationsXml(),
                 'author-notes': { fn: { p: {} } },
                 'pub-date': { day: '', month: '', year: '' },
@@ -340,7 +344,7 @@ class ArticleGenerator {
 
     async execute(): Promise<string> {
         await this._collectEditorInfo();
-        const front = this._frontXml();
+        const front = await this._frontXml();
 
         return xmlbuilder
             .create(
@@ -352,6 +356,6 @@ class ArticleGenerator {
     }
 }
 
-export const generateArticle = async (submission: Submission): Promise<string> => {
-    return new ArticleGenerator(submission).execute();
+export const generateArticle = async (submission: Submission, ejpNames: EJPNameRepository): Promise<string> => {
+    return new ArticleGenerator(submission, ejpNames).execute();
 };
