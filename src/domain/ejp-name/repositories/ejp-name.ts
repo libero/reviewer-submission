@@ -27,7 +27,6 @@ export class KnexEJPNamesRepository implements EJPNameRepository {
             .into(this.TABLE_NAME);
 
         await this._query.executor(query);
-
         return ejpName;
     }
 
@@ -38,12 +37,11 @@ export class KnexEJPNamesRepository implements EJPNameRepository {
             .from(this.TABLE_NAME)
             .whereRaw("lower(first || ' ' || last) = ?", [name.toLowerCase()]);
 
-        const record = await this._query.executor<DatabaseEntry>(query);
-
-        if (record) {
-            return new EJPName(record.id, record.first, record.last);
+        const record = await this._query.executor<DatabaseEntry[]>(query);
+        if (record.length > 0) {
+            return new EJPName(record[0].id, record[0].first, record[0].last);
         }
 
-        return record;
+        return null;
     }
 }

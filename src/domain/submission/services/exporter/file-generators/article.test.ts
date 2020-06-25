@@ -2,7 +2,6 @@ import { mocked } from 'ts-jest/utils';
 import Axios from 'axios';
 import { generateArticle } from './article';
 import submission from './article.test.data';
-// import EJPName from 'src/domain/ejp-name/services/models/ejp-name';
 import EJPName from '../../../../ejp-name/services/models/ejp-name';
 
 jest.mock('axios');
