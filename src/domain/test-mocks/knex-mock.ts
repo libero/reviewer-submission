@@ -12,6 +12,7 @@ export class MockKnex {
     delete = jest.fn().mockReturnValue(this);
     update = jest.fn().mockReturnValue(this);
     table = jest.fn().mockReturnValue(this);
+    whereRaw = jest.fn().mockReturnValue(this);
 }
 
 export function createMockAdapter(mock: MockKnex): KnexTableAdapter {

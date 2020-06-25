@@ -2,6 +2,7 @@ import { mocked } from 'ts-jest/utils';
 import Axios from 'axios';
 import { generateArticle } from './article';
 import submission from './article.test.data';
+import EJPName from '../../../../ejp-name/services/models/ejp-name';
 
 jest.mock('axios');
 
@@ -36,8 +37,18 @@ describe('ArticleGenerator', () => {
                 data: id ? editorsData[id] : {},
             });
         });
+        const ejpNamesMock = {
+            findByName: async (name: string): Promise<EJPName | null> => {
+                if (name === 'J. Edward Reviewer') {
+                    return new EJPName(1, 'J. Edward', 'Reviewer');
+                }
 
-        const output = await generateArticle(submission);
+                return null;
+            },
+            create: jest.fn(),
+        };
+
+        const output = await generateArticle(submission, ejpNamesMock);
 
         expect(output).toMatchSnapshot();
     });

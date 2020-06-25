@@ -3,6 +3,7 @@ import { FileService } from '../../../file/services/file-service';
 import File from '../../../file/services/models/file';
 import submission from './file-generators/article.test.data';
 import * as generators from './file-generators';
+import { EJPNameRepository } from 'src/domain/ejp-name/repositories/types';
 
 const mockFile = jest.fn();
 const mockGenerateAsync = jest.fn();
@@ -29,6 +30,10 @@ describe('MecaExporter', () => {
         getSupportingFiles,
         getFileContent,
     } as unknown) as FileService;
+    const ejpNames = ({
+        create: jest.fn(),
+        findByName: jest.fn(),
+    } as unknown) as EJPNameRepository;
 
     it('exports correctly', async () => {
         const manuscriptFile = { filename: 'manuscript.pdf' } as File;
@@ -41,7 +46,7 @@ describe('MecaExporter', () => {
             .mockImplementationOnce(() => Promise.resolve('supporting 1'))
             .mockImplementationOnce(() => Promise.resolve('supporting 2'));
 
-        const mecaExporter = new MecaExporter(fileService);
+        const mecaExporter = new MecaExporter(fileService, ejpNames);
         await mecaExporter.export(submission, '1.2.3.4');
 
         expect(mockFile).toHaveBeenCalledTimes(8);
@@ -59,7 +64,7 @@ describe('MecaExporter', () => {
     it('throws if no manuscript file set', async () => {
         findManuscriptFile.mockImplementation(() => Promise.resolve(null));
 
-        const mecaExporter = new MecaExporter(fileService);
+        const mecaExporter = new MecaExporter(fileService, ejpNames);
         await expect(mecaExporter.export(submission, '1.2.3.4')).rejects.toThrowError('No manuscript file');
     });
 });

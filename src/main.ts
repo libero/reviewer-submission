@@ -28,8 +28,10 @@ import { FileService } from './domain/file/services/file-service';
 import { AuditService } from './domain/audit/services/audit';
 import { S3Store } from './domain/submission/services/storage/s3-store';
 import { SftpStore } from './domain/submission/services/storage/sftp-store';
+import { KnexEJPNamesRepository } from './domain/ejp-name/repositories/ejp-name';
 import { MecaExporter } from './domain/submission/services/exporter/meca-exporter';
 import * as S3 from 'aws-sdk/clients/s3';
+import { createKnexAdapter } from './domain/knex-table-adapter';
 
 // found via https://github.com/digicatapult/graphql-complexity-experiment/blob/master/app/apollo.js
 const estimators = [
@@ -86,7 +88,8 @@ const init = async (): Promise<void> => {
     const srvFile = new FileService(knexConnection, createS3(config.s3), config.s3.fileBucket, srvAudit);
     const s3Store = new S3Store(config.s3, config.meca_config);
     const sftpStore = new SftpStore(config.meca_config);
-    const mecaExporter = new MecaExporter(srvFile);
+    const ejpNames = new KnexEJPNamesRepository(createKnexAdapter(knexConnection, 'public'));
+    const mecaExporter = new MecaExporter(srvFile, ejpNames);
     const srvSubmission = new SubmissionService(knexConnection, mecaExporter, s3Store, sftpStore);
     const srvExtractionService = new SemanticExtractionService(knexConnection, config.science_beam);
 
