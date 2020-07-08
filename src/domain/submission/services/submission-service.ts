@@ -2,7 +2,7 @@ import * as Knex from 'knex';
 import { SubmissionId, ManuscriptDetails, DisclosureDetails } from '../types';
 import XpubSubmissionRootRepository from '../repositories/xpub-submission-root';
 import { v4 as uuid } from 'uuid';
-import Submission from './models/submission';
+import Submission, { SubmissionStatus } from './models/submission';
 import { createKnexAdapter } from '../../knex-table-adapter';
 import { MecaExporter } from './exporter/meca-exporter';
 import { S3Store } from './storage/s3-store';
@@ -52,7 +52,7 @@ export class SubmissionService {
             id,
             updated: new Date(),
             articleType,
-            status: 'INITIAL',
+            status: SubmissionStatus.INITIAL,
             createdBy: userId,
         });
         this.setLastStepVisited(submission, 'author');
@@ -78,7 +78,8 @@ export class SubmissionService {
         }
 
         this.runMecaExport(submission, ip);
-
+        submission.status = SubmissionStatus.MECA_EXPORT_PENDING;
+        await this.submissionRepository.update(submission);
         return this.get(id);
     }
 

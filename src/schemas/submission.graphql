@@ -12,6 +12,7 @@ type Submission {
     disclosure: DisclosureDetails
     suggestions: [Suggestion]
     lastStepVisted: String
+    status: String
 }
 
 type Suggestion {
