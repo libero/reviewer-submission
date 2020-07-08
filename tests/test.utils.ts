@@ -236,7 +236,8 @@ export const startSubmissionAlt = async (articleType: string): Promise<AxiosResp
             query: `
                 mutation StartSubmission($articleType: String!) {
                     startSubmission(articleType: $articleType) {
-                        id
+                        id,
+                        status
                     }
                 }
             `,
