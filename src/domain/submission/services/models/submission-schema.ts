@@ -6,8 +6,6 @@ import { authorSchema } from './authorDetails-schema';
 import { disclosureSchema } from './disclosure-schema';
 import { SubmissionStatus } from '../../types';
 
-// console.log('SubmissionStatus.INITIAL', SubmissionStatus.INITIAL === 'INITIAL');
-// console.log('ArticleType', ArticleType);
 export const submissionSchema = Joi.object({
     id: Joi.string().required(),
     created: Joi.date().required(),

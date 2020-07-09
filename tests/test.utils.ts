@@ -214,7 +214,8 @@ export const submit = async (id: string): Promise<AxiosResponse> => {
             query: `
                 mutation submit($id: ID!) {
                     submit(id: $id) {
-                        id
+                        id,
+                        status
                     }
                 }
             `,
