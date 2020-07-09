@@ -51,7 +51,6 @@ export type FileDetails = {
     supportingFiles?: Array<File>; // responsibility of the Files Service
 };
 
-
 export enum SubmissionStatus {
     INITIAL = 'INITIAL',
     MECA_EXPORT_PENDING = 'MECA_EXPORT_PENDING',
