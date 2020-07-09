@@ -4,14 +4,17 @@ import { manuscriptDetailsSchema, featureManuscriptDetailsSchema } from './manus
 import { editorDetailsSchema, featureEditorDetailsSchema } from './editorDetails-schema';
 import { authorSchema } from './authorDetails-schema';
 import { disclosureSchema } from './disclosure-schema';
+import { SubmissionStatus } from '../../types';
 
+// console.log('SubmissionStatus.INITIAL', SubmissionStatus.INITIAL === 'INITIAL');
+// console.log('ArticleType', ArticleType);
 export const submissionSchema = Joi.object({
     id: Joi.string().required(),
     created: Joi.date().required(),
     updated: Joi.date().required(),
     status: Joi.string()
         .required()
-        .equal('INITIAL'),
+        .equal(SubmissionStatus.INITIAL),
     createdBy: Joi.string().required(),
     articleType: Joi.string()
         .required()

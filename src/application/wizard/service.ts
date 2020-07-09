@@ -9,8 +9,9 @@ import {
     ManuscriptDetails,
     EditorDetails,
     DisclosureDetails,
+    SubmissionStatus,
 } from '../../domain/submission/types';
-import Submission, { SubmissionStatus } from '../../domain/submission/services/models/submission';
+import Submission from '../../domain/submission/services/models/submission';
 import { AuthorTeamMember, EditorTeamMember, EditorReviewerTeamMember } from '../../domain/teams/repositories/types';
 import { PermissionService, SubmissionOperation } from '../permission/service';
 import { User } from 'src/domain/user/user';

@@ -20,15 +20,6 @@ export enum ArticleType {
     SHORT_REPORT = 'short-report',
 }
 
-export enum SubmissionStatus {
-    INITIAL = 'INITIAL',
-    MECA_EXPORT_PENDING = 'MECA_EXPORT_PENDING',
-    MECA_EXPORT_FAILED = 'MECA_EXPORT_FAILED',
-    MECA_EXPORT_SUCCEEDED = 'MECA_EXPORT_SUCCEEDED',
-    MECA_IMPORT_FAILED = 'MECA_IMPORT_FAILED',
-    MECA_IMPORT_SUCCEEDED = 'MECA_IMPORT_SUCCEEDED',
-}
-
 export default class Submission {
     id: SubmissionId;
     created: Date;

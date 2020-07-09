@@ -1,8 +1,8 @@
 import * as Knex from 'knex';
-import { SubmissionId, ManuscriptDetails, DisclosureDetails } from '../types';
+import { SubmissionId, ManuscriptDetails, DisclosureDetails, SubmissionStatus } from '../types';
 import XpubSubmissionRootRepository from '../repositories/xpub-submission-root';
 import { v4 as uuid } from 'uuid';
-import Submission, { SubmissionStatus } from './models/submission';
+import Submission from './models/submission';
 import { createKnexAdapter } from '../../knex-table-adapter';
 import { MecaExporter } from './exporter/meca-exporter';
 import { S3Store } from './storage/s3-store';
