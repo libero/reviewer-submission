@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
-import Submission, { SubmissionStatus, ArticleType } from './submission';
-import { SubmissionId } from '../../types';
+import Submission, { ArticleType } from './submission';
+import { SubmissionId, SubmissionStatus } from '../../types';
 import File from '../../../file/services/models/file';
 import { FileId, FileType, FileStatus } from '../../../file/types';
 

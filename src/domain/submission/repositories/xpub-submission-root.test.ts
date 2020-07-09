@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { v4 as uuid } from 'uuid';
 import XpubSubmissionRootRepository from './xpub-submission-root';
-import { SubmissionId } from '../types';
+import { SubmissionId, SubmissionStatus } from '../types';
 import { createMockAdapter, MockKnex } from '../../test-mocks/knex-mock';
 import { KnexTableAdapter } from '../../knex-table-adapter';
-import Submission, { ArticleType, SubmissionStatus } from '../services/models/submission';
+import Submission, { ArticleType } from '../services/models/submission';
 
 const entryId = SubmissionId.fromUuid(uuid());
 const entryId2 = SubmissionId.fromUuid(uuid());

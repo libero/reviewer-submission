@@ -193,7 +193,8 @@ export const startSubmission = async (apollo: ApolloClient<unknown>, articleType
     const startSubmission = gql`
         mutation StartSubmission($articleType: String!) {
             startSubmission(articleType: $articleType) {
-                id
+                id,
+                status
             }
         }
     `;
@@ -213,7 +214,8 @@ export const submit = async (id: string): Promise<AxiosResponse> => {
             query: `
                 mutation submit($id: ID!) {
                     submit(id: $id) {
-                        id
+                        id,
+                        status
                     }
                 }
             `,
@@ -236,7 +238,8 @@ export const startSubmissionAlt = async (articleType: string): Promise<AxiosResp
             query: `
                 mutation StartSubmission($articleType: String!) {
                     startSubmission(articleType: $articleType) {
-                        id
+                        id,
+                        status
                     }
                 }
             `,

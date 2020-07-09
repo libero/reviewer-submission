@@ -61,6 +61,8 @@ describe('Submit Integration Tests', () => {
         expect(data).toBeTruthy();
         const id = data && data.startSubmission ? data.startSubmission.id : '';
         expect(id).toHaveLength(36);
+        const status = data && data.startSubmission ? data.startSubmission.status : '';
+        expect(status).toBe('INITIAL');
 
         const submitResponse = await submit(id);
         expect(submitResponse.data.errors[0].message).toEqual(
@@ -117,7 +119,7 @@ describe('Submit Integration Tests', () => {
         await saveSubmissionDetails(submissionId, submissionDetails);
         await saveEditorDetails(submissionId, editorDetails);
         await saveDisclosurePage(submissionId, disclosureDetails);
-        await submit(submissionId);
+        const submitResponse = await submit(submissionId);
 
         const sftpClient = new SftpClient();
         await sftpClient.connect({
@@ -164,6 +166,7 @@ describe('Submit Integration Tests', () => {
 
         expect(sftpFile).toBeTruthy();
         expect(s3File).toBeTruthy();
+        expect(submitResponse.data.data.submit.status).toBe('SUBMITTED');
 
         await checkArchive(sftpFile);
         await checkArchive(s3File);

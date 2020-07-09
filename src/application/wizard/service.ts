@@ -9,6 +9,7 @@ import {
     ManuscriptDetails,
     EditorDetails,
     DisclosureDetails,
+    SubmissionStatus,
 } from '../../domain/submission/types';
 import Submission from '../../domain/submission/services/models/submission';
 import { AuthorTeamMember, EditorTeamMember, EditorReviewerTeamMember } from '../../domain/teams/repositories/types';
@@ -121,8 +122,9 @@ export class WizardService {
         if (!allowed) {
             throw new Error('User not allowed to submit');
         }
-
-        await this.submissionService.submit(await this.getFullSubmission(submissionId), ip);
+        const fullSubmission = await this.getFullSubmission(submissionId);
+        fullSubmission.status = submission.status;
+        await this.submissionService.submit(fullSubmission, ip);
 
         return this.getFullSubmission(submissionId);
     }
@@ -321,6 +323,24 @@ export class WizardService {
 
             if (details.editorDetails) {
                 submission.editorDetails = { ...details.editorDetails, ...submission.editorDetails };
+            }
+
+            if (submission.status) {
+                switch (submission.status) {
+                    case SubmissionStatus.INITIAL:
+                        submission.status = 'CONTINUE_SUBMISSION';
+                        break;
+                    case SubmissionStatus.MECA_EXPORT_PENDING:
+                    case SubmissionStatus.MECA_EXPORT_FAILED:
+                    case SubmissionStatus.MECA_EXPORT_SUCCEEDED:
+                    case SubmissionStatus.MECA_IMPORT_FAILED:
+                    case SubmissionStatus.MECA_IMPORT_SUCCEEDED:
+                        submission.status = 'SUBMITTED';
+                        break;
+                    default:
+                        submission.status = 'CONTINUE_SUBMISSION';
+                        break;
+                }
             }
         }
         return submission;

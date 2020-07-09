@@ -1,8 +1,8 @@
 import { SubmissionService } from './submission-service';
 import XpubSubmissionRootRepository from '../repositories/xpub-submission-root';
 import Knex = require('knex');
-import { SubmissionId } from '../types';
-import Submission, { SubmissionStatus, ArticleType } from './models/submission';
+import { SubmissionId, SubmissionStatus } from '../types';
+import Submission, { ArticleType } from './models/submission';
 import { S3Store } from './storage/s3-store';
 import { MecaExporter } from './exporter/meca-exporter';
 import { SftpStore } from './storage/sftp-store';

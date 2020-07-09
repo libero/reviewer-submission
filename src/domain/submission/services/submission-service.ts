@@ -1,5 +1,5 @@
 import * as Knex from 'knex';
-import { SubmissionId, ManuscriptDetails, DisclosureDetails } from '../types';
+import { SubmissionId, ManuscriptDetails, DisclosureDetails, SubmissionStatus } from '../types';
 import XpubSubmissionRootRepository from '../repositories/xpub-submission-root';
 import { v4 as uuid } from 'uuid';
 import Submission from './models/submission';
@@ -52,7 +52,7 @@ export class SubmissionService {
             id,
             updated: new Date(),
             articleType,
-            status: 'INITIAL',
+            status: SubmissionStatus.INITIAL,
             createdBy: userId,
         });
         this.setLastStepVisited(submission, 'author');
@@ -77,8 +77,10 @@ export class SubmissionService {
             throw new Error(`The submission ${id} cannot be submitted.`);
         }
 
-        this.runMecaExport(submission, ip);
+        submission.status = SubmissionStatus.MECA_EXPORT_PENDING;
+        await this.submissionRepository.update(submission);
 
+        this.runMecaExport(submission, ip);
         return this.get(id);
     }
 

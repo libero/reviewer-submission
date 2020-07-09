@@ -126,6 +126,13 @@ describe('Dashboard Integration Tests', () => {
         expect(deleteResponse.data.errors).toBeUndefined();
     });
 
+    it('it should return state as initial', async () => {
+        const startSubmissionResponse = await startSubmissionAlt('research-article');
+        expect(startSubmissionResponse.data.errors).toBeUndefined();
+        expect(startSubmissionResponse.data.data.startSubmission.status).toBe('INITIAL');
+    });
+
+
     it('it should throw if the user tries to delete a submission that is not their own', async () => {
         const startSubmissionResponse = await startSubmissionAlt('research-article');
         expect(startSubmissionResponse.data.errors).toBeUndefined();
