@@ -61,6 +61,8 @@ describe('Submit Integration Tests', () => {
         expect(data).toBeTruthy();
         const id = data && data.startSubmission ? data.startSubmission.id : '';
         expect(id).toHaveLength(36);
+        const status = data && data.startSubmission ? data.startSubmission.status : '';
+        expect(status).toBe('INITIAL')
 
         const submitResponse = await submit(id);
         expect(submitResponse.data.errors[0].message).toEqual(

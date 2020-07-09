@@ -193,7 +193,8 @@ export const startSubmission = async (apollo: ApolloClient<unknown>, articleType
     const startSubmission = gql`
         mutation StartSubmission($articleType: String!) {
             startSubmission(articleType: $articleType) {
-                id
+                id,
+                status
             }
         }
     `;
