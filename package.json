@@ -82,7 +82,7 @@
         "@types/helmet": "^0.0.45",
         "@types/hpp": "^0.2.1",
         "@types/jest": "^23.3.13",
-        "@types/jsonwebtoken": "^8.3.7",
+        "@types/jsonwebtoken": "^8.5.0",
         "@types/knex": "^0.16.1",
         "@types/node": "^10.12.18",
         "@types/node-fetch": "^2.5.4",

@@ -1,6 +1,7 @@
 import * as JSZip from 'jszip';
 import { SubmissionExporter } from './types';
 import Submission from '../models/submission';
+import { encode } from './jwt';
 import { FileService } from '../../../file/services/file-service';
 import { FileId } from '../../../file/types';
 import {
@@ -12,6 +13,7 @@ import {
     removeUnicode,
 } from './file-generators';
 import { EJPNameRepository } from 'src/domain/ejp-name/repositories/types';
+import { v4 } from 'uuid';
 
 interface ArchiveFile {
     id?: FileId;
@@ -22,11 +24,21 @@ interface ArchiveFile {
 }
 
 export class MecaExporter implements SubmissionExporter {
-    constructor(private readonly fileService: FileService, private readonly ejpNames: EJPNameRepository) {}
+    constructor(
+        private readonly fileService: FileService,
+        private readonly ejpNames: EJPNameRepository,
+        private readonly jwtSecret: string,
+    ) {}
 
     async export(submission: Submission, ip: string): Promise<Buffer> {
         const manuscriptFile = await this.fileService.findManuscriptFile(submission.id);
         const supportingFiles = await this.fileService.getSupportingFiles(submission.id);
+        const payload = {
+            sub: 'reviwer-submission',
+            issuer: 'libero',
+            jti: v4(),
+        };
+        const token = encode(this.jwtSecret, payload, '15m');
 
         if (!manuscriptFile) {
             throw new Error('No manuscript file');
@@ -45,7 +57,7 @@ export class MecaExporter implements SubmissionExporter {
         );
 
         const mandatoryFiles = [
-            { filename: 'article.xml', content: await generateArticle(submission, this.ejpNames) },
+            { filename: 'article.xml', content: await generateArticle(submission, this.ejpNames, token) },
             { filename: 'cover_letter.pdf', content: await generateCoverLetter(submission.files.coverLetter || '') },
             { filename: 'disclosure.pdf', content: await generateDisclosure(submission, ip) },
             { filename: 'manifest.xml', content: generateManifest(submission) },
