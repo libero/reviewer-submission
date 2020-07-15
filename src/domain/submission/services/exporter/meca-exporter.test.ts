@@ -46,7 +46,7 @@ describe('MecaExporter', () => {
             .mockImplementationOnce(() => Promise.resolve('supporting 1'))
             .mockImplementationOnce(() => Promise.resolve('supporting 2'));
 
-        const mecaExporter = new MecaExporter(fileService, ejpNames);
+        const mecaExporter = new MecaExporter(fileService, ejpNames, 'secret');
         await mecaExporter.export(submission, '1.2.3.4');
 
         expect(mockFile).toHaveBeenCalledTimes(8);
@@ -64,7 +64,7 @@ describe('MecaExporter', () => {
     it('throws if no manuscript file set', async () => {
         findManuscriptFile.mockImplementation(() => Promise.resolve(null));
 
-        const mecaExporter = new MecaExporter(fileService, ejpNames);
+        const mecaExporter = new MecaExporter(fileService, ejpNames, 'secret');
         await expect(mecaExporter.export(submission, '1.2.3.4')).rejects.toThrowError('No manuscript file');
     });
 });

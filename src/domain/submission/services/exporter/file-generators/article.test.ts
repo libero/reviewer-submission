@@ -48,7 +48,7 @@ describe('ArticleGenerator', () => {
             create: jest.fn(),
         };
 
-        const output = await generateArticle(submission, ejpNamesMock);
+        const output = await generateArticle(submission, ejpNamesMock, 'secret');
 
         expect(output).toMatchSnapshot();
     });

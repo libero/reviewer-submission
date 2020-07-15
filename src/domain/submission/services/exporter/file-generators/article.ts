@@ -63,10 +63,18 @@ class ArticleGenerator {
     private editors: Editor[] = [];
     private affiliations: string[] = [];
 
-    constructor(private readonly submission: Submission, private readonly ejpNames: EJPNameRepository) {}
+    constructor(
+        private readonly submission: Submission,
+        private readonly ejpNames: EJPNameRepository,
+        private readonly token: string,
+    ) {}
 
     async getEditor(id: string): Promise<Editor | null> {
-        const { data } = await axios.get<ContinuumPerson>(`${config.user_api_url}/people/${id}`);
+        const { data } = await axios.get<ContinuumPerson>(`${config.user_api_url}/people/${id}`, {
+            headers: {
+                Authorization: `Bearer ${this.token}`,
+            },
+        });
 
         if (!data) {
             return null;
@@ -356,6 +364,10 @@ class ArticleGenerator {
     }
 }
 
-export const generateArticle = async (submission: Submission, ejpNames: EJPNameRepository): Promise<string> => {
-    return new ArticleGenerator(submission, ejpNames).execute();
+export const generateArticle = async (
+    submission: Submission,
+    ejpNames: EJPNameRepository,
+    token: string,
+): Promise<string> => {
+    return new ArticleGenerator(submission, ejpNames, token).execute();
 };
