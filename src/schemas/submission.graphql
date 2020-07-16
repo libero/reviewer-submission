@@ -11,7 +11,7 @@ type Submission {
     editorDetails: EditorDetails
     disclosure: DisclosureDetails
     suggestions: [Suggestion]
-    lastStepVisted: String
+    lastStepVisited: String
     status: String
 }
 
