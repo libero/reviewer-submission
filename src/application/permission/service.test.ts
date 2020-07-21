@@ -19,6 +19,7 @@ describe('userCan', () => {
             status: 'CREATED',
             createdBy: 'user-id',
         });
+        submission.status = 'INITIAL';
     });
 
     describe('SubmissionOperation.UPDATE', () => {

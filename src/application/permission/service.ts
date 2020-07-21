@@ -1,5 +1,6 @@
-import Submission from 'src/domain/submission/services/models/submission';
-import { User } from 'src/domain/user/user';
+import Submission from '../../domain/submission/services/models/submission';
+import { User } from '../../domain/user/user';
+import { SubmissionStatus } from '../../domain/submission/types';
 
 export enum SubmissionOperation {
     CREATE = 'Create Submission',
@@ -33,7 +34,10 @@ export class PermissionService {
             case SubmissionOperation.READ:
             case SubmissionOperation.UPDATE:
             case SubmissionOperation.DELETE:
-                return this.isStaff(user) || submission.createdBy === user.id;
+                return (
+                    this.isStaff(user) ||
+                    (submission.status === SubmissionStatus.INITIAL && submission.createdBy === user.id)
+                );
             default:
                 return false;
         }
