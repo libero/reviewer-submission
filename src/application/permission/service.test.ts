@@ -49,19 +49,19 @@ describe('userCan', () => {
                 const op = SubmissionOperation.UPDATE;
                 user.role = 'user';
                 user.id = 'user-id';
-                const subClone = {...submission};
+                const subClone = { ...submission };
                 subClone.status = 'MECA_EXPORT_PENDING';
                 expect(permission.userCanWithSubmission(user, op, submission)).toBe(true);
-            })
+            });
 
             it('should return true if staff and already submitted', () => {
                 const op = SubmissionOperation.UPDATE;
                 user.role = 'staff';
                 user.id = 'user-id';
-                const subClone = {...submission};
+                const subClone = { ...submission };
                 subClone.status = 'MECA_EXPORT_PENDING';
                 expect(permission.userCanWithSubmission(user, op, submission)).toBe(true);
-            })
+            });
         });
         describe('Any submission', () => {
             it('should return true if staff', () => {
