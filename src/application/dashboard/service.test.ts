@@ -18,15 +18,16 @@ describe('dashboard service', () => {
         userCanWithSubmission: jest.fn(),
     };
 
-    const submissionService = ({
-        create: jest.fn(),
-        findByUserId: jest.fn(),
-        get: jest.fn(),
-        delete: jest.fn(),
-    } as unknown) as SubmissionService;
+    let submissionService: SubmissionService;
 
     beforeEach(() => {
         jest.resetAllMocks();
+        submissionService = ({
+            create: jest.fn(),
+            findByUserId: jest.fn(async () => []),
+            get: jest.fn(),
+            delete: jest.fn(),
+        } as unknown) as SubmissionService;
     });
 
     describe('findMySubmissions', () => {
