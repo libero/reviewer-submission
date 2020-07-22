@@ -23,7 +23,9 @@ describe('dashboard service', () => {
     beforeEach(() => {
         jest.resetAllMocks();
         submissionService = ({
-            create: jest.fn(),
+            create: jest.fn(async () => ({
+                status: 'INITIAL',
+            })),
             findByUserId: jest.fn(async () => []),
             get: jest.fn(),
             delete: jest.fn(),
