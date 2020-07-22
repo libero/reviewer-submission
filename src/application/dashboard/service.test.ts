@@ -18,15 +18,16 @@ describe('dashboard service', () => {
         userCanWithSubmission: jest.fn(),
     };
 
-    const submissionService = ({
-        create: jest.fn(),
-        findByUserId: jest.fn(),
-        get: jest.fn(),
-        delete: jest.fn(),
-    } as unknown) as SubmissionService;
+    let submissionService: SubmissionService;
 
     beforeEach(() => {
         jest.resetAllMocks();
+        submissionService = ({
+            create: jest.fn(),
+            findByUserId: jest.fn(async () => []),
+            get: jest.fn(),
+            delete: jest.fn(),
+        } as unknown) as SubmissionService;
     });
 
     describe('findMySubmissions', () => {
@@ -42,6 +43,33 @@ describe('dashboard service', () => {
             expect(permissionService.isStaff).toHaveBeenCalledTimes(0);
             expect(permissionService.userCan).toHaveBeenCalledTimes(0);
             expect(permissionService.userCanWithSubmission).toHaveBeenCalledTimes(0);
+        });
+
+        it('should map the status correctly', async () => {
+            submissionService = ({
+                findByUserId: jest.fn(async () => [
+                    { status: 'INITIAL' },
+                    { status: 'MECA_IMPORT_FAILED' },
+                    { status: 'MECA_EXPORT_FAILED' },
+                    { status: 'MECA_EXPORT_SUCCEEDED' },
+                    { status: 'MECA_EXPORT_PENDING' },
+                    { status: 'not a status' },
+                ]),
+            } as unknown) as SubmissionService;
+            const service = new DashboardService(permissionService, submissionService);
+            const subs = await service.findMySubmissions(mockUser);
+            const subStatuses = subs.map(sub => sub.status);
+            expect(permissionService.isStaff).toHaveBeenCalledTimes(0);
+            expect(permissionService.userCan).toHaveBeenCalledTimes(0);
+            expect(permissionService.userCanWithSubmission).toHaveBeenCalledTimes(0);
+            expect(subStatuses).toStrictEqual([
+                'CONTINUE_SUBMISSION',
+                'SUBMITTED',
+                'SUBMITTED',
+                'SUBMITTED',
+                'SUBMITTED',
+                'CONTINUE_SUBMISSION',
+            ]);
         });
     });
 

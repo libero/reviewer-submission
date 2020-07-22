@@ -1,4 +1,4 @@
-import { SubmissionId } from '../../domain/submission/types';
+import { SubmissionId, SubmissionStatus } from '../../domain/submission/types';
 import Submission from '../../domain/submission/services/models/submission';
 import { PermissionService, SubmissionOperation } from '../permission/service';
 import { User } from '../../domain/user/user';
@@ -12,7 +12,27 @@ export class DashboardService {
 
     async findMySubmissions(user: User): Promise<Submission[]> {
         // we don't need to check permissions to perform this operation.
-        return this.submissionService.findByUserId(user.id);
+        const submissions = await this.submissionService.findByUserId(user.id);
+        return submissions.map(submission => {
+            if (submission.status) {
+                switch (submission.status) {
+                    case SubmissionStatus.INITIAL:
+                        submission.status = 'CONTINUE_SUBMISSION';
+                        break;
+                    case SubmissionStatus.MECA_EXPORT_PENDING:
+                    case SubmissionStatus.MECA_EXPORT_FAILED:
+                    case SubmissionStatus.MECA_EXPORT_SUCCEEDED:
+                    case SubmissionStatus.MECA_IMPORT_FAILED:
+                    case SubmissionStatus.MECA_IMPORT_SUCCEEDED:
+                        submission.status = 'SUBMITTED';
+                        break;
+                    default:
+                        submission.status = 'CONTINUE_SUBMISSION';
+                        break;
+                }
+            }
+            return submission;
+        });
     }
 
     async startSubmission(user: User, articleType: string): Promise<Submission> {

@@ -45,6 +45,7 @@ describe('getSubmission', () => {
             id: '89e0aec8-b9fc-4413-8a37-5cc775edbe3a',
             createdBy: '89e0aec8-b9fc-4413-8a37-5cc77567',
             files: {},
+            status: 'INITIAL',
         })),
     } as unknown) as SubmissionService;
 
@@ -140,6 +141,7 @@ describe('saveAuthorPage', () => {
         get: jest.fn().mockImplementation(() => ({
             createdBy: user.id,
             files: {},
+            status: 'INITIAL',
         })),
     } as unknown) as SubmissionService;
 
@@ -217,6 +219,7 @@ describe('saveAuthorPage', () => {
             saveAuthorDetails: jest.fn(),
             get: jest.fn().mockImplementationOnce(() => ({
                 createdBy: user.id,
+                status: 'INITIAL',
             })),
         } as unknown) as SubmissionService;
         const existingTeam = null;
@@ -270,6 +273,7 @@ describe('saveAuthorPage', () => {
         const submissionServiceMock = ({
             get: jest.fn().mockImplementationOnce(() => ({
                 createdBy: '89e0aec8-b9fc-4413-8a37-5cc77567',
+                status: 'INITIAL',
             })),
         } as unknown) as SubmissionService;
 
@@ -348,6 +352,7 @@ describe('saveEditorPage', () => {
             get: jest.fn().mockImplementationOnce(() => ({
                 id: '89e0aec8-b9fc-4413-8a37-5cc775edbe3a',
                 createdBy: '89e0aec8-b9fc-4413-8a37-10Dc77567',
+                status: 'INITIAL',
             })),
         } as unknown) as SubmissionService;
 
@@ -388,6 +393,7 @@ describe('saveEditorPage', () => {
                 id: '89e0aec8-b9fc-4413-8a37-5cc775edbe3a',
                 createdBy: '89e0aec8-b9fc-4413-8a37-5cc77567',
                 files: {},
+                status: 'INITIAL',
             })),
             saveEditorDetails: jest.fn().mockImplementation(() => {}),
         } as unknown) as SubmissionService;
@@ -429,6 +435,7 @@ describe('saveEditorPage', () => {
                 id: '89e0aec8-b9fc-4413-8a37-5cc775edbe3a',
                 createdBy: '89e0aec8-b9fc-4413-8a37-5cc77567',
                 files: {},
+                status: 'INITIAL',
             },
             details.opposedReviewersReason,
             details.opposedReviewingEditorsReason,
@@ -532,6 +539,7 @@ describe('saveDisclosurePage', () => {
                 id: '89e0aec8-b9fc-4413-8a37-5cc775edbe3a',
                 createdBy: '89e0aec8-b9fc-4413-8a37-5cc77567',
                 files: {},
+                status: 'INITIAL',
             })),
             saveDisclosureDetails: jest.fn().mockImplementation(() => {}),
         } as unknown) as SubmissionService;
@@ -564,6 +572,7 @@ describe('saveDisclosurePage', () => {
                 id: '89e0aec8-b9fc-4413-8a37-5cc775edbe3a',
                 createdBy: '89e0aec8-b9fc-4413-8a37-5cc77567',
                 files: {},
+                status: 'INITIAL',
             },
             details,
         );
@@ -578,6 +587,7 @@ describe('submit', () => {
         id: '89e0aec8-b9fc-4413-8a37-5cc775edbe3a',
         createdBy: '89e0aec8-b9fc-4413-8a37-5cc77567',
         files: {},
+        status: 'INITIAL',
     };
     const user = {
         id: '89e0aec8-b9fc-4413-8a37-5cc77567',
@@ -666,6 +676,7 @@ describe('submit', () => {
                 supportingFiles: [],
             },
             id: '89e0aec8-b9fc-4413-8a37-5cc775edbe3a',
+            status: 'CONTINUE_SUBMISSION',
         });
         expect(submitMock.mock.calls[0][1]).toEqual(ip);
         expect(submission).toBeDefined();
@@ -746,6 +757,7 @@ describe('deleteManuscriptFile', () => {
             get: jest.fn().mockImplementationOnce(() => ({
                 id: submissionId,
                 createdBy: '89e0aec8-b9fc-4413-8a37-5cc77567',
+                status: 'INITIAL',
             })),
         } as unknown) as SubmissionService;
 
@@ -1072,6 +1084,7 @@ describe('deleteSupportingFile', () => {
             get: jest.fn().mockImplementationOnce(() => ({
                 id: submissionId,
                 createdBy: '89e0aec8-b9fc-4413-8a37-5cc77567',
+                status: 'INITIAL',
             })),
         } as unknown) as SubmissionService;
 
@@ -1178,6 +1191,7 @@ describe('saveFilesPage', () => {
             id: '89e0aec8-b9fc-4413-8a37-5cc775edbe3a',
             createdBy: '89e0aec8-b9fc-4413-8a37-5cc77567',
             files: {},
+            status: 'INITIAL',
         };
         const submissionServiceMock = ({
             get: jest.fn().mockImplementation(() => sub),
@@ -1289,6 +1303,7 @@ describe('saveDetailsPage', () => {
             id: '89e0aec8-b9fc-4413-8a37-5cc775edbe3a',
             createdBy: '89e0aec8-b9fc-4413-8a37-5cc77567',
             files: {},
+            status: 'INITIAL',
         };
 
         const details = {

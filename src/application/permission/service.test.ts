@@ -19,6 +19,7 @@ describe('userCan', () => {
             status: 'CREATED',
             createdBy: 'user-id',
         });
+        submission.status = 'INITIAL';
     });
 
     describe('SubmissionOperation.UPDATE', () => {
@@ -42,6 +43,24 @@ describe('userCan', () => {
                 user.role = 'user';
                 user.id = 'not created by me';
                 expect(permission.userCanWithSubmission(user, op, submission)).toBe(false);
+            });
+
+            it('should return false if not staff and already submitted', () => {
+                const op = SubmissionOperation.UPDATE;
+                user.role = 'user';
+                user.id = 'user-id';
+                const subClone = { ...submission };
+                subClone.status = 'MECA_EXPORT_PENDING';
+                expect(permission.userCanWithSubmission(user, op, submission)).toBe(true);
+            });
+
+            it('should return true if staff and already submitted', () => {
+                const op = SubmissionOperation.UPDATE;
+                user.role = 'staff';
+                user.id = 'user-id';
+                const subClone = { ...submission };
+                subClone.status = 'MECA_EXPORT_PENDING';
+                expect(permission.userCanWithSubmission(user, op, submission)).toBe(true);
             });
         });
         describe('Any submission', () => {
