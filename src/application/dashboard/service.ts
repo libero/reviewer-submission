@@ -10,7 +10,7 @@ export class DashboardService {
         private readonly submissionService: SubmissionService,
     ) {}
 
-    async findMySubmissions(user: User): Promise<Submission[]> {
+    async findMySubmissions(user: User): Promise<Array<Omit<Submission, 'updated'> & { updated: string }>> {
         // we don't need to check permissions to perform this operation.
         const submissions = await this.submissionService.findByUserId(user.id);
         return submissions.map(submission => {
@@ -31,7 +31,8 @@ export class DashboardService {
                         break;
                 }
             }
-            return submission;
+            const { updated, ...rest } = submission;
+            return { ...rest, updated: updated.toISOString() } as Omit<Submission, 'updated'> & { updated: string };
         });
     }
 
@@ -41,7 +42,25 @@ export class DashboardService {
             throw new Error('User not allowed to create submission');
         }
 
-        return this.submissionService.create(articleType, user.id);
+        const submission = await this.submissionService.create(articleType, user.id);
+        if (submission.status) {
+            switch (submission.status) {
+                case SubmissionStatus.INITIAL:
+                    submission.status = 'CONTINUE_SUBMISSION';
+                    break;
+                case SubmissionStatus.MECA_EXPORT_PENDING:
+                case SubmissionStatus.MECA_EXPORT_FAILED:
+                case SubmissionStatus.MECA_EXPORT_SUCCEEDED:
+                case SubmissionStatus.MECA_IMPORT_FAILED:
+                case SubmissionStatus.MECA_IMPORT_SUCCEEDED:
+                    submission.status = 'SUBMITTED';
+                    break;
+                default:
+                    submission.status = 'CONTINUE_SUBMISSION';
+                    break;
+            }
+        }
+        return submission;
     }
 
     async getSubmission(user: User, id: SubmissionId): Promise<Submission> {

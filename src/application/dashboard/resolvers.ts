@@ -7,7 +7,11 @@ import { InfraLogger as logger } from '../../logger';
 
 const resolvers = (dashboard: DashboardService, userService: UserService): IResolvers => ({
     Query: {
-        async getSubmissions(_, {}: {}, context): Promise<Submission[] | null> {
+        async getSubmissions(
+            _,
+            {}: {},
+            context,
+        ): Promise<Array<Omit<Submission, 'updated'> & { updated: string }> | null> {
             logger.info(`resolver: getSubmissions()`);
             const user = await userService.getCurrentUser(context.authorizationHeader);
             return await dashboard.findMySubmissions(user);

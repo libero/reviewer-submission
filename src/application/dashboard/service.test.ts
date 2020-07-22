@@ -23,7 +23,9 @@ describe('dashboard service', () => {
     beforeEach(() => {
         jest.resetAllMocks();
         submissionService = ({
-            create: jest.fn(),
+            create: jest.fn(async () => ({
+                status: 'INITIAL',
+            })),
             findByUserId: jest.fn(async () => []),
             get: jest.fn(),
             delete: jest.fn(),
@@ -48,12 +50,12 @@ describe('dashboard service', () => {
         it('should map the status correctly', async () => {
             submissionService = ({
                 findByUserId: jest.fn(async () => [
-                    { status: 'INITIAL' },
-                    { status: 'MECA_IMPORT_FAILED' },
-                    { status: 'MECA_EXPORT_FAILED' },
-                    { status: 'MECA_EXPORT_SUCCEEDED' },
-                    { status: 'MECA_EXPORT_PENDING' },
-                    { status: 'not a status' },
+                    { status: 'INITIAL', updated: new Date() },
+                    { status: 'MECA_IMPORT_FAILED', updated: new Date() },
+                    { status: 'MECA_EXPORT_FAILED', updated: new Date() },
+                    { status: 'MECA_EXPORT_SUCCEEDED', updated: new Date() },
+                    { status: 'MECA_EXPORT_PENDING', updated: new Date() },
+                    { status: 'not a status', updated: new Date() },
                 ]),
             } as unknown) as SubmissionService;
             const service = new DashboardService(permissionService, submissionService);

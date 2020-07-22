@@ -126,10 +126,42 @@ describe('Dashboard Integration Tests', () => {
         expect(deleteResponse.data.errors).toBeUndefined();
     });
 
-    it('it should return state as initial', async () => {
+    it('it should return state as CONTINUE_SUBMISSION', async () => {
         const startSubmissionResponse = await startSubmissionAlt('research-article');
         expect(startSubmissionResponse.data.errors).toBeUndefined();
-        expect(startSubmissionResponse.data.data.startSubmission.status).toBe('INITIAL');
+        expect(startSubmissionResponse.data.data.startSubmission.status).toBe('CONTINUE_SUBMISSION');
+    });
+
+    it('it should allow users to get their submissions', async () => {
+        const startSubmissionResponse = await startSubmissionAlt('research-article');
+        expect(startSubmissionResponse.data.errors).toBeUndefined();
+        expect(startSubmissionResponse.data.data.startSubmission.status).toBe('CONTINUE_SUBMISSION');
+        const submissionsResponse = await axios.post(
+            'http://localhost:3000/graphql',
+            {
+                query: `
+                    query getSubmissions {
+                        getSubmissions {
+                            id
+                            lastStepVisited
+                            manuscriptDetails {
+                                title
+                            }
+                            updated
+                            articleType
+                            status
+                        }
+                    }
+                `
+            },
+            {
+                headers: { Authorization: `Bearer ${jwtToken}` },
+            },
+        );
+
+        expect(submissionsResponse.status).toBe(200);
+        expect(submissionsResponse.data.data).toBeDefined();
+        expect(typeof submissionsResponse.data.data.getSubmissions[0].updated).toBe('string');
     });
 
 
