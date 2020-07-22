@@ -1,9 +1,9 @@
 scalar Upload
-
-# TODO : Missing created, status
+ 
 type Submission {
     id: ID!
     updated: String!
+    created: String
     articleType: String!
     author: AuthorDetails
     manuscriptDetails: ManuscriptDetails
