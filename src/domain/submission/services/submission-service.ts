@@ -9,6 +9,7 @@ import { S3Store } from './storage/s3-store';
 import { SftpStore } from './storage/sftp-store';
 import { SubmissionStore } from './storage/submission-store';
 import { InfraLogger as logger } from '../../../logger';
+import { MailService } from 'src/domain/mail/services/mail-service';
 
 export class SubmissionService {
     submissionRepository: XpubSubmissionRootRepository;
@@ -18,6 +19,7 @@ export class SubmissionService {
         private readonly mecaExporter: MecaExporter,
         private readonly s3Store: S3Store,
         private readonly sftpStore: SftpStore,
+        private readonly mailService: MailService,
     ) {
         const adapter = createKnexAdapter(knex, 'public');
         this.submissionRepository = new XpubSubmissionRootRepository(adapter);
@@ -79,6 +81,12 @@ export class SubmissionService {
 
         submission.status = SubmissionStatus.MECA_EXPORT_PENDING;
         await this.submissionRepository.update(submission);
+
+        // @TODO: send submit email 
+        // questions:
+        // 1. which email address gets emailed
+        // 2. BCC/CC required?
+        // this.mailService.sendEmail();
 
         this.runMecaExport(submission, ip);
         return this.get(id);

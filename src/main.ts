@@ -104,7 +104,7 @@ const init = async (): Promise<void> => {
     const sftpStore = new SftpStore(config.meca_config);
     const ejpNames = new KnexEJPNamesRepository(createKnexAdapter(knexConnection, 'public'));
     const mecaExporter = new MecaExporter(srvFile, ejpNames, config.authentication_jwt_secret);
-    const srvSubmission = new SubmissionService(knexConnection, mecaExporter, s3Store, sftpStore);
+    const srvSubmission = new SubmissionService(knexConnection, mecaExporter, s3Store, sftpStore, srvMail);
     const srvExtractionService = new SemanticExtractionService(knexConnection, config.science_beam);
 
     logger.info(`Initialising application services...`);
