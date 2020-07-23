@@ -2,9 +2,13 @@ import * as SES from 'aws-sdk/clients/ses';
 
 export class MailService {
     ses: SES;
+    sender: string;
+    sendmail: boolean;
 
-    constructor(s3: SES) {
+    constructor(s3: SES, sender: string, sendmail: boolean) {
         this.ses = s3;
+        this.sender = sender;
+        this.sendmail = sendmail;
     }
 
     async sendEmail(
@@ -14,8 +18,7 @@ export class MailService {
         to: string[],
         cc: string[] = [],
         bcc: string[] = [],
-    ): Promise<void> {
-
+    ): Promise<boolean> {
         // after much discussion, it was decided to have a send email config to bypass sending.
 
         var params = {
@@ -44,5 +47,6 @@ export class MailService {
             Source: 'sender@example.com', // pull from config
         };
         await this.ses.sendEmail(params);
+        return true;
     }
 }
