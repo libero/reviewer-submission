@@ -3,7 +3,7 @@ import * as helmet from 'helmet';
 import * as knex from 'knex';
 import { Express, Request, Response } from 'express';
 import { ApolloServer, AuthenticationError, makeExecutableSchema, UserInputError } from 'apollo-server-express';
-import config, { S3Config } from './config';
+import config, { S3Config, SESConfig } from './config';
 import { InfraLogger as logger } from './logger';
 import { join } from 'path';
 import { importSchema } from 'graphql-import';
@@ -31,7 +31,9 @@ import { SftpStore } from './domain/submission/services/storage/sftp-store';
 import { KnexEJPNamesRepository } from './domain/ejp-name/repositories/ejp-name';
 import { MecaExporter } from './domain/submission/services/exporter/meca-exporter';
 import * as S3 from 'aws-sdk/clients/s3';
+import * as SES from 'aws-sdk/clients/ses';
 import { createKnexAdapter } from './domain/knex-table-adapter';
+import { MailService } from './domain/mail/services/mail-service';
 
 // found via https://github.com/digicatapult/graphql-complexity-experiment/blob/master/app/apollo.js
 const estimators = [
@@ -64,6 +66,17 @@ const createS3 = (s3config: S3Config): S3 => {
     return new S3(s3Options);
 };
 
+const createSes = (sesConfig: SESConfig): SES => {
+    const defaultOptions = {
+        accessKeyId: sesConfig.accessKeyId,
+        secretAccessKey: sesConfig.secretAccessKey,
+        apiVersion: '2010-12-01',
+        signatureVersion: 'v4'
+    };
+    const sesOptions = defaultOptions;
+    return new SES(sesOptions);
+}
+
 const init = async (): Promise<void> => {
     logger.info('Starting service');
     dumpConfig();
@@ -85,6 +98,7 @@ const init = async (): Promise<void> => {
     const srvSurvey = new SurveyService(knexConnection);
     const srvUser = new UserService(config.user_api_url);
     const srvTeam = new TeamService(knexConnection);
+    const srvMail = new MailService(createSes(config.ses));
     const srvFile = new FileService(knexConnection, createS3(config.s3), config.s3.fileBucket, srvAudit);
     const s3Store = new S3Store(config.s3, config.meca_config);
     const sftpStore = new SftpStore(config.meca_config);
