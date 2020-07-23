@@ -77,7 +77,7 @@ const appConfig: Config = {
     mail: {
         sendmail: Boolean(process.env.SEND_MAIL) || false,
         sender: envOrEmpty('MAIL_SENDER'),
-    }
+    },
     max_ql_depth: Number(envOrEmpty('MAX_QL_DEPTH')),
     max_ql_complexity: Number(envOrEmpty('MAX_QL_COMPLEXITY')),
     max_file_size_in_bytes: Number(envOrEmpty('MAX_FILE_SIZE_IN_BYTES')),
