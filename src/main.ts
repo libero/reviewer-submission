@@ -70,8 +70,7 @@ const createSes = (sesConfig: SESConfig): SES => {
     const defaultOptions = {
         accessKeyId: sesConfig.accessKeyId,
         secretAccessKey: sesConfig.secretAccessKey,
-        apiVersion: '2010-12-01',
-        signatureVersion: 'v4'
+        region: sesConfig.region,
     };
     const sesOptions = defaultOptions;
     return new SES(sesOptions);

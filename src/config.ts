@@ -12,6 +12,7 @@ export interface S3Config {
 export interface SESConfig {
     accessKeyId: string;
     secretAccessKey: string;
+    region: string;
 }
 
 export interface ScienceBeamConfig {
@@ -67,6 +68,7 @@ const appConfig: Config = {
     ses: {
         accessKeyId: envOrEmpty('SES_ACCESS_KEY_ID'),
         secretAccessKey: envOrEmpty('SES_SECRET_ACCESS_KEY'),
+        region: envOrEmpty('SES_REGION'),
     },
     max_ql_depth: Number(envOrEmpty('MAX_QL_DEPTH')),
     max_ql_complexity: Number(envOrEmpty('MAX_QL_COMPLEXITY')),

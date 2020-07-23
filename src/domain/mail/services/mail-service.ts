@@ -15,6 +15,9 @@ export class MailService {
         cc: string[] = [],
         bcc: string[] = [],
     ): Promise<void> {
+
+        // after much discussion, it was decided to have a send email config to bypass sending.
+
         var params = {
             Destination: {
                 BccAddresses: bcc,

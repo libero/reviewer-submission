@@ -9,7 +9,7 @@ import { S3Store } from './storage/s3-store';
 import { SftpStore } from './storage/sftp-store';
 import { SubmissionStore } from './storage/submission-store';
 import { InfraLogger as logger } from '../../../logger';
-import { MailService } from 'src/domain/mail/services/mail-service';
+import { MailService } from '../../mail/services/mail-service';
 
 export class SubmissionService {
     submissionRepository: XpubSubmissionRootRepository;
@@ -112,8 +112,7 @@ export class SubmissionService {
 
             You are receiving this email because you have been identified as the corresponding author of a submission to eLife. If this isn't you please contact editorial@elifesciences.org.`,
         };
-        this.mailService.sendEmail(data.text, data.html, 'Your eLife submission', [toEmail || '']);
-
+        await this.mailService.sendEmail(data.text, data.html, 'Your eLife submission', [toEmail || '']);
         this.runMecaExport(submission, ip);
         return this.get(id);
     }
