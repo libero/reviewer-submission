@@ -112,12 +112,7 @@ export class SubmissionService {
 
             You are receiving this email because you have been identified as the corresponding author of a submission to eLife. If this isn't you please contact editorial@elifesciences.org.`,
         };
-
-        // @TODO: send submit email
-        // questions:
-        // 1. which email address gets emailed
-        // 2. BCC/CC required?
-        this.mailService.sendEmail();
+        this.mailService.sendEmail(data.text, data.html, 'Your eLife submission', [toEmail || '']);
 
         this.runMecaExport(submission, ip);
         return this.get(id);
