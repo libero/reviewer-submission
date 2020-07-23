@@ -8,12 +8,12 @@ export class MailService {
     }
 
     async sendEmail(
+        textMessage: string,
+        html: string,
         subject: string,
         to: string[],
         cc: string[] = [],
         bcc: string[] = [],
-        textMessage: string,
-        html: string,
     ): Promise<void> {
         var params = {
             Destination: {
