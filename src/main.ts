@@ -97,7 +97,7 @@ const init = async (): Promise<void> => {
     const srvSurvey = new SurveyService(knexConnection);
     const srvUser = new UserService(config.user_api_url);
     const srvTeam = new TeamService(knexConnection);
-    const srvMail = new MailService(createSes(config.ses));
+    const srvMail = new MailService(createSes(config.ses), config.mail.sender, config.mail.sendmail);
     const srvFile = new FileService(knexConnection, createS3(config.s3), config.s3.fileBucket, srvAudit);
     const s3Store = new S3Store(config.s3, config.meca_config);
     const sftpStore = new SftpStore(config.meca_config);

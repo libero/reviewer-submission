@@ -40,6 +40,10 @@ export interface Config {
     max_ql_depth: number;
     s3: S3Config;
     ses: SESConfig;
+    mail: {
+        sender: string;
+        sendmail: boolean;
+    }
     science_beam: ScienceBeamConfig;
     max_file_size_in_bytes: number;
     meca_config: MecaConfig;
@@ -70,6 +74,10 @@ const appConfig: Config = {
         secretAccessKey: envOrEmpty('SES_SECRET_ACCESS_KEY'),
         region: envOrEmpty('SES_REGION'),
     },
+    mail: {
+        sendmail: Boolean(process.env.SEND_MAIL) || false,
+        sender: envOrEmpty('MAIL_SENDER'),
+    }
     max_ql_depth: Number(envOrEmpty('MAX_QL_DEPTH')),
     max_ql_complexity: Number(envOrEmpty('MAX_QL_COMPLEXITY')),
     max_file_size_in_bytes: Number(envOrEmpty('MAX_FILE_SIZE_IN_BYTES')),
