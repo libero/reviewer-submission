@@ -4,8 +4,16 @@ import Knex = require('knex');
 import { SubmissionId, SubmissionStatus } from '../types';
 import Submission, { ArticleType } from './models/submission';
 import { S3Store } from './storage/s3-store';
+import SES from 'aws-sdk/clients/ses';
 import { MecaExporter } from './exporter/meca-exporter';
 import { SftpStore } from './storage/sftp-store';
+import { MailService } from '../../mail/services/mail-service';
+
+jest.mock('aws-sdk/clients/ses');
+
+const mockSES = ({
+    sendEmail: jest.fn(),
+} as unknown) as SES;
 
 const submissionModels: Submission[] = [
     new Submission({
@@ -25,12 +33,15 @@ const submissionModels: Submission[] = [
 ];
 jest.mock('../repositories/xpub-submission-root');
 
+const mailService = new MailService(mockSES, 'noreply@elifesciences.org', false);
+
 const makeSubmissionService = (): SubmissionService =>
     new SubmissionService(
         (null as unknown) as Knex,
         (jest.fn() as unknown) as MecaExporter,
         (jest.fn() as unknown) as S3Store,
         (jest.fn() as unknown) as SftpStore,
+        mailService,
     );
 
 describe('Submission Service', () => {
