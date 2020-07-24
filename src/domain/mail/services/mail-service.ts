@@ -44,7 +44,7 @@ export class MailService {
                 },
             },
             ReplyToAddresses: [],
-            Source: 'sender@example.com', // pull from config
+            Source: this.sender,
         };
         await this.ses.sendEmail(params);
         return true;
