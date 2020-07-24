@@ -19,9 +19,11 @@ export class MailService {
         cc: string[] = [],
         bcc: string[] = [],
     ): Promise<boolean> {
-        // after much discussion, it was decided to have a send email config to bypass sending.
+        if (this.sendmail === false) {
+            return false;
+        }
 
-        var params = {
+        const params = {
             Destination: {
                 BccAddresses: bcc,
                 CcAddresses: cc,

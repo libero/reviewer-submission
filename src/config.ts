@@ -43,7 +43,7 @@ export interface Config {
     mail: {
         sender: string;
         sendmail: boolean;
-    }
+    };
     science_beam: ScienceBeamConfig;
     max_file_size_in_bytes: number;
     meca_config: MecaConfig;

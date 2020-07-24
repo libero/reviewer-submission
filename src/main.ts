@@ -74,7 +74,7 @@ const createSes = (sesConfig: SESConfig): SES => {
     };
     const sesOptions = defaultOptions;
     return new SES(sesOptions);
-}
+};
 
 const init = async (): Promise<void> => {
     logger.info('Starting service');
