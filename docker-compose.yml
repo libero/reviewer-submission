@@ -38,6 +38,11 @@ services:
       MECA_SFTP_USERNAME: 'test'
       MECA_SFTP_PASSWORD: 'test'
       MECA_SFTP_PORT: 22
+      SEND_MAIL: 'false'
+      MAIL_SENDER: 'noreply@elifesciences.org'
+      SES_REGION: ''
+      SES_SECRET_ACCESS_KEY: ''
+      SES_ACCESS_KEY_ID: ''
     volumes:
       - ./config:/etc/reviewer
       - ./.eslintignore:/app/.eslintignore

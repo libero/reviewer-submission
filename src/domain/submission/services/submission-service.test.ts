@@ -4,8 +4,18 @@ import Knex = require('knex');
 import { SubmissionId, SubmissionStatus } from '../types';
 import Submission, { ArticleType } from './models/submission';
 import { S3Store } from './storage/s3-store';
+import SES from 'aws-sdk/clients/ses';
 import { MecaExporter } from './exporter/meca-exporter';
 import { SftpStore } from './storage/sftp-store';
+import { MailService } from '../../mail/services/mail-service';
+import { FileId, FileType } from '../../file/types';
+import File from '../../file/services/models/file';
+
+jest.mock('aws-sdk/clients/ses');
+
+const mockSES = ({
+    sendEmail: jest.fn(),
+} as unknown) as SES;
 
 const submissionModels: Submission[] = [
     new Submission({
@@ -14,6 +24,7 @@ const submissionModels: Submission[] = [
         createdBy: '123',
         articleType: ArticleType.FEATURE_ARTICLE,
         updated: new Date('2020-02-18T15:14:53.155Z'),
+        created: new Date('2020-02-18T15:14:53.155Z'),
     }),
     new Submission({
         id: SubmissionId.fromUuid('e0ba60c9-1966-43bc-ba83-6a09c6f3ab1c'),
@@ -21,9 +32,12 @@ const submissionModels: Submission[] = [
         createdBy: '124',
         articleType: ArticleType.RESEARCH_ADVANCE,
         updated: new Date('2020-02-18T15:14:53.155Z'),
+        created: new Date('2020-02-18T15:14:53.155Z'),
     }),
 ];
 jest.mock('../repositories/xpub-submission-root');
+
+let mailService = new MailService(mockSES, 'noreply@elifesciences.org', false);
 
 const makeSubmissionService = (): SubmissionService =>
     new SubmissionService(
@@ -31,11 +45,85 @@ const makeSubmissionService = (): SubmissionService =>
         (jest.fn() as unknown) as MecaExporter,
         (jest.fn() as unknown) as S3Store,
         (jest.fn() as unknown) as SftpStore,
+        mailService,
     );
 
 describe('Submission Service', () => {
     beforeEach(() => {
         jest.resetAllMocks();
+        mailService = new MailService(mockSES, 'noreply@elifesciences.org', false);
+    });
+
+    describe('submit', () => {
+        it('should call send email', async () => {
+            XpubSubmissionRootRepository.prototype.update = jest.fn().mockReturnValue(true);
+            XpubSubmissionRootRepository.prototype.findById = jest.fn().mockReturnValue(submissionModels[0]);
+            MailService.prototype.sendEmail = jest.fn();
+            const service = makeSubmissionService();
+            const submitable = submissionModels[0];
+            submitable.lastStepVisited = '1';
+            submitable.author = {
+                firstName: 'string',
+                lastName: 'string',
+                email: 'name@elifesciences.org',
+                institution: 'institution',
+            };
+            submitable.manuscriptDetails = {
+                title: 'title',
+                subjects: ['sub'],
+                previouslyDiscussed: 'string',
+                previouslySubmitted: 'string',
+                cosubmission: ['co-sub'],
+            };
+
+            submitable.files = {
+                coverLetter: 'letter',
+                manuscriptFile: new File({
+                    id: FileId.fromUuid('3647dbde-c192-4bcd-9ecd-9a5e52111863'),
+                    submissionId: SubmissionId.fromUuid('3647dbde-c192-4bcd-9ecd-9a5e52111863'),
+                    mimeType: 'mimeType',
+                    filename: 'filename',
+                    status: 'STORED',
+                    size: 0,
+                    type: FileType.MANUSCRIPT_SOURCE,
+                    created: new Date(),
+                    updated: new Date(),
+                }),
+            };
+            submitable.editorDetails = {
+                suggestedSeniorEditors: ['11'],
+                opposedSeniorEditors: ['222'],
+                opposedSeniorEditorsReason: 'string',
+                suggestedReviewingEditors: ['222'],
+                opposedReviewingEditors: ['222'],
+                opposedReviewingEditorsReason: 'reason',
+                suggestedReviewers: [
+                    {
+                        name: 'string',
+                        email: 's@elife.org',
+                    },
+                ],
+                opposedReviewers: [
+                    {
+                        name: 'string',
+                        email: 's@elife.org',
+                    },
+                ],
+                opposedReviewersReason: 'string',
+            };
+            submitable.disclosure = {
+                submitterSignature: 'signature',
+                disclosureConsent: true,
+            };
+            submitable.suggestions = [
+                {
+                    value: 'string',
+                    fieldName: 'string',
+                },
+            ];
+            await service.submit(submitable, '1.1.1.1');
+            expect(mailService.sendEmail).toHaveBeenCalledTimes(1);
+        });
     });
 
     describe('findAll', () => {

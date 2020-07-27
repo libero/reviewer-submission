@@ -9,6 +9,8 @@ import { S3Store } from './storage/s3-store';
 import { SftpStore } from './storage/sftp-store';
 import { SubmissionStore } from './storage/submission-store';
 import { InfraLogger as logger } from '../../../logger';
+import { MailService } from '../../mail/services/mail-service';
+import { submittedEmail } from './emails';
 
 export class SubmissionService {
     submissionRepository: XpubSubmissionRootRepository;
@@ -18,6 +20,7 @@ export class SubmissionService {
         private readonly mecaExporter: MecaExporter,
         private readonly s3Store: S3Store,
         private readonly sftpStore: SftpStore,
+        private readonly mailService: MailService,
     ) {
         const adapter = createKnexAdapter(knex, 'public');
         this.submissionRepository = new XpubSubmissionRootRepository(adapter);
@@ -34,8 +37,6 @@ export class SubmissionService {
         const store = new SubmissionStore([this.s3Store, this.sftpStore]);
         const locations = await store.write(id, buffer);
         logger.info(`Submission ${id} saved to ${locations}`);
-
-        // @todo: email notification to author
     }
 
     async findAll(): Promise<Submission[]> {
@@ -79,7 +80,13 @@ export class SubmissionService {
 
         submission.status = SubmissionStatus.MECA_EXPORT_PENDING;
         await this.submissionRepository.update(submission);
-
+        const toEmail = submission.author?.email;
+        const emailContent = submittedEmail(submission.author?.firstName, submission.manuscriptDetails.title);
+        const data = {
+            html: emailContent.html,
+            text: emailContent.text,
+        };
+        await this.mailService.sendEmail(data.text, data.html, 'Your eLife submission', [toEmail || '']);
         this.runMecaExport(submission, ip);
         return this.get(id);
     }

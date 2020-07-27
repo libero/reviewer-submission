@@ -9,6 +9,12 @@ export interface S3Config {
     awsEndPoint?: string;
 }
 
+export interface SESConfig {
+    accessKeyId: string;
+    secretAccessKey: string;
+    region: string;
+}
+
 export interface ScienceBeamConfig {
     api_url: string;
     timeout: number;
@@ -33,6 +39,11 @@ export interface Config {
     max_ql_complexity: number;
     max_ql_depth: number;
     s3: S3Config;
+    ses: SESConfig;
+    mail: {
+        sender: string;
+        sendmail: boolean;
+    };
     science_beam: ScienceBeamConfig;
     max_file_size_in_bytes: number;
     meca_config: MecaConfig;
@@ -57,6 +68,15 @@ const appConfig: Config = {
         s3ForcePathStyle: Boolean(process.env.S3_FORCE_PATH_STYLE) || true,
         fileBucket: envOrEmpty('S3_FILE_BUCKET'),
         awsEndPoint: envOrEmpty('S3_AWS_ENDPOINT'),
+    },
+    ses: {
+        accessKeyId: envOrEmpty('SES_ACCESS_KEY_ID'),
+        secretAccessKey: envOrEmpty('SES_SECRET_ACCESS_KEY'),
+        region: envOrEmpty('SES_REGION'),
+    },
+    mail: {
+        sendmail: Boolean(process.env.SEND_MAIL) || false,
+        sender: envOrEmpty('MAIL_SENDER'),
     },
     max_ql_depth: Number(envOrEmpty('MAX_QL_DEPTH')),
     max_ql_complexity: Number(envOrEmpty('MAX_QL_COMPLEXITY')),
