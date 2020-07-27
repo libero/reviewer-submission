@@ -124,6 +124,9 @@ const init = async (): Promise<void> => {
     app.use(hpp());
     app.get('/health', (_: Request, res: Response) => res.sendStatus(200));
 
+    // meca import callback
+    app.post('/meca-result/:id', (_: Request, res: Response) => res.sendStatus(200));
+
     const typeDefs = await importSchema(join(__dirname, './schemas/**/*.graphql'), {
         forceGraphQLImport: false,
         skipGraphQLImport: true,
