@@ -12,6 +12,7 @@ import { FileId, FileType } from '../../file/types';
 import File from '../../file/services/models/file';
 
 jest.mock('aws-sdk/clients/ses');
+jest.mock('./storage/submission-store');
 
 const mockSES = ({
     sendEmail: jest.fn(),
@@ -36,13 +37,14 @@ const submissionModels: Submission[] = [
     }),
 ];
 jest.mock('../repositories/xpub-submission-root');
-
 let mailService = new MailService(mockSES, 'noreply@elifesciences.org', false);
+const mecaMock = jest.fn(async () => {});
 
+jest.mock('./exporter/meca-exporter');
 const makeSubmissionService = (): SubmissionService =>
     new SubmissionService(
         (null as unknown) as Knex,
-        (jest.fn() as unknown) as MecaExporter,
+        ({ export: mecaMock } as unknown) as MecaExporter,
         (jest.fn() as unknown) as S3Store,
         (jest.fn() as unknown) as SftpStore,
         mailService,
@@ -62,6 +64,7 @@ describe('Submission Service', () => {
             const service = makeSubmissionService();
             const submitable = submissionModels[0];
             submitable.lastStepVisited = '1';
+            submitable.status = 'INITIAL';
             submitable.author = {
                 firstName: 'string',
                 lastName: 'string',
@@ -123,6 +126,82 @@ describe('Submission Service', () => {
             ];
             await service.submit(submitable, '1.1.1.1');
             expect(mailService.sendEmail).toHaveBeenCalledTimes(1);
+        });
+
+        it('should set the correct status on success', async () => {
+            const updateMock = jest.fn().mockReturnValue(true);
+            XpubSubmissionRootRepository.prototype.update = updateMock;
+            XpubSubmissionRootRepository.prototype.findById = jest.fn().mockReturnValue(submissionModels[0]);
+            MailService.prototype.sendEmail = jest.fn();
+            const service = makeSubmissionService();
+            const submitable = submissionModels[0];
+            submitable.lastStepVisited = '1';
+            submitable.status = 'INITIAL';
+            submitable.author = {
+                firstName: 'string',
+                lastName: 'string',
+                email: 'name@elifesciences.org',
+                institution: 'institution',
+            };
+            submitable.manuscriptDetails = {
+                title: 'title',
+                subjects: ['sub'],
+                previouslyDiscussed: 'string',
+                previouslySubmitted: 'string',
+                cosubmission: ['co-sub'],
+            };
+
+            submitable.files = {
+                coverLetter: 'letter',
+                manuscriptFile: new File({
+                    id: FileId.fromUuid('3647dbde-c192-4bcd-9ecd-9a5e52111863'),
+                    submissionId: SubmissionId.fromUuid('3647dbde-c192-4bcd-9ecd-9a5e52111863'),
+                    mimeType: 'mimeType',
+                    filename: 'filename',
+                    status: 'STORED',
+                    size: 0,
+                    type: FileType.MANUSCRIPT_SOURCE,
+                    created: new Date(),
+                    updated: new Date(),
+                }),
+            };
+            submitable.editorDetails = {
+                suggestedSeniorEditors: ['11'],
+                opposedSeniorEditors: ['222'],
+                opposedSeniorEditorsReason: 'string',
+                suggestedReviewingEditors: ['222'],
+                opposedReviewingEditors: ['222'],
+                opposedReviewingEditorsReason: 'reason',
+                suggestedReviewers: [
+                    {
+                        name: 'string',
+                        email: 's@elife.org',
+                    },
+                ],
+                opposedReviewers: [
+                    {
+                        name: 'string',
+                        email: 's@elife.org',
+                    },
+                ],
+                opposedReviewersReason: 'string',
+            };
+            submitable.disclosure = {
+                submitterSignature: 'signature',
+                disclosureConsent: true,
+            };
+            submitable.suggestions = [
+                {
+                    value: 'string',
+                    fieldName: 'string',
+                },
+            ];
+            await service.submit(submitable, '1.1.1.1');
+            expect(updateMock).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    status: 'MECA_EXPORT_SUCCEEDED',
+                }),
+            );
         });
     });
 
