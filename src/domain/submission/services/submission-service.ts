@@ -11,10 +11,8 @@ import { SubmissionStore } from './storage/submission-store';
 import { InfraLogger as logger } from '../../../logger';
 import { MailService } from '../../mail/services/mail-service';
 import { submittedEmail } from './emails';
-
 export class SubmissionService {
     submissionRepository: XpubSubmissionRootRepository;
-
     constructor(
         knex: Knex<{}, unknown[]>,
         private readonly mecaExporter: MecaExporter,
@@ -25,28 +23,22 @@ export class SubmissionService {
         const adapter = createKnexAdapter(knex, 'public');
         this.submissionRepository = new XpubSubmissionRootRepository(adapter);
     }
-
     private setLastStepVisited(submission: Submission, step: string): void {
         submission.lastStepVisited = `/submit/${submission.id}/${step}`;
     }
-
     private async runMecaExport(submission: Submission, ip: string): Promise<void> {
         const buffer = await this.mecaExporter.export(submission, ip);
         const id = submission.id;
-
         const store = new SubmissionStore([this.s3Store, this.sftpStore]);
         const locations = await store.write(id, buffer);
         logger.info(`Submission ${id} saved to ${locations}`);
     }
-
     async findAll(): Promise<Submission[]> {
         return await this.submissionRepository.findAll();
     }
-
     async findByUserId(userId: string): Promise<Submission[]> {
         return await this.submissionRepository.findByUserId(userId);
     }
-
     async create(articleType: string, userId: string): Promise<Submission> {
         const id = SubmissionId.fromUuid(uuid());
         const submission = new Submission({
@@ -59,7 +51,6 @@ export class SubmissionService {
         this.setLastStepVisited(submission, 'author');
         return await this.submissionRepository.create(submission);
     }
-
     async get(id: SubmissionId): Promise<Submission> {
         const submission = await this.submissionRepository.findById(id);
         if (!submission) {
@@ -67,17 +58,14 @@ export class SubmissionService {
         }
         return submission;
     }
-
     async delete(id: SubmissionId): Promise<boolean> {
         return await this.submissionRepository.delete(id);
     }
-
     async submit(submission: Submission, ip: string): Promise<Submission> {
         const id = submission.id;
         if (!submission.isSubmittable()) {
             throw new Error(`The submission ${id} cannot be submitted.`);
         }
-
         submission.status = SubmissionStatus.MECA_EXPORT_PENDING;
         await this.submissionRepository.update(submission);
         const toEmail = submission.author?.email;
@@ -87,27 +75,32 @@ export class SubmissionService {
             text: emailContent.text,
         };
         await this.mailService.sendEmail(data.text, data.html, 'Your eLife submission', [toEmail || '']);
-        this.runMecaExport(submission, ip);
+        this.runMecaExport(submission, ip)
+            .then(() => {
+                submission.status = SubmissionStatus.MECA_EXPORT_SUCCEEDED;
+            })
+            .catch(() => {
+                submission.status = SubmissionStatus.MECA_EXPORT_FAILED;
+            })
+            .finally(async () => {
+                await this.submissionRepository.update(submission);
+            });
         return this.get(id);
     }
-
     async saveAuthorDetails(submission: Submission): Promise<Submission> {
         this.setLastStepVisited(submission, 'author');
         return await this.submissionRepository.update(submission);
     }
-
     async saveFilesDetails(submission: Submission, coverLetter: string): Promise<Submission> {
         submission.files.coverLetter = coverLetter;
         this.setLastStepVisited(submission, 'files');
         return await this.submissionRepository.update(submission);
     }
-
     async saveManuscriptDetails(submission: Submission, details: ManuscriptDetails): Promise<Submission> {
         submission.manuscriptDetails = details;
         this.setLastStepVisited(submission, 'details');
         return await this.submissionRepository.update(submission);
     }
-
     async saveEditorDetails(
         submission: Submission,
         opposedReviewersReason?: string,
@@ -120,10 +113,8 @@ export class SubmissionService {
             opposedSeniorEditorsReason,
         );
         this.setLastStepVisited(submission, 'editors');
-
         return await this.submissionRepository.update(submission);
     }
-
     async saveDisclosureDetails(submission: Submission, disclosureDetails: DisclosureDetails): Promise<Submission> {
         submission.disclosure.submitterSignature = disclosureDetails.submitterSignature;
         submission.disclosure.disclosureConsent = disclosureDetails.disclosureConsent;
