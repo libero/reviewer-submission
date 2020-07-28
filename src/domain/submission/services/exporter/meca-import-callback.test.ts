@@ -6,7 +6,6 @@ import { MailService } from 'src/domain/mail/services/mail-service';
 import { v4 } from 'uuid';
 import { InfraLogger as logger } from '../../../../logger';
 
-const logMock = jest.fn();
 jest.mock('../../../../logger');
 
 describe('MecaImportCallback', () => {
