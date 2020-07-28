@@ -3,12 +3,15 @@ import SES from 'aws-sdk/clients/ses';
 jest.mock('aws-sdk/clients/ses');
 
 describe('mailService', () => {
-    const mockSES = ({
-        sendEmail: jest.fn(),
-    } as unknown) as SES;
+    let mockSES: SES;
 
     beforeEach(() => {
         jest.resetAllMocks();
+        mockSES = ({
+            sendEmail: jest.fn(() => ({
+                promise: jest.fn(),
+            })),
+        } as unknown) as SES;
     });
 
     const toAddress = 'hi@elifesciences.org';
