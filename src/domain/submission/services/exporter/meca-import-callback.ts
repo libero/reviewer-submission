@@ -31,9 +31,8 @@ export class MecaImportCallback {
             logger.error(`error saving audit log ${error}`);
         }
         logger.info('MECA callback received', { id, response });
-
+        const submission = await this.submissionService.get(submissionId);
         try {
-            const submission = await this.submissionService.get(submissionId);
             await this.submissionService.updateStatus(submission, status);
         } catch (e) {
             throw new Error('Unable to update manuscript ' + id);
