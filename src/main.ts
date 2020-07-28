@@ -1,4 +1,5 @@
 import * as express from 'express';
+import * as bodyParser from 'body-parser';
 import * as helmet from 'helmet';
 import * as knex from 'knex';
 import { Express, Request, Response } from 'express';
@@ -128,7 +129,7 @@ const init = async (): Promise<void> => {
     app.get('/health', (_: Request, res: Response) => res.sendStatus(200));
 
     // meca import callback
-    app.post('/meca-result/:id', async (req: Request, res: Response) => {
+    app.post('/meca-result/:id', bodyParser.json(), async (req: Request, res: Response) => {
         const apiKey = 'SOMEKEY';
         const authHeader = req.get('authorization');
         const token = authHeader && authHeader.match(/Bearer (.+)/) && RegExp.$1;
@@ -139,15 +140,17 @@ const init = async (): Promise<void> => {
                 manuscriptId,
             });
             res.status(403).send({ error: 'Invalid API key' });
+            return;
         }
 
-        const { body } = req.body;
-        if (!mecaImportCallback.validateResponse(body.result)) {
+        const { body } = req;
+        if (!body || !mecaImportCallback.validateResponse(body.result)) {
             logger.warn('MECA callback received with invalid request body', {
                 manuscriptId,
                 body,
             });
             res.status(400).send({ error: 'Invalid request body' });
+            return;
         }
 
         try {
