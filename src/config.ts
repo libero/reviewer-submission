@@ -65,7 +65,7 @@ const appConfig: Config = {
     s3: {
         accessKeyId: envOrEmpty('S3_ACCESS_KEY_ID'),
         secretAccessKey: envOrEmpty('S3_SECRET_ACCESS_KEY'),
-        s3ForcePathStyle: Boolean(process.env.S3_FORCE_PATH_STYLE) || true,
+        s3ForcePathStyle: process.env.S3_FORCE_PATH_STYLE && process.env.S3_FORCE_PATH_STYLE === 'true' ? true : false,
         fileBucket: envOrEmpty('S3_FILE_BUCKET'),
         awsEndPoint: envOrEmpty('S3_AWS_ENDPOINT'),
     },
@@ -75,7 +75,7 @@ const appConfig: Config = {
         region: envOrEmpty('SES_REGION'),
     },
     mail: {
-        sendmail: Boolean(process.env.SEND_MAIL) || false,
+        sendmail: process.env.SEND_MAIL && process.env.SEND_MAIL === 'true' ? true : false,
         sender: envOrEmpty('MAIL_SENDER'),
     },
     max_ql_depth: Number(envOrEmpty('MAX_QL_DEPTH')),
