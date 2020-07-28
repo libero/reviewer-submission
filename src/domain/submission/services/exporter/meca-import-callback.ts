@@ -4,7 +4,7 @@ import { SubmissionStatus } from '../../types';
 import { SubmissionId } from '../../types';
 import { AuditService } from '../../../audit/services/audit';
 import { AuditAction, AuditId, UserId, ObjectId } from '../../../audit/types';
-import uuid from 'uuid';
+import { v4 as uuid } from 'uuid';
 
 export class MecaImportCallback {
     constructor(private readonly submissionService: SubmissionService, private readonly auditService: AuditService) {}
