@@ -19,7 +19,7 @@ export class MecaImportCallback {
         try {
             await this.auditService.recordAudit({
                 id: AuditId.fromUuid(uuid()),
-                userId: UserId.fromUuid('SYSTEM'),
+                userId: 'SYSTEM',
                 action: AuditAction.UPDATED,
                 value: status,
                 objectType: 'submission.status',
