@@ -107,7 +107,7 @@ const init = async (): Promise<void> => {
     const mecaExporter = new MecaExporter(srvFile, ejpNames, config.authentication_jwt_secret);
     const srvSubmission = new SubmissionService(knexConnection, mecaExporter, s3Store, sftpStore, srvMail);
     const srvExtractionService = new SemanticExtractionService(knexConnection, config.science_beam);
-    const mecaImportCallback = new MecaImportCallback(srvSubmission);
+    const mecaImportCallback = new MecaImportCallback(srvSubmission, srvAudit);
 
     logger.info(`Initialising application services...`);
     const srvPermission = new PermissionService();
@@ -150,9 +150,16 @@ const init = async (): Promise<void> => {
             res.status(400).send({ error: 'Invalid request body' });
         }
 
-        await mecaImportCallback.storeResult(req.params.id, body.result);
-
-        res.status(200).json();
+        try {
+            await mecaImportCallback.storeResult(req.params.id, body.result);
+            res.sendStatus(204);
+        } catch (err) {
+            logger.error('Failed to process MECA callback', {
+                manuscriptId,
+                error: err.message,
+            });
+            res.status(500).send({ error: err.message });
+        }
     });
 
     const typeDefs = await importSchema(join(__dirname, './schemas/**/*.graphql'), {

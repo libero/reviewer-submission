@@ -508,4 +508,19 @@ describe('Submission Service', () => {
             );
         });
     });
+    describe('setStatus', () => {
+        it('sets the status passed', async () => {
+            XpubSubmissionRootRepository.prototype.update = jest.fn().mockReturnValue(true);
+            const service = makeSubmissionService();
+            await service.updateStatus(submissionModels[0], SubmissionStatus.MECA_EXPORT_FAILED);
+
+            const expected = {
+                status: 'MECA_EXPORT_FAILED',
+            };
+
+            await expect(XpubSubmissionRootRepository.prototype.update).toBeCalledWith(
+                expect.objectContaining(expected),
+            );
+        });
+    });
 });

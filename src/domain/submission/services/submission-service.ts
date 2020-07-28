@@ -121,4 +121,9 @@ export class SubmissionService {
         this.setLastStepVisited(submission, 'disclosure');
         return await this.submissionRepository.update(submission);
     }
+
+    async updateStatus(submission: Submission, status: SubmissionStatus): Promise<Submission> {
+        submission.status = SubmissionStatus[status];
+        return await this.submissionRepository.update(submission);
+    }
 }
