@@ -48,7 +48,7 @@ export class MailService {
             ReplyToAddresses: [],
             Source: this.sender,
         };
-        await this.ses.sendEmail(params);
+        await this.ses.sendEmail(params).promise();
         return true;
     }
 }
