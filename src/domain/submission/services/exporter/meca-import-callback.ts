@@ -3,7 +3,7 @@ import { InfraLogger as logger } from '../../../../logger';
 import { SubmissionStatus } from '../../types';
 import { SubmissionId } from '../../types';
 import { AuditService } from '../../../audit/services/audit';
-import { AuditAction, AuditId, UserId, ObjectId } from '../../../audit/types';
+import { AuditAction, AuditId, ObjectId } from '../../../audit/types';
 import { v4 as uuid } from 'uuid';
 
 export class MecaImportCallback {
