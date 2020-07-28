@@ -29,6 +29,11 @@ export interface MecaConfig {
         password: string;
         path: string;
     };
+    api_key: string;
+    email: {
+        subject_prefix: string;
+        recipient: string;
+    };
 }
 
 export interface Config {
@@ -95,6 +100,11 @@ const appConfig: Config = {
             username: envOrEmpty('MECA_SFTP_USERNAME'),
             password: envOrEmpty('MECA_SFTP_PASSWORD'),
             path: envOrEmpty('MECA_SFTP_PATH'),
+        },
+        api_key: envOrEmpty('MECA_API_KEY'),
+        email: {
+            subject_prefix: envOrEmpty('MECA_EMAIL_PREFIX'),
+            recipient: envOrEmpty('MECA_EMAIL_RECIPIENT'),
         },
     },
 };
