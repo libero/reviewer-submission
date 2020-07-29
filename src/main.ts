@@ -1,4 +1,5 @@
 import * as express from 'express';
+import * as bodyParser from 'body-parser';
 import * as helmet from 'helmet';
 import * as knex from 'knex';
 import { Express, Request, Response } from 'express';
@@ -34,6 +35,8 @@ import * as S3 from 'aws-sdk/clients/s3';
 import * as SES from 'aws-sdk/clients/ses';
 import { createKnexAdapter } from './domain/knex-table-adapter';
 import { MailService } from './domain/mail/services/mail-service';
+
+import { MecaImportCallback } from './domain/submission/services/exporter/meca-import-callback';
 
 // found via https://github.com/digicatapult/graphql-complexity-experiment/blob/master/app/apollo.js
 const estimators = [
@@ -105,6 +108,13 @@ const init = async (): Promise<void> => {
     const mecaExporter = new MecaExporter(srvFile, ejpNames, config.authentication_jwt_secret);
     const srvSubmission = new SubmissionService(knexConnection, mecaExporter, s3Store, sftpStore, srvMail);
     const srvExtractionService = new SemanticExtractionService(knexConnection, config.science_beam);
+    const mecaImportCallback = new MecaImportCallback(
+        srvSubmission,
+        srvAudit,
+        srvMail,
+        config.meca_config.email.subject_prefix,
+        config.meca_config.email.recipient,
+    );
 
     logger.info(`Initialising application services...`);
     const srvPermission = new PermissionService();
@@ -123,6 +133,43 @@ const init = async (): Promise<void> => {
     app.use(helmet());
     app.use(hpp());
     app.get('/health', (_: Request, res: Response) => res.sendStatus(200));
+
+    // meca import callback
+    app.post('/meca-result/:id', bodyParser.json(), async (req: Request, res: Response) => {
+        const apiKey = 'SOMEKEY';
+        const authHeader = req.get('authorization');
+        const token = authHeader && authHeader.match(/Bearer (.+)/) && RegExp.$1;
+        const manuscriptId = req.params.id;
+
+        if (token !== apiKey) {
+            logger.warn('MECA callback received with invalid API key', {
+                manuscriptId,
+            });
+            res.status(403).send({ error: 'Invalid API key' });
+            return;
+        }
+
+        const { body } = req;
+        if (!body || !mecaImportCallback.validateResponse(body.result)) {
+            logger.warn('MECA callback received with invalid request body', {
+                manuscriptId,
+                body,
+            });
+            res.status(400).send({ error: 'Invalid request body' });
+            return;
+        }
+
+        try {
+            await mecaImportCallback.storeResult(req.params.id, body.result);
+            res.sendStatus(204);
+        } catch (err) {
+            logger.error('Failed to process MECA callback', {
+                manuscriptId,
+                error: err.message,
+            });
+            res.status(500).send({ error: err.message });
+        }
+    });
 
     const typeDefs = await importSchema(join(__dirname, './schemas/**/*.graphql'), {
         forceGraphQLImport: false,

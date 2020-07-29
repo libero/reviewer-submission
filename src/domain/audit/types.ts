@@ -18,7 +18,7 @@ export enum AuditAction {
 export interface DtoAuditLog {
     id: AuditId;
     created: Date;
-    userId: UserId;
+    userId: UserId | 'SYSTEM';
     objectId: ObjectId;
     objectType: string;
     updated: Date;
