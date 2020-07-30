@@ -1,11 +1,11 @@
-import { SurveyId, SurveyResponseId } from '../../types';
+import { SurveyResponseId } from '../../types';
 import { Question } from './question';
 import { Answer } from './answer';
 import { SubmissionId } from '../../../submission/types';
 
 export class SurveyResponse {
     id: SurveyResponseId;
-    surveyId: SurveyId;
+    surveyId: string;
     submissionId: SubmissionId;
     questions: Question[];
     answers: Answer[];
@@ -14,7 +14,7 @@ export class SurveyResponse {
 
     constructor(
         id: SurveyResponseId,
-        surveyId: SurveyId,
+        surveyId: string,
         submissionId: SubmissionId,
         questions: Question[] = [],
         answers: Answer[] = [],

@@ -1,13 +1,13 @@
 import { v4 as uuid } from 'uuid';
 import { SurveyResponse } from './survey-response';
-import { SurveyId, SurveyResponseId } from '../../types';
+import { SurveyResponseId } from '../../types';
 import { SubmissionId } from '../../../submission/types';
 import { Question } from './question';
 import { Answer } from './answer';
 
 const createSurveyResponse = (): SurveyResponse => {
     const id = SurveyResponseId.fromUuid(uuid());
-    const surveyId = SurveyId.fromUuid(uuid());
+    const surveyId = uuid();
     const submissionId = SubmissionId.fromUuid(uuid());
     const question1 = new Question('1', 'question1');
     const question2 = new Question('2', 'question2');
@@ -27,11 +27,7 @@ describe('Survey Entity', () => {
     });
 
     it('stores answers correctly', () => {
-        const survey = new SurveyResponse(
-            SurveyResponseId.fromUuid(uuid()),
-            SurveyId.fromUuid(uuid()),
-            SubmissionId.fromUuid(uuid()),
-        );
+        const survey = new SurveyResponse(SurveyResponseId.fromUuid(uuid()), uuid(), SubmissionId.fromUuid(uuid()));
 
         survey.answerQuestion('1', 'question1', 'answer0');
         survey.answerQuestion('1', 'question1', 'answer1');

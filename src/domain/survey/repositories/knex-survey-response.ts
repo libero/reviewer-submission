@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { SurveyResponseId, SurveyId } from '../types';
+import { SurveyResponseId } from '../types';
 import { SurveyResponseRepository } from './types';
 import { KnexTableAdapter } from '../../knex-table-adapter';
 import { SurveyResponse } from '../services/models/survey-response';
@@ -9,7 +9,7 @@ import { Answer } from '../services/models/answer';
 
 type DatabaseEntry = {
     id: SurveyResponseId;
-    survey_id: SurveyId;
+    survey_id: string;
     manuscript_id: SubmissionId;
     response: {
         questions: Question[];
