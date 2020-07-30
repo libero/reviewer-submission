@@ -14,7 +14,6 @@ import { FileId } from '../../domain/file/types';
 import File from '../../domain/file/services/models/file';
 import { InfraLogger as logger } from '../../logger';
 import { SurveyService } from '../../domain/survey/services/survey-service';
-import { SurveyId } from '../../domain/survey/types';
 import { SurveyAnswer } from '../../domain/survey/services/models/survey-answer';
 import { SurveyResponse } from '../../domain/survey/services/models/survey-response';
 
@@ -140,7 +139,7 @@ const resolvers = (wizard: WizardService, userService: UserService, surveyServic
             const { surveyId, submissionId, answers } = args;
             logger.info(`resolver: submitSurveyResponse(${submissionId})`);
             const surveyResponse = await surveyService.submitResponse(
-                SurveyId.fromUuid(surveyId),
+                surveyId,
                 SubmissionId.fromUuid(submissionId),
                 answers,
             );
