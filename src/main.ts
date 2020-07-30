@@ -136,12 +136,11 @@ const init = async (): Promise<void> => {
 
     // meca import callback
     app.post('/meca-result/:id', bodyParser.json(), async (req: Request, res: Response) => {
-        const apiKey = 'SOMEKEY';
         const authHeader = req.get('authorization');
         const token = authHeader && authHeader.match(/Bearer (.+)/) && RegExp.$1;
         const manuscriptId = req.params.id;
 
-        if (token !== apiKey) {
+        if (token !== config.meca_config.api_key) {
             logger.warn('MECA callback received with invalid API key', {
                 manuscriptId,
             });
