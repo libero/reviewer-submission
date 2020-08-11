@@ -67,7 +67,8 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
             .builder()
             .select(...this.COLUMNS)
             .from(this.TABLE_NAME)
-            .where({ created_by: userId });
+            .where({ created_by: userId })
+            .orderBy('updated', 'desc');
 
         const result = await this._query.executor<DatabaseEntry[]>(query);
         return result.map(this.entryToModel);
