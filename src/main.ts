@@ -91,7 +91,7 @@ const init = async (): Promise<void> => {
 
     const shutDown = async (server: Server): Promise<void> => {
         await knexConnection.destroy();
-        server.close(() => logger.info(`server closed`));
+        await waitForServerClosure(server);
         process.exit();
     };
 
@@ -126,6 +126,12 @@ const init = async (): Promise<void> => {
         UserResolvers(srvUser),
         WizardResolvers(srvWizard, srvUser, srvSurvey),
     ];
+
+    const waitForServerClosure = async (server: Server): Promise<void> => {
+        return new Promise(resolve => {
+            server.close(() => resolve());
+        });
+    };
 
     logger.info(`Initialising Express...`);
 
