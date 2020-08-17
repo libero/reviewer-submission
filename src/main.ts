@@ -89,9 +89,15 @@ const init = async (): Promise<void> => {
         connection: config.db_connection,
     });
 
+    const waitForServerClosure = async (server: Server): Promise<void> => {
+        return new Promise(resolve => {
+            server.close(() => resolve());
+        });
+    };
+
     const shutDown = async (server: Server): Promise<void> => {
         await knexConnection.destroy();
-        server.close(() => logger.info(`server closed`));
+        await waitForServerClosure(server);
         process.exit();
     };
 
