@@ -89,6 +89,12 @@ const init = async (): Promise<void> => {
         connection: config.db_connection,
     });
 
+    const waitForServerClosure = async (server: Server): Promise<void> => {
+        return new Promise(resolve => {
+            server.close(() => resolve());
+        });
+    };
+
     const shutDown = async (server: Server): Promise<void> => {
         await knexConnection.destroy();
         await waitForServerClosure(server);
@@ -126,12 +132,6 @@ const init = async (): Promise<void> => {
         UserResolvers(srvUser),
         WizardResolvers(srvWizard, srvUser, srvSurvey),
     ];
-
-    const waitForServerClosure = async (server: Server): Promise<void> => {
-        return new Promise(resolve => {
-            server.close(() => resolve());
-        });
-    };
 
     logger.info(`Initialising Express...`);
 
