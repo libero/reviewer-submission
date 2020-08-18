@@ -1,3 +1,7 @@
+if (process.env.INCLUDE_NEW_RELIC && process.env.INCLUDE_NEW_RELIC === 'true') {
+    require('newrelic');
+}
+
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import * as helmet from 'helmet';

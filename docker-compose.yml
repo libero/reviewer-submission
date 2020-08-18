@@ -46,6 +46,7 @@ services:
       SES_REGION: ''
       SES_SECRET_ACCESS_KEY: ''
       SES_ACCESS_KEY_ID: ''
+      INCLUDE_NEW_RELIC: 'false'
     volumes:
       - ./config:/etc/reviewer
       - ./.eslintignore:/app/.eslintignore
