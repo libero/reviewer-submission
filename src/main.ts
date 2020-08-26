@@ -208,6 +208,7 @@ const init = async (): Promise<void> => {
                             estimators,
                         });
                         if (complexity >= config.max_ql_complexity) {
+                            logger.error('Max query complexity reached');
                             throw new UserInputError(
                                 `${complexity} is over max ${config.max_ql_complexity} complexity`,
                             );
@@ -247,6 +248,7 @@ const init = async (): Promise<void> => {
                     };
                     return { userId: decodedToken.sub, authorizationHeader: connectionParams.Authorization };
                 }
+                logger.error('Auth token is missing');
                 throw new Error('Missing auth token!');
             },
         },
@@ -254,8 +256,14 @@ const init = async (): Promise<void> => {
     apolloServer.applyMiddleware({ app });
     const server = app.listen(config.port, () => logger.info(`Service listening on port ${config.port}`));
     apolloServer.installSubscriptionHandlers(server);
-    process.on('SIGTERM', async () => await shutDown(server));
-    process.on('SIGINT', async () => await shutDown(server));
+    process.on('SIGTERM', async () => {
+        logger.info('SIGTERM called');
+        await shutDown(server);
+    });
+    process.on('SIGINT', async () => {
+        logger.info('SIGINT called');
+        await shutDown(server);
+    });
 };
 
 init();

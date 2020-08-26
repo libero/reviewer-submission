@@ -73,6 +73,7 @@ export class SemanticExtractionService {
                 timeout,
             });
             if (response.status == 200) {
+                logger.info(`Sciencebeam extracting complete for submission id ${submissionId}`);
                 success = await this.getSuggestionsFromData(submissionId, response.data);
             } else {
                 logger.error(`Sciencebeam responded with: ${response.status} and returned ${response.data}`);

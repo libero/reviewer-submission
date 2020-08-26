@@ -4,6 +4,7 @@ import Submission from '../models/submission';
 import { encode } from './jwt';
 import { FileService } from '../../../file/services/file-service';
 import { FileId } from '../../../file/types';
+import { InfraLogger as logger } from '../../../../logger';
 import {
     generateArticle,
     generateCoverLetter,
@@ -41,6 +42,7 @@ export class MecaExporter implements SubmissionExporter {
         const token = encode(this.jwtSecret, payload, '15m');
 
         if (!manuscriptFile) {
+            logger.error(`No manuscript found for submission ${submission.id}`);
             throw new Error('No manuscript file');
         }
 

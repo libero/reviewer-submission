@@ -129,6 +129,7 @@ export class FileService {
             Key: this.getFileS3Key(FileType.SUPPORTING_FILE, submissionId, fileId),
         });
         await this.setStatusToDeleted(user.id, file);
+        logger.info(`find entry with id: ${fileId} deleted`)
         return fileId;
     }
 
@@ -144,6 +145,7 @@ export class FileService {
             const manuscriptFile = await this.findManuscriptFile(submissionId);
             // we have a file so delete it
             if (manuscriptFile !== null) {
+                logger.info(`replacing existing manuscriptFile with id: ${manuscriptFile.id}`);
                 await this.deleteManuscript(user, manuscriptFile.id, submissionId);
             }
         }
@@ -207,6 +209,7 @@ export class FileService {
     async findManuscriptFile(submissionId: SubmissionId): Promise<File | null> {
         const file = await this.fileRepository.findManuscriptBySubmissionId(submissionId);
         if (!file) {
+            logger.info(`cannot find manuscriptFile with submission id: ${submissionId}`);
             return null;
         }
 
@@ -320,7 +323,7 @@ export class FileService {
             buffer = Buffer.concat(chunks);
             await this.setStatusToStored(userId, file);
         } catch (e) {
-            logger.error(e);
+            logger.error('upload of manuscript file failed', e);
             await this.setStatusToCancelled(userId, file);
         }
 
@@ -338,7 +341,7 @@ export class FileService {
             await this.handleFileUpload(pubsub, submissionId, userId, file, stream, FileType.SUPPORTING_FILE);
             await this.setStatusToStored(userId, file);
         } catch (e) {
-            logger.error(e);
+            logger.error('upload of support file failed', e);
             await this.setStatusToCancelled(userId, file);
             throw e;
         }
