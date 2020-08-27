@@ -57,7 +57,7 @@ describe('scienceBeamApi', () => {
         const result = await service.extractSuggestions(emptyBuffer, 'application/pdf', 'test.pdf', id);
 
         expect(mockCreate).toBeCalledTimes(1);
-        expect(logger.info).toBeCalledTimes(1);
+        expect(logger.info).toBeCalledTimes(2);
         expect(logger.info).toBeCalledWith('Sciencebeam extracting string');
         expect(result).toBe(true);
     });

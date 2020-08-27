@@ -1,5 +1,7 @@
 import * as SES from 'aws-sdk/clients/ses';
 
+import { InfraLogger as logger } from '../../../logger';
+
 export class MailService {
     ses: SES;
     sender: string;
@@ -19,7 +21,9 @@ export class MailService {
         cc: string[] = [],
         bcc: string[] = [],
     ): Promise<boolean> {
+        logger.info('sending email');
         if (this.sendmail === false) {
+            logger.warn('emails are not enabled');
             return false;
         }
 
@@ -48,7 +52,14 @@ export class MailService {
             ReplyToAddresses: [],
             Source: this.sender,
         };
-        await this.ses.sendEmail(params).promise();
-        return true;
+
+        try {
+            await this.ses.sendEmail(params).promise();
+            logger.info('email sent');
+            return true;
+        } catch (e) {
+            logger.error('email failed to send', e);
+            return false;
+        }
     }
 }

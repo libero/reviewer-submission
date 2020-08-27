@@ -92,6 +92,7 @@ export class FileService {
         uploadId = '',
         parts: { ETag: string | undefined; PartNumber: number }[],
     ): Promise<PromiseResult<S3.Types.CompleteMultipartUploadOutput, AWSError>> {
+        logger.info(`completing multipart for uploadId ${uploadId}`);
         return this.s3
             .completeMultipartUpload({
                 Bucket: this.bucket,
@@ -107,6 +108,7 @@ export class FileService {
     async deleteManuscript(user: User, fileId: FileId, submissionId: SubmissionId): Promise<boolean> {
         const file = await this.fileRepository.findFileById(fileId);
         if (file === null) {
+            logger.info(`deleteManuscript - Unable to find entry with id: ${fileId}`);
             throw new Error(`Unable to find entry with id: ${fileId}`);
         }
 
@@ -115,12 +117,14 @@ export class FileService {
             Key: this.getFileS3Key(FileType.MANUSCRIPT_SOURCE, submissionId, fileId),
         });
         await this.setStatusToDeleted(user.id, file);
+        logger.info(`deleteManuscript - file deleted ${fileId}`);
         return true;
     }
 
     async deleteSupportingFile(user: User, fileId: FileId, submissionId: SubmissionId): Promise<FileId> {
         const file = await this.fileRepository.findFileById(fileId);
         if (file === null) {
+            logger.info(`deleteSupportingFile - Unable to find entry with id: ${fileId}`);
             throw new Error(`Unable to find entry with id: ${fileId}`);
         }
 
@@ -129,6 +133,7 @@ export class FileService {
             Key: this.getFileS3Key(FileType.SUPPORTING_FILE, submissionId, fileId),
         });
         await this.setStatusToDeleted(user.id, file);
+        logger.info(`deleteSupportingFile - file deleted ${fileId}`);
         return fileId;
     }
 
@@ -144,6 +149,7 @@ export class FileService {
             const manuscriptFile = await this.findManuscriptFile(submissionId);
             // we have a file so delete it
             if (manuscriptFile !== null) {
+                logger.info(`replacing existing manuscriptFile with id: ${manuscriptFile.id}`);
                 await this.deleteManuscript(user, manuscriptFile.id, submissionId);
             }
         }
@@ -207,6 +213,7 @@ export class FileService {
     async findManuscriptFile(submissionId: SubmissionId): Promise<File | null> {
         const file = await this.fileRepository.findManuscriptBySubmissionId(submissionId);
         if (!file) {
+            logger.info(`cannot find manuscriptFile with submission id: ${submissionId}`);
             return null;
         }
 
@@ -309,6 +316,7 @@ export class FileService {
     ): Promise<Buffer> {
         let buffer: Buffer = new Buffer('');
         try {
+            logger.info(`Start uploading the manuscript file with id ${file.id}`);
             const chunks = await this.handleFileUpload(
                 pubsub,
                 submissionId,
@@ -320,7 +328,7 @@ export class FileService {
             buffer = Buffer.concat(chunks);
             await this.setStatusToStored(userId, file);
         } catch (e) {
-            logger.error(e);
+            logger.error(`upload of manuscript file failed with id ${file.id}`, e);
             await this.setStatusToCancelled(userId, file);
         }
 
@@ -335,10 +343,11 @@ export class FileService {
         submissionId: SubmissionId,
     ): Promise<void> {
         try {
+            logger.info(`Start uploading the supporting file with id ${file.id}`);
             await this.handleFileUpload(pubsub, submissionId, userId, file, stream, FileType.SUPPORTING_FILE);
             await this.setStatusToStored(userId, file);
         } catch (e) {
-            logger.error(e);
+            logger.error(`upload of supporting file has failed with id ${file.id}`, e);
             await this.setStatusToCancelled(userId, file);
             throw e;
         }
