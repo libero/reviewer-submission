@@ -2,7 +2,7 @@ import * as Knex from 'knex';
 import { SubmissionId, ManuscriptDetails, DisclosureDetails, SubmissionStatus } from '../types';
 import XpubSubmissionRootRepository from '../repositories/xpub-submission-root';
 import { v4 as uuid } from 'uuid';
-import Submission from './models/submission';
+import Submission, { ArticleType } from './models/submission';
 import { createKnexAdapter } from '../../knex-table-adapter';
 import { MecaExporter } from './exporter/meca-exporter';
 import { S3Store } from './storage/s3-store';
@@ -11,6 +11,7 @@ import { SubmissionStore } from './storage/submission-store';
 import { InfraLogger as logger } from '../../../logger';
 import { MailService } from '../../mail/services/mail-service';
 import { submittedEmail } from './emails';
+
 export class SubmissionService {
     submissionRepository: XpubSubmissionRootRepository;
     constructor(
@@ -87,6 +88,11 @@ export class SubmissionService {
             });
         return this.get(id);
     }
+    async saveArticleType(submission: Submission, articleType: ArticleType): Promise<Submission> {
+        submission.articleType = articleType;
+        return await this.submissionRepository.update(submission);
+    }
+
     async saveAuthorDetails(submission: Submission): Promise<Submission> {
         this.setLastStepVisited(submission, 'author');
         return await this.submissionRepository.update(submission);

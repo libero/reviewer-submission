@@ -2,6 +2,7 @@ import { DashboardService } from './service';
 import { SubmissionService } from '../../domain/submission';
 import { SubmissionOperation } from '../permission/service';
 import { SubmissionId } from '../../domain/submission/types';
+import { ArticleType } from '../../domain/submission/services/models/submission';
 
 describe('dashboard service', () => {
     const mockUser = {
@@ -11,7 +12,12 @@ describe('dashboard service', () => {
     };
 
     const mockSubmissionId = SubmissionId.fromUuid('7e892574-69c3-4d1c-bf09-c02fad99ea4c');
-
+    const mockSubmission = {
+        id: mockSubmissionId,
+        createdBy: '89e0aec8-b9fc-4413-8a37-5cc77567',
+        files: {},
+        status: 'INITIAL',
+    };
     const permissionService = {
         isStaff: jest.fn(),
         userCan: jest.fn(),
@@ -27,7 +33,8 @@ describe('dashboard service', () => {
                 status: 'INITIAL',
             })),
             findByUserId: jest.fn(async () => []),
-            get: jest.fn(),
+            get: jest.fn().mockImplementation(() => mockSubmission),
+            saveArticleType: jest.fn(),
             delete: jest.fn(),
         } as unknown) as SubmissionService;
     });
@@ -156,6 +163,38 @@ describe('dashboard service', () => {
                 'User not allowed to delete submission',
             );
             expect(submissionService.delete).toHaveBeenCalledTimes(0);
+        });
+    });
+
+    describe('saveArticleType', () => {
+        it('calls update when allowed', async () => {
+            permissionService.userCanWithSubmission = jest.fn().mockReturnValue(true);
+            const service = new DashboardService(permissionService, submissionService);
+            await service.saveArticleType(mockUser, mockSubmissionId, ArticleType.RESEARCH_ARTICLE);
+            expect(submissionService.saveArticleType).toHaveBeenCalledTimes(1);
+            expect(submissionService.saveArticleType as jest.Mock).toHaveBeenCalledWith(
+                mockSubmission,
+                ArticleType.RESEARCH_ARTICLE,
+            );
+        });
+        it('checks permissions', async () => {
+            permissionService.userCanWithSubmission = jest.fn().mockReturnValue(true);
+            const service = new DashboardService(permissionService, submissionService);
+            await service.saveArticleType(mockUser, mockSubmissionId, ArticleType.RESEARCH_ARTICLE);
+            expect(permissionService.userCanWithSubmission).toHaveBeenCalledTimes(1);
+            expect(permissionService.userCanWithSubmission as jest.Mock).toHaveBeenCalledWith(
+                mockUser,
+                SubmissionOperation.UPDATE,
+                mockSubmission,
+            );
+        });
+        it("doesn't call create when not allowed, and throws", async () => {
+            permissionService.userCanWithSubmission = jest.fn().mockReturnValue(false);
+            const service = new DashboardService(permissionService, submissionService);
+            expect(service.saveArticleType(mockUser, mockSubmissionId, ArticleType.RESEARCH_ARTICLE)).rejects.toThrow(
+                'User not allowed to submit',
+            );
+            expect(submissionService.saveArticleType).toHaveBeenCalledTimes(0);
         });
     });
 });

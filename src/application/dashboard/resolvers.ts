@@ -23,7 +23,11 @@ const resolvers = (dashboard: DashboardService, userService: UserService): IReso
             const user = await userService.getCurrentUser(context.authorizationHeader);
             return await dashboard.startSubmission(user, args.articleType);
         },
-
+        async saveArticleType(_, args: { id: SubmissionId; articleType: string }, context): Promise<Submission | null> {
+            logger.info(`resolver: saveArticleType(${args.id}, ${args.articleType})`);
+            const user = await userService.getCurrentUser(context.authorizationHeader);
+            return await dashboard.saveArticleType(user, args.articleType);
+        },
         async deleteSubmission(_, { id }: { id: SubmissionId }, context): Promise<SubmissionId> {
             logger.info(`resolver: deleteSubmission(${id})`);
             const user = await userService.getCurrentUser(context.authorizationHeader);

@@ -523,4 +523,21 @@ describe('Submission Service', () => {
             );
         });
     });
+
+    describe('saveArticleType', () => {
+        it('updates the submissions articleType', async () => {
+            XpubSubmissionRootRepository.prototype.update = jest.fn().mockReturnValue(true);
+            const service = makeSubmissionService();
+            await service.saveArticleType(submissionModels[0], ArticleType.RESEARCH_ARTICLE);
+
+            const expected = {
+                ...submissionModels[0],
+                articleType: 'research-article',
+            };
+
+            await expect(XpubSubmissionRootRepository.prototype.update).toBeCalledWith(
+                expect.objectContaining(expected),
+            );
+        });
+    });
 });
