@@ -1,5 +1,5 @@
 import { DashboardService } from './service';
-import Submission from '../../domain/submission/services/models/submission';
+import Submission, { ArticleType } from '../../domain/submission/services/models/submission';
 import { SubmissionId } from '../../domain/submission/types';
 import { IResolvers } from 'apollo-server-express';
 import { UserService } from 'src/domain/user';
@@ -26,7 +26,7 @@ const resolvers = (dashboard: DashboardService, userService: UserService): IReso
         async saveArticleType(_, args: { id: SubmissionId; articleType: string }, context): Promise<Submission | null> {
             logger.info(`resolver: saveArticleType(${args.id}, ${args.articleType})`);
             const user = await userService.getCurrentUser(context.authorizationHeader);
-            return await dashboard.saveArticleType(user, args.articleType);
+            return await dashboard.saveArticleType(user, args.id, args.articleType as ArticleType);
         },
         async deleteSubmission(_, { id }: { id: SubmissionId }, context): Promise<SubmissionId> {
             logger.info(`resolver: deleteSubmission(${id})`);
