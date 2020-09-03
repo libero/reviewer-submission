@@ -146,7 +146,7 @@ describe('Submission Entity', () => {
             });
         });
         it('articleType has 6 values', () => {
-            expect(Object.keys(ArticleType).length).toBe(6);
+            expect(Object.keys(ArticleType).length).toBe(7);
         });
     });
 
