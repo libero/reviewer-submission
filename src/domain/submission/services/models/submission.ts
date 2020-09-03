@@ -18,6 +18,8 @@ export enum ArticleType {
     SCIENTIFIC_CORRESPONDENCE = 'scientific-correspondence',
     TOOLS_RESOURCES = 'tools-resources',
     SHORT_REPORT = 'short-report',
+    // this is needed due to xpub migration issues
+    EMPTY = '',
 }
 
 export default class Submission {
@@ -74,6 +76,8 @@ export default class Submission {
                 return ArticleType.TOOLS_RESOURCES;
             case 'short-report':
                 return ArticleType.SHORT_REPORT;
+            case '':
+                return ArticleType.EMPTY;
             default:
                 throw new Error('Invalid article type');
         }

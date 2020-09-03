@@ -29,7 +29,7 @@ interface ContinuumPerson {
     affiliations?: Affiliation[];
 }
 
-const articleTypeMap: { [key in ArticleType]: number } = {
+const articleTypeMap: { [key: string]: number } = {
     'research-article': 5,
     'short-report': 13,
     'tools-resources': 18,
