@@ -1,5 +1,5 @@
 import { SubmissionId, SubmissionStatus } from '../../domain/submission/types';
-import Submission from '../../domain/submission/services/models/submission';
+import Submission, { ArticleType } from '../../domain/submission/services/models/submission';
 import { PermissionService, SubmissionOperation } from '../permission/service';
 import { User } from '../../domain/user/user';
 import { SubmissionService } from '../../domain/submission';
@@ -60,6 +60,20 @@ export class DashboardService {
                     break;
             }
         }
+        return submission;
+    }
+
+    async saveArticleType(user: User, submissionId: SubmissionId, articleType: ArticleType): Promise<Submission> {
+        let submission = await this.submissionService.get(submissionId);
+        const allowed = this.permissionService.userCanWithSubmission(user, SubmissionOperation.UPDATE, submission);
+        if (submission === null) {
+            throw new Error('No submission found');
+        }
+        if (!allowed) {
+            throw new Error('User not allowed to submit');
+        }
+        submission = await this.submissionService.saveArticleType(submission, articleType);
+
         return submission;
     }
 

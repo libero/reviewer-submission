@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import * as xmlbuilder from 'xmlbuilder';
 import axios from 'axios';
-import Submission, { ArticleType } from '../../models/submission';
+import Submission from '../../models/submission';
 import config from '../../../../../config';
 import { EJPNameRepository } from 'src/domain/ejp-name/repositories/types';
 
@@ -29,7 +29,7 @@ interface ContinuumPerson {
     affiliations?: Affiliation[];
 }
 
-const articleTypeMap: { [key in ArticleType]: number } = {
+const articleTypeMap: { [key: string]: number } = {
     'research-article': 5,
     'short-report': 13,
     'tools-resources': 18,

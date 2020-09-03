@@ -4,7 +4,7 @@ type Submission {
     id: ID!
     updated: String!
     created: String
-    articleType: String!
+    articleType: String
     author: AuthorDetails
     manuscriptDetails: ManuscriptDetails
     files: FileDetails
