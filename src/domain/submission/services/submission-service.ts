@@ -9,6 +9,7 @@ import { S3Store } from './storage/s3-store';
 import { SftpStore } from './storage/sftp-store';
 import { SubmissionStore } from './storage/submission-store';
 import { InfraLogger as logger } from '../../../logger';
+import { Auditor, AuditId, ObjectId, UserId, AuditAction } from '../../audit/types';
 import { MailService } from '../../mail/services/mail-service';
 import { submittedEmail } from './emails';
 
@@ -20,6 +21,7 @@ export class SubmissionService {
         private readonly s3Store: S3Store,
         private readonly sftpStore: SftpStore,
         private readonly mailService: MailService,
+        private readonly auditService: Auditor,
     ) {
         const adapter = createKnexAdapter(knex, 'public');
         this.submissionRepository = new XpubSubmissionRootRepository(adapter);
@@ -50,7 +52,18 @@ export class SubmissionService {
             createdBy: userId,
         });
         this.setLastStepVisited(submission, 'author');
-        return await this.submissionRepository.create(submission);
+        const createdSubmission = await this.submissionRepository.create(submission);
+        await this.auditService.recordAudit({
+            id: AuditId.fromUuid(uuid()),
+            userId: UserId.fromUuid(userId),
+            action: AuditAction.CREATED,
+            value: JSON.stringify({ articleType }),
+            objectType: 'submission',
+            objectId: ObjectId.fromUuid(submission.id.toString()),
+            created: new Date(),
+            updated: new Date(),
+        });
+        return createdSubmission;
     }
     async get(id: SubmissionId): Promise<Submission> {
         const submission = await this.submissionRepository.findById(id);

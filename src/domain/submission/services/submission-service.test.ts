@@ -1,6 +1,7 @@
 import { SubmissionService } from './submission-service';
 import XpubSubmissionRootRepository from '../repositories/xpub-submission-root';
 import Knex = require('knex');
+import { v4 } from 'uuid';
 import { SubmissionId, SubmissionStatus } from '../types';
 import Submission, { ArticleType } from './models/submission';
 import { S3Store } from './storage/s3-store';
@@ -9,11 +10,12 @@ import { MecaExporter } from './exporter/meca-exporter';
 import { SftpStore } from './storage/sftp-store';
 import { MailService } from '../../mail/services/mail-service';
 import { FileId, FileType } from '../../file/types';
+import { Auditor, AuditAction } from '../../audit/types';
 import File from '../../file/services/models/file';
 
 jest.mock('aws-sdk/clients/ses');
 jest.mock('./storage/submission-store');
-
+const mockUserId = v4();
 const mockSES = ({
     sendEmail: jest.fn(),
 } as unknown) as SES;
@@ -47,6 +49,7 @@ const makeSubmissionService = (mecaInjectable = jest.fn(async () => {})): Submis
         (jest.fn() as unknown) as S3Store,
         (jest.fn() as unknown) as SftpStore,
         mailService,
+        ({ recordAudit: jest.fn() } as unknown) as Auditor,
     );
 
 describe('Submission Service', () => {
@@ -314,24 +317,48 @@ describe('Submission Service', () => {
     });
 
     describe('create', () => {
+        it('audits create submission action', async (): Promise<void> => {
+            XpubSubmissionRootRepository.prototype.create = jest.fn(async (submission: Submission) => submission);
+            const recordAuditMock = jest.fn();
+            const auditServiceMock = { recordAudit: recordAuditMock };
+            const service = new SubmissionService(
+                (null as unknown) as Knex,
+                ({ export: jest.fn(async () => {}) } as unknown) as MecaExporter,
+                (jest.fn() as unknown) as S3Store,
+                (jest.fn() as unknown) as SftpStore,
+                mailService,
+                (auditServiceMock as unknown) as Auditor,
+            );
+            const submission = await service.create('research-article', mockUserId);
+            expect(recordAuditMock).toBeCalledTimes(1);
+            expect(recordAuditMock).toBeCalledWith(
+                expect.objectContaining({
+                    userId: mockUserId,
+                    action: AuditAction.CREATED,
+                    value: JSON.stringify({ articleType: 'research-article' }),
+                    objectType: 'submission',
+                    objectId: submission.id,
+                }),
+            );
+        });
         it('throws if an invalid articleType is passed', async (): Promise<void> => {
             XpubSubmissionRootRepository.prototype.create = jest.fn(async (submission: Submission) => submission);
             const service = makeSubmissionService();
-            await expect(service.create('articleType', 'userId')).rejects.toThrow('Invalid article type');
+            await expect(service.create('articleType', mockUserId)).rejects.toThrow('Invalid article type');
         });
         it('returns a created Submission when correct values are sent', async (): Promise<void> => {
             XpubSubmissionRootRepository.prototype.create = jest.fn(async (submission: Submission) => submission);
             const service = makeSubmissionService();
-            const submission = await service.create('research-article', 'userId');
+            const submission = await service.create('research-article', mockUserId);
             expect(submission).toBeInstanceOf(Submission);
         });
         it('returns a created Submission with correctly set initial properties', async (): Promise<void> => {
             XpubSubmissionRootRepository.prototype.create = jest.fn(async (submission: Submission) => submission);
             const service = makeSubmissionService();
-            const submission = await service.create('research-article', 'userId');
+            const submission = await service.create('research-article', mockUserId);
             expect(submission.status).toBe('INITIAL');
             expect(submission.articleType).toBe('research-article');
-            expect(submission.createdBy).toBe('userId');
+            expect(submission.createdBy).toBe(mockUserId);
             expect(submission.id).toBeDefined();
             expect(submission.updated).toBeDefined();
             expect(submission.lastStepVisited).toBe(`/submit/${submission.id}/author`);
