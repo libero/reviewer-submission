@@ -198,65 +198,12 @@ describe('Submission Service', () => {
             const submitable = submissionModels[0];
             submitable.lastStepVisited = '1';
             submitable.status = 'INITIAL';
-            submitable.author = {
-                firstName: 'string',
-                lastName: 'string',
-                email: 'name@elifesciences.org',
-                institution: 'institution',
-            };
-            submitable.manuscriptDetails = {
-                title: 'title',
-                subjects: ['sub'],
-                previouslyDiscussed: 'string',
-                previouslySubmitted: 'string',
-                cosubmission: ['co-sub'],
-            };
-
-            submitable.files = {
-                coverLetter: 'letter',
-                manuscriptFile: new File({
-                    id: FileId.fromUuid('3647dbde-c192-4bcd-9ecd-9a5e52111863'),
-                    submissionId: SubmissionId.fromUuid('3647dbde-c192-4bcd-9ecd-9a5e52111863'),
-                    mimeType: 'mimeType',
-                    filename: 'filename',
-                    status: 'STORED',
-                    size: 0,
-                    type: FileType.MANUSCRIPT_SOURCE,
-                    created: new Date(),
-                    updated: new Date(),
-                }),
-            };
-            submitable.editorDetails = {
-                suggestedSeniorEditors: ['11'],
-                opposedSeniorEditors: ['222'],
-                opposedSeniorEditorsReason: 'string',
-                suggestedReviewingEditors: ['222'],
-                opposedReviewingEditors: ['222'],
-                opposedReviewingEditorsReason: 'reason',
-                suggestedReviewers: [
-                    {
-                        name: 'string',
-                        email: 's@elife.org',
-                    },
-                ],
-                opposedReviewers: [
-                    {
-                        name: 'string',
-                        email: 's@elife.org',
-                    },
-                ],
-                opposedReviewersReason: 'string',
-            };
-            submitable.disclosure = {
-                submitterSignature: 'signature',
-                disclosureConsent: true,
-            };
-            submitable.suggestions = [
-                {
-                    value: 'string',
-                    fieldName: 'string',
-                },
-            ];
+            submitable.author = authorData;
+            submitable.manuscriptDetails = manuscriptData;
+            submitable.files = filesData;
+            submitable.editorDetails = editorsData;
+            submitable.disclosure = disclosureData;
+            submitable.suggestions = suggestions;
             await service.submit(submitable, '1.1.1.1', mockUserId);
             expect(updateMock).toHaveBeenCalledWith(
                 expect.objectContaining({
