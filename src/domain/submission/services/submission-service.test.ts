@@ -12,6 +12,7 @@ import { MailService } from '../../mail/services/mail-service';
 import { FileId, FileType } from '../../file/types';
 import { Auditor, AuditAction } from '../../audit/types';
 import File from '../../file/services/models/file';
+const flushPromises = (): Promise<void> => new Promise(setImmediate);
 
 jest.mock('aws-sdk/clients/ses');
 jest.mock('./storage/submission-store');
@@ -120,12 +121,12 @@ describe('Submission Service', () => {
                 fieldName: 'string',
             },
         ];
-        it('should audit that the MECA export was pending', async (): Promise<void> => {
+        it('should audit a successful MECA export submit', async (): Promise<void> => {
             const updateMock = jest.fn().mockReturnValue(true);
             XpubSubmissionRootRepository.prototype.update = updateMock;
             XpubSubmissionRootRepository.prototype.findById = jest.fn().mockReturnValue(submissionModels[0]);
             MailService.prototype.sendEmail = jest.fn();
-            const recordAuditMock = jest.fn().mockReturnValue(true);
+            const recordAuditMock = jest.fn();
             const auditServiceMock = { recordAudit: recordAuditMock };
             const service = makeSubmissionService(undefined, auditServiceMock);
             const submitable = submissionModels[0];
@@ -138,11 +139,62 @@ describe('Submission Service', () => {
             submitable.disclosure = disclosureData;
             submitable.suggestions = suggestions;
             await service.submit(submitable, '1.1.1.1', mockUserId);
+            await flushPromises();
             expect(recordAuditMock).toHaveBeenCalledWith(
                 expect.objectContaining({
                     userId: mockUserId,
                     action: AuditAction.UPDATED,
                     value: JSON.stringify({ status: 'MECA_EXPORT_PENDING' }),
+                    objectType: 'submission',
+                    objectId: submissionModels[0].id,
+                }),
+            );
+            expect(recordAuditMock).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    userId: mockUserId,
+                    action: AuditAction.UPDATED,
+                    value: JSON.stringify({ status: 'MECA_EXPORT_SUCCEEDED' }),
+                    objectType: 'submission',
+                    objectId: submissionModels[0].id,
+                }),
+            );
+        });
+        it('should audit a failed MECA export submit', async (): Promise<void> => {
+            const updateMock = jest.fn().mockReturnValue(true);
+            XpubSubmissionRootRepository.prototype.update = updateMock;
+            XpubSubmissionRootRepository.prototype.findById = jest.fn().mockReturnValue(submissionModels[0]);
+            MailService.prototype.sendEmail = jest.fn();
+            const recordAuditMock = jest.fn();
+            const auditServiceMock = { recordAudit: recordAuditMock };
+            const service = makeSubmissionService(
+                jest.fn(() => Promise.reject()),
+                auditServiceMock,
+            );
+            const submitable = submissionModels[0];
+            submitable.lastStepVisited = '1';
+            submitable.status = 'INITIAL';
+            submitable.author = authorData;
+            submitable.manuscriptDetails = manuscriptData;
+            submitable.files = filesData;
+            submitable.editorDetails = editorsData;
+            submitable.disclosure = disclosureData;
+            submitable.suggestions = suggestions;
+            await service.submit(submitable, '1.1.1.1', mockUserId);
+            await flushPromises();
+            expect(recordAuditMock).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    userId: mockUserId,
+                    action: AuditAction.UPDATED,
+                    value: JSON.stringify({ status: 'MECA_EXPORT_PENDING' }),
+                    objectType: 'submission',
+                    objectId: submissionModels[0].id,
+                }),
+            );
+            expect(recordAuditMock).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    userId: mockUserId,
+                    action: AuditAction.UPDATED,
+                    value: JSON.stringify({ status: 'MECA_EXPORT_FAILED' }),
                     objectType: 'submission',
                     objectId: submissionModels[0].id,
                 }),
