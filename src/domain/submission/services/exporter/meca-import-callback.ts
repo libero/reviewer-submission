@@ -19,17 +19,18 @@ export class MecaImportCallback {
     validateResponse(response: string): boolean {
         return response === 'success' || response === 'failure';
     }
-    async storeResult(id: string, response: string): Promise<void> {
+    async storeResult(id: string, body: { response: string }): Promise<void> {
         const submissionId = SubmissionId.fromUuid(id);
+        const { response } = body;
         const status =
             response === 'success' ? SubmissionStatus.MECA_IMPORT_SUCCEEDED : SubmissionStatus.MECA_IMPORT_FAILED;
         try {
             await this.auditService.recordAudit({
                 id: AuditId.fromUuid(uuid()),
                 userId: 'SYSTEM',
-                action: AuditAction.UPDATED,
-                value: response,
-                objectType: 'MECA_IMPORT_CALLBACK',
+                action: AuditAction.MECA_RESULT,
+                value: JSON.stringify(body),
+                objectType: 'submission',
                 objectId: ObjectId.fromUuid(id),
                 created: new Date(),
                 updated: new Date(),
