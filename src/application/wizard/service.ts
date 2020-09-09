@@ -124,7 +124,7 @@ export class WizardService {
         }
         const fullSubmission = await this.getFullSubmission(submissionId);
         fullSubmission.status = submission.status;
-        await this.submissionService.submit(fullSubmission, ip);
+        await this.submissionService.submit(fullSubmission, ip, user.id);
 
         return this.getFullSubmission(submissionId);
     }

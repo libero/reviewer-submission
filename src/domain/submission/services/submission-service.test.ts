@@ -1,6 +1,7 @@
 import { SubmissionService } from './submission-service';
 import XpubSubmissionRootRepository from '../repositories/xpub-submission-root';
 import Knex = require('knex');
+import { v4 } from 'uuid';
 import { SubmissionId, SubmissionStatus } from '../types';
 import Submission, { ArticleType } from './models/submission';
 import { S3Store } from './storage/s3-store';
@@ -9,11 +10,13 @@ import { MecaExporter } from './exporter/meca-exporter';
 import { SftpStore } from './storage/sftp-store';
 import { MailService } from '../../mail/services/mail-service';
 import { FileId, FileType } from '../../file/types';
+import { Auditor, AuditAction } from '../../audit/types';
 import File from '../../file/services/models/file';
+const flushPromises = (): Promise<void> => new Promise(setImmediate);
 
 jest.mock('aws-sdk/clients/ses');
 jest.mock('./storage/submission-store');
-
+const mockUserId = v4();
 const mockSES = ({
     sendEmail: jest.fn(),
 } as unknown) as SES;
@@ -40,13 +43,17 @@ jest.mock('../repositories/xpub-submission-root');
 let mailService = new MailService(mockSES, 'noreply@elifesciences.org', false);
 
 jest.mock('./exporter/meca-exporter');
-const makeSubmissionService = (mecaInjectable = jest.fn(async () => {})): SubmissionService =>
+const makeSubmissionService = (
+    mecaInjectable = jest.fn(async () => {}),
+    auditService = { recordAudit: jest.fn() },
+): SubmissionService =>
     new SubmissionService(
         (null as unknown) as Knex,
         ({ export: mecaInjectable } as unknown) as MecaExporter,
         (jest.fn() as unknown) as S3Store,
         (jest.fn() as unknown) as SftpStore,
         mailService,
+        (auditService as unknown) as Auditor,
     );
 
 describe('Submission Service', () => {
@@ -56,6 +63,143 @@ describe('Submission Service', () => {
     });
 
     describe('submit', () => {
+        const authorData = {
+            firstName: 'string',
+            lastName: 'string',
+            email: 'name@elifesciences.org',
+            institution: 'institution',
+        };
+        const manuscriptData = {
+            title: 'title',
+            subjects: ['sub'],
+            previouslyDiscussed: 'string',
+            previouslySubmitted: 'string',
+            cosubmission: ['co-sub'],
+        };
+        const filesData = {
+            coverLetter: 'letter',
+            manuscriptFile: new File({
+                id: FileId.fromUuid('3647dbde-c192-4bcd-9ecd-9a5e52111863'),
+                submissionId: SubmissionId.fromUuid('3647dbde-c192-4bcd-9ecd-9a5e52111863'),
+                mimeType: 'mimeType',
+                filename: 'filename',
+                status: 'STORED',
+                size: 0,
+                type: FileType.MANUSCRIPT_SOURCE,
+                created: new Date(),
+                updated: new Date(),
+            }),
+        };
+        const editorsData = {
+            suggestedSeniorEditors: ['11'],
+            opposedSeniorEditors: ['222'],
+            opposedSeniorEditorsReason: 'string',
+            suggestedReviewingEditors: ['222'],
+            opposedReviewingEditors: ['222'],
+            opposedReviewingEditorsReason: 'reason',
+            suggestedReviewers: [
+                {
+                    name: 'string',
+                    email: 's@elife.org',
+                },
+            ],
+            opposedReviewers: [
+                {
+                    name: 'string',
+                    email: 's@elife.org',
+                },
+            ],
+            opposedReviewersReason: 'string',
+        };
+        const disclosureData = {
+            submitterSignature: 'signature',
+            disclosureConsent: true,
+        };
+        const suggestions = [
+            {
+                value: 'string',
+                fieldName: 'string',
+            },
+        ];
+        it('should audit a successful MECA export submit', async (): Promise<void> => {
+            const updateMock = jest.fn().mockReturnValue(true);
+            XpubSubmissionRootRepository.prototype.update = updateMock;
+            XpubSubmissionRootRepository.prototype.findById = jest.fn().mockReturnValue(submissionModels[0]);
+            MailService.prototype.sendEmail = jest.fn();
+            const recordAuditMock = jest.fn();
+            const auditServiceMock = { recordAudit: recordAuditMock };
+            const service = makeSubmissionService(undefined, auditServiceMock);
+            const submitable = submissionModels[0];
+            submitable.lastStepVisited = '1';
+            submitable.status = 'INITIAL';
+            submitable.author = authorData;
+            submitable.manuscriptDetails = manuscriptData;
+            submitable.files = filesData;
+            submitable.editorDetails = editorsData;
+            submitable.disclosure = disclosureData;
+            submitable.suggestions = suggestions;
+            await service.submit(submitable, '1.1.1.1', mockUserId);
+            await flushPromises();
+            expect(recordAuditMock).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    userId: mockUserId,
+                    action: AuditAction.UPDATED,
+                    value: JSON.stringify({ status: 'MECA_EXPORT_PENDING' }),
+                    objectType: 'submission',
+                    objectId: submissionModels[0].id,
+                }),
+            );
+            expect(recordAuditMock).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    userId: mockUserId,
+                    action: AuditAction.UPDATED,
+                    value: JSON.stringify({ status: 'MECA_EXPORT_SUCCEEDED' }),
+                    objectType: 'submission',
+                    objectId: submissionModels[0].id,
+                }),
+            );
+        });
+        it('should audit a failed MECA export submit', async (): Promise<void> => {
+            const updateMock = jest.fn().mockReturnValue(true);
+            XpubSubmissionRootRepository.prototype.update = updateMock;
+            XpubSubmissionRootRepository.prototype.findById = jest.fn().mockReturnValue(submissionModels[0]);
+            MailService.prototype.sendEmail = jest.fn();
+            const recordAuditMock = jest.fn();
+            const auditServiceMock = { recordAudit: recordAuditMock };
+            const service = makeSubmissionService(
+                jest.fn(() => Promise.reject()),
+                auditServiceMock,
+            );
+            const submitable = submissionModels[0];
+            submitable.lastStepVisited = '1';
+            submitable.status = 'INITIAL';
+            submitable.author = authorData;
+            submitable.manuscriptDetails = manuscriptData;
+            submitable.files = filesData;
+            submitable.editorDetails = editorsData;
+            submitable.disclosure = disclosureData;
+            submitable.suggestions = suggestions;
+            await service.submit(submitable, '1.1.1.1', mockUserId);
+            await flushPromises();
+            expect(recordAuditMock).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    userId: mockUserId,
+                    action: AuditAction.UPDATED,
+                    value: JSON.stringify({ status: 'MECA_EXPORT_PENDING' }),
+                    objectType: 'submission',
+                    objectId: submissionModels[0].id,
+                }),
+            );
+            expect(recordAuditMock).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    userId: mockUserId,
+                    action: AuditAction.UPDATED,
+                    value: JSON.stringify({ status: 'MECA_EXPORT_FAILED' }),
+                    objectType: 'submission',
+                    objectId: submissionModels[0].id,
+                }),
+            );
+        });
         it('should call send email', async () => {
             XpubSubmissionRootRepository.prototype.update = jest.fn().mockReturnValue(true);
             XpubSubmissionRootRepository.prototype.findById = jest.fn().mockReturnValue(submissionModels[0]);
@@ -64,66 +208,13 @@ describe('Submission Service', () => {
             const submitable = submissionModels[0];
             submitable.lastStepVisited = '1';
             submitable.status = 'INITIAL';
-            submitable.author = {
-                firstName: 'string',
-                lastName: 'string',
-                email: 'name@elifesciences.org',
-                institution: 'institution',
-            };
-            submitable.manuscriptDetails = {
-                title: 'title',
-                subjects: ['sub'],
-                previouslyDiscussed: 'string',
-                previouslySubmitted: 'string',
-                cosubmission: ['co-sub'],
-            };
-
-            submitable.files = {
-                coverLetter: 'letter',
-                manuscriptFile: new File({
-                    id: FileId.fromUuid('3647dbde-c192-4bcd-9ecd-9a5e52111863'),
-                    submissionId: SubmissionId.fromUuid('3647dbde-c192-4bcd-9ecd-9a5e52111863'),
-                    mimeType: 'mimeType',
-                    filename: 'filename',
-                    status: 'STORED',
-                    size: 0,
-                    type: FileType.MANUSCRIPT_SOURCE,
-                    created: new Date(),
-                    updated: new Date(),
-                }),
-            };
-            submitable.editorDetails = {
-                suggestedSeniorEditors: ['11'],
-                opposedSeniorEditors: ['222'],
-                opposedSeniorEditorsReason: 'string',
-                suggestedReviewingEditors: ['222'],
-                opposedReviewingEditors: ['222'],
-                opposedReviewingEditorsReason: 'reason',
-                suggestedReviewers: [
-                    {
-                        name: 'string',
-                        email: 's@elife.org',
-                    },
-                ],
-                opposedReviewers: [
-                    {
-                        name: 'string',
-                        email: 's@elife.org',
-                    },
-                ],
-                opposedReviewersReason: 'string',
-            };
-            submitable.disclosure = {
-                submitterSignature: 'signature',
-                disclosureConsent: true,
-            };
-            submitable.suggestions = [
-                {
-                    value: 'string',
-                    fieldName: 'string',
-                },
-            ];
-            await service.submit(submitable, '1.1.1.1');
+            submitable.author = authorData;
+            submitable.manuscriptDetails = manuscriptData;
+            submitable.files = filesData;
+            submitable.editorDetails = editorsData;
+            submitable.disclosure = disclosureData;
+            submitable.suggestions = suggestions;
+            await service.submit(submitable, '1.1.1.1', mockUserId);
             expect(mailService.sendEmail).toHaveBeenCalledTimes(1);
         });
 
@@ -136,66 +227,13 @@ describe('Submission Service', () => {
             const submitable = submissionModels[0];
             submitable.lastStepVisited = '1';
             submitable.status = 'INITIAL';
-            submitable.author = {
-                firstName: 'string',
-                lastName: 'string',
-                email: 'name@elifesciences.org',
-                institution: 'institution',
-            };
-            submitable.manuscriptDetails = {
-                title: 'title',
-                subjects: ['sub'],
-                previouslyDiscussed: 'string',
-                previouslySubmitted: 'string',
-                cosubmission: ['co-sub'],
-            };
-
-            submitable.files = {
-                coverLetter: 'letter',
-                manuscriptFile: new File({
-                    id: FileId.fromUuid('3647dbde-c192-4bcd-9ecd-9a5e52111863'),
-                    submissionId: SubmissionId.fromUuid('3647dbde-c192-4bcd-9ecd-9a5e52111863'),
-                    mimeType: 'mimeType',
-                    filename: 'filename',
-                    status: 'STORED',
-                    size: 0,
-                    type: FileType.MANUSCRIPT_SOURCE,
-                    created: new Date(),
-                    updated: new Date(),
-                }),
-            };
-            submitable.editorDetails = {
-                suggestedSeniorEditors: ['11'],
-                opposedSeniorEditors: ['222'],
-                opposedSeniorEditorsReason: 'string',
-                suggestedReviewingEditors: ['222'],
-                opposedReviewingEditors: ['222'],
-                opposedReviewingEditorsReason: 'reason',
-                suggestedReviewers: [
-                    {
-                        name: 'string',
-                        email: 's@elife.org',
-                    },
-                ],
-                opposedReviewers: [
-                    {
-                        name: 'string',
-                        email: 's@elife.org',
-                    },
-                ],
-                opposedReviewersReason: 'string',
-            };
-            submitable.disclosure = {
-                submitterSignature: 'signature',
-                disclosureConsent: true,
-            };
-            submitable.suggestions = [
-                {
-                    value: 'string',
-                    fieldName: 'string',
-                },
-            ];
-            await service.submit(submitable, '1.1.1.1');
+            submitable.author = authorData;
+            submitable.manuscriptDetails = manuscriptData;
+            submitable.files = filesData;
+            submitable.editorDetails = editorsData;
+            submitable.disclosure = disclosureData;
+            submitable.suggestions = suggestions;
+            await service.submit(submitable, '1.1.1.1', mockUserId);
             expect(updateMock).toHaveBeenCalledWith(
                 expect.objectContaining({
                     status: 'MECA_EXPORT_SUCCEEDED',
@@ -212,66 +250,13 @@ describe('Submission Service', () => {
             const submitable = submissionModels[0];
             submitable.lastStepVisited = '1';
             submitable.status = 'INITIAL';
-            submitable.author = {
-                firstName: 'string',
-                lastName: 'string',
-                email: 'name@elifesciences.org',
-                institution: 'institution',
-            };
-            submitable.manuscriptDetails = {
-                title: 'title',
-                subjects: ['sub'],
-                previouslyDiscussed: 'string',
-                previouslySubmitted: 'string',
-                cosubmission: ['co-sub'],
-            };
-
-            submitable.files = {
-                coverLetter: 'letter',
-                manuscriptFile: new File({
-                    id: FileId.fromUuid('3647dbde-c192-4bcd-9ecd-9a5e52111863'),
-                    submissionId: SubmissionId.fromUuid('3647dbde-c192-4bcd-9ecd-9a5e52111863'),
-                    mimeType: 'mimeType',
-                    filename: 'filename',
-                    status: 'STORED',
-                    size: 0,
-                    type: FileType.MANUSCRIPT_SOURCE,
-                    created: new Date(),
-                    updated: new Date(),
-                }),
-            };
-            submitable.editorDetails = {
-                suggestedSeniorEditors: ['11'],
-                opposedSeniorEditors: ['222'],
-                opposedSeniorEditorsReason: 'string',
-                suggestedReviewingEditors: ['222'],
-                opposedReviewingEditors: ['222'],
-                opposedReviewingEditorsReason: 'reason',
-                suggestedReviewers: [
-                    {
-                        name: 'string',
-                        email: 's@elife.org',
-                    },
-                ],
-                opposedReviewers: [
-                    {
-                        name: 'string',
-                        email: 's@elife.org',
-                    },
-                ],
-                opposedReviewersReason: 'string',
-            };
-            submitable.disclosure = {
-                submitterSignature: 'signature',
-                disclosureConsent: true,
-            };
-            submitable.suggestions = [
-                {
-                    value: 'string',
-                    fieldName: 'string',
-                },
-            ];
-            await service.submit(submitable, '1.1.1.1');
+            submitable.author = authorData;
+            submitable.manuscriptDetails = manuscriptData;
+            submitable.files = filesData;
+            submitable.editorDetails = editorsData;
+            submitable.disclosure = disclosureData;
+            submitable.suggestions = suggestions;
+            await service.submit(submitable, '1.1.1.1', mockUserId);
             expect(updateMock).toHaveBeenCalledWith(
                 expect.objectContaining({
                     status: 'MECA_EXPORT_FAILED',
@@ -314,24 +299,41 @@ describe('Submission Service', () => {
     });
 
     describe('create', () => {
+        it('audits create submission action', async (): Promise<void> => {
+            XpubSubmissionRootRepository.prototype.create = jest.fn(async (submission: Submission) => submission);
+            const recordAuditMock = jest.fn();
+            const auditServiceMock = { recordAudit: recordAuditMock };
+            const service = makeSubmissionService(undefined, auditServiceMock);
+            const submission = await service.create('research-article', mockUserId);
+            expect(recordAuditMock).toBeCalledTimes(1);
+            expect(recordAuditMock).toBeCalledWith(
+                expect.objectContaining({
+                    userId: mockUserId,
+                    action: AuditAction.CREATED,
+                    value: JSON.stringify({ articleType: 'research-article' }),
+                    objectType: 'submission',
+                    objectId: submission.id,
+                }),
+            );
+        });
         it('throws if an invalid articleType is passed', async (): Promise<void> => {
             XpubSubmissionRootRepository.prototype.create = jest.fn(async (submission: Submission) => submission);
             const service = makeSubmissionService();
-            await expect(service.create('articleType', 'userId')).rejects.toThrow('Invalid article type');
+            await expect(service.create('articleType', mockUserId)).rejects.toThrow('Invalid article type');
         });
         it('returns a created Submission when correct values are sent', async (): Promise<void> => {
             XpubSubmissionRootRepository.prototype.create = jest.fn(async (submission: Submission) => submission);
             const service = makeSubmissionService();
-            const submission = await service.create('research-article', 'userId');
+            const submission = await service.create('research-article', mockUserId);
             expect(submission).toBeInstanceOf(Submission);
         });
         it('returns a created Submission with correctly set initial properties', async (): Promise<void> => {
             XpubSubmissionRootRepository.prototype.create = jest.fn(async (submission: Submission) => submission);
             const service = makeSubmissionService();
-            const submission = await service.create('research-article', 'userId');
+            const submission = await service.create('research-article', mockUserId);
             expect(submission.status).toBe('INITIAL');
             expect(submission.articleType).toBe('research-article');
-            expect(submission.createdBy).toBe('userId');
+            expect(submission.createdBy).toBe(mockUserId);
             expect(submission.id).toBeDefined();
             expect(submission.updated).toBeDefined();
             expect(submission.lastStepVisited).toBe(`/submit/${submission.id}/author`);

@@ -9,6 +9,7 @@ import { S3Store } from './storage/s3-store';
 import { SftpStore } from './storage/sftp-store';
 import { SubmissionStore } from './storage/submission-store';
 import { InfraLogger as logger } from '../../../logger';
+import { Auditor, AuditId, ObjectId, UserId, AuditAction } from '../../audit/types';
 import { MailService } from '../../mail/services/mail-service';
 import { submittedEmail } from './emails';
 
@@ -20,6 +21,7 @@ export class SubmissionService {
         private readonly s3Store: S3Store,
         private readonly sftpStore: SftpStore,
         private readonly mailService: MailService,
+        private readonly auditService: Auditor,
     ) {
         const adapter = createKnexAdapter(knex, 'public');
         this.submissionRepository = new XpubSubmissionRootRepository(adapter);
@@ -50,7 +52,18 @@ export class SubmissionService {
             createdBy: userId,
         });
         this.setLastStepVisited(submission, 'author');
-        return await this.submissionRepository.create(submission);
+        const createdSubmission = await this.submissionRepository.create(submission);
+        await this.auditService.recordAudit({
+            id: AuditId.fromUuid(uuid()),
+            userId: UserId.fromUuid(userId),
+            action: AuditAction.CREATED,
+            value: JSON.stringify({ articleType }),
+            objectType: 'submission',
+            objectId: ObjectId.fromUuid(submission.id.toString()),
+            created: new Date(),
+            updated: new Date(),
+        });
+        return createdSubmission;
     }
     async get(id: SubmissionId): Promise<Submission> {
         const submission = await this.submissionRepository.findById(id);
@@ -62,13 +75,23 @@ export class SubmissionService {
     async delete(id: SubmissionId): Promise<boolean> {
         return await this.submissionRepository.delete(id);
     }
-    async submit(submission: Submission, ip: string): Promise<Submission> {
+    async submit(submission: Submission, ip: string, userId: string): Promise<Submission> {
         const id = submission.id;
         if (!submission.isSubmittable()) {
             throw new Error(`The submission ${id} cannot be submitted.`);
         }
         submission.status = SubmissionStatus.MECA_EXPORT_PENDING;
         await this.submissionRepository.update(submission);
+        await this.auditService.recordAudit({
+            id: AuditId.fromUuid(uuid()),
+            userId: UserId.fromUuid(userId),
+            action: AuditAction.UPDATED,
+            value: JSON.stringify({ status: SubmissionStatus.MECA_EXPORT_PENDING }),
+            objectType: 'submission',
+            objectId: ObjectId.fromUuid(submission.id.toString()),
+            created: new Date(),
+            updated: new Date(),
+        });
         const toEmail = submission.author?.email;
         const emailContent = submittedEmail(submission.author?.firstName, submission.manuscriptDetails.title);
         const data = {
@@ -85,6 +108,16 @@ export class SubmissionService {
             })
             .finally(async () => {
                 await this.submissionRepository.update(submission);
+                await this.auditService.recordAudit({
+                    id: AuditId.fromUuid(uuid()),
+                    userId: UserId.fromUuid(userId),
+                    action: AuditAction.UPDATED,
+                    value: JSON.stringify({ status: submission.status }),
+                    objectType: 'submission',
+                    objectId: ObjectId.fromUuid(submission.id.toString()),
+                    created: new Date(),
+                    updated: new Date(),
+                });
             });
         return this.get(id);
     }
