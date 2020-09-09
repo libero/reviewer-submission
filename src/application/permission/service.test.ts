@@ -14,7 +14,7 @@ describe('userCan', () => {
         user = { id: 'Bob-001', name: 'Bob', role: 'ham & cheese' };
         submission = new Submission({
             id: SubmissionId.fromUuid(v4()),
-            updated: new Date(),
+            updated: new Date().toISOString(),
             articleType: ArticleType.RESEARCH_ADVANCE,
             status: 'CREATED',
             createdBy: 'user-id',

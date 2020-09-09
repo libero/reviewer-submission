@@ -5,8 +5,8 @@ import Submission, { ArticleType } from '../../models/submission';
 
 const submission = new Submission({
     id: SubmissionId.fromUuid('604e06ca-882d-4b5b-a147-e016893e60e9'),
-    created: new Date('2018-09-07T12:25:53.196Z'),
-    updated: new Date('2018-09-07T12:25:53.196Z'),
+    created: new Date('2018-09-07T12:25:53.196Z').toISOString(),
+    updated: new Date('2018-09-07T12:25:53.196Z').toISOString(),
     createdBy: '6d8cd1ce-15b6-46c1-b901-bc91598c8f2d',
     status: 'INITIAL',
     articleType: ArticleType.RESEARCH_ARTICLE,

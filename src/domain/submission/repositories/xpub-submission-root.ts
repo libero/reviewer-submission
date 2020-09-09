@@ -89,7 +89,7 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
         if (existingSubmission === null) {
             throw new Error(`Unable to find entry with id: ${submission.id}`);
         }
-        submission.updated = new Date();
+        submission.updated = new Date().toISOString();
         const entryToSave = this.modelToEntry(submission);
         const query = this._query
             .builder()
@@ -101,7 +101,7 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
     }
 
     public async create(submission: Submission): Promise<Submission> {
-        submission.updated = new Date();
+        submission.updated = new Date().toISOString();
         const entryToSave = this.modelToEntry(submission);
         const query = this._query
             .builder()
@@ -126,8 +126,8 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
         const previouslySubmitted = submission.manuscriptDetails.previouslySubmitted;
         return {
             id: submission.id,
-            created: submission.created as Date,
-            updated: submission.updated as Date,
+            created: new Date(submission.created),
+            updated: new Date(submission.updated),
             created_by: submission.createdBy,
             status: submission.status,
             last_step_visited: submission.lastStepVisited,
@@ -151,8 +151,8 @@ export default class XpubSubmissionRootRepository implements SubmissionRepositor
     private entryToModel(record: DatabaseEntry): Submission {
         const result = new Submission({
             id: record.id,
-            created: record.created,
-            updated: record.updated,
+            created: record.created.toISOString(),
+            updated: record.updated.toISOString(),
             articleType: record.meta.articleType,
             status: record.status,
             createdBy: record.created_by,

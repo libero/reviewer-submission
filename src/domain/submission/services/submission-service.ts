@@ -46,7 +46,7 @@ export class SubmissionService {
         const id = SubmissionId.fromUuid(uuid());
         const submission = new Submission({
             id,
-            updated: new Date(),
+            updated: new Date().toISOString(),
             articleType,
             status: SubmissionStatus.INITIAL,
             createdBy: userId,
