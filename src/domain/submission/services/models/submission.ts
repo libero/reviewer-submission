@@ -24,8 +24,8 @@ export enum ArticleType {
 
 export default class Submission {
     id: SubmissionId;
-    created: Date;
-    updated: Date;
+    created: string;
+    updated: string;
     articleType: ArticleType;
     status: string;
     createdBy: string;
@@ -48,15 +48,15 @@ export default class Submission {
         createdBy,
     }: {
         id: SubmissionId;
-        created?: Date;
-        updated?: Date;
+        created?: string;
+        updated?: string;
         articleType: string;
         status: string;
         createdBy: string;
     }) {
         this.id = id;
-        this.created = created || new Date();
-        this.updated = updated || new Date();
+        this.created = created || new Date().toISOString();
+        this.updated = updated || new Date().toISOString();
         this.articleType = this.articleTypeFromString(articleType);
         this.status = status;
         this.createdBy = createdBy;

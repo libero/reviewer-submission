@@ -67,8 +67,8 @@ describe('Knex Submission Repository', () => {
                 status: SubmissionStatus.INITIAL,
                 createdBy: '123',
                 articleType: ArticleType.FEATURE_ARTICLE,
-                updated: new Date('2020-02-18T15:14:53.255Z'),
-                created: new Date('2020-02-18T15:14:53.155Z'),
+                updated: '2020-02-18T15:14:53.255Z',
+                created: '2020-02-18T15:14:53.155Z',
                 lastStepVisited: 'p1',
                 disclosure: {
                     disclosureConsent: undefined,
@@ -93,8 +93,8 @@ describe('Knex Submission Repository', () => {
                 createdBy: '124',
                 lastStepVisited: 'p2',
                 articleType: ArticleType.RESEARCH_ADVANCE,
-                updated: new Date('2020-02-18T15:14:53.255Z'),
-                created: new Date('2020-02-18T15:14:53.155Z'),
+                updated: '2020-02-18T15:14:53.255Z',
+                created: '2020-02-18T15:14:53.155Z',
                 disclosure: {
                     disclosureConsent: undefined,
                     submitterSignature: undefined,
@@ -149,8 +149,8 @@ describe('Knex Submission Repository', () => {
                 createdBy: '123',
                 lastStepVisited: 'p1',
                 articleType: ArticleType.FEATURE_ARTICLE,
-                updated: new Date('2020-02-18T15:14:53.255Z'),
-                created: new Date('2020-02-18T15:14:53.155Z'),
+                updated: '2020-02-18T15:14:53.255Z',
+                created: '2020-02-18T15:14:53.155Z',
                 disclosure: {
                     disclosureConsent: undefined,
                     submitterSignature: undefined,

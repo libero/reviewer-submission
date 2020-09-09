@@ -27,16 +27,16 @@ const submissionModels: Submission[] = [
         status: SubmissionStatus.INITIAL,
         createdBy: '123',
         articleType: ArticleType.FEATURE_ARTICLE,
-        updated: new Date('2020-02-18T15:14:53.155Z'),
-        created: new Date('2020-02-18T15:14:53.155Z'),
+        updated: new Date('2020-02-18T15:14:53.155Z').toISOString(),
+        created: new Date('2020-02-18T15:14:53.155Z').toISOString(),
     }),
     new Submission({
         id: SubmissionId.fromUuid('e0ba60c9-1966-43bc-ba83-6a09c6f3ab1c'),
         status: SubmissionStatus.INITIAL,
         createdBy: '124',
         articleType: ArticleType.RESEARCH_ADVANCE,
-        updated: new Date('2020-02-18T15:14:53.155Z'),
-        created: new Date('2020-02-18T15:14:53.155Z'),
+        updated: new Date('2020-02-18T15:14:53.155Z').toISOString(),
+        created: new Date('2020-02-18T15:14:53.155Z').toISOString(),
     }),
 ];
 jest.mock('../repositories/xpub-submission-root');

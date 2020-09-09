@@ -10,7 +10,7 @@ export class DashboardService {
         private readonly submissionService: SubmissionService,
     ) {}
 
-    async findMySubmissions(user: User): Promise<Array<Omit<Submission, 'updated'> & { updated: string }>> {
+    async findMySubmissions(user: User): Promise<Array<Submission>> {
         // we don't need to check permissions to perform this operation.
         const submissions = await this.submissionService.findByUserId(user.id);
         return submissions.map(submission => {
@@ -31,8 +31,7 @@ export class DashboardService {
                         break;
                 }
             }
-            const { updated, ...rest } = submission;
-            return { ...rest, updated: updated.toISOString() } as Omit<Submission, 'updated'> & { updated: string };
+            return submission;
         });
     }
 

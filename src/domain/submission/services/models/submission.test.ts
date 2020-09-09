@@ -52,7 +52,7 @@ describe('Submission Entity', () => {
             id: id,
             status: SubmissionStatus.INITIAL,
             createdBy: '123',
-            updated: new Date(),
+            updated: new Date().toISOString(),
             articleType: 'research-article',
         });
     });
@@ -78,7 +78,7 @@ describe('Submission Entity', () => {
                     id,
                     status: SubmissionStatus.INITIAL,
                     createdBy: '123',
-                    updated: new Date(),
+                    updated: new Date().toISOString(),
                     articleType: 'foo',
                 });
             }).toThrow('Invalid article type');
@@ -89,7 +89,7 @@ describe('Submission Entity', () => {
                     id,
                     status: SubmissionStatus.INITIAL,
                     createdBy: '123',
-                    updated: new Date(),
+                    updated: new Date().toISOString(),
                     articleType: 'research-article',
                 });
                 expect(s.articleType).toBe(ArticleType.RESEARCH_ARTICLE);
@@ -99,7 +99,7 @@ describe('Submission Entity', () => {
                     id,
                     status: SubmissionStatus.INITIAL,
                     createdBy: '123',
-                    updated: new Date(),
+                    updated: new Date().toISOString(),
                     articleType: 'feature',
                 });
                 expect(s.articleType).toBe(ArticleType.FEATURE_ARTICLE);
@@ -109,7 +109,7 @@ describe('Submission Entity', () => {
                     id,
                     status: SubmissionStatus.INITIAL,
                     createdBy: '123',
-                    updated: new Date(),
+                    updated: new Date().toISOString(),
                     articleType: 'research-advance',
                 });
                 expect(s.articleType).toBe(ArticleType.RESEARCH_ADVANCE);
@@ -119,7 +119,7 @@ describe('Submission Entity', () => {
                     id,
                     status: SubmissionStatus.INITIAL,
                     createdBy: '123',
-                    updated: new Date(),
+                    updated: new Date().toISOString(),
                     articleType: 'scientific-correspondence',
                 });
                 expect(s.articleType).toBe(ArticleType.SCIENTIFIC_CORRESPONDENCE);
@@ -129,7 +129,7 @@ describe('Submission Entity', () => {
                     id,
                     status: SubmissionStatus.INITIAL,
                     createdBy: '123',
-                    updated: new Date(),
+                    updated: new Date().toISOString(),
                     articleType: 'tools-resources',
                 });
                 expect(s.articleType).toBe(ArticleType.TOOLS_RESOURCES);
@@ -139,7 +139,7 @@ describe('Submission Entity', () => {
                     id,
                     status: SubmissionStatus.INITIAL,
                     createdBy: '123',
-                    updated: new Date(),
+                    updated: new Date().toISOString(),
                     articleType: 'short-report',
                 });
                 expect(s.articleType).toBe(ArticleType.SHORT_REPORT);

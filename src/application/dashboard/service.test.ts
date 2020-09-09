@@ -57,12 +57,12 @@ describe('dashboard service', () => {
         it('should map the status correctly', async () => {
             submissionService = ({
                 findByUserId: jest.fn(async () => [
-                    { status: 'INITIAL', updated: new Date() },
-                    { status: 'MECA_IMPORT_FAILED', updated: new Date() },
-                    { status: 'MECA_EXPORT_FAILED', updated: new Date() },
-                    { status: 'MECA_EXPORT_SUCCEEDED', updated: new Date() },
-                    { status: 'MECA_EXPORT_PENDING', updated: new Date() },
-                    { status: 'not a status', updated: new Date() },
+                    { status: 'INITIAL', updated: new Date().toISOString() },
+                    { status: 'MECA_IMPORT_FAILED', updated: new Date().toISOString() },
+                    { status: 'MECA_EXPORT_FAILED', updated: new Date().toISOString() },
+                    { status: 'MECA_EXPORT_SUCCEEDED', updated: new Date().toISOString() },
+                    { status: 'MECA_EXPORT_PENDING', updated: new Date().toISOString() },
+                    { status: 'not a status', updated: new Date().toISOString() },
                 ]),
             } as unknown) as SubmissionService;
             const service = new DashboardService(permissionService, submissionService);
