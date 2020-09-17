@@ -10,7 +10,7 @@ export const fileSchema = Joi.object({
     filename: Joi.string().required(),
     url: Joi.string().required(),
     mimeType: Joi.string().required(),
-    size: Joi.number().required(),
+    size: Joi.number().required().allow(null), // this allows submissions from xPub to pass validation
     downloadLink: Joi.string(),
     status: Joi.string()
         .required()
