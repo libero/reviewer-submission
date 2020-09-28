@@ -142,7 +142,7 @@ describe('dashboard service', () => {
             const service = new DashboardService(permissionService, submissionService);
             await service.deleteSubmission(mockUser, mockSubmissionId);
             expect(submissionService.delete).toHaveBeenCalledTimes(1);
-            expect(submissionService.delete as jest.Mock).toHaveBeenCalledWith(mockSubmissionId);
+            expect(submissionService.delete as jest.Mock).toHaveBeenCalledWith(mockUser, mockSubmissionId);
         });
         it('checks permissions', async () => {
             submissionService.get = jest.fn().mockReturnValue('cheese');

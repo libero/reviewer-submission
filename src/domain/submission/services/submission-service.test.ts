@@ -12,6 +12,8 @@ import { MailService } from '../../mail/services/mail-service';
 import { FileId, FileType } from '../../file/types';
 import { Auditor, AuditAction } from '../../audit/types';
 import File from '../../file/services/models/file';
+import { User } from '../../user/user';
+import { FileService } from '../../file/services/file-service';
 const flushPromises = (): Promise<void> => new Promise(setImmediate);
 
 jest.mock('aws-sdk/clients/ses');
@@ -46,6 +48,7 @@ jest.mock('./exporter/meca-exporter');
 const makeSubmissionService = (
     mecaInjectable = jest.fn(async () => {}),
     auditService = { recordAudit: jest.fn() },
+    fileService = { deleteFilesForSubmission: jest.fn() },
 ): SubmissionService =>
     new SubmissionService(
         (null as unknown) as Knex,
@@ -54,6 +57,7 @@ const makeSubmissionService = (
         (jest.fn() as unknown) as SftpStore,
         mailService,
         (auditService as unknown) as Auditor,
+        (fileService as unknown) as FileService,
     );
 
 describe('Submission Service', () => {
@@ -344,12 +348,12 @@ describe('Submission Service', () => {
         it('should return true if is deletes the submission', async (): Promise<void> => {
             XpubSubmissionRootRepository.prototype.delete = jest.fn().mockReturnValue(true);
             const service = makeSubmissionService();
-            await expect(service.delete(submissionModels[0].id)).resolves.toBe(true);
+            await expect(service.delete({} as User, submissionModels[0].id)).resolves.toBe(true);
         });
         it('should return false if deletion fails', async (): Promise<void> => {
             XpubSubmissionRootRepository.prototype.delete = jest.fn().mockReturnValue(false);
             const service = makeSubmissionService();
-            await expect(service.delete(submissionModels[0].id)).resolves.toBe(false);
+            await expect(service.delete({} as User, submissionModels[0].id)).resolves.toBe(false);
         });
     });
 

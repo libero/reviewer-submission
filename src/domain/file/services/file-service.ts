@@ -364,6 +364,17 @@ export class FileService {
         return Body ? Body.toString('utf-8') : '';
     }
 
+    async deleteFilesForSubmission(user: User, submissionId: SubmissionId): Promise<void> {
+        const manuscriptFile = await this.findManuscriptFile(submissionId);
+        if (manuscriptFile !== null) {
+            await this.deleteManuscript(user, manuscriptFile.id, submissionId);
+        }
+        const supportingFiles = await this.getSupportingFiles(submissionId);
+        await Promise.all(
+            supportingFiles.map(supportingFile => this.deleteSupportingFile(user, supportingFile.id, submissionId)),
+        );
+    }
+
     private addDownloadLink(file: File): void {
         const downloadLink = this.s3.getSignedUrl('getObject', {
             Bucket: this.bucket,

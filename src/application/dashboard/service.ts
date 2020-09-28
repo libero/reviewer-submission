@@ -91,6 +91,6 @@ export class DashboardService {
         if (!allowed) {
             throw new Error('User not allowed to delete submission');
         }
-        return this.submissionService.delete(id);
+        return this.submissionService.delete(user, id);
     }
 }
