@@ -12,6 +12,8 @@ import { InfraLogger as logger } from '../../../logger';
 import { Auditor, AuditId, ObjectId, UserId, AuditAction } from '../../audit/types';
 import { MailService } from '../../mail/services/mail-service';
 import { submittedEmail } from './emails';
+import { FileService } from '../../file/services/file-service';
+import { User } from '../../user/user';
 
 export class SubmissionService {
     submissionRepository: XpubSubmissionRootRepository;
@@ -22,6 +24,7 @@ export class SubmissionService {
         private readonly sftpStore: SftpStore,
         private readonly mailService: MailService,
         private readonly auditService: Auditor,
+        private readonly fileService: FileService,
     ) {
         const adapter = createKnexAdapter(knex, 'public');
         this.submissionRepository = new XpubSubmissionRootRepository(adapter);
@@ -72,7 +75,8 @@ export class SubmissionService {
         }
         return submission;
     }
-    async delete(id: SubmissionId): Promise<boolean> {
+    async delete(user: User, id: SubmissionId): Promise<boolean> {
+        await this.fileService.deleteFilesForSubmission(user, id);
         return await this.submissionRepository.delete(id);
     }
     async submit(submission: Submission, ip: string, userId: string): Promise<Submission> {
