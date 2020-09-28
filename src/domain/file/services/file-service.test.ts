@@ -13,6 +13,7 @@ jest.mock('aws-sdk/clients/s3');
 
 const submissionId = v4();
 const firstFileId = FileId.fromUuid('cc65c0c1-233d-4a3f-bdd5-eaf0f4e05b33');
+const secondFileId = FileId.fromUuid('cd65c0c1-233d-4a3f-bdd5-daf0f4e05b43');
 const files = [
     {
         id: firstFileId,
@@ -23,6 +24,16 @@ const files = [
         status: '',
         size: 0,
         type: FileType.MANUSCRIPT_SOURCE,
+    },
+    {
+        id: secondFileId,
+        submissionId: SubmissionId.fromUuid(submissionId),
+        url: '',
+        mimeType: '',
+        filename: '',
+        status: '',
+        size: 0,
+        type: FileType.SUPPORTING_FILE,
     },
 ];
 
@@ -161,6 +172,37 @@ describe('File Service', () => {
             await expect(
                 service.deleteManuscript(mockUser, fileId, SubmissionId.fromUuid(submissionId)),
             ).rejects.toThrow('Unable to find entry with id: 18f0d56a-600c-4007-b140-f3de9acf5ff9');
+
+            findFileByIdSpy.mockRestore();
+        });
+    });
+
+    describe('deleteFilesForSubmission', () => {
+        it('should delete manuscript', async () => {
+            expect(mockAudit.recordAudit).toHaveBeenCalledTimes(0);
+
+            const findManuscriptBySubmissionIdSpy = jest
+                .spyOn(XpubFileRepository.prototype, 'findManuscriptBySubmissionId')
+                .mockReturnValue(Promise.resolve(new File(files[0])));
+
+            const findFileByIdSpy = jest
+                .spyOn(XpubFileRepository.prototype, 'findFileById')
+                .mockReturnValue(Promise.resolve(new File(files[0])));
+
+            const getSupportingFilesBySubmissionIdSpy = jest
+                .spyOn(XpubFileRepository.prototype, 'getSupportingFilesBySubmissionId')
+                .mockReturnValue(Promise.resolve([new File(files[1])]));
+
+            const update = jest.fn();
+            FileService.prototype.update = update;
+            const service = new FileService((null as unknown) as Knex, (mockS3 as unknown) as S3, 'bucket', mockAudit);
+
+            await service.deleteFilesForSubmission(mockUser, SubmissionId.fromUuid(submissionId));
+
+            expect(findManuscriptBySubmissionIdSpy).toBeCalledWith(SubmissionId.fromUuid(submissionId));
+            expect(findFileByIdSpy).toHaveBeenNthCalledWith(1, new File(files[0]).id);
+            expect(findFileByIdSpy).toHaveBeenNthCalledWith(2, new File(files[1]).id);
+            expect(getSupportingFilesBySubmissionIdSpy).toHaveBeenCalledWith(SubmissionId.fromUuid(submissionId));
 
             findFileByIdSpy.mockRestore();
         });
