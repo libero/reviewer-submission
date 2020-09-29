@@ -398,14 +398,6 @@ ALTER TABLE ONLY public."user"
 CREATE INDEX ejp_name_concat ON public.ejp_name USING btree (lower(((first || ' '::text) || last)));
 
 --
--- Name: file file_manuscript_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.file
-    ADD CONSTRAINT file_manuscript_id_fkey FOREIGN KEY (manuscript_id) REFERENCES public.manuscript(id);
-
-
---
 -- Name: identity identity_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
