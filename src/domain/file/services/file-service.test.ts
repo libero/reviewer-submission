@@ -59,7 +59,9 @@ const mockS3 = {
     createMultipartUpload: createMultipartUpload.mockReturnValue(mockFileUploadManager),
     completeMultipartUpload: jest.fn().mockReturnValue(mockFileUploadManager),
     getSignedUrl: jest.fn().mockReturnValue(downloadLink),
-    deleteObject: jest.fn().mockImplementationOnce(() => true),
+    deleteObject: jest.fn().mockReturnValue({
+        promise: jest.fn(),
+    }),
 };
 
 describe('File Service', () => {
