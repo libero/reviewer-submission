@@ -112,10 +112,12 @@ export class FileService {
             throw new Error(`Unable to find entry with id: ${fileId}`);
         }
 
-        await this.s3.deleteObject({
-            Bucket: this.bucket,
-            Key: this.getFileS3Key(FileType.MANUSCRIPT_SOURCE, submissionId, fileId),
-        });
+        await this.s3
+            .deleteObject({
+                Bucket: this.bucket,
+                Key: this.getFileS3Key(FileType.MANUSCRIPT_SOURCE, submissionId, fileId),
+            })
+            .promise();
         await this.setStatusToDeleted(user.id, file);
         logger.info(`deleteManuscript - file deleted ${fileId}`);
         return true;
@@ -128,10 +130,12 @@ export class FileService {
             throw new Error(`Unable to find entry with id: ${fileId}`);
         }
 
-        await this.s3.deleteObject({
-            Bucket: this.bucket,
-            Key: this.getFileS3Key(FileType.SUPPORTING_FILE, submissionId, fileId),
-        });
+        await this.s3
+            .deleteObject({
+                Bucket: this.bucket,
+                Key: this.getFileS3Key(FileType.SUPPORTING_FILE, submissionId, fileId),
+            })
+            .promise();
         await this.setStatusToDeleted(user.id, file);
         logger.info(`deleteSupportingFile - file deleted ${fileId}`);
         return fileId;
