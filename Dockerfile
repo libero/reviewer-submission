@@ -48,7 +48,7 @@ LABEL maintainer="eLife Reviewer Product Team <reviewer-product@elifesciences.or
 
 WORKDIR /app
 
-RUN apk add fontconfig
+RUN apk add fontconfig ghostscript-fonts
 
 COPY --from=dev /app/node_modules node_modules
 COPY --from=build-prod /app/dist/ dist/
