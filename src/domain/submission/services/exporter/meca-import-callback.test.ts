@@ -63,11 +63,11 @@ describe('MecaImportCallback', () => {
         it('should audit the correct information', async () => {
             const mecaImportCallback = createCallback();
             const id = v4();
-            await mecaImportCallback.storeResult(id, { response: 'success' });
+            await mecaImportCallback.storeResult(id, { result: 'success' });
             expect(recordAuditMock).toHaveBeenCalledWith(
                 expect.objectContaining({
                     objectId: id,
-                    value: '{"response":"success"}',
+                    value: '{"result":"success"}',
                     objectType: 'submission',
                 }),
             );
@@ -78,11 +78,11 @@ describe('MecaImportCallback', () => {
             recordAuditMock.mockRejectedValue('out of cheese error');
             const mecaImportCallback = createCallback();
             const id = v4();
-            await mecaImportCallback.storeResult(id, { response: 'success' });
+            await mecaImportCallback.storeResult(id, { result: 'success' });
             expect(recordAuditMock).toHaveBeenCalledWith(
                 expect.objectContaining({
                     objectId: id,
-                    value: '{"response":"success"}',
+                    value: '{"result":"success"}',
                     objectType: 'submission',
                 }),
             );
@@ -94,7 +94,7 @@ describe('MecaImportCallback', () => {
             const submission = { id, status: 'initial' };
             submissionGetMock.mockResolvedValue(submission);
             const mecaImportCallback = createCallback();
-            await mecaImportCallback.storeResult(id, { response: 'success' });
+            await mecaImportCallback.storeResult(id, { result: 'success' });
             expect(submissionUpdateStatusMock).toHaveBeenCalledWith(submission, 'MECA_IMPORT_SUCCEEDED');
         });
 
@@ -103,7 +103,7 @@ describe('MecaImportCallback', () => {
             const submission = { id, status: 'initial' };
             submissionGetMock.mockResolvedValue(submission);
             const mecaImportCallback = createCallback();
-            await mecaImportCallback.storeResult(id, { response: 'failure' });
+            await mecaImportCallback.storeResult(id, { result: 'failure' });
             expect(sendMailMock).toHaveBeenCalled();
         });
 
@@ -115,7 +115,7 @@ describe('MecaImportCallback', () => {
             const mecaImportCallback = createCallback();
             expect.assertions(1);
             try {
-                await mecaImportCallback.storeResult(id, { response: 'success' });
+                await mecaImportCallback.storeResult(id, { result: 'success' });
             } catch (e) {
                 expect(e.message).toEqual('Unable to update manuscript ' + id);
             }

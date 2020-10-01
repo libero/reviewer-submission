@@ -19,11 +19,11 @@ export class MecaImportCallback {
     validateResponse(response: string): boolean {
         return response === 'success' || response === 'failure';
     }
-    async storeResult(id: string, body: { response: string }): Promise<void> {
+    async storeResult(id: string, body: { result: string }): Promise<void> {
         const submissionId = SubmissionId.fromUuid(id);
-        const { response } = body;
+        const { result } = body;
         const status =
-            response === 'success' ? SubmissionStatus.MECA_IMPORT_SUCCEEDED : SubmissionStatus.MECA_IMPORT_FAILED;
+            result === 'success' ? SubmissionStatus.MECA_IMPORT_SUCCEEDED : SubmissionStatus.MECA_IMPORT_FAILED;
         try {
             await this.auditService.recordAudit({
                 id: AuditId.fromUuid(uuid()),
@@ -38,7 +38,7 @@ export class MecaImportCallback {
         } catch (error) {
             logger.error(`error saving audit log ${error}`);
         }
-        logger.info('MECA callback received', { id, response });
+        logger.info('MECA callback received', { id, result });
         const submission = await this.submissionService.get(submissionId);
         try {
             await this.submissionService.updateStatus(submission, status);
@@ -46,7 +46,7 @@ export class MecaImportCallback {
                 const mailText = `
                   EJP failed to import MECA package.
                   Manuscript ID: ${id}
-                  EJP response: ${response}
+                  EJP response: ${result}
                 `;
                 await this.mailService.sendEmail(
                     mailText,

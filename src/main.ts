@@ -166,7 +166,7 @@ const init = async (): Promise<void> => {
             return;
         }
 
-        const { body } = req;
+        const { body }: { body: { result: string } } = req;
         if (!body || !mecaImportCallback.validateResponse(body.result)) {
             logger.warn('MECA callback received with invalid request body', {
                 manuscriptId,
@@ -177,7 +177,7 @@ const init = async (): Promise<void> => {
         }
 
         try {
-            await mecaImportCallback.storeResult(req.params.id, body.result);
+            await mecaImportCallback.storeResult(req.params.id, body);
             res.sendStatus(204);
         } catch (err) {
             logger.error('Failed to process MECA callback', {
