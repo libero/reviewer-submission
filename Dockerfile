@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     make \
     g++ \
     bzip2 \
-    libfontconfig
+    libfontconfig \
 
 COPY  tsconfig.build.json \
       tsconfig.json \
@@ -48,7 +48,7 @@ LABEL maintainer="eLife Reviewer Product Team <reviewer-product@elifesciences.or
 
 WORKDIR /app
 
-RUN apk add fontconfig
+RUN apk add fontconfig ghostscript-fonts
 
 COPY --from=dev /app/node_modules node_modules
 COPY --from=build-prod /app/dist/ dist/
