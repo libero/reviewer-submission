@@ -67,7 +67,7 @@ describe('MecaImportCallback', () => {
             expect(recordAuditMock).toHaveBeenCalledWith(
                 expect.objectContaining({
                     objectId: id,
-                    value: '{"response":"success"}',
+                    value: '{"result":"success"}',
                     objectType: 'submission',
                 }),
             );
@@ -82,7 +82,7 @@ describe('MecaImportCallback', () => {
             expect(recordAuditMock).toHaveBeenCalledWith(
                 expect.objectContaining({
                     objectId: id,
-                    value: '{"response":"success"}',
+                    value: '{"result":"success"}',
                     objectType: 'submission',
                 }),
             );
