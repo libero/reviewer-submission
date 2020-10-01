@@ -1,6 +1,5 @@
 import * as fs from 'fs-extra';
 import * as pdf from 'html-pdf';
-import { InfraLogger as logger } from '../../../../../logger';
 
 const toPdf = async (html: string): Promise<Buffer> => {
     return new Promise((resolve, reject) => {
