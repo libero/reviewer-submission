@@ -19,7 +19,7 @@ import { v4 } from 'uuid';
 interface ArchiveFile {
     id?: FileId;
     filename: string;
-    content: string;
+    content: Promise<string>;
     type?: string;
     mimeType?: string;
 }
@@ -51,7 +51,7 @@ export class MecaExporter implements SubmissionExporter {
                 async (file): Promise<ArchiveFile> => ({
                     id: file.id,
                     filename: file.filename,
-                    content: await this.fileService.getFileContent(file),
+                    content: this.fileService.getFileContent(file),
                     type: file.type,
                     mimeType: file.mimeType,
                 }),
@@ -59,9 +59,9 @@ export class MecaExporter implements SubmissionExporter {
         );
 
         const mandatoryFiles = [
-            { filename: 'article.xml', content: await generateArticle(submission, this.ejpNames, token) },
-            { filename: 'cover_letter.pdf', content: await generateCoverLetter(submission.files.coverLetter || '') },
-            { filename: 'disclosure.pdf', content: await generateDisclosure(submission, ip) },
+            { filename: 'article.xml', content: generateArticle(submission, this.ejpNames, token) },
+            { filename: 'cover_letter.pdf', content: generateCoverLetter(submission.files.coverLetter || '') },
+            { filename: 'disclosure.pdf', content: generateDisclosure(submission, ip) },
             { filename: 'manifest.xml', content: generateManifest(submission) },
             { filename: 'transfer.xml', content: generateTransfer('') },
         ];
@@ -71,7 +71,8 @@ export class MecaExporter implements SubmissionExporter {
 
         await Promise.all(
             allFiles.map(async (file, index) => {
-                zip.file(removeUnicode(file.filename, index), await file.content);
+                const fileContent = await file.content;
+                zip.file(removeUnicode(file.filename, index), fileContent);
             }),
         );
 

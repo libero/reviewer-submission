@@ -13,6 +13,7 @@ import { ReadStream } from 'fs';
 import { Auditor, AuditId, ObjectId, UserId, AuditAction } from '../../audit/types';
 import { User } from 'src/domain/user/user';
 import { InfraLogger as logger } from '../../../logger';
+import internal from 'stream';
 
 const s3MinChunkSize = 5 * 1024 * 1024; // at least 5MB (non rounded)
 
@@ -365,7 +366,7 @@ export class FileService {
             })
             .promise();
 
-        return Body ? Body.toString('utf-8') : '';
+        return Body as string;
     }
 
     async deleteFilesForSubmission(user: User, submissionId: SubmissionId): Promise<void> {
