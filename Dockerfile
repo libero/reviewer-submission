@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     make \
     g++ \
     bzip2 \
-    libfontconfig \
+    libfontconfig
 
 COPY  tsconfig.build.json \
       tsconfig.json \
