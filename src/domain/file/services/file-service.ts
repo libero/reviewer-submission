@@ -13,7 +13,6 @@ import { ReadStream } from 'fs';
 import { Auditor, AuditId, ObjectId, UserId, AuditAction } from '../../audit/types';
 import { User } from 'src/domain/user/user';
 import { InfraLogger as logger } from '../../../logger';
-import internal from 'stream';
 
 const s3MinChunkSize = 5 * 1024 * 1024; // at least 5MB (non rounded)
 
