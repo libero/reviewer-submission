@@ -37,7 +37,7 @@ export class SubmissionService {
         const id = submission.id;
         const store = new SubmissionStore([this.s3Store, this.sftpStore]);
         const locations = await store.write(id, buffer);
-        logger.info(`Submission ${id} saved to ${locations}`);
+        logger.info(`Submission ${id} saved to ${JSON.stringify(locations, null, 4)}`);
     }
     async findAll(): Promise<Submission[]> {
         return await this.submissionRepository.findAll();
@@ -107,8 +107,9 @@ export class SubmissionService {
             .then(() => {
                 submission.status = SubmissionStatus.MECA_EXPORT_SUCCEEDED;
             })
-            .catch(() => {
+            .catch(e => {
                 submission.status = SubmissionStatus.MECA_EXPORT_FAILED;
+                logger.error(`Submission ${id} failed to export`, e);
             })
             .finally(async () => {
                 await this.submissionRepository.update(submission);
