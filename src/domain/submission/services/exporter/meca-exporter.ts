@@ -60,7 +60,7 @@ export class MecaExporter implements SubmissionExporter {
 
         const mandatoryFiles = [
             { filename: 'article.xml', content: generateArticle(submission, this.ejpNames, token) },
-            { filename: 'cover_letter.pdf', content: generateCoverLetter(submission.files.coverLetter || '') },
+            { filename: 'cover_letter.pdf', content: generateCoverLetter(submission.files.coverLetter as string) },
             { filename: 'disclosure.pdf', content: generateDisclosure(submission, ip) },
             { filename: 'manifest.xml', content: generateManifest(submission) },
             { filename: 'transfer.xml', content: generateTransfer('') },
