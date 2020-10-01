@@ -38,12 +38,12 @@ const checkArchive = async (content: string): Promise<void> => {
     const fileNames = Object.keys(contents.files);
 
     expect(fileNames).toEqual([
-        'article.xml',
-        'cover_letter.pdf',
-        'disclosure.pdf',
         'manifest.xml',
+        'disclosure.pdf',
         'a.txt',
         'transfer.xml',
+        'article.xml',
+        'cover_letter.pdf',
     ]);
 };
 

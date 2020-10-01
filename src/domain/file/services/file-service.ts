@@ -365,7 +365,7 @@ export class FileService {
             })
             .promise();
 
-        return Body ? Body.toString('utf-8') : '';
+        return Body as string;
     }
 
     async deleteFilesForSubmission(user: User, submissionId: SubmissionId): Promise<void> {
