@@ -16,7 +16,7 @@ export const submissionSchema = Joi.object({
     createdBy: Joi.string().required(),
     articleType: Joi.string()
         .required()
-        .valid([
+        .valid(...[
             'research-article',
             'feature',
             'research-advance',

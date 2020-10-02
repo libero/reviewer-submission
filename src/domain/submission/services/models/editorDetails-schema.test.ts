@@ -37,31 +37,31 @@ describe('author schema', () => {
         it('valid', () => {
             const { error, value } = editorDetailsSchema.validate(editors)
             expect(value).toStrictEqual(editors);
-            expect(error).toBeNull();
+            expect(error).toBeUndefined();
         });
         it('no opposed Senior Editors', () => {
             editors.opposedSeniorEditors = [];
             const { error, value } = editorDetailsSchema.validate(editors)
             expect(value).toStrictEqual(editors);
-            expect(error).toBeNull();
+            expect(error).toBeUndefined();
         });
         it('no opposed Reviewing Editors', () => {
             editors.opposedReviewingEditors = [];
             const { error, value } = editorDetailsSchema.validate(editors)
             expect(value).toStrictEqual(editors);
-            expect(error).toBeNull();
+            expect(error).toBeUndefined();
         });
         it('no opposed Reviewers', () => {
             editors.opposedReviewers = [];
             const { error, value } = editorDetailsSchema.validate(editors)
             expect(value).toStrictEqual(editors);
-            expect(error).toBeNull();
+            expect(error).toBeUndefined();
         });
         it('no suggested Reviewers', () => {
             editors.suggestedReviewers = [];
             const { error, value } = editorDetailsSchema.validate(editors)
             expect(value).toStrictEqual(editors);
-            expect(error).toBeNull();
+            expect(error).toBeUndefined();
         });
     });
 
@@ -70,28 +70,28 @@ describe('author schema', () => {
             editors.suggestedSeniorEditors = [];
             const { error } = editorDetailsSchema.validate(editors)
             expect(error?.message).toEqual(
-                'ValidationError: child "suggestedSeniorEditors" fails because ["suggestedSeniorEditors" does not contain 1 required value(s)]',
+                '"suggestedSeniorEditors" does not contain 1 required value(s)',
             );
         });
         it('7 suggested Senior Editors', () => {
             editors.suggestedSeniorEditors = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
             const { error } = editorDetailsSchema.validate(editors)
             expect(error?.message).toEqual(
-                'ValidationError: child "suggestedSeniorEditors" fails because ["suggestedSeniorEditors" must contain less than or equal to 6 items]',
+                '"suggestedSeniorEditors" must contain less than or equal to 6 items',
             );
         });
         it('2 opposed Senior Editors', () => {
             editors.opposedSeniorEditors = ['a', 'b'];
             const { error } = editorDetailsSchema.validate(editors)
             expect(error?.message).toEqual(
-                'ValidationError: child "opposedSeniorEditors" fails because ["opposedSeniorEditors" must contain less than or equal to 1 items]',
+                '"opposedSeniorEditors" must contain less than or equal to 1 items',
             );
         });
         it('opposed Senior Editors without reason', () => {
             editors.opposedSeniorEditorsReason = '';
             const { error } = editorDetailsSchema.validate(editors)
             expect(error?.message).toEqual(
-                'ValidationError: child "opposedSeniorEditorsReason" fails because ["opposedSeniorEditorsReason" is not allowed to be empty]',
+                '"opposedSeniorEditorsReason" is not allowed to be empty',
             );
         });
 
@@ -99,28 +99,28 @@ describe('author schema', () => {
             editors.suggestedReviewingEditors = [];
             const { error } = editorDetailsSchema.validate(editors)
             expect(error?.message).toEqual(
-                'ValidationError: child "suggestedReviewingEditors" fails because ["suggestedReviewingEditors" does not contain 1 required value(s)]',
+                '"suggestedReviewingEditors" does not contain 1 required value(s)',
             );
         });
         it('7 suggested Reviewing Editors', () => {
             editors.suggestedReviewingEditors = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
             const { error } = editorDetailsSchema.validate(editors)
             expect(error?.message).toEqual(
-                'ValidationError: child "suggestedReviewingEditors" fails because ["suggestedReviewingEditors" must contain less than or equal to 6 items]',
+                '"suggestedReviewingEditors" must contain less than or equal to 6 items',
             );
         });
         it('3 opposed Reviewing Editors', () => {
             editors.opposedReviewingEditors = ['a', 'b', 'c'];
             const { error } = editorDetailsSchema.validate(editors)
             expect(error?.message).toEqual(
-                'ValidationError: child "opposedReviewingEditors" fails because ["opposedReviewingEditors" must contain less than or equal to 2 items]',
+                '"opposedReviewingEditors" must contain less than or equal to 2 items',
             );
         });
         it('opposed Reviewing Editors without reason', () => {
             editors.opposedReviewingEditorsReason = '';
             const { error } = editorDetailsSchema.validate(editors)
             expect(error?.message).toEqual(
-                'ValidationError: child "opposedReviewingEditorsReason" fails because ["opposedReviewingEditorsReason" is not allowed to be empty]',
+                '"opposedReviewingEditorsReason" is not allowed to be empty',
             );
         });
 
@@ -136,7 +136,7 @@ describe('author schema', () => {
             ];
             const { error } = editorDetailsSchema.validate(editors)
             expect(error?.message).toEqual(
-                'ValidationError: child "suggestedReviewers" fails because ["suggestedReviewers" must contain less than or equal to 6 items]',
+                '"suggestedReviewers" must contain less than or equal to 6 items',
             );
         });
         it('3 opposed Reviewers', () => {
@@ -147,14 +147,14 @@ describe('author schema', () => {
             ];
             const { error } = editorDetailsSchema.validate(editors)
             expect(error?.message).toEqual(
-                'ValidationError: child "opposedReviewers" fails because ["opposedReviewers" must contain less than or equal to 2 items]',
+                '"opposedReviewers" must contain less than or equal to 2 items',
             );
         });
         it('opposed Reviewers without reason', () => {
             editors.opposedReviewersReason = '';
             const { error } = editorDetailsSchema.validate(editors)
             expect(error?.message).toEqual(
-                'ValidationError: child "opposedReviewersReason" fails because ["opposedReviewersReason" is not allowed to be empty]',
+                '"opposedReviewersReason" is not allowed to be empty',
             );
         });
     });
