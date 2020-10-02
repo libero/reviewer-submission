@@ -66,7 +66,7 @@ describe('Submit Integration Tests', () => {
 
         const submitResponse = await submit(id);
         expect(submitResponse.data.errors[0].message).toEqual(
-            'child "manuscriptDetails" fails because [child "title" fails because ["title" is required]]',
+            '"manuscriptDetails.title" is required',
         );
     });
 
