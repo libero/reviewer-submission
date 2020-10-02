@@ -13,24 +13,24 @@ describe('author schema', () => {
 
     describe('succeeds when', () => {
         it('valid', () => {
-            const { error, value } = disclosureSchema.validate(disclosureSchema);
+            const { error, value } = disclosureSchema.validate(disclosure);
             expect(value).toStrictEqual(disclosure);
-            expect(error).toBeNull();
+            expect(error).toBeUndefined();
         });
     });
     describe('fails when', () => {
         it('no consent', () => {
             disclosure.disclosureConsent = false;
-            const { error } = disclosureSchema.validate(disclosureSchema);
+            const { error } = disclosureSchema.validate(disclosure);
             expect(error?.message).toEqual(
-                'ValidationError: child "disclosureConsent" fails because ["disclosureConsent" must be one of [true]]',
+                '"submitterSignature" must be [true]',
             );
         });
         it('no signature', () => {
             disclosure.submitterSignature = '';
-            const { error } = disclosureSchema.validate(disclosureSchema);
+            const { error } = disclosureSchema.validate(disclosure);
             expect(error?.message).toEqual(
-                'ValidationError: child "submitterSignature" fails because ["submitterSignature" is not allowed to be empty]',
+                '"submitterSignature" is not allowed to be empty',
             );
         });
     });

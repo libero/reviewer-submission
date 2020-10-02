@@ -36,7 +36,7 @@ describe('file schema', () => {
         it('valid', () => {
             const { error, value } = fileSchema.validate(file);
             expect(value).toStrictEqual(file);
-            expect(error).toBeNull();
+            expect(error).toBeUndefined();
         });
     });
     describe('fails when', () => {
@@ -44,7 +44,7 @@ describe('file schema', () => {
             file.status = 'CREATED';
             const { error } = fileSchema.validate(file);
             expect(error?.message).toEqual(
-                'ValidationError: child "status" fails because ["status" must be one of [STORED]]',
+                '"status" must be [STORED]',
             );
         });
     });

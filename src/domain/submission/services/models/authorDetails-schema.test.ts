@@ -17,7 +17,7 @@ describe('author schema', () => {
         it('valid', () => {
             const { error, value } = authorSchema.validate(author);
             expect(value).toStrictEqual(author);
-            expect(error).toBeNull();
+            expect(error).toBeUndefined();
         });
     });
     describe('fails when', () => {
@@ -25,35 +25,35 @@ describe('author schema', () => {
             author.firstName = '';
             const { error } = authorSchema.validate(author);
             expect(error?.message).toEqual(
-                'ValidationError: child "firstName" fails because ["firstName" is not allowed to be empty]',
+                '"firstName" is not allowed to be empty',
             );
         });
         it('no last name', () => {
             author.lastName = '';
             const { error } = authorSchema.validate(author);
             expect(error?.message).toEqual(
-                'ValidationError: child "lastName" fails because ["lastName" is not allowed to be empty]',
+                '"lastName" is not allowed to be empty',
             );
         });
         it('no affiliation', () => {
             author.institution = '';
             const { error } = authorSchema.validate(author);
             expect(error?.message).toEqual(
-                'ValidationError: child "institution" fails because ["institution" is not allowed to be empty]',
+                '"institution" is not allowed to be empty',
             );
         });
         it('no email', () => {
             author.email = '';
             const { error } = authorSchema.validate(author);
             expect(error?.message).toEqual(
-                'ValidationError: child "email" fails because ["email" is not allowed to be empty]',
+                '"email" is not allowed to be empty',
             );
         });
         it('invalid email', () => {
             author.email = 'abc';
             const { error } = authorSchema.validate(author);
             expect(error?.message).toEqual(
-                'ValidationError: child "email" fails because ["email" must be a valid email]',
+                '"email" must be a valid email',
             );
         });
     });

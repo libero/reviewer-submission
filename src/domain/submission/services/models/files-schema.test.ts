@@ -33,13 +33,13 @@ describe('file schema', () => {
         it('valid', () => {
             const { error, value } = filesSchema.validate(files);
             expect(value).toStrictEqual(files);
-            expect(error).toBeNull();
+            expect(error).toBeUndefined();
         });
         it('no supporting files', () => {
             files.supportingFiles = [];
             const { error, value } = filesSchema.validate(files);
             expect(value).toStrictEqual(files);
-            expect(error).toBeNull();
+            expect(error).toBeUndefined();
         });
     });
 
@@ -48,14 +48,14 @@ describe('file schema', () => {
             files.coverLetter = '';
             const { error } = filesSchema.validate(files);
             expect(error?.message).toEqual(
-                'ValidationError: child "coverLetter" fails because ["coverLetter" is not allowed to be empty]',
+                '"coverLetter" is not allowed to be empty',
             );
         });
         it('manuscript missing', () => {
             files.manuscriptFile = null;
             const { error } = filesSchema.validate(files);
             expect(error?.message).toEqual(
-                'ValidationError: child "manuscriptFile" fails because ["manuscriptFile" must be an object]',
+                '"manuscriptFile" must be of type object',
             );
         });
         it('manuscript not stored', () => {
@@ -64,7 +64,7 @@ describe('file schema', () => {
             }
             const { error } = filesSchema.validate(files);
             expect(error?.message).toEqual(
-                'ValidationError: child "manuscriptFile" fails because [child "status" fails because ["status" must be one of [STORED]]]',
+                '"manuscriptFile.status" must be [STORED]',
             );
         });
     });

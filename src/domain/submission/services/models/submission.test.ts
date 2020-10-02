@@ -162,7 +162,7 @@ describe('Submission Entity', () => {
     describe('Un-Submittable when', () => {
         it('is a new submission', () => {
             expect(() => submission.isSubmittable()).toThrow(
-                'child "manuscriptDetails" fails because [child "title" fails because ["title" is required]]',
+                '"manuscriptDetails.title" is required',
             );
         });
 
@@ -170,7 +170,7 @@ describe('Submission Entity', () => {
             setValidSubmission();
             submission.status = 'MECA_IMPORT_SUCCEEDED';
             expect(() => submission.isSubmittable()).toThrow(
-                'child "status" fails because ["status" must be one of [INITIAL]]',
+                '"status" must be [INITIAL]',
             );
         });
 
@@ -179,7 +179,7 @@ describe('Submission Entity', () => {
             setValidSubmission();
             submission.disclosure.disclosureConsent = false;
             expect(() => submission.isSubmittable()).toThrow(
-                'child "disclosure" fails because [child "disclosureConsent" fails because ["disclosureConsent" must be one of [true]]]',
+                '"disclosure.disclosureConsent" must be [true]',
             );
         });
 
@@ -190,7 +190,7 @@ describe('Submission Entity', () => {
                 submission.files.manuscriptFile.status = FileStatus.CREATED;
             }
             expect(() => submission.isSubmittable()).toThrow(
-                'child "files" fails because [child "manuscriptFile" fails because [child "status" fails because ["status" must be one of [STORED]]]]',
+                '"files.manuscriptFile.status" must be [STORED]',
             );
         });
 
@@ -201,7 +201,7 @@ describe('Submission Entity', () => {
                 submission.author.email = '';
             }
             expect(() => submission.isSubmittable()).toThrow(
-                'child "author" fails because [child "email" fails because ["email" is not allowed to be empty]]',
+                '"author.email" is not allowed to be empty',
             );
         });
 
@@ -212,7 +212,7 @@ describe('Submission Entity', () => {
                 submission.editorDetails.suggestedSeniorEditors = [];
             }
             expect(() => submission.isSubmittable()).toThrow(
-                'child "editorDetails" fails because [child "suggestedSeniorEditors" fails because ["suggestedSeniorEditors" does not contain 1 required value(s)]]',
+                '"editorDetails.suggestedSeniorEditors" does not contain 1 required value(s)',
             );
         });
 
@@ -223,7 +223,7 @@ describe('Submission Entity', () => {
                 submission.manuscriptDetails.title = '';
             }
             expect(() => submission.isSubmittable()).toThrow(
-                'child "manuscriptDetails" fails because [child "title" fails because ["title" is not allowed to be empty]]',
+                '"manuscriptDetails.title" is not allowed to be empty',
             );
         });
     });
