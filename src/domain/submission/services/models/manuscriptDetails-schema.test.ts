@@ -1,4 +1,3 @@
-import * as Joi from 'joi';
 import { manuscriptDetailsSchema } from './manuscriptDetails-schema';
 
 describe('author schema', () => {
@@ -56,23 +55,17 @@ describe('author schema', () => {
         it('no title', () => {
             details.title = '';
             const { error } = manuscriptDetailsSchema.validate(details);
-            expect(error?.message).toEqual(
-                '"title" is not allowed to be empty',
-            );
+            expect(error?.message).toEqual('"title" is not allowed to be empty');
         });
         it('no subjects', () => {
             details.subjects = [];
             const { error } = manuscriptDetailsSchema.validate(details);
-            expect(error?.message).toEqual(
-                '\"subjects\" must contain at least 1 items',
-            );
+            expect(error?.message).toEqual('"subjects" must contain at least 1 items');
         });
         it('3 subjects', () => {
             details.subjects = ['a', 'b', 'c'];
             const { error } = manuscriptDetailsSchema.validate(details);
-            expect(error?.message).toEqual(
-                '"subjects" must contain less than or equal to 2 items',
-            );
+            expect(error?.message).toEqual('"subjects" must contain less than or equal to 2 items');
         });
     });
 });

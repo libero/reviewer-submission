@@ -1,4 +1,3 @@
-import * as Joi from 'joi';
 import { filesSchema } from './files-schema';
 import { TestFile } from './file-schema.test';
 
@@ -47,25 +46,19 @@ describe('file schema', () => {
         it('cover letter missing', () => {
             files.coverLetter = '';
             const { error } = filesSchema.validate(files);
-            expect(error?.message).toEqual(
-                '"coverLetter" is not allowed to be empty',
-            );
+            expect(error?.message).toEqual('"coverLetter" is not allowed to be empty');
         });
         it('manuscript missing', () => {
             files.manuscriptFile = null;
             const { error } = filesSchema.validate(files);
-            expect(error?.message).toEqual(
-                '"manuscriptFile" must be of type object',
-            );
+            expect(error?.message).toEqual('"manuscriptFile" must be of type object');
         });
         it('manuscript not stored', () => {
             if (files.manuscriptFile) {
                 files.manuscriptFile.status = 'CREATED';
             }
             const { error } = filesSchema.validate(files);
-            expect(error?.message).toEqual(
-                '"manuscriptFile.status" must be [STORED]',
-            );
+            expect(error?.message).toEqual('"manuscriptFile.status" must be [STORED]');
         });
     });
 });

@@ -1,4 +1,3 @@
-import * as Joi from 'joi';
 import { disclosureSchema } from './disclosure-schema';
 
 describe('author schema', () => {
@@ -22,16 +21,12 @@ describe('author schema', () => {
         it('no consent', () => {
             disclosure.disclosureConsent = false;
             const { error } = disclosureSchema.validate(disclosure);
-            expect(error?.message).toEqual(
-                '"submitterSignature" must be [true]',
-            );
+            expect(error?.message).toEqual('"submitterSignature" must be [true]');
         });
         it('no signature', () => {
             disclosure.submitterSignature = '';
             const { error } = disclosureSchema.validate(disclosure);
-            expect(error?.message).toEqual(
-                '"submitterSignature" is not allowed to be empty',
-            );
+            expect(error?.message).toEqual('"submitterSignature" is not allowed to be empty');
         });
     });
 });

@@ -1,4 +1,3 @@
-import * as Joi from 'joi';
 import { fileSchema } from './file-schema';
 
 export type TestFile = {
@@ -43,9 +42,7 @@ describe('file schema', () => {
         it('file not stored', () => {
             file.status = 'CREATED';
             const { error } = fileSchema.validate(file);
-            expect(error?.message).toEqual(
-                '"status" must be [STORED]',
-            );
+            expect(error?.message).toEqual('"status" must be [STORED]');
         });
     });
 });

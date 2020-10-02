@@ -6,7 +6,6 @@ import {
     EditorDetails,
     FileDetails,
 } from '../../types';
-import * as Joi from 'joi';
 import { submissionSchema } from './submission-schema';
 import logger from '../../../../logger';
 import { Suggestion } from '../../../semantic-extraction/types';
