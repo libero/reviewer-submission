@@ -66,7 +66,7 @@ describe('Submit Integration Tests', () => {
 
         const submitResponse = await submit(id);
         expect(submitResponse.data.errors[0].message).toEqual(
-            'child "manuscriptDetails" fails because [child "title" fails because ["title" is required]]',
+            '"manuscriptDetails.title" is required',
         );
     });
 
@@ -95,13 +95,13 @@ describe('Submit Integration Tests', () => {
             opposedReviewingEditorsReason: 'because 2',
             suggestedReviewers: [
                 {
-                    email: 'jimmy@doe.com',
+                    email: 'test1@doe-test.elifesciences.org',
                     name: 'name',
                 },
             ],
             opposedReviewers: [
                 {
-                    email: 'jimmy@doe.com',
+                    email: 'test2@doe-test.elifesciences.org',
                     name: 'name',
                 },
             ],

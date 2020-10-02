@@ -16,14 +16,16 @@ export const submissionSchema = Joi.object({
     createdBy: Joi.string().required(),
     articleType: Joi.string()
         .required()
-        .valid([
-            'research-article',
-            'feature',
-            'research-advance',
-            'scientific-correspondence',
-            'tools-resources',
-            'short-report',
-        ]),
+        .valid(
+            ...[
+                'research-article',
+                'feature',
+                'research-advance',
+                'scientific-correspondence',
+                'tools-resources',
+                'short-report',
+            ],
+        ),
     manuscriptDetails: Joi.when('articleType', {
         is: 'feature',
         then: featureManuscriptDetailsSchema,

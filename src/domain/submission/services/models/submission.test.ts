@@ -161,26 +161,20 @@ describe('Submission Entity', () => {
 
     describe('Un-Submittable when', () => {
         it('is a new submission', () => {
-            expect(() => submission.isSubmittable()).toThrow(
-                'child "manuscriptDetails" fails because [child "title" fails because ["title" is required]]',
-            );
+            expect(() => submission.isSubmittable()).toThrow('"manuscriptDetails.title" is required');
         });
 
         it('status is MECA_IMPORT_SUCCEEDED', () => {
             setValidSubmission();
             submission.status = 'MECA_IMPORT_SUCCEEDED';
-            expect(() => submission.isSubmittable()).toThrow(
-                'child "status" fails because ["status" must be one of [INITIAL]]',
-            );
+            expect(() => submission.isSubmittable()).toThrow('"status" must be [INITIAL]');
         });
 
         // one test from disclosure-schema
         it('no disclosure consent', () => {
             setValidSubmission();
             submission.disclosure.disclosureConsent = false;
-            expect(() => submission.isSubmittable()).toThrow(
-                'child "disclosure" fails because [child "disclosureConsent" fails because ["disclosureConsent" must be one of [true]]]',
-            );
+            expect(() => submission.isSubmittable()).toThrow('"disclosure.disclosureConsent" must be [true]');
         });
 
         // one test from files-schema
@@ -189,9 +183,7 @@ describe('Submission Entity', () => {
             if (submission.files.manuscriptFile) {
                 submission.files.manuscriptFile.status = FileStatus.CREATED;
             }
-            expect(() => submission.isSubmittable()).toThrow(
-                'child "files" fails because [child "manuscriptFile" fails because [child "status" fails because ["status" must be one of [STORED]]]]',
-            );
+            expect(() => submission.isSubmittable()).toThrow('"files.manuscriptFile.status" must be [STORED]');
         });
 
         // one test from authorDetail-schema
@@ -200,9 +192,7 @@ describe('Submission Entity', () => {
             if (submission.author) {
                 submission.author.email = '';
             }
-            expect(() => submission.isSubmittable()).toThrow(
-                'child "author" fails because [child "email" fails because ["email" is not allowed to be empty]]',
-            );
+            expect(() => submission.isSubmittable()).toThrow('"author.email" is not allowed to be empty');
         });
 
         // one test from editorDetails-schema
@@ -212,7 +202,7 @@ describe('Submission Entity', () => {
                 submission.editorDetails.suggestedSeniorEditors = [];
             }
             expect(() => submission.isSubmittable()).toThrow(
-                'child "editorDetails" fails because [child "suggestedSeniorEditors" fails because ["suggestedSeniorEditors" does not contain 1 required value(s)]]',
+                '"editorDetails.suggestedSeniorEditors" does not contain 1 required value(s)',
             );
         });
 
@@ -222,9 +212,7 @@ describe('Submission Entity', () => {
             if (submission.manuscriptDetails) {
                 submission.manuscriptDetails.title = '';
             }
-            expect(() => submission.isSubmittable()).toThrow(
-                'child "manuscriptDetails" fails because [child "title" fails because ["title" is not allowed to be empty]]',
-            );
+            expect(() => submission.isSubmittable()).toThrow('"manuscriptDetails.title" is not allowed to be empty');
         });
     });
 

@@ -1,4 +1,3 @@
-import * as Joi from 'joi';
 import { filesSchema } from './files-schema';
 import { TestFile } from './file-schema.test';
 
@@ -31,41 +30,35 @@ describe('file schema', () => {
 
     describe('succeeds when', () => {
         it('valid', () => {
-            const { error, value } = Joi.validate(files, filesSchema);
+            const { error, value } = filesSchema.validate(files);
             expect(value).toStrictEqual(files);
-            expect(error).toBeNull();
+            expect(error).toBeUndefined();
         });
         it('no supporting files', () => {
             files.supportingFiles = [];
-            const { error, value } = Joi.validate(files, filesSchema);
+            const { error, value } = filesSchema.validate(files);
             expect(value).toStrictEqual(files);
-            expect(error).toBeNull();
+            expect(error).toBeUndefined();
         });
     });
 
     describe('fails when', () => {
         it('cover letter missing', () => {
             files.coverLetter = '';
-            const { error } = Joi.validate(files, filesSchema);
-            expect(error.toString()).toEqual(
-                'ValidationError: child "coverLetter" fails because ["coverLetter" is not allowed to be empty]',
-            );
+            const { error } = filesSchema.validate(files);
+            expect(error?.message).toEqual('"coverLetter" is not allowed to be empty');
         });
         it('manuscript missing', () => {
             files.manuscriptFile = null;
-            const { error } = Joi.validate(files, filesSchema);
-            expect(error.toString()).toEqual(
-                'ValidationError: child "manuscriptFile" fails because ["manuscriptFile" must be an object]',
-            );
+            const { error } = filesSchema.validate(files);
+            expect(error?.message).toEqual('"manuscriptFile" must be of type object');
         });
         it('manuscript not stored', () => {
             if (files.manuscriptFile) {
                 files.manuscriptFile.status = 'CREATED';
             }
-            const { error } = Joi.validate(files, filesSchema);
-            expect(error.toString()).toEqual(
-                'ValidationError: child "manuscriptFile" fails because [child "status" fails because ["status" must be one of [STORED]]]',
-            );
+            const { error } = filesSchema.validate(files);
+            expect(error?.message).toEqual('"manuscriptFile.status" must be [STORED]');
         });
     });
 });

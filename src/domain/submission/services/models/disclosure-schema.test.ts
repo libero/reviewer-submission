@@ -1,4 +1,3 @@
-import * as Joi from 'joi';
 import { disclosureSchema } from './disclosure-schema';
 
 describe('author schema', () => {
@@ -13,25 +12,21 @@ describe('author schema', () => {
 
     describe('succeeds when', () => {
         it('valid', () => {
-            const { error, value } = Joi.validate(disclosure, disclosureSchema);
+            const { error, value } = disclosureSchema.validate(disclosure);
             expect(value).toStrictEqual(disclosure);
-            expect(error).toBeNull();
+            expect(error).toBeUndefined();
         });
     });
     describe('fails when', () => {
         it('no consent', () => {
             disclosure.disclosureConsent = false;
-            const { error } = Joi.validate(disclosure, disclosureSchema);
-            expect(error.toString()).toEqual(
-                'ValidationError: child "disclosureConsent" fails because ["disclosureConsent" must be one of [true]]',
-            );
+            const { error } = disclosureSchema.validate(disclosure);
+            expect(error?.message).toEqual('"disclosureConsent" must be [true]');
         });
         it('no signature', () => {
             disclosure.submitterSignature = '';
-            const { error } = Joi.validate(disclosure, disclosureSchema);
-            expect(error.toString()).toEqual(
-                'ValidationError: child "submitterSignature" fails because ["submitterSignature" is not allowed to be empty]',
-            );
+            const { error } = disclosureSchema.validate(disclosure);
+            expect(error?.message).toEqual('"submitterSignature" is not allowed to be empty');
         });
     });
 });
