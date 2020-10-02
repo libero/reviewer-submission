@@ -21,7 +21,7 @@ describe('author schema', () => {
         it('no consent', () => {
             disclosure.disclosureConsent = false;
             const { error } = disclosureSchema.validate(disclosure);
-            expect(error?.message).toEqual('"submitterSignature" must be [true]');
+            expect(error?.message).toEqual('"disclosureConsent" must be [true]');
         });
         it('no signature', () => {
             disclosure.submitterSignature = '';
