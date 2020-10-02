@@ -23,8 +23,11 @@ export class SurveyService {
         const id: SurveyResponseId = SurveyResponseId.fromUuid(uuid());
         const surveyResponse = new SurveyResponse(id, surveyId, submissionId);
 
-        answers.forEach(({ questionId, text, answer }: SurveyAnswer) => {
-            surveyResponse.answerQuestion(questionId, text, answer);
+        answers.forEach((surveyAnswer: SurveyAnswer | null) => {
+            if (surveyAnswer) {
+                const { questionId, text, answer } = surveyAnswer;
+                surveyResponse.answerQuestion(questionId, text, answer);
+            }
         });
 
         return await this.surveyResponseRepository.create(surveyResponse);
