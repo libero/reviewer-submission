@@ -95,13 +95,13 @@ describe('Submit Integration Tests', () => {
             opposedReviewingEditorsReason: 'because 2',
             suggestedReviewers: [
                 {
-                    email: 'jimmy@doe.com',
+                    email: 'test1@doe-test.elifesciences.org',
                     name: 'name',
                 },
             ],
             opposedReviewers: [
                 {
-                    email: 'jimmy@doe.com',
+                    email: 'test2@doe-test.elifesciences.org',
                     name: 'name',
                 },
             ],

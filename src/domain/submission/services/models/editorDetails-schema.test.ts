@@ -35,31 +35,31 @@ describe('author schema', () => {
 
     describe('succeeds when', () => {
         it('valid', () => {
-            const { error, value } = Joi.validate(editors, editorDetailsSchema);
+            const { error, value } = editorDetailsSchema.validate(editors)
             expect(value).toStrictEqual(editors);
             expect(error).toBeNull();
         });
         it('no opposed Senior Editors', () => {
             editors.opposedSeniorEditors = [];
-            const { error, value } = Joi.validate(editors, editorDetailsSchema);
+            const { error, value } = editorDetailsSchema.validate(editors)
             expect(value).toStrictEqual(editors);
             expect(error).toBeNull();
         });
         it('no opposed Reviewing Editors', () => {
             editors.opposedReviewingEditors = [];
-            const { error, value } = Joi.validate(editors, editorDetailsSchema);
+            const { error, value } = editorDetailsSchema.validate(editors)
             expect(value).toStrictEqual(editors);
             expect(error).toBeNull();
         });
         it('no opposed Reviewers', () => {
             editors.opposedReviewers = [];
-            const { error, value } = Joi.validate(editors, editorDetailsSchema);
+            const { error, value } = editorDetailsSchema.validate(editors)
             expect(value).toStrictEqual(editors);
             expect(error).toBeNull();
         });
         it('no suggested Reviewers', () => {
             editors.suggestedReviewers = [];
-            const { error, value } = Joi.validate(editors, editorDetailsSchema);
+            const { error, value } = editorDetailsSchema.validate(editors)
             expect(value).toStrictEqual(editors);
             expect(error).toBeNull();
         });
@@ -68,58 +68,58 @@ describe('author schema', () => {
     describe('fails when', () => {
         it('no suggested Senior Editors', () => {
             editors.suggestedSeniorEditors = [];
-            const { error } = Joi.validate(editors, editorDetailsSchema);
-            expect(error.toString()).toEqual(
+            const { error } = editorDetailsSchema.validate(editors)
+            expect(error?.message).toEqual(
                 'ValidationError: child "suggestedSeniorEditors" fails because ["suggestedSeniorEditors" does not contain 1 required value(s)]',
             );
         });
         it('7 suggested Senior Editors', () => {
             editors.suggestedSeniorEditors = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
-            const { error } = Joi.validate(editors, editorDetailsSchema);
-            expect(error.toString()).toEqual(
+            const { error } = editorDetailsSchema.validate(editors)
+            expect(error?.message).toEqual(
                 'ValidationError: child "suggestedSeniorEditors" fails because ["suggestedSeniorEditors" must contain less than or equal to 6 items]',
             );
         });
         it('2 opposed Senior Editors', () => {
             editors.opposedSeniorEditors = ['a', 'b'];
-            const { error } = Joi.validate(editors, editorDetailsSchema);
-            expect(error.toString()).toEqual(
+            const { error } = editorDetailsSchema.validate(editors)
+            expect(error?.message).toEqual(
                 'ValidationError: child "opposedSeniorEditors" fails because ["opposedSeniorEditors" must contain less than or equal to 1 items]',
             );
         });
         it('opposed Senior Editors without reason', () => {
             editors.opposedSeniorEditorsReason = '';
-            const { error } = Joi.validate(editors, editorDetailsSchema);
-            expect(error.toString()).toEqual(
+            const { error } = editorDetailsSchema.validate(editors)
+            expect(error?.message).toEqual(
                 'ValidationError: child "opposedSeniorEditorsReason" fails because ["opposedSeniorEditorsReason" is not allowed to be empty]',
             );
         });
 
         it('no suggested Reviewing Editors', () => {
             editors.suggestedReviewingEditors = [];
-            const { error } = Joi.validate(editors, editorDetailsSchema);
-            expect(error.toString()).toEqual(
+            const { error } = editorDetailsSchema.validate(editors)
+            expect(error?.message).toEqual(
                 'ValidationError: child "suggestedReviewingEditors" fails because ["suggestedReviewingEditors" does not contain 1 required value(s)]',
             );
         });
         it('7 suggested Reviewing Editors', () => {
             editors.suggestedReviewingEditors = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
-            const { error } = Joi.validate(editors, editorDetailsSchema);
-            expect(error.toString()).toEqual(
+            const { error } = editorDetailsSchema.validate(editors)
+            expect(error?.message).toEqual(
                 'ValidationError: child "suggestedReviewingEditors" fails because ["suggestedReviewingEditors" must contain less than or equal to 6 items]',
             );
         });
         it('3 opposed Reviewing Editors', () => {
             editors.opposedReviewingEditors = ['a', 'b', 'c'];
-            const { error } = Joi.validate(editors, editorDetailsSchema);
-            expect(error.toString()).toEqual(
+            const { error } = editorDetailsSchema.validate(editors)
+            expect(error?.message).toEqual(
                 'ValidationError: child "opposedReviewingEditors" fails because ["opposedReviewingEditors" must contain less than or equal to 2 items]',
             );
         });
         it('opposed Reviewing Editors without reason', () => {
             editors.opposedReviewingEditorsReason = '';
-            const { error } = Joi.validate(editors, editorDetailsSchema);
-            expect(error.toString()).toEqual(
+            const { error } = editorDetailsSchema.validate(editors)
+            expect(error?.message).toEqual(
                 'ValidationError: child "opposedReviewingEditorsReason" fails because ["opposedReviewingEditorsReason" is not allowed to be empty]',
             );
         });
@@ -134,26 +134,26 @@ describe('author schema', () => {
                 { name: 'f', email: 'f@f.com' },
                 { name: 'g', email: 'g@g.com' },
             ];
-            const { error } = Joi.validate(editors, editorDetailsSchema);
-            expect(error.toString()).toEqual(
+            const { error } = editorDetailsSchema.validate(editors)
+            expect(error?.message).toEqual(
                 'ValidationError: child "suggestedReviewers" fails because ["suggestedReviewers" must contain less than or equal to 6 items]',
             );
         });
         it('3 opposed Reviewers', () => {
             editors.opposedReviewers = [
-                { name: 'a', email: 'a@a.com' },
-                { name: 'b', email: 'b@b.com' },
-                { name: 'c', email: 'c@c.com' },
+                { name: 'a', email: 'a@a-a.com' },
+                { name: 'b', email: 'b.a@b-c.com' },
+                { name: 'c', email: 'c-aa@c-b.com' },
             ];
-            const { error } = Joi.validate(editors, editorDetailsSchema);
-            expect(error.toString()).toEqual(
+            const { error } = editorDetailsSchema.validate(editors)
+            expect(error?.message).toEqual(
                 'ValidationError: child "opposedReviewers" fails because ["opposedReviewers" must contain less than or equal to 2 items]',
             );
         });
         it('opposed Reviewers without reason', () => {
             editors.opposedReviewersReason = '';
-            const { error } = Joi.validate(editors, editorDetailsSchema);
-            expect(error.toString()).toEqual(
+            const { error } = editorDetailsSchema.validate(editors)
+            expect(error?.message).toEqual(
                 'ValidationError: child "opposedReviewersReason" fails because ["opposedReviewersReason" is not allowed to be empty]',
             );
         });

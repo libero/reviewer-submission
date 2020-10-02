@@ -94,7 +94,7 @@ export default class Submission {
     }
 
     public isSubmittable(): boolean {
-        const { error } = Joi.validate(this, submissionSchema);
+        const { error } = submissionSchema.validate(this);
         if (error) {
             logger.error(`Bad manuscript data: ${error}`);
             throw new Error(error.message);

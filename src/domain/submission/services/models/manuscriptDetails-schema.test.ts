@@ -22,31 +22,31 @@ describe('author schema', () => {
 
     describe('succeeds when', () => {
         it('valid', () => {
-            const { error, value } = Joi.validate(details, manuscriptDetailsSchema);
+            const { error, value } = manuscriptDetailsSchema.validate(manuscriptDetailsSchema);
             expect(value).toStrictEqual(details);
             expect(error).toBeNull();
         });
         it('previously discussed is empty', () => {
             details.previouslyDiscussed = '';
-            const { error, value } = Joi.validate(details, manuscriptDetailsSchema);
+            const { error, value } = manuscriptDetailsSchema.validate(manuscriptDetailsSchema);
             expect(value).toStrictEqual(details);
             expect(error).toBeNull();
         });
         it('previously discussed is null', () => {
             details.previouslyDiscussed = null;
-            const { error, value } = Joi.validate(details, manuscriptDetailsSchema);
+            const { error, value } = manuscriptDetailsSchema.validate(manuscriptDetailsSchema);
             expect(value).toStrictEqual(details);
             expect(error).toBeNull();
         });
         it('previously submitted is empty', () => {
             details.previouslySubmitted = '';
-            const { error, value } = Joi.validate(details, manuscriptDetailsSchema);
+            const { error, value } = manuscriptDetailsSchema.validate(manuscriptDetailsSchema);
             expect(value).toStrictEqual(details);
             expect(error).toBeNull();
         });
         it('co-submissions is empty', () => {
             details.cosubmission = [];
-            const { error, value } = Joi.validate(details, manuscriptDetailsSchema);
+            const { error, value } = manuscriptDetailsSchema.validate(manuscriptDetailsSchema);
             expect(value).toStrictEqual(details);
             expect(error).toBeNull();
         });
@@ -55,22 +55,22 @@ describe('author schema', () => {
     describe('fails when', () => {
         it('no title', () => {
             details.title = '';
-            const { error } = Joi.validate(details, manuscriptDetailsSchema);
-            expect(error.toString()).toEqual(
+            const { error } = manuscriptDetailsSchema.validate(manuscriptDetailsSchema);
+            expect(error?.message).toEqual(
                 'ValidationError: child "title" fails because ["title" is not allowed to be empty]',
             );
         });
         it('no subjects', () => {
             details.subjects = [];
-            const { error } = Joi.validate(details, manuscriptDetailsSchema);
-            expect(error.toString()).toEqual(
+            const { error } = manuscriptDetailsSchema.validate(manuscriptDetailsSchema);
+            expect(error?.message).toEqual(
                 'ValidationError: child "subjects" fails because ["subjects" must contain at least 1 items]',
             );
         });
         it('3 subjects', () => {
             details.subjects = ['a', 'b', 'c'];
-            const { error } = Joi.validate(details, manuscriptDetailsSchema);
-            expect(error.toString()).toEqual(
+            const { error } = manuscriptDetailsSchema.validate(manuscriptDetailsSchema);
+            expect(error?.message).toEqual(
                 'ValidationError: child "subjects" fails because ["subjects" must contain less than or equal to 2 items]',
             );
         });

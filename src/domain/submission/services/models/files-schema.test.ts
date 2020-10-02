@@ -31,13 +31,13 @@ describe('file schema', () => {
 
     describe('succeeds when', () => {
         it('valid', () => {
-            const { error, value } = Joi.validate(files, filesSchema);
+            const { error, value } = filesSchema.validate(files);
             expect(value).toStrictEqual(files);
             expect(error).toBeNull();
         });
         it('no supporting files', () => {
             files.supportingFiles = [];
-            const { error, value } = Joi.validate(files, filesSchema);
+            const { error, value } = filesSchema.validate(files);
             expect(value).toStrictEqual(files);
             expect(error).toBeNull();
         });
@@ -46,15 +46,15 @@ describe('file schema', () => {
     describe('fails when', () => {
         it('cover letter missing', () => {
             files.coverLetter = '';
-            const { error } = Joi.validate(files, filesSchema);
-            expect(error.toString()).toEqual(
+            const { error } = filesSchema.validate(files);
+            expect(error?.message).toEqual(
                 'ValidationError: child "coverLetter" fails because ["coverLetter" is not allowed to be empty]',
             );
         });
         it('manuscript missing', () => {
             files.manuscriptFile = null;
-            const { error } = Joi.validate(files, filesSchema);
-            expect(error.toString()).toEqual(
+            const { error } = filesSchema.validate(files);
+            expect(error?.message).toEqual(
                 'ValidationError: child "manuscriptFile" fails because ["manuscriptFile" must be an object]',
             );
         });
@@ -62,8 +62,8 @@ describe('file schema', () => {
             if (files.manuscriptFile) {
                 files.manuscriptFile.status = 'CREATED';
             }
-            const { error } = Joi.validate(files, filesSchema);
-            expect(error.toString()).toEqual(
+            const { error } = filesSchema.validate(files);
+            expect(error?.message).toEqual(
                 'ValidationError: child "manuscriptFile" fails because [child "status" fails because ["status" must be one of [STORED]]]',
             );
         });

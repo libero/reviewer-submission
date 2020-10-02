@@ -34,7 +34,7 @@ describe('file schema', () => {
 
     describe('succeeds when', () => {
         it('valid', () => {
-            const { error, value } = Joi.validate(file, fileSchema);
+            const { error, value } = fileSchema.validate(file);
             expect(value).toStrictEqual(file);
             expect(error).toBeNull();
         });
@@ -42,8 +42,8 @@ describe('file schema', () => {
     describe('fails when', () => {
         it('file not stored', () => {
             file.status = 'CREATED';
-            const { error } = Joi.validate(file, fileSchema);
-            expect(error.toString()).toEqual(
+            const { error } = fileSchema.validate(file);
+            expect(error?.message).toEqual(
                 'ValidationError: child "status" fails because ["status" must be one of [STORED]]',
             );
         });
