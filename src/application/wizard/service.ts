@@ -300,7 +300,7 @@ export class WizardService {
                         case 'opposedReviewer':
                         case 'suggestedReviewer': {
                             acc.editorDetails[rolesToProps[team.role]] = team.teamMembers.map(tm => {
-                                var meta = (tm as EditorReviewerTeamMember).meta;
+                                const meta = (tm as EditorReviewerTeamMember).meta;
                                 return { ...meta, email: (meta.email || '').trim() };
                             });
                             return acc;
