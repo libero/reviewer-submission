@@ -299,9 +299,10 @@ export class WizardService {
 
                         case 'opposedReviewer':
                         case 'suggestedReviewer': {
-                            acc.editorDetails[rolesToProps[team.role]] = team.teamMembers.map(
-                                tm => (tm as EditorReviewerTeamMember).meta,
-                            );
+                            acc.editorDetails[rolesToProps[team.role]] = team.teamMembers.map(tm => {
+                                const meta = (tm as EditorReviewerTeamMember).meta;
+                                return { ...meta, email: (meta.email || '').trim() };
+                            });
                             return acc;
                         }
 
@@ -318,7 +319,7 @@ export class WizardService {
             );
 
             if (details.author) {
-                submission.author = details.author;
+                submission.author = { ...details.author, email: (details.author.email || '').trim() };
             }
 
             if (details.editorDetails) {
