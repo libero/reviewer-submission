@@ -20,7 +20,7 @@ const replaceDictionary = (template: string, dictionary: { key: string; value: s
     return result;
 };
 
-const supplementaryXml = (files: File[]): string => {
+const supplementaryXml = (files: File[], startingIndex: number): string => {
     const fileList = files.filter(fileObject => fileObject.type === 'SUPPORTING_FILE');
 
     let supplementaryFileXml = '';
@@ -29,7 +29,7 @@ const supplementaryXml = (files: File[]): string => {
     fileList.forEach((file, index) => {
         const vars = [
             { key: 'id', value: (file.id as unknown) as string },
-            { key: 'filename', value: removeUnicode(file.filename, index) },
+            { key: 'filename', value: removeUnicode(file.filename, startingIndex + index) },
             { key: 'mimeType', value: file.mimeType },
         ];
 
@@ -48,10 +48,11 @@ export const generateManifest = (submission: Submission): string => {
     const template = fs.readFileSync(`${__dirname}/templates/manifest.xml`, 'utf8');
     // manuscript is always the 5th index of files array after the 5 MECA generated xml / pdf files
     const manuscriptFileZipIndex = 5;
+    const supportingFileZipStartingIndex = manuscriptFileZipIndex + 1;
     const manuscriptFilename = removeUnicode(manuscriptFile.filename, manuscriptFileZipIndex);
 
     const result = template
-        .replace('{supplementaryFiles}', supplementaryXml(submission.files.supportingFiles || []))
+        .replace('{supplementaryFiles}', supplementaryXml(submission.files.supportingFiles || [], supportingFileZipStartingIndex))
         .replace('{manuscript.mimeType}', manuscriptFile.mimeType);
 
     return replaceAll(result, 'manuscript.filename', manuscriptFilename);
