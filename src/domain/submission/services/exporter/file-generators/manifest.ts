@@ -46,8 +46,9 @@ export const generateManifest = (submission: Submission): string => {
     }
 
     const template = fs.readFileSync(`${__dirname}/templates/manifest.xml`, 'utf8');
-    // manuscript is always the 5th index of files array
-    const manuscriptFilename = removeUnicode(manuscriptFile.filename, 5);
+    // manuscript is always the 5th index of files array after the 5 MECA generated xml / pdf files
+    const manuscriptFileZipIndex = 5;
+    const manuscriptFilename = removeUnicode(manuscriptFile.filename, manuscriptFileZipIndex);
 
     const result = template
         .replace('{supplementaryFiles}', supplementaryXml(submission.files.supportingFiles || []))
