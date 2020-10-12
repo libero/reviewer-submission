@@ -46,7 +46,8 @@ export const generateManifest = (submission: Submission): string => {
     }
 
     const template = fs.readFileSync(`${__dirname}/templates/manifest.xml`, 'utf8');
-    const manuscriptFilename = removeUnicode(manuscriptFile.filename, 0);
+    // manuscript is always the 5th index of files array
+    const manuscriptFilename = removeUnicode(manuscriptFile.filename, 5);
 
     const result = template
         .replace('{supplementaryFiles}', supplementaryXml(submission.files.supportingFiles || []))
