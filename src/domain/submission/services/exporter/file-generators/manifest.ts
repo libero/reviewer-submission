@@ -52,7 +52,10 @@ export const generateManifest = (submission: Submission): string => {
     const manuscriptFilename = removeUnicode(manuscriptFile.filename, manuscriptFileZipIndex);
 
     const result = template
-        .replace('{supplementaryFiles}', supplementaryXml(submission.files.supportingFiles || [], supportingFileZipStartingIndex))
+        .replace(
+            '{supplementaryFiles}',
+            supplementaryXml(submission.files.supportingFiles || [], supportingFileZipStartingIndex),
+        )
         .replace('{manuscript.mimeType}', manuscriptFile.mimeType);
 
     return replaceAll(result, 'manuscript.filename', manuscriptFilename);
