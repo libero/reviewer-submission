@@ -140,7 +140,7 @@ const init = async (): Promise<void> => {
     const srvWizard = new WizardService(srvPermission, srvSubmission, srvTeam, srvFile, srvExtractionService, config);
 
     const resolvers = [
-        DashboardResolvers(srvDashboard, srvUser),
+        DashboardResolvers(srvDashboard, srvUser, srvTeam),
         UserResolvers(srvUser),
         WizardResolvers(srvWizard, srvUser, srvSurvey),
     ];
