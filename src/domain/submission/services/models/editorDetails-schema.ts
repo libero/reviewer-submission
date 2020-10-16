@@ -51,6 +51,14 @@ const base = {
                 name: Joi.string().required(),
                 email: Joi.string()
                     .regex(EMAIL_REGEX)
+                    .error(errors => {
+                        if (!errors.length || !errors[0].code) {
+                            throw new Error("Bad errors object. Couldn't map error message.");
+                        }
+                        return errors[0].code === 'string.pattern.base'
+                            ? new Error(`"${errors[0].path.join('.')}" must be a valid email`)
+                            : errors[0];
+                    })
                     .required(),
             }),
         )
@@ -61,6 +69,14 @@ const base = {
                 name: Joi.string().required(),
                 email: Joi.string()
                     .regex(EMAIL_REGEX)
+                    .error(errors => {
+                        if (!errors.length || !errors[0].code) {
+                            throw new Error("Bad errors object. Couldn't map error message.");
+                        }
+                        return errors[0].code === 'string.pattern.base'
+                            ? new Error(`"${errors[0].path.join('.')}" must be a valid email`)
+                            : errors[0];
+                    })
                     .required(),
             }),
         )
