@@ -37,13 +37,13 @@ const checkArchive = async (content: string): Promise<void> => {
     const contents = await zip.loadAsync(content);
     const fileNames = Object.keys(contents.files);
 
-    expect(fileNames).toEqual([
-        'manifest.xml',
-        'disclosure.pdf',
+    expect(fileNames.sort()).toEqual([
         'a.txt',
-        'transfer.xml',
         'article.xml',
         'cover_letter.pdf',
+        'disclosure.pdf',
+        'manifest.xml',
+        'transfer.xml',
     ]);
 };
 
@@ -65,9 +65,7 @@ describe('Submit Integration Tests', () => {
         expect(status).toBe('CONTINUE_SUBMISSION');
 
         const submitResponse = await submit(id);
-        expect(submitResponse.data.errors[0].message).toEqual(
-            '"manuscriptDetails.title" is required',
-        );
+        expect(submitResponse.data.errors[0].message).toEqual('"manuscriptDetails.title" is required');
     });
 
     it('exports a meca archive', async () => {
