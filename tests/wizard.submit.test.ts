@@ -37,14 +37,9 @@ const checkArchive = async (content: string): Promise<void> => {
     const contents = await zip.loadAsync(content);
     const fileNames = Object.keys(contents.files);
 
-    expect(fileNames).toEqual([
-        'manifest.xml',
-        'disclosure.pdf',
-        'a.txt',
-        'transfer.xml',
-        'article.xml',
-        'cover_letter.pdf',
-    ]);
+    expect(fileNames.sort()).toEqual(
+        ['manifest.xml', 'disclosure.pdf', 'a.txt', 'transfer.xml', 'article.xml', 'cover_letter.pdf'].sort(),
+    );
 };
 
 describe('Submit Integration Tests', () => {
