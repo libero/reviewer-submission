@@ -7,7 +7,7 @@ import * as bodyParser from 'body-parser';
 import * as helmet from 'helmet';
 import * as knex from 'knex';
 import { Express, Request, Response } from 'express';
-import { ApolloServer, AuthenticationError, makeExecutableSchema, UserInputError } from 'apollo-server-express';
+import { ApolloServer, AuthenticationError, UserInputError } from 'apollo-server-express';
 import config, { S3Config, SESConfig } from './config';
 import { InfraLogger as logger } from './logger';
 import { join } from 'path';
