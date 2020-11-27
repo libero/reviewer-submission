@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as util from 'util';
 import { loadSchema } from '@graphql-tools/load';
 import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader';
+import { printSchema } from 'graphql';
 
 // 1. ensure lint-schemas dir exists
 // 2. import and merge schemas in the same way as the server
@@ -14,6 +15,6 @@ util.promisify(fs.mkdir)('lint-schemas', { recursive: true })
             loaders: [new GraphQLFileLoader()],
         }),
     )
-    .then(merged => util.promisify(fs.writeFile)('lint-schemas/all.graphql', merged, { encoding: 'utf8' }))
+    .then(merged => util.promisify(fs.writeFile)('lint-schemas/all.graphql', printSchema(merged), { encoding: 'utf8' }))
     .then(_ => process.exit(0))
     .catch(_ => process.exit(1));
