@@ -7,11 +7,14 @@ import * as bodyParser from 'body-parser';
 import * as helmet from 'helmet';
 import * as knex from 'knex';
 import { Express, Request, Response } from 'express';
-import { ApolloServer, AuthenticationError, makeExecutableSchema, UserInputError } from 'apollo-server-express';
+import { ApolloServer, AuthenticationError, UserInputError } from 'apollo-server-express';
 import config, { S3Config, SESConfig } from './config';
 import { InfraLogger as logger } from './logger';
 import { join } from 'path';
-import { importSchema } from 'graphql-import';
+import { loadSchema } from '@graphql-tools/load';
+import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader';
+import { addResolversToSchema } from '@graphql-tools/schema';
+import { mergeResolvers } from '@graphql-tools/merge';
 import { verify } from 'jsonwebtoken';
 import { GraphQLError, GraphQLFormattedError } from 'graphql';
 import * as hpp from 'hpp';
@@ -139,11 +142,11 @@ const init = async (): Promise<void> => {
     const srvDashboard = new DashboardService(srvPermission, srvSubmission);
     const srvWizard = new WizardService(srvPermission, srvSubmission, srvTeam, srvFile, srvExtractionService, config);
 
-    const resolvers = [
+    const resolvers = mergeResolvers([
         DashboardResolvers(srvDashboard, srvUser, srvTeam),
         UserResolvers(srvUser),
         WizardResolvers(srvWizard, srvUser, srvSurvey),
-    ];
+    ]);
 
     logger.info(`Initialising Express...`);
 
@@ -188,14 +191,14 @@ const init = async (): Promise<void> => {
         }
     });
 
-    const typeDefs = await importSchema(join(__dirname, './schemas/**/*.graphql'), {
-        forceGraphQLImport: false,
-        skipGraphQLImport: true,
+    const schema = await loadSchema(join(__dirname, './schemas/**/*.graphql'), {
+        loaders: [new GraphQLFileLoader()],
     });
-    const schema = makeExecutableSchema({ typeDefs, resolvers });
+    const schemaWithResolvers = addResolversToSchema({ schema, resolvers });
+
     logger.info(`Initialising ApolloServer...`);
     const apolloServer = new ApolloServer({
-        schema,
+        schema: schemaWithResolvers,
         uploads: {
             maxFileSize: config.max_file_size_in_bytes,
         },
@@ -208,7 +211,7 @@ const init = async (): Promise<void> => {
                         // @todo: may need to have resolver level complexity.
                         // This needs to be revisited when the queries and their complexities are known
                         const complexity = getComplexity({
-                            schema,
+                            schema: schemaWithResolvers,
                             query: request.operationName
                                 ? separateOperations(document)[request.operationName]
                                 : document,
