@@ -42,6 +42,7 @@ import * as S3 from 'aws-sdk/clients/s3';
 import * as SES from 'aws-sdk/clients/ses';
 import { createKnexAdapter } from './domain/knex-table-adapter';
 import { MailService } from './domain/mail/services/mail-service';
+import { SubmissionId } from './domain/submission/types';
 
 import { MecaImportCallback } from './domain/submission/services/exporter/meca-import-callback';
 
@@ -154,6 +155,35 @@ const init = async (): Promise<void> => {
     app.use(helmet());
     app.use(hpp());
     app.get('/health', (_: Request, res: Response) => res.sendStatus(200));
+
+    app.post('/retry-export/:id', async (req: Request<{ id: string }>, res: Response) => {
+        const submissionId = (req.params.id as unknown) as SubmissionId;
+        let submission;
+        try {
+            submission = await srvSubmission.get(submissionId);
+        } catch {
+            res.sendStatus(400);
+            return;
+        }
+        if (submission.status !== 'MECA_EXPORT_FAILED') {
+            logger.warn(`Unable to retry MECA export of submission ${submissionId}: not in failed state`);
+            res.status(400).send({ error: 'Submission not in failed state' });
+            return;
+        }
+        const fullSubmission = await srvWizard.getFullSubmission(submissionId);
+        logger.info(`Attempting to resubmit submission ${submissionId}`);
+        srvSubmission
+            .resubmit(fullSubmission)
+            .then(() => {
+                logger.info(`Resubmit of submission ${submissionId} successful.`);
+                res.sendStatus(200);
+                return;
+            })
+            .catch(() => {
+                logger.info(`Failed to resubmit submission ${submissionId}.`);
+                res.sendStatus(500);
+            });
+    });
 
     // meca import callback
     app.post('/meca-result/:id', bodyParser.json(), async (req: Request, res: Response) => {
