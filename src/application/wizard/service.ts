@@ -268,7 +268,7 @@ export class WizardService {
      * @todo add teams as well
      * @param submissionId
      */
-    private async getFullSubmission(submissionId: SubmissionId): Promise<Submission> {
+    public async getFullSubmission(submissionId: SubmissionId): Promise<Submission> {
         const submission = await this.submissionService.get(submissionId);
         if (submission) {
             submission.files.manuscriptFile = await this.fileService.findManuscriptFile(submission.id);
