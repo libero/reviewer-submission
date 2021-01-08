@@ -10,7 +10,7 @@ import { MecaExporter } from './exporter/meca-exporter';
 import { SftpStore } from './storage/sftp-store';
 import { MailService } from '../../mail/services/mail-service';
 import { FileId, FileType } from '../../file/types';
-import { Auditor, AuditAction, UserId } from '../../audit/types';
+import { Auditor, AuditAction } from '../../audit/types';
 import File from '../../file/services/models/file';
 import { User } from '../../user/user';
 import { FileService } from '../../file/services/file-service';
