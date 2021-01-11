@@ -171,6 +171,7 @@ const init = async (): Promise<void> => {
             return;
         }
         const fullSubmission = await srvWizard.getFullSubmission(submissionId);
+        fullSubmission.status = submission.status;
         logger.info(`Attempting to resubmit submission ${submissionId}`);
         srvSubmission
             .resubmit(fullSubmission)
