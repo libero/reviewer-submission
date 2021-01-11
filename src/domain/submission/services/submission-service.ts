@@ -131,20 +131,32 @@ export class SubmissionService {
         try {
             await this.runMecaExport(submission, '0.0.0.0');
             submission.status = SubmissionStatus.MECA_EXPORT_SUCCEEDED;
+            await this.auditService.recordAudit({
+                id: AuditId.fromUuid(uuid()),
+                userId: 'SYSTEM',
+                action: AuditAction.UPDATED,
+                value: JSON.stringify({ status: submission.status, retry: true }),
+                objectType: 'submission',
+                objectId: ObjectId.fromUuid(submission.id.toString()),
+                created: new Date(),
+                updated: new Date(),
+            });
+            await this.submissionRepository.update(submission);
         } catch (e) {
             logger.error('Unable to resubmit', e);
+            await this.auditService.recordAudit({
+                id: AuditId.fromUuid(uuid()),
+                userId: 'SYSTEM',
+                action: AuditAction.UPDATED,
+                value: JSON.stringify({ status: submission.status, retry: true }),
+                objectType: 'submission',
+                objectId: ObjectId.fromUuid(submission.id.toString()),
+                created: new Date(),
+                updated: new Date(),
+            });
+            await this.submissionRepository.update(submission);
+            throw new Error(e);
         }
-        await this.auditService.recordAudit({
-            id: AuditId.fromUuid(uuid()),
-            userId: 'SYSTEM',
-            action: AuditAction.UPDATED,
-            value: JSON.stringify({ status: submission.status, retry: true }),
-            objectType: 'submission',
-            objectId: ObjectId.fromUuid(submission.id.toString()),
-            created: new Date(),
-            updated: new Date(),
-        });
-        await this.submissionRepository.update(submission);
     }
 
     async saveArticleType(submission: Submission, articleType: ArticleType): Promise<Submission> {
