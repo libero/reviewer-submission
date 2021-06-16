@@ -55,7 +55,7 @@
         "graphql-query-complexity": "^0.4.1",
         "helmet": "^3.21.2",
         "hpp": "^0.2.3",
-        "html-pdf": "^2.2.0",
+        "html-pdf": "^3.0.1",
         "joi": "17.2.1",
         "jsonwebtoken": "^8.5.1",
         "jszip": "^3.2.2",
