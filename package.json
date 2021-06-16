@@ -60,7 +60,7 @@
         "jsonwebtoken": "^8.5.1",
         "jszip": "^3.2.2",
         "knex": "0.20.8",
-        "newrelic": "6.12.0",
+        "newrelic": "7.5.0",
         "node-fetch": "^2.6.1",
         "pdf2json": "^1.2.1",
         "pdfkit": "^0.11.0",
