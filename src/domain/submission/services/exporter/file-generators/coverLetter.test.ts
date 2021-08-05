@@ -17,7 +17,6 @@ describe('Cover letter PDF generator', () => {
         const pdfString = pdf.toString();
         expect(pdfString.indexOf('%PDF')).toBe(0);
     });
-
     it('PDF document contains the cover letter', async () => {
         const document = await generateCoverLetter(coverLetter);
 
