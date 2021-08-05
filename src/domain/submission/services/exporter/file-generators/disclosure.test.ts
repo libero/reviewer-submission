@@ -3,7 +3,7 @@ import { generateDisclosure } from './disclosure';
 import submission from './article.test.data';
 
 describe('Disclosure PDF generator', () => {
-    it('returns a string of a PDF', async () => {
+    it('returns a string of a PDF', async done => {
         const document = await generateDisclosure(submission, '1.2.3.4');
         const pdfParser = new PDFParser();
         let errors = 0;
@@ -27,5 +27,6 @@ describe('Disclosure PDF generator', () => {
 
         await pdfParser.parseBuffer(document);
         await donePromise;
+        done();
     });
 });
