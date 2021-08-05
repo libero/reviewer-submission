@@ -10,6 +10,14 @@ import { sign } from 'jsonwebtoken';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as FormData from 'form-data';
+import * as PDFParser from 'pdf2json';
+export interface ThingWithR {
+    R: ThingWithT[];
+}
+
+export interface ThingWithT {
+    T: string;
+}
 
 export const authenticationJwtSecret = 'super_secret_jam';
 
@@ -403,3 +411,22 @@ export const saveDisclosurePage = async (submissionId: string, details: object):
         },
     );
 };
+
+export const getTextFromPDF = (document: Buffer): Promise<{ jsonData: string; errors: number }> =>
+    new Promise(resolve => {
+        const pdfParser = new PDFParser();
+        let errors = 0;
+
+        pdfParser.on('pdfParser_dataError', (err: string) => {
+            if (err) errors += 1;
+            resolve({ errors, jsonData: '' });
+        });
+        pdfParser.on('pdfParser_dataReady', () => {
+            const text = pdfParser.data.Pages[0].Texts.map((item: ThingWithR) =>
+                item.R.map((t: ThingWithT) => t.T).reduce((prev: string, curr: string) => prev + curr),
+            ).reduce((prev: string, curr: string) => prev + curr);
+
+            resolve({ jsonData: JSON.stringify(text, null, 2), errors });
+        });
+        pdfParser.parseBuffer(document);
+    });
