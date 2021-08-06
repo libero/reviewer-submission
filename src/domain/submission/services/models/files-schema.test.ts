@@ -3,7 +3,7 @@ import { TestFile } from './file-schema.test';
 
 describe('file schema', () => {
     let files: {
-        coverLetter: string;
+        coverLetter?: string;
         manuscriptFile: TestFile | null;
         supportingFiles: TestFile[];
     };
@@ -40,14 +40,21 @@ describe('file schema', () => {
             expect(value).toStrictEqual(files);
             expect(error).toBeUndefined();
         });
+        it('no cover letter', () => {
+            delete files.coverLetter;
+            const { error, value } = filesSchema.validate(files);
+            expect(value).toStrictEqual(files);
+            expect(error).toBeUndefined();
+        });
+        it('cover letter empty string', () => {
+            files.coverLetter = '';
+            const { error, value } = filesSchema.validate(files);
+            expect(value).toStrictEqual(files);
+            expect(error).toBeUndefined();
+        });
     });
 
     describe('fails when', () => {
-        it('cover letter missing', () => {
-            files.coverLetter = '';
-            const { error } = filesSchema.validate(files);
-            expect(error?.message).toEqual('"coverLetter" is not allowed to be empty');
-        });
         it('manuscript missing', () => {
             files.manuscriptFile = null;
             const { error } = filesSchema.validate(files);
