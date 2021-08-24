@@ -1,7 +1,7 @@
 export const submittedEmail = (firstName = '', title = ''): { html: string; text: string } => {
     return {
         html: `<p>Dear ${firstName},</p>
-        <p>Thank you for submitting your work, "${title}", to eLife using our new submission initial interface.</p>
+        <p>Thank you for submitting your work, "${title}", to eLife using our new initial submission interface.</p>
         <p>You will hear from us again shortly once your submission has undergone quality checks, at which point you will receive a link to track the progress of your submission in a different system, which we use for evaluation and tracking.</p>
 
         <p>Best wishes,<p>
