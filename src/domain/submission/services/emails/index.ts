@@ -1,8 +1,8 @@
 export const submittedEmail = (firstName = '', title = ''): { html: string; text: string } => {
     return {
         html: `<p>Dear ${firstName},</p>
-        <p>Thank you for submitting your work, "${title}", to eLife using our new submission interface. Your submission has now been transferred to our legacy system where the editorial evaluation will be carried out.</p>
-        <p>You will hear from us again shortly once your submission has undergone our quality check process, at which point you will receive a link to track the progress of your submission.</p>
+        <p>Thank you for submitting your work, "${title}", to eLife using our new submission initial interface.</p>
+        <p>You will hear from us again shortly once your submission has undergone quality checks, at which point you will receive a link to track the progress of your submission in a different system, which we use for evaluation and tracking.</p>
 
         <p>Best wishes,<p>
         <p>Nicola<p>
@@ -14,9 +14,9 @@ export const submittedEmail = (firstName = '', title = ''): { html: string; text
         You are receiving this email because you have been identified as the corresponding author of a submission to eLife. If this isn't you please contact editorial@elifesciences.org
         </p>`,
         text: `Dear ${firstName},
-        Thank you for submitting your work, "${title}", to eLife using our new submission interface. Your submission has now been transferred to our legacy system where the editorial evaluation will be carried out.
+        Thank you for submitting your work, "${title}", to eLife using our new initial submission interface.
 
-        You will hear from us again shortly once your submission has undergone our quality check process, at which point you will receive a link to track the progress of your submission.
+        You will hear from us again shortly once your submission has undergone quality checks, at which point you will receive a link to track the progress of your submission in a different system, which we use for evaluation and tracking.
 
         Best wishes,
 
