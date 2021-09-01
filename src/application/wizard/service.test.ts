@@ -305,7 +305,7 @@ describe('saveEditorPage', () => {
     } as unknown) as TeamService;
     const permissionService = new PermissionService();
     const fileServiceMock = ({
-        findManuscriptFile: jest.fn().mockImplementation(() => {}),
+        findManuscriptFile: jest.fn().mockImplementation(),
         getSupportingFiles: jest.fn().mockImplementation(() => []),
     } as unknown) as FileService;
     const semanticExtractionServiceMock = ({
@@ -395,7 +395,7 @@ describe('saveEditorPage', () => {
                 files: {},
                 status: 'INITIAL',
             })),
-            saveEditorDetails: jest.fn().mockImplementation(() => {}),
+            saveEditorDetails: jest.fn().mockImplementation(),
         } as unknown) as SubmissionService;
         const wizardService = new WizardService(
             permissionService,
@@ -450,7 +450,7 @@ describe('saveDisclosurePage', () => {
     const mockConfig = ({} as unknown) as Config;
 
     const teamServiceMock = ({
-        addOrUpdateEditorTeams: jest.fn().mockImplementation(() => {}),
+        addOrUpdateEditorTeams: jest.fn().mockImplementation(),
         findTeams: jest.fn().mockImplementation(() => []),
     } as unknown) as TeamService;
 
@@ -468,7 +468,7 @@ describe('saveDisclosurePage', () => {
     it('it should throw if not found', async () => {
         const submissionServiceMock = ({
             get: jest.fn().mockImplementation(() => null),
-            saveDisclosureDetails: jest.fn().mockImplementation(() => {}),
+            saveDisclosureDetails: jest.fn().mockImplementation(),
         } as unknown) as SubmissionService;
 
         const wizardService = new WizardService(
@@ -504,7 +504,7 @@ describe('saveDisclosurePage', () => {
                 createdBy: '89e0aec8-b9fc-4413-8a37-65c77567',
                 files: {},
             })),
-            saveDisclosureDetails: jest.fn().mockImplementation(() => {}),
+            saveDisclosureDetails: jest.fn().mockImplementation(),
         } as unknown) as SubmissionService;
 
         const wizardService = new WizardService(
@@ -541,7 +541,7 @@ describe('saveDisclosurePage', () => {
                 files: {},
                 status: 'INITIAL',
             })),
-            saveDisclosureDetails: jest.fn().mockImplementation(() => {}),
+            saveDisclosureDetails: jest.fn().mockImplementation(),
         } as unknown) as SubmissionService;
 
         const wizardService = new WizardService(
@@ -1319,7 +1319,7 @@ describe('saveDetailsPage', () => {
                 .fn()
                 .mockImplementationOnce(() => sub)
                 .mockImplementationOnce(() => ({ ...sub, ...{ manuscriptDetails: { ...details } } })),
-            saveManuscriptDetails: jest.fn().mockImplementation(() => {}),
+            saveManuscriptDetails: jest.fn().mockImplementation(),
         } as unknown) as SubmissionService;
         const teamServiceMock = ({ findTeams: jest.fn().mockImplementation(() => []) } as unknown) as TeamService;
 

@@ -47,7 +47,7 @@ let mailService = new MailService(mockSES, 'noreply@elifesciences.org', false);
 
 jest.mock('./exporter/meca-exporter');
 const makeSubmissionService = (
-    mecaInjectable = jest.fn(async () => {}),
+    mecaInjectable = jest.fn(),
     auditService = { recordAudit: jest.fn() },
     fileService = { deleteFilesForSubmission: jest.fn() },
 ): SubmissionService =>

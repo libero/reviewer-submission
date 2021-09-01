@@ -44,7 +44,7 @@ describe('MecaImportCallback', () => {
         const submissionUpdateStatusMock = jest.fn();
         const submissionService = { get: submissionGetMock, updateStatus: submissionUpdateStatusMock };
 
-        const recordAuditMock = jest.fn(async () => {});
+        const recordAuditMock = jest.fn();
         const auditService = { recordAudit: recordAuditMock };
 
         const sendMailMock = jest.fn();

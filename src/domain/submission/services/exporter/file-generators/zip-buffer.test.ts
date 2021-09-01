@@ -24,7 +24,7 @@ describe('Generate ZIP archive', () => {
             },
         ]);
         const zip = await JsZip.loadAsync(buffer);
-        const file = await zip.file('async.txt').async('string');
+        const file = await zip?.file('async.txt')?.async('string');
         expect(file).toEqual('some content');
     });
 });
