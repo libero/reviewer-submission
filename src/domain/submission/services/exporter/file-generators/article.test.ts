@@ -69,6 +69,8 @@ describe('ArticleGenerator', () => {
             create: jest.fn(),
         };
 
-        await expect(generateArticle(submission, ejpNamesMock, 'secret')).rejects.toThrowError('FooBar');
+        await expect(generateArticle(submission, ejpNamesMock, 'secret')).rejects.toThrowError(
+            'People API failed to return info for elifePersonId: 87f34696',
+        );
     });
 });
