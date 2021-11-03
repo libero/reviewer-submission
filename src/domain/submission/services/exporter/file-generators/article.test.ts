@@ -52,4 +52,23 @@ describe('ArticleGenerator', () => {
 
         expect(output).toMatchSnapshot();
     });
+
+    it('throws expected message when people api call rejects', async () => {
+        const mockedGet = mocked(Axios.get, true);
+        mockedGet.mockImplementation(() => {
+            return Promise.reject();
+        });
+        const ejpNamesMock = {
+            findByName: async (name: string): Promise<EJPName | null> => {
+                if (name === 'J. Edward Reviewer') {
+                    return new EJPName(1, 'J. Edward', 'Reviewer');
+                }
+
+                return null;
+            },
+            create: jest.fn(),
+        };
+
+        await expect(generateArticle(submission, ejpNamesMock, 'secret')).rejects.toThrowError('FooBar');
+    });
 });
