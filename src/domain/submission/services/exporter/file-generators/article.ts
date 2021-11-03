@@ -70,11 +70,19 @@ class ArticleGenerator {
     ) {}
 
     async getEditor(id: string): Promise<Editor | null> {
-        const { data } = await axios.get<ContinuumPerson>(`${config.user_api_url}/people/${id}`, {
-            headers: {
-                Authorization: `Bearer ${this.token}`,
-            },
-        });
+        let peopleApiResponse;
+
+        try {
+            peopleApiResponse = await axios.get<ContinuumPerson>(`${config.user_api_url}/people/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${this.token}`,
+                },
+            });
+        } catch {
+            throw new Error(`People API failed to return info for elifePersonId: ${id}`);
+        }
+
+        const { data } = peopleApiResponse;
 
         if (!data) {
             return null;
