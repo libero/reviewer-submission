@@ -61,7 +61,7 @@
         "jszip": "^3.7.0",
         "knex": "0.20.8",
         "newrelic": "7.5.0",
-        "node-fetch": "^2.6.1",
+        "node-fetch": "^3.1.1",
         "pdf2json": "^1.2.1",
         "pdfkit": "^0.11.0",
         "pg": "7.17.1",
