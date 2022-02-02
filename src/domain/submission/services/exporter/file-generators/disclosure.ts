@@ -23,7 +23,7 @@ export const generateDisclosure = (submission: Submission, clientIp: string): Pr
         'IP Address': clientIp,
     };
 
-    const doc = new PDFDocument();
+    const doc = new PDFDocument({ compress: false });
 
     const bold = 'Helvetica-Bold';
     const normal = 'Helvetica';
