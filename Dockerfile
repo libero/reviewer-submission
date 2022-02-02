@@ -3,7 +3,7 @@ ARG image_tag=latest
 #
 # Stage: Development environment
 #
-FROM node:12-slim@sha256:13feae32c9b554584a6df818bde1546edee7a8e497b54c57680c621235a48606 as dev
+FROM node:12-slim@sha256:088f7e3daea13c31fcc81f40fc2151496c7fb583a2aacf8c9891b69d09a1f8df as dev
 
 WORKDIR /app
 
@@ -43,7 +43,7 @@ RUN cp -r ./src/domain/submission/services/exporter/file-generators/templates/* 
 #
 # Stage: Production environment
 #
-FROM node:12-alpine@sha256:5646d1e5bc470500414feb3540186c02845db0e0e1788621c271fbf3a0c1830d as prod
+FROM node:12-alpine@sha256:5cbf7b125ab0155df10b7fc86252b000d8b01c508da39c069a0c3d07db03a673 as prod
 LABEL maintainer="eLife Reviewer Product Team <reviewer-product@elifesciences.org>"
 
 WORKDIR /app
