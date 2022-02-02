@@ -95,7 +95,7 @@
         "apollo-link-context": "^1.0.20",
         "apollo-link-error": "^1.1.12",
         "apollo-link-http": "^1.5.16",
-        "axios": "^0.21.1",
+        "axios": "^0.21.2",
         "form-data": "^3.0.0",
         "graphql-schema-linter": "^0.2.4",
         "graphql-tag": "^2.10.3",
