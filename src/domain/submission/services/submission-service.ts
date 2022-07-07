@@ -34,6 +34,7 @@ export class SubmissionService {
     }
     private async runMecaExport(submission: Submission, ip: string): Promise<void> {
         const buffer = await this.mecaExporter.export(submission, ip);
+        logger.info(`Meca exporter created buffer for ${submission.id}`);
         const id = submission.id;
         const store = new SubmissionStore([this.s3Store, this.sftpStore]);
         const locations = await store.write(id, buffer);
@@ -143,7 +144,7 @@ export class SubmissionService {
             });
             await this.submissionRepository.update(submission);
         } catch (e) {
-            logger.error('Unable to resubmit', e);
+            logger.error(`Unable to resubmit ${submission.id}`, e);
             await this.auditService.recordAudit({
                 id: AuditId.fromUuid(uuid()),
                 userId: 'SYSTEM',

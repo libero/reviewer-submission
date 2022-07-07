@@ -34,6 +34,7 @@ export class MecaExporter implements SubmissionExporter {
     async export(submission: Submission, ip: string): Promise<Buffer> {
         const manuscriptFile = await this.fileService.findManuscriptFile(submission.id);
         const supportingFiles = await this.fileService.getSupportingFiles(submission.id);
+        logger.info(`Found files for submission ${submission.id}`);
         const payload = {
             sub: 'reviwer-submission',
             issuer: 'libero',
@@ -57,6 +58,7 @@ export class MecaExporter implements SubmissionExporter {
                 }),
             ),
         );
+        logger.info(`retrieved files contents for submission ${submission.id}`);
 
         const mandatoryFiles = [
             { filename: 'article.xml', content: generateArticle(submission, this.ejpNames, token) },
@@ -65,6 +67,7 @@ export class MecaExporter implements SubmissionExporter {
             { filename: 'manifest.xml', content: generateManifest(submission) },
             { filename: 'transfer.xml', content: generateTransfer('') },
         ];
+        logger.info(`Generated mandatory files object for ${submission.id}`);
 
         const allFiles = mandatoryFiles.concat(uploadedFiles);
         const zip = new JSZip();
@@ -75,6 +78,7 @@ export class MecaExporter implements SubmissionExporter {
                 zip.file(removeUnicode(file.filename, index), fileContent);
             }),
         );
+        logger.info(`Added files to archive for ${submission.id}`);
 
         return zip.generateAsync({ type: 'nodebuffer', compression: 'DEFLATE' });
     }
